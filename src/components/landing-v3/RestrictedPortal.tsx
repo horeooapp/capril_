@@ -16,7 +16,7 @@ export default function RestrictedPortal() {
     <div className="min-h-screen bg-[#09090B] flex flex-col relative overflow-hidden font-sans antialiased tracking-tight selection:bg-white/20 selection:text-white">
       {/* Subtle Noise / Grid Element instead of heavy glowing orbs */}
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none mix-blend-overlay"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0  pointer-events-none"></div>
 
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 sm:p-12">
@@ -32,7 +32,7 @@ export default function RestrictedPortal() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.8, type: "spring" }}
-              className="bg-white/5 p-4 rounded-3xl border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)] backdrop-blur-xl"
+              className="bg-white/5 p-4 rounded-3xl border border-white/10 shadow-[0_0_40px_rgba(255,255,255,0.05)]"
             >
               <img
                 src="/logo.png"
@@ -89,8 +89,8 @@ export default function RestrictedPortal() {
                 onClick={() => handleLoginClick('ADMIN')}
                 className="group relative block w-full text-left"
             >
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-blue-500/40 to-blue-900/10 rounded-[2rem] opacity-0 group-hover:opacity-100 blur transition duration-500" />
-              <div className="relative flex flex-col items-center text-center p-8 rounded-[2rem] bg-white/5 backdrop-blur-3xl border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.08] transition-all duration-300">
+              <div className="absolute -inset-0.5 bg-slate-900 rounded-[2rem] opacity-0 group-hover:opacity-100 blur transition duration-500" />
+              <div className="relative flex flex-col items-center text-center p-8 rounded-[2rem] bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-white/[0.08] transition-all duration-300">
                 <div className="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
                   <ShieldAlert className="w-6 h-6" />
                 </div>

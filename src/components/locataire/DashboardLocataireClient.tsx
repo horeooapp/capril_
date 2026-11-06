@@ -39,7 +39,7 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Hero Section: Welcome & Score */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 glass-panel p-8 md:p-10 rounded-[3rem] border border-white/40 shadow-xl bg-gradient-to-br from-white/80 to-blue-50/30 overflow-hidden relative">
+                <div className="lg:col-span-2 glass-panel p-8 md:p-10 rounded-[3rem] border border-white/40 shadow-xl bg-slate-900 overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                     <div className="relative z-10">
                         <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tighter uppercase mb-4">
@@ -325,13 +325,13 @@ export default function DashboardLocataireClient({ data, session }: DashboardLoc
                             Rappels Automatiques
                          </h3>
                          <div className="space-y-3">
-                             <div className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-white/80">
+                             <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-white/80">
                                  <span className="text-[13px] font-bold text-gray-600">Alerte J-3</span>
                                  <div className={`w-8 h-4 rounded-full relative ${profile?.alerteJ3Active ? 'bg-[#375623]' : 'bg-gray-300'}`}>
                                      <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${profile?.alerteJ3Active ? 'right-0.5' : 'left-0.5'}`}></div>
                                  </div>
                              </div>
-                             <div className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-white/80">
+                             <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-white/80">
                                  <span className="text-[13px] font-bold text-gray-600">Alerte J-1</span>
                                  <div className={`w-8 h-4 rounded-full relative ${profile?.alerteJ1Active ? 'bg-[#375623]' : 'bg-gray-300'}`}>
                                      <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${profile?.alerteJ1Active ? 'right-0.5' : 'left-0.5'}`}></div>

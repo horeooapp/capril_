@@ -128,7 +128,7 @@ export default function MandatesDashboardClient({
                     <button 
                         type="button"
                         onClick={() => setIsCreateModalOpen(true)} 
-                        className="bg-gradient-to-r from-slate-900 to-slate-800 hover:from-amber-500 hover:to-amber-600 hover:text-slate-950 text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md flex items-center gap-2"
+                        className="bg-slate-900 hover:from-amber-500 hover:to-amber-600 hover:text-slate-950 text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-md flex items-center gap-2"
                     >
                         <Plus size={16} /> Confier un Bien en Gestion
                     </button>
@@ -137,7 +137,7 @@ export default function MandatesDashboardClient({
 
             {/* Educational Banner - Collapsible */}
             {showEducationalBanner && (
-                <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-500/30 animate-in fade-in duration-200">
+                <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-500/30 animate-in fade-in duration-200">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">

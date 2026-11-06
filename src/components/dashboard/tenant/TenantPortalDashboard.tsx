@@ -129,7 +129,7 @@ export function TenantPortalDashboard({
         </div>
 
         {/* HEADER */}
-        <div style={{background:`linear-gradient(145deg,${T.navy} 0%,${T.teal} 100%)`,padding:"14px 20px 18px",position:"relative",overflow:"hidden"}}>
+        <div style={{background:`${T.navy}`,padding:"14px 20px 18px",position:"relative",overflow:"hidden"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div>
               <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
@@ -242,7 +242,7 @@ export function TenantPortalDashboard({
               {/* logement */}
               <div style={{padding:"12px 16px 0"}}>
                 <SecTitle label="Mon logement"/>
-                <div onClick={()=>go("bail")} style={{background:`linear-gradient(135deg,${T.navy}08,${T.teal}08)`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,cursor:"pointer"}}>
+                <div onClick={()=>go("bail")} style={{background:`#F8FAFC`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,cursor:"pointer"}}>
                   <div style={{fontSize:12,fontWeight:800,color:T.text,marginBottom:4}}>{bail?.logementNom || "Logement QAPRIL"}</div>
                   <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
                     <Badge label={bail?.type || "Bail Standard"} color={T.teal} bg={T.tealPale}/>
@@ -289,7 +289,7 @@ export function TenantPortalDashboard({
           {/* ══ MON BAIL ══ */}
           {tab==="bail"&&(
             <div style={{padding:"12px 16px 0"}}>
-              <div style={{background:`linear-gradient(135deg,${T.navy}08,${T.teal}08)`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,marginBottom:12}}>
+              <div style={{background:`#F8FAFC`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,marginBottom:12}}>
                 <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:4}}>{bail?.logementNom}</div>
                 <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
                   <Badge label={bail?.type} color={T.navy} bg={T.navyPale}/>

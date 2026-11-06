@@ -93,7 +93,7 @@ export default function GuardrailsClient() {
             )}
 
             {selectedLog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60">
                     <div className="bg-white max-w-2xl w-full rounded-[2.5rem] p-8 shadow-2xl relative">
                         <button onClick={() => setSelectedLog(null)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 border border-gray-200 rounded-full w-8 h-8 flex justify-center items-center font-bold">X</button>
                         

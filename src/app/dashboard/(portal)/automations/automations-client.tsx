@@ -146,7 +146,7 @@ export default function AutomationsDashboardClient({ initialSettings }: { initia
             </div>
 
             {/* Orchestrator Banner */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[16px] p-8 text-white relative shadow-md border border-slate-700 overflow-hidden flex items-center justify-between">
+            <div className="bg-slate-900 rounded-[16px] p-8 text-white relative shadow-md border border-slate-700 overflow-hidden flex items-center justify-between">
                 <Settings2 size={120} className="absolute -left-10 text-white/5 animate-spin-slow" />
                 <div className="relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-6 pl-8 md:pl-16">
                     <div>
@@ -155,7 +155,7 @@ export default function AutomationsDashboardClient({ initialSettings }: { initia
                             Nos instances Cron tournent en continu côté serveur (BullMQ/Redis) pour garantir la stricte exécution de vos mandats, même quand l'agence est fermée de nuit.
                         </p>
                     </div>
-                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "API de script ouverte (Node.js/Python supportés)"}); }} className="bg-white/10 hover:bg-white text-white hover:text-slate-900 border border-white/20 px-5 py-2.5 rounded-[8px] font-bold text-[11px] uppercase tracking-widest transition-colors shadow-sm shrink-0 backdrop-blur-md">
+                    <button onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r=>setTimeout(r, 800)), {loading: "Traitement...", success: "API de script ouverte (Node.js/Python supportés)"}); }} className="bg-white/10 hover:bg-white text-white hover:text-slate-900 border border-white/20 px-5 py-2.5 rounded-[8px] font-bold text-[11px] uppercase tracking-widest transition-colors shadow-sm shrink-0">
                         Créer Script Custom
                     </button>
                 </div>

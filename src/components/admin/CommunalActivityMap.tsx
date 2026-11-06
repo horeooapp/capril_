@@ -23,7 +23,7 @@ export default function CommunalActivityMap({ activeCommunes = [] }: CommunalAct
             {/* Abstract Grid / Map Background */}
             <div className="absolute inset-0 opacity-20" 
                 style={{ 
-                    backgroundImage: "radial-gradient(circle at 2px 2px, #374151 1px, transparent 0)", 
+                    backgroundImage: "none", 
                     backgroundSize: "32px 32px" 
                 }} 
             />

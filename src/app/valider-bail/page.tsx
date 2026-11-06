@@ -88,7 +88,7 @@ function ValiderBailContent() {
             {/* Main Card */}
             <main className="max-w-md mx-auto w-full my-auto py-8 relative z-10">
                 {success ? (
-                    <div className="bg-slate-800/90 border border-emerald-500/50 rounded-3xl p-8 text-center space-y-4 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95">
+                    <div className="bg-slate-800/90 border border-emerald-500/50 rounded-3xl p-8 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
                         <CheckCircle2 size={56} className="text-emerald-400 mx-auto" />
                         <h1 className="text-2xl font-black text-white uppercase tracking-tight">Bail Validé avec Succès !</h1>
                         <p className="text-sm text-slate-300 font-medium">
@@ -99,7 +99,7 @@ function ValiderBailContent() {
                         </p>
                     </div>
                 ) : (
-                    <div className="bg-slate-950/80 border-2 border-amber-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
+                    <div className="bg-slate-950 border-2 border-amber-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
                         <div className="text-center space-y-2">
                             <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-[#FF8200] flex items-center justify-center mx-auto border border-amber-500/30">
                                 <Key size={26} />
@@ -143,7 +143,7 @@ function ValiderBailContent() {
                             <button 
                                 type="submit"
                                 disabled={loading || otp.trim().length !== 6}
-                                className="w-full h-13 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]"
+                                className="w-full h-13 rounded-2xl bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]"
                             >
                                 {loading ? (
                                     <>

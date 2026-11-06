@@ -32,7 +32,7 @@ export default function AdminManualPage() {
     return (
         <div className="max-w-7xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header / Cover */}
-            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white/60 border border-white/80 shadow-xl backdrop-blur-md mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
+            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white border border-white/80 shadow-xl mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
                 <style dangerouslySetInnerHTML={{__html: `
                     @media print {
                         @page { margin: 2cm; }
@@ -94,7 +94,7 @@ export default function AdminManualPage() {
             <div className="flex flex-col lg:flex-row gap-12 print:gap-0">
                 {/* Table of Contents - Sidebar */}
                 <div className="lg:w-1/4 shrink-0 print:hidden">
-                    <div className="sticky top-24 bg-white/60 border border-white/80 p-6 rounded-3xl shadow-lg backdrop-blur-md">
+                    <div className="sticky top-24 bg-white border border-white/80 p-6 rounded-3xl shadow-lg">
                         <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                             <Book size={18} className="text-ivoire-dark" /> Sommaire
                         </h3>
@@ -134,7 +134,7 @@ export default function AdminManualPage() {
                 <div className="lg:w-3/4 space-y-16 print:w-full print:space-y-10">
                     
                     {/* SECTION 1 */}
-                    <div id="section-1" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-1" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">1. Qu'est-ce que QAPRIL ?</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
                             <p className="print:text-black">QAPRIL est une application numérique qui permet aux propriétaires et locataires de gestion leurs locations de façon simple, sécurisée et officielle en Côte d'Ivoire.</p>
@@ -200,7 +200,7 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 2 */}
-                    <div id="section-2" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-2" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">2. S'inscrire sur QAPRIL</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
                             <p className="print:text-black">L'inscription est gratuite. Vous avez besoin uniquement de votre numéro de téléphone ivoirien.</p>
@@ -251,7 +251,7 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 3 */}
-                    <div id="section-3" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-3" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">3. Guide du Propriétaire Bailleur</h2>
                         <div className="space-y-10 text-gray-600 print:text-black">
                             
@@ -337,7 +337,7 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 4 LOCATAIRE */}
-                    <div id="section-4" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-4" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">4. Guide du Locataire</h2>
                         <div className="space-y-8 text-gray-600 text-sm leading-relaxed print:text-black">
                             <p className="text-lg font-medium text-gray-900">En tant que locataire, QAPRIL est entièrement GRATUIT. Vous ne payez rien pour recevoir vos quittances ou consulter votre historique.</p>
@@ -376,7 +376,7 @@ export default function AdminManualPage() {
 
                     {/* SECTION 5, 6, 7, 8 MINI */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:block print:space-y-8">
-                        <div id="section-5" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                        <div id="section-5" className="bg-white border border-white/80 p-8 rounded-[2rem] shadow-xl scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
                             <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
                                 <Briefcase className="text-ivoire-dark print:hidden"/> 5. Guide Agent
                             </h2>
@@ -389,7 +389,7 @@ export default function AdminManualPage() {
                             </ul>
                         </div>
 
-                        <div id="section-6" className="bg-white/70 border border-white/80 p-8 rounded-[2rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
+                        <div id="section-6" className="bg-white border border-white/80 p-8 rounded-[2rem] shadow-xl scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
                             <h2 className="text-xl font-black text-gray-900 mb-4 uppercase flex items-center gap-2 print:text-2xl print:mb-4">
                                 <Building className="text-ivoire-dark print:hidden"/> 6. Guide Agence
                             </h2>
@@ -398,7 +398,7 @@ export default function AdminManualPage() {
                         </div>
                     </div>
 
-                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                    <div id="section-7" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
                             <FileText className="text-ivoire-dark print:hidden" size={32} /> 7. Réception des Quittances & Notifications
                         </h2>
@@ -447,7 +447,7 @@ export default function AdminManualPage() {
                         </div>
                     </div>
 
-                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
+                    <div id="section-8" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0 print:break-inside-avoid">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-6 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
                             <FileCheck className="text-ivoire-dark print:hidden" size={32} /> 8. Module M17 DGI
                         </h2>
@@ -455,7 +455,7 @@ export default function AdminManualPage() {
                     </div>
 
                     {/* SECTION 9 */}
-                    <div id="section-9" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
+                    <div id="section-9" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:border-none print:shadow-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase flex items-center gap-3 print:text-2xl print:mb-4">
                             <HelpCircle className="text-ivoire-dark print:hidden" size={32} /> 9. Questions Fréquentes
                         </h2>

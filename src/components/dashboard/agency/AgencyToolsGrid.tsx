@@ -92,7 +92,7 @@ export const AgencyToolsGrid: React.FC = () => {
              initial={{ width: 0 }}
              animate={{ width: "87%" }}
              transition={{ duration: 1.5, ease: "easeOut" }}
-             className="h-full bg-gradient-to-r from-indigo-500 to-blue-600"
+             className="h-full bg-[#0284C7]"
            />
         </div>
         <p className="text-[10px] font-medium text-slate-400 italic">

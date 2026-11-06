@@ -40,7 +40,7 @@ export default function FiscalDashboardClient({ initialStats }: { initialStats: 
                 </button>
             </div>
 
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[20px] p-8 md:p-12 text-white relative shadow-lg overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 border border-slate-700">
+            <div className="bg-slate-900 rounded-[20px] p-8 md:p-12 text-white relative shadow-lg overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 border border-slate-700">
                 <div className="relative z-10 max-w-xl">
                     <div className="bg-sky-500/20 px-3 py-1 rounded-[8px] text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2 mb-6 border border-sky-400/30 text-sky-100">
                         <Activity size={12} className="text-sky-300"/> Conforme OHADA

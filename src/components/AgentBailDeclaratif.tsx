@@ -240,8 +240,7 @@ export default function AgentBailDeclaratif({
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             {msg.role === "assistant" && (
-              <div className="w-7 h-7 rounded-full bg-[#1B3A6B] flex items-center justify-center
-                text-[#F5A800] text-xs font-bold mr-2 flex-shrink-0 mt-1">
+              <div className="w-7 h-7 rounded-full bg-[#1B3A6B] flex items-center justify-center text-[#F5A800] text-xs font-bold mr-2 flex-shrink-0 mt-1">
                 Q
               </div>
             )}
@@ -260,8 +259,7 @@ export default function AgentBailDeclaratif({
         {/* Indicateur de frappe */}
         {loading && (
           <div className="flex justify-start">
-            <div className="w-7 h-7 rounded-full bg-[#1B3A6B] flex items-center justify-center
-              text-[#F5A800] text-xs font-bold mr-2 flex-shrink-0">Q</div>
+            <div className="w-7 h-7 rounded-full bg-[#1B3A6B] flex items-center justify-center text-[#F5A800] text-xs font-bold mr-2 flex-shrink-0">Q</div>
             <div className="bg-white border border-[#D0DFF5] rounded-2xl rounded-bl-sm px-4 py-3">
               <div className="flex gap-1">
                 <div className="w-2 h-2 rounded-full bg-[#1B3A6B] animate-bounce" />
@@ -285,14 +283,12 @@ export default function AgentBailDeclaratif({
             onKeyDown={e => e.key === "Enter" && envoyerMessage()}
             placeholder="Répondez ici..."
             disabled={loading}
-            className="flex-1 bg-[#F0F5FF] border border-[#C0CFDF] rounded-xl px-4 py-2.5
-              text-[#1B3A6B] text-sm outline-none focus:border-[#1B3A6B] disabled:opacity-50"
+            className="flex-1 bg-[#F0F5FF] border border-[#C0CFDF] rounded-xl px-4 py-2.5 text-[#1B3A6B] text-sm outline-none focus:border-[#1B3A6B] disabled:opacity-50"
           />
           <button
             onClick={envoyerMessage}
             disabled={loading || !input.trim()}
-            className="bg-[#1B3A6B] text-white w-10 h-10 rounded-xl flex items-center
-              justify-center border-none cursor-pointer disabled:opacity-50 flex-shrink-0"
+            className="bg-[#1B3A6B] text-white w-10 h-10 rounded-xl flex items-center justify-center border-none cursor-pointer disabled:opacity-50 flex-shrink-0"
           >
             <span style={{ fontSize: 16 }}>→</span>
           </button>
@@ -310,8 +306,7 @@ export default function AgentBailDeclaratif({
               confirmerCreation(bailData)
             }}
             disabled={loading}
-            className="flex-1 bg-[#F5A800] text-[#1B2A3B] py-3 rounded-xl font-bold
-              text-sm border-none cursor-pointer disabled:opacity-50"
+            className="flex-1 bg-[#F5A800] text-[#1B2A3B] py-3 rounded-xl font-bold text-sm border-none cursor-pointer disabled:opacity-50"
           >
             Confirmer et créer le bail
           </button>
@@ -324,8 +319,7 @@ export default function AgentBailDeclaratif({
               envoyerMessageDirect("Je souhaite corriger des informations")
             }}
             disabled={loading}
-            className="flex-1 bg-white border border-[#C0CFDF] text-[#4A6A8A] py-3
-              rounded-xl text-sm font-semibold cursor-pointer disabled:opacity-50"
+            className="flex-1 bg-white border border-[#C0CFDF] text-[#4A6A8A] py-3 rounded-xl text-sm font-semibold cursor-pointer disabled:opacity-50"
           >
             Corriger
           </button>

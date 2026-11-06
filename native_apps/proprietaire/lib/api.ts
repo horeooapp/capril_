@@ -47,16 +47,15 @@ export async function removeStoredToken(): Promise<void> {
             if (typeof window !== 'undefined' && window.localStorage) {
                 window.localStorage.removeItem('userToken');
             }
-        } else {
-            try {
-                await SecureStore.deleteItemAsync('userToken');
-            } catch {}
+            await AsyncStorage.removeItem('userToken');
+            return;
         }
-    } catch {}
-
-    try {
-        await AsyncStorage.removeItem('userToken');
-    } catch {}
+        await SecureStore.deleteItemAsync('userToken');
+    } catch {
+        try {
+            await AsyncStorage.removeItem('userToken');
+        } catch {}
+    }
 }
 
 export type UserProfileRole = 'proprietaire' | 'agence';
@@ -103,16 +102,15 @@ export async function removeStoredProfile(): Promise<void> {
             if (typeof window !== 'undefined' && window.localStorage) {
                 window.localStorage.removeItem('userProfileRole');
             }
-        } else {
-            try {
-                await SecureStore.deleteItemAsync('userProfileRole');
-            } catch {}
+            await AsyncStorage.removeItem('userProfileRole');
+            return;
         }
-    } catch {}
-
-    try {
-        await AsyncStorage.removeItem('userProfileRole');
-    } catch {}
+        await SecureStore.deleteItemAsync('userProfileRole');
+    } catch {
+        try {
+            await AsyncStorage.removeItem('userProfileRole');
+        } catch {}
+    }
 }
 
 /**

@@ -123,8 +123,8 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
             {candidatures.length > 0 ? (
                 <div className="flex flex-col items-center">
                     <div className="w-full max-w-md bg-white rounded-[28px] shadow-2xl border border-slate-200/80 overflow-hidden relative transition-all">
-                        <div className="h-64 bg-gradient-to-br from-rose-500 via-pink-600 to-indigo-700 relative flex flex-col justify-end p-8 text-white">
-                            <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg">
+                        <div className="h-64 bg-slate-900 relative flex flex-col justify-end p-8 text-white">
+                            <div className="absolute top-6 right-6 bg-white/20 px-4 py-2 rounded-full border border-white/30 text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-lg">
                                 <Star size={14} className="text-yellow-300 fill-yellow-300"/> Score ICL : {nextCand.candidat?.locataireProfile?.scoreBadge || nextCand.scoreQapril || '780 (Excellent)'}
                             </div>
                             <h2 className="text-4xl font-black drop-shadow-md tracking-tight">{nextCand.prenom} {nextCand.nom}</h2>
@@ -283,9 +283,9 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
             {/* MODAL DETAILED PROFILE */}
             {activeModalCandidate && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
                     <div className="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
-                        <div className="bg-gradient-to-r from-indigo-900 to-slate-900 p-8 text-white relative">
+                        <div className="bg-slate-900 p-8 text-white relative">
                             <button 
                                 onClick={() => setActiveModalCandidate(null)}
                                 className="absolute top-6 right-6 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
@@ -488,9 +488,9 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
             {/* MODALE D'INTRODUCTION DU CONTRAT DE BAIL */}
             {leaseModalCandidate && (
-                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
                     <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
-                        <div className="bg-gradient-to-r from-emerald-800 to-teal-950 p-6 text-white relative">
+                        <div className="bg-[#059669] p-6 text-white relative">
                             <button 
                                 onClick={() => setLeaseModalCandidate(null)}
                                 className="absolute top-5 right-5 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
@@ -598,9 +598,9 @@ export default function MatchingDashboardClient({ candidatures, acceptedCandidat
 
             {/* MODALE DE DEMANDE DE PRÉCISIONS / COMPLÉMENTS */}
             {infoModalCandidate && (
-                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[220] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
                     <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
-                        <div className="bg-gradient-to-r from-blue-900 to-indigo-950 p-6 text-white relative">
+                        <div className="bg-[#0284C7] p-6 text-white relative">
                             <button 
                                 onClick={() => setInfoModalCandidate(null)}
                                 className="absolute top-5 right-5 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"

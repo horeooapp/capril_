@@ -19,7 +19,7 @@ export const ReliabilityBadge = ({ score, showLabel = true }: ReliabilityBadgePr
 
     return (
         <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl border ${conf.color} shadow-xl ${conf.glow} transition-all hover:scale-105 cursor-help group`}>
-            <div className="flex items-center justify-center p-1 bg-white/60 rounded-lg shadow-inner">
+            <div className="flex items-center justify-center p-1 bg-white rounded-lg shadow-inner">
                 <Icon size={14} className="group-hover:rotate-12 transition-transform" />
             </div>
             <div className="flex flex-col">

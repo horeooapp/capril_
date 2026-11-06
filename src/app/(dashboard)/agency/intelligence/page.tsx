@@ -52,7 +52,7 @@ export default async function IntelligenceDashboardPage() {
                 <span className="text-blue-500 font-black text-[10px] tracking-[0.4em] uppercase">Intelligence Hub</span>
             </div>
             <h1 className="text-6xl font-black tracking-tighter leading-none">
-                PILOTAGE <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">STRATÉGIQUE</span>
+                PILOTAGE <br/> <span className="text-slate-900">STRATÉGIQUE</span>
             </h1>
         </div>
         <div className="flex flex-col items-end">

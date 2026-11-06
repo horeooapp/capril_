@@ -538,7 +538,7 @@ function LeaseRegistrationForm() {
                                 </div>
 
                                 {/* TOTAL INITIAL BREAKDOWN CARD */}
-                                <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+                                <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
                                     <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
                                         <div className="flex items-center gap-2">
                                             <Coins className="text-[#FF8200]" size={20} />
@@ -810,7 +810,7 @@ function LeaseModeSelector() {
                 {/* Mode IA — Assistant conversationnel */}
                 <div
                     onClick={() => setMode("agent")}
-                    className="bg-gradient-to-br from-[#1B3A6B] to-[#0F2344] rounded-3xl p-8 cursor-pointer active:scale-[0.99] hover:shadow-2xl hover:shadow-blue-900/30 transition-all border border-blue-800/50 flex flex-col justify-between group"
+                    className="bg-slate-900] rounded-3xl p-8 cursor-pointer active:scale-[0.99] hover:shadow-2xl hover:shadow-blue-900/30 transition-all border border-blue-800/50 flex flex-col justify-between group"
                 >
                     <div>
                         <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">

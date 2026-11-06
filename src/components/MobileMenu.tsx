@@ -209,7 +209,7 @@ export default function MobileMenu({
             {/* Backdrop */}
             {isOpen && (
                 <div 
-                    className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[110] transition-opacity duration-300 animate-in fade-in"
+                    className="fixed inset-0 bg-slate-950 z-[110] transition-opacity duration-300 animate-in fade-in"
                     onClick={toggleMenu}
                 />
             )}
@@ -221,7 +221,7 @@ export default function MobileMenu({
                 }`}
             >
                 {/* En-tête du tiroir avec Logo & Fermeture */}
-                <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90 shrink-0">
+                <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900 shrink-0">
                     <Link 
                         href="/" 
                         onClick={() => setIsOpen(false)}
@@ -248,7 +248,7 @@ export default function MobileMenu({
                     <Link 
                         href="/" 
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#FF8200]/15 to-amber-500/10 hover:from-[#FF8200]/25 hover:to-amber-500/20 border border-[#FF8200]/30 text-amber-200 font-bold text-xs transition-all active:scale-95"
+                        className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-900 hover:from-[#FF8200]/25 hover:to-amber-500/20 border border-[#FF8200]/30 text-amber-200 font-bold text-xs transition-all active:scale-95"
                     >
                         <span className="flex items-center gap-2">
                             <Home size={15} className="text-[#FF8200]" />
@@ -289,7 +289,7 @@ export default function MobileMenu({
                                     className={`p-2 rounded-xl border flex items-center gap-2 transition-all active:scale-95 ${
                                         isActive 
                                             ? `bg-slate-800/90 text-white shadow-sm ${r.borderActive} ring-1 ring-white/10` 
-                                            : 'bg-slate-950/70 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+                                            : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
                                     }`}
                                 >
                                     <div 
@@ -328,7 +328,7 @@ export default function MobileMenu({
                             ) : (
                                 <button
                                     onClick={handleInstallClick}
-                                    className={`w-full py-2 px-3 rounded-xl bg-gradient-to-r ${currentRoleConfig.gradient} text-slate-950 font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition-all active:scale-95`}
+                                    className={`w-full py-2 px-3 rounded-xl  ${currentRoleConfig.gradient} text-slate-950 font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition-all active:scale-95`}
                                 >
                                     <Download size={14} strokeWidth={2.5} />
                                     <span>Installer l'app {currentRoleConfig.shortLabel}</span>
@@ -370,7 +370,7 @@ export default function MobileMenu({
                 </nav>
 
                 {/* Pied du tiroir : Profil, Rôles et BOUTON DÉCONNEXION */}
-                <div className="p-4 border-t border-slate-800 bg-slate-900/90 shrink-0 space-y-2.5">
+                <div className="p-4 border-t border-slate-800 bg-slate-900 shrink-0 space-y-2.5">
                     {session?.user ? (() => {
                         const isAgencyRole = ['AGENCY', 'NON_CERTIFIED_AGENT', 'AGENCE_AGREE', 'AGENCE_NON_AGREE', 'AGENCY_AGREE', 'AGENCY_NON_AGREE'].includes(displayRole || '');
                         const userAgencyName = (session.user as any).agencyName || (session.user as any).nomAgence || "Mon Agence";
@@ -381,7 +381,7 @@ export default function MobileMenu({
                         return (
                             <>
                                 {/* Carte Utilisateur */}
-                                <div className="p-2.5 bg-slate-950/70 rounded-xl border border-slate-800 flex items-center justify-between">
+                                <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
                                     <div className="flex items-center gap-2.5 min-w-0">
                                         <div className="w-8 h-8 rounded-full bg-[#FF8200] text-slate-950 font-black text-xs flex items-center justify-center shrink-0">
                                             {cardInitial}

@@ -64,9 +64,9 @@ export default function IclDashboardClient({ initialProfile }: { initialProfile:
                 </div>
             </div>
 
-            <div className={`rounded-[24px] p-8 md:p-12 text-white relative shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 border ${profile?.scoreBadge === 'A+' || profile?.scoreBadge === 'A' ? 'bg-[linear-gradient(135deg,#047857_0%,#064E3B_100%)] border-emerald-900' : 'bg-slate-900 border-slate-800'}`}>
+            <div className={`rounded-[24px] p-8 md:p-12 text-white relative shadow-sm overflow-hidden flex flex-col md:flex-row items-center justify-between gap-10 border ${profile?.scoreBadge === 'A+' || profile?.scoreBadge === 'A' ? 'bg-slate-50 border-emerald-900' : 'bg-slate-900 border-slate-800'}`}>
                 <div className="relative z-10 max-w-xl">
-                    <div className="bg-white/10 px-3 py-1.5 rounded-[8px] text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2 mb-6 border border-white/20 backdrop-blur-md">
+                    <div className="bg-white/10 px-3 py-1.5 rounded-[8px] text-[10px] font-bold uppercase tracking-widest inline-flex items-center gap-2 mb-6 border border-white/20">
                         <ShieldCheck size={14} className={profile?.scoreBadge === 'A+' || profile?.scoreBadge === 'A' ? 'text-emerald-300' : 'text-slate-300'} /> Données Certifiées par QAPRIL
                     </div>
                     <h2 className="text-4xl font-black tracking-tight mb-4">Votre Score: {score}/100</h2>
@@ -76,7 +76,7 @@ export default function IclDashboardClient({ initialProfile }: { initialProfile:
                 </div>
                 
                 <div className="relative z-10 flex flex-col items-center">
-                    <div className={`w-40 h-40 rounded-full flex items-center justify-center text-7xl font-black shadow-lg border-[6px] backdrop-blur-sm ${badgeColor()}`}>
+                    <div className={`w-40 h-40 rounded-full flex items-center justify-center text-7xl font-black shadow-lg border-[6px]  ${badgeColor()}`}>
                         {profile?.scoreBadge || "?"}
                     </div>
                     <p className="mt-6 text-[10px] font-bold uppercase tracking-widest text-white/70 bg-black/20 px-4 py-2 rounded-[8px] border border-white/10">

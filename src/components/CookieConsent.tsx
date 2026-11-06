@@ -69,7 +69,7 @@ export default function CookieConsent() {
           exit={{ y: 100, opacity: 0 }}
           className="fixed bottom-0 left-0 right-0 md:bottom-8 md:left-auto md:right-8 z-[9999] p-4 md:p-0 md:w-[440px]"
         >
-          <div className="relative overflow-hidden bg-white/90 dark:bg-[#0F1117]/95 backdrop-blur-2xl rounded-[2.5rem] border border-black/5 dark:border-white/10 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)]">
+          <div className="relative overflow-hidden bg-white dark:bg-[#0F1117]/95 rounded-[2.5rem] border border-black/5 dark:border-white/10 shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)]">
             
             {/* Design accents */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2" />

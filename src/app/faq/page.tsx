@@ -428,7 +428,7 @@ export default function FAQPage() {
                                 className={`border rounded-3xl transition-all overflow-hidden ${
                                     openFaqIndex === index
                                         ? "border-[#C55A11]/30 bg-white shadow-lg"
-                                        : "border-slate-200 bg-white/80 hover:border-slate-300"
+                                        : "border-slate-200 bg-white hover:border-slate-300"
                                 }`}
                             >
                                 <button

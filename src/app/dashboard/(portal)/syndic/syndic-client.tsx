@@ -151,7 +151,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
             </SectionCard>
 
             {/* Automated Distribution Banner */}
-            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 sm:p-10 text-white relative shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
+            <div className="bg-slate-900 rounded-3xl p-6 sm:p-10 text-white relative shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-700">
                 <div className="relative z-10 max-w-xl space-y-3">
                     <div className="bg-sky-500/20 text-sky-300 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border border-sky-400/30 inline-flex items-center gap-2">
                         <Coins size={13} /> Répartition Automatique & Transparente
@@ -183,7 +183,7 @@ export default function SyndicDashboardClient({ initialSyndicates }: { initialSy
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col border border-slate-200">
                         {/* Modal Header */}
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">

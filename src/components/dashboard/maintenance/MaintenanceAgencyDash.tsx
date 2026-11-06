@@ -51,7 +51,7 @@ export default function MaintenanceAgencyDash({ initialTickets }: { initialTicke
   return (
     <div className="space-y-6">
       {/* Filters & Search */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-900/50 p-6 border border-gray-800 rounded-3xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-900/50 p-6 border border-gray-800 rounded-3xl">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
           <input 

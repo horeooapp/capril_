@@ -102,7 +102,7 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                                              <motion.div 
                                                  initial={{ width: 0 }} 
                                                  animate={{ width: `${(city.avgRent / 1000000) * 100}%` }} 
-                                                 className={`h-full ${idx === 0 ? 'bg-gradient-to-r from-ci-orange to-ci-or' : 'bg-white/20'}`}
+                                                 className={`h-full ${idx === 0 ? 'bg-slate-900' : 'bg-white/20'}`}
                                              ></motion.div>
                                          </div>
                                      </div>
@@ -152,7 +152,7 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                             </h3>
                             <div className="flex-1 grid grid-cols-2 gap-6">
                                 {safeCities.filter(c => ["Cocody", "Marcory", "Plateau", "Yopougon"].includes(c?.name)).map(commune => (
-                                     <div key={commune.name} className="relative p-6 rounded-2xl bg-gradient-to-br from-ci-nuit to-ci-nuit2 border border-white/5">
+                                     <div key={commune.name} className="relative p-6 rounded-2xl bg-slate-900 border border-white/5">
                                          <div className="absolute top-4 right-4 text-[10px] text-ci-or font-black">TOP</div>
                                          <div className="text-[10px] font-black text-gray-500 uppercase">{commune.name}</div>
                                          <div className="text-2xl font-black mt-2">{commune.avgRent?.toLocaleString?.() || commune.avgRent} F</div>

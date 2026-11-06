@@ -57,7 +57,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
                 </div>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-700 to-indigo-900 rounded-[12px] p-8 md:p-10 text-white relative overflow-hidden shadow-md flex items-center justify-between">
+            <div className="bg-[#0284C7] rounded-[12px] p-8 md:p-10 text-white relative overflow-hidden shadow-md flex items-center justify-between">
                  <div className="relative z-10 max-w-2xl">
                      <h2 className="text-2xl font-black tracking-tight mb-2">Engagez votre audience avec Q-Mail.</h2>
                      <p className="text-indigo-200 text-[13px] leading-relaxed mb-6 font-medium">Concevez des campagnes d'emailings et SMS groupées vers vos Leads (Nouveaux programmes, Rappel de régularisations, Voeux). Taux d'ouverture garanti par SendGrid.</p>
@@ -138,7 +138,7 @@ export default function CRMDashboardClient({ initialContacts }: { initialContact
             </SectionCard>
 
             {selectedContact && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 animate-in fade-in duration-200">
                     <div className="bg-white rounded-[16px] shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col scale-100 animate-in zoom-in-95 duration-200 border border-slate-200">
                         {/* Header */}
                         <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">

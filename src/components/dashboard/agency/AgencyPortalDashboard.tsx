@@ -35,7 +35,7 @@ export const AgencyPortalDashboard: React.FC<{ user: any, properties: any[], can
 
   return (
     <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
-      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
+      <div className="fixed inset-0 bg-white/40 -[100px] -z-10 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
       <div className="px-4">

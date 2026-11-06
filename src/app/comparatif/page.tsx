@@ -125,8 +125,7 @@ export default function ComparatifPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",
+              backgroundImage: "none",
               backgroundSize: "60px 60px"
             }}
           />
@@ -134,8 +133,7 @@ export default function ComparatifPage() {
             className="absolute inset-0 z-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 30%, rgba(245,158,11,0.14) 0%, transparent 65%), radial-gradient(circle at 80% 80%, rgba(239,68,68,0.1) 0%, transparent 55%)"
+              backgroundImage: "none"
             }}
           />
 
@@ -235,7 +233,7 @@ export default function ComparatifPage() {
               </div>
 
               {/* Résultat visuel */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 text-white text-center shadow-lg">
+              <div className="p-6 sm:p-8 rounded-2xl bg-slate-900 text-white text-center shadow-lg">
                 <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 block mb-2">
                   Économie Réalisée par An
                 </span>
@@ -331,8 +329,7 @@ export default function ComparatifPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 50%, rgba(245,158,11,0.15) 0%, transparent 70%)"
+              backgroundImage: "none"
             }}
           />
           <div className="max-w-3xl mx-auto relative z-10">

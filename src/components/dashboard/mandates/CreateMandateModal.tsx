@@ -216,7 +216,7 @@ export default function CreateMandateModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[130] bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[130] bg-slate-950 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.96, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -224,7 +224,7 @@ export default function CreateMandateModal({
                 className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-4xl my-auto overflow-hidden flex flex-col max-h-[92vh]"
             >
                 {/* Header */}
-                <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <div className="px-6 py-5 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
                     <div className="flex items-center gap-3.5">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
                             <FileSignature size={24} />
@@ -631,7 +631,7 @@ export default function CreateMandateModal({
                     {currentStep === 4 && (
                         <div className="space-y-6 animate-in fade-in duration-200">
                             {/* Simulator Card */}
-                            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-500/30">
+                            <div className="bg-slate-900 text-white p-6 rounded-3xl shadow-xl border border-indigo-500/30">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-2.5">
                                         <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-300/30 flex items-center justify-center text-amber-400">
@@ -814,7 +814,7 @@ export default function CreateMandateModal({
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-7 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
+                                className="px-7 py-3 bg-[#D97706] hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
                             >
                                 {isSubmitting ? "Génération du contrat..." : "Émettre et Transmettre le Mandat"}
                                 <ArrowRight size={16} />

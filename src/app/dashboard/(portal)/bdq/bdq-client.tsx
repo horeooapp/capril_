@@ -44,7 +44,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <div className="mb-2 bg-gradient-to-r from-violet-600 to-indigo-700 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-[8px] inline-flex items-center gap-2 shadow-sm">
+                    <div className="mb-2 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-[8px] inline-flex items-center gap-2 shadow-sm">
                         <Bot size={12} /> Intelligence Artificielle QAPRIL
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
@@ -58,7 +58,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                     <button onClick={() => toast.success('Ouverture du portail d\'analyse API...')} className="bg-white border text-slate-900 border-slate-200 px-5 py-2.5 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
                         <BarChart4 size={16} /> Rapport API
                     </button>
-                    <button onClick={(e) => { e.preventDefault(); setIsCreateOpen(true); }} className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-sm flex items-center gap-2">
+                    <button onClick={(e) => { e.preventDefault(); setIsCreateOpen(true); }} className="bg-slate-900 text-white px-5 py-2.5 rounded-[10px] font-bold text-[11px] uppercase tracking-widest hover:shadow-lg hover:shadow-violet-500/25 transition-all shadow-sm flex items-center gap-2">
                         <Plus size={16} /> Initier Nouvelle Saisie IA
                     </button>
                 </div>
@@ -66,7 +66,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
 
             {/* AI Metrics Panel */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-violet-800 to-indigo-900 p-6 rounded-[16px] shadow-lg flex flex-col justify-center relative overflow-hidden text-white border border-violet-700">
+                <div className="bg-slate-900 p-6 rounded-[16px] shadow-lg flex flex-col justify-center relative overflow-hidden text-white border border-violet-700">
                     <Bot className="absolute -right-4 -bottom-4 opacity-10" size={100} />
                     <span className="text-[9.5px] font-bold text-violet-300 uppercase tracking-widest mb-2 relative z-10 flex items-center gap-1.5 border border-violet-400/30 w-max px-2 py-0.5 rounded-[6px] bg-violet-900/50"><MessageCircle size={10}/> Conversations Actives</span>
                     <span className="text-3xl font-black relative z-10">{totalConversations}</span>
@@ -192,10 +192,10 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
             </div>
 
             {isCreateOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-[28px] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col border border-slate-100 animate-in zoom-in-95 duration-200">
                         {/* Header Premium */}
-                        <div className="p-6 sm:p-7 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-violet-50 via-indigo-50/40 to-white">
+                        <div className="p-6 sm:p-7 border-b border-slate-100 flex justify-between items-center bg-slate-900">
                             <div className="flex items-center gap-3.5">
                                 <div className="w-12 h-12 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-lg shadow-violet-500/20">
                                     <SmartphoneNfc size={22} />
@@ -284,7 +284,7 @@ export default function BdqAiCockpitClient({ initialConversations }: { initialCo
                                 <button 
                                     type="submit" 
                                     disabled={isCreating} 
-                                    className="w-full py-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2.5 disabled:opacity-50 transition-all shadow-lg shadow-violet-500/25 cursor-pointer active:scale-[0.98]"
+                                    className="w-full py-4 rounded-xl bg-slate-900 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2.5 disabled:opacity-50 transition-all shadow-lg shadow-violet-500/25 cursor-pointer active:scale-[0.98]"
                                 >
                                     {isCreating ? (
                                         <>

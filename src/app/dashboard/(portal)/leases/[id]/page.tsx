@@ -340,7 +340,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
 
                             <div className="space-y-5 relative z-10">
                                 {showCdc && (
-                                    <div className="p-5 bg-white/5 rounded-[16px] border border-white/10 backdrop-blur-sm">
+                                    <div className="p-5 bg-white/5 rounded-[16px] border border-white/10">
                                         <div className="flex justify-between items-center mb-3">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Caution</p>
                                             <span className="text-[12px] font-black">{Number(tLease.depositAmount || 0).toLocaleString()} XOF</span>
@@ -370,7 +370,7 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                                 )}
 
                                 {showInsurance && (
-                                    <div className={`p-5 rounded-[16px] border backdrop-blur-sm ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-indigo-900/50 border-indigo-500/30'}`}>
+                                    <div className={`p-5 rounded-[16px] border  ${tLease.insurance && tLease.insurance.status === 'ACTIVE' ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-indigo-900/50 border-indigo-500/30'}`}>
                                         <div className="flex justify-between items-center mb-3">
                                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Assurance</p>
                                             {tLease.insurance && tLease.insurance.status === 'ACTIVE' ? (

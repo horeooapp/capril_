@@ -48,7 +48,7 @@ export default async function TenantMaintenancePage() {
                 </div>
             </div>
 
-            <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#1F4E79_100%)] p-6 rounded-[1.5rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white shadow-lg">
+            <div className="bg-slate-50 p-6 rounded-[1.5rem] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-white shadow-lg">
                 <div className="flex items-start sm:items-center gap-4">
                     <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center shrink-0 border border-white/20 mt-1 sm:mt-0">
                         <Wrench size={20} />

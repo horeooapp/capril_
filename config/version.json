@@ -10,14 +10,14 @@
       "version": "1.1.1",
       "versionCode": 3,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Correction du bouton de déconnexion, dialogue de confirmation natif, purge sécurisée du cache et retour propre à l'écran de connexion."
+      "releaseNotes": "Menu bas rehaussé, indicateur de mise à jour instantanée, messagerie fiabilisée et conformité visuelle."
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
       "version": "1.1.1",
       "versionCode": 3,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Correction de 'Changer de profil / Déconnexion', bascule fluide Propriétaire / Agence et purge de session."
+      "releaseNotes": "Onglet Accueil épuré, menu bas rehaussé avec marges sécurisées, détection de mise à jour en direct."
     }
   }
 }

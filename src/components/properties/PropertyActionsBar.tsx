@@ -126,7 +126,7 @@ export default function PropertyActionsBar({ property, isOwner }: PropertyAction
 
       {/* MODAL MODIFICATION */}
       {showEditModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
             <div className="bg-slate-900 p-6 text-white flex justify-between items-center">
               <div>
@@ -270,7 +270,7 @@ export default function PropertyActionsBar({ property, isOwner }: PropertyAction
 
       {/* MODAL SUPPRESSION */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-slate-100 animate-scale-up p-6 space-y-6">
             <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle size={28} />

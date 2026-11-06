@@ -390,8 +390,8 @@ export default function ManualDashboardClient({ userContext }: { userContext: Us
             </div>
 
             {/* Connected User & Platform Context Banner */}
-            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-[24px] p-6 sm:p-7 shadow-md relative overflow-hidden">
-                <div className="absolute right-0 top-0 bottom-0 w-80 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 to-transparent pointer-events-none"></div>
+            <div className="bg-slate-900 text-white rounded-[24px] p-6 sm:p-7 shadow-md relative overflow-hidden">
+                <div className="absolute right-0 top-0 bottom-0 w-80  from-indigo-500/10 to-transparent pointer-events-none"></div>
 
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="space-y-1.5 max-w-xl">
@@ -410,15 +410,15 @@ export default function ManualDashboardClient({ userContext }: { userContext: Us
                     </div>
 
                     <div className="grid grid-cols-3 gap-3 w-full md:w-auto shrink-0">
-                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 text-center border border-white/10">
+                        <div className="bg-white/10 rounded-2xl p-3 text-center border border-white/10">
                             <span className="text-[9px] font-bold text-slate-300 uppercase block tracking-wider">Biens</span>
                             <span className="text-xl font-black text-white">{userContext.propertiesCount}</span>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 text-center border border-white/10">
+                        <div className="bg-white/10 rounded-2xl p-3 text-center border border-white/10">
                             <span className="text-[9px] font-bold text-slate-300 uppercase block tracking-wider">Baux Actifs</span>
                             <span className="text-xl font-black text-emerald-400">{userContext.activeLeasesCount}</span>
                         </div>
-                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-3 text-center border border-white/10">
+                        <div className="bg-white/10 rounded-2xl p-3 text-center border border-white/10">
                             <span className="text-[9px] font-bold text-slate-300 uppercase block tracking-wider">Tickets</span>
                             <span className="text-xl font-black text-amber-400">{userContext.openTicketsCount}</span>
                         </div>

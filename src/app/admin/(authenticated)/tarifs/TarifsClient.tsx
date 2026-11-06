@@ -49,7 +49,7 @@ export default function TarifsClient() {
 
             <div className="flex-1 relative">
                 {loading && (
-                    <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center">
+                    <div className="absolute inset-0 z-10 bg-white/50 flex items-center justify-center">
                         <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
                     </div>
                 )}

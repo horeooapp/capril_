@@ -68,8 +68,8 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
                             <div key={a.id} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all group">
                                 <div className="h-56 bg-gray-200 relative overflow-hidden">
                                     {/* Placeholder image */}
-                                    <div className="absolute inset-0 bg-[linear-gradient(135deg,#1F4E79_0%,#111827_100%)] opacity-10"></div>
-                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-800">
+                                    <div className="absolute inset-0 bg-slate-50 opacity-10"></div>
+                                    <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-800">
                                         {a.logement?.propertyType || "Logement"}
                                     </div>
                                     <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-green-500/30">

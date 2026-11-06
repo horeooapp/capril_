@@ -169,7 +169,7 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
     }
 
     return (
-        <div className="fixed inset-0 z-[120] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[120] bg-slate-950 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.96, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -177,7 +177,7 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
                 className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 w-full max-w-5xl my-auto overflow-hidden flex flex-col max-h-[92vh]"
             >
                 {/* Header */}
-                <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex justify-between items-center relative border-b border-slate-700/60">
+                <div className="px-6 py-5 bg-slate-900 text-white flex justify-between items-center relative border-b border-slate-700/60">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
                             <Wrench size={24} />
@@ -699,7 +699,7 @@ export default function AddProviderModal({ isOpen, onClose, onProviderAdded }: A
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-black px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:from-amber-400 hover:to-amber-500 transition-all shadow-md disabled:opacity-50 flex items-center gap-2"
+                                    className="bg-[#D97706] text-slate-950 font-black px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:from-amber-400 hover:to-amber-500 transition-all shadow-md disabled:opacity-50 flex items-center gap-2"
                                 >
                                     {isSubmitting ? "Enregistrement en cours..." : "Valider & Enregistrer l'Artisan"}
                                 </button>

@@ -57,7 +57,7 @@ export function DeleteAccountSection() {
             {/* Confirmation Modal */}
             <AnimatePresence>
                 {isOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-qnavy-dark/40 backdrop-blur-md">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-qnavy-dark/40">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}

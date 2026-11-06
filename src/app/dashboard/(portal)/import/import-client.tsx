@@ -80,7 +80,7 @@ export default function ImportDashboardClient() {
 
                  {/* Instructions and Template */}
                  <div className="space-y-6">
-                     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[16px] p-8 text-white relative shadow-md overflow-hidden border border-slate-700">
+                     <div className="bg-slate-900 rounded-[16px] p-8 text-white relative shadow-md overflow-hidden border border-slate-700">
                          <h3 className="text-[15px] font-black mb-4 flex items-center gap-2">
                              Étape 1 : Le Modèle
                          </h3>

@@ -52,7 +52,7 @@ export default async function CDCGlobalDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1 p-8 rounded-[16px] bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 text-white shadow-lg relative overflow-hidden">
+                <div className="md:col-span-1 p-8 rounded-[16px] bg-slate-900 border border-slate-700 text-white shadow-lg relative overflow-hidden">
                     <div className="relative z-10 space-y-2">
                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300 flex items-center gap-2">
                             <ShieldCheck size={14} className="text-emerald-400" /> Total Consigné Sécurisé

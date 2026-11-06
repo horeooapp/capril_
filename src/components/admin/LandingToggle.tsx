@@ -27,7 +27,7 @@ export default function LandingToggle({ initialEnabled }: LandingToggleProps) {
     }
 
     return (
-        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-sm border border-gray-200 p-2 pl-4 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-4 bg-white/50 border border-gray-200 p-2 pl-4 rounded-2xl shadow-sm">
             <div className="flex flex-col">
                 <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 border-b border-transparent">Module</span>
                 <span className={`text-[10px] font-black uppercase tracking-tight flex items-center gap-1 mt-0.5 ${isEnabled ? 'text-primary' : 'text-gray-500'}`}>

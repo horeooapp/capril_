@@ -22,7 +22,7 @@ export default function GovernanceDashboardPage() {
 
             <SectionCard noPadding>
                 <div className="p-8 pb-4">
-                    <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[16px] p-8 md:p-12 text-white relative shadow-md overflow-hidden flex flex-col items-center text-center border border-slate-700">
+                    <div className="bg-slate-900 rounded-[16px] p-8 md:p-12 text-white relative shadow-md overflow-hidden flex flex-col items-center text-center border border-slate-700">
                         <Globe size={80} className="text-sky-500/10 absolute -top-10 -right-10" />
                         <Calendar size={48} className="text-sky-400 mb-6" />
                         <h2 className="text-2xl font-black mb-4">Assemblée Générale Annuelle</h2>

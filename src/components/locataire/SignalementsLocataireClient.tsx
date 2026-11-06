@@ -69,7 +69,7 @@ export default function SignalementsLocataireClient({ initialSignalements, bails
             </div>
 
             {isAdding && (
-                <div className="glass-panel p-8 rounded-[2.5rem] border-2 border-primary/20 bg-white/80 shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="glass-panel p-8 rounded-[2.5rem] border-2 border-primary/20 bg-white shadow-2xl animate-in zoom-in-95 duration-300">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Ouvrir un ticket d'intervention</h2>
                         <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-red-50 text-red-400 rounded-xl transition-colors">

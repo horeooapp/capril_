@@ -90,7 +90,7 @@ export default function AdminHeader({ session, onLogout }: AdminHeaderProps) {
                 
                 <div style={{
                     width: '30px', height: '30px', borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--ci-orange), var(--ci-or))',
+                    background: "transparent",
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '11px', fontWeight: 800, color: '#fff',
                     flexShrink: 0

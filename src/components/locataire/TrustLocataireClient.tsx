@@ -59,7 +59,7 @@ export default function TrustLocataireClient({ profile }: any) {
     return (
         <div className="space-y-12 animate-in fade-in duration-700">
             {/* Header / Score Display */}
-            <div className="glass-panel p-10 rounded-[3rem] border border-white/40 shadow-2xl bg-gradient-to-br from-white to-blue-50/30 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative">
+            <div className="glass-panel p-10 rounded-[3rem] border border-white/40 shadow-2xl bg-slate-900 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[100px] -mr-40 -mt-40"></div>
                 
                 <div className="relative">
@@ -80,11 +80,11 @@ export default function TrustLocataireClient({ profile }: any) {
                     <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2 italic">Indice ICL.</h1>
                     <p className="text-lg text-gray-500 font-medium">L'Indice de Confiance Locatif est votre meilleure recommandation pour louer sans caution ou négocier votre loyer.</p>
                     <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                         <div className="px-4 py-2 bg-white rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                             <TrendingUp size={16} className="text-[#375623]" />
                             Score : {badge === 'A+' ? 'Excellent' : badge === 'A' ? 'Très Bon' : 'En progression'}
                          </div>
-                         <div className="px-4 py-2 bg-white/60 rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                         <div className="px-4 py-2 bg-white rounded-xl border border-white/80 text-[12px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                             <Zap size={16} className="text-orange-400" />
                             Réactualisé en temps réel
                          </div>
@@ -121,7 +121,7 @@ export default function TrustLocataireClient({ profile }: any) {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${item.score}%` }}
                                         transition={{ duration: 1, delay: i * 0.1 }}
-                                        className="h-full bg-gradient-to-r from-slate-800 to-blue-400"
+                                        className="h-full bg-slate-900"
                                      />
                                 </div>
                             </div>

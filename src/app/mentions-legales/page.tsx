@@ -37,7 +37,7 @@ export default function MentionsLegalesPage() {
         {/* ─── HERO ─── */}
         <section className="relative pt-40 pb-32 overflow-hidden" style={{ background: "var(--ink)" }}>
           <div className="absolute inset-0" aria-hidden style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",
+            backgroundImage: "none",
             backgroundSize: "60px 60px"
           }} />
           <div className="absolute inset-0 z-0" aria-hidden>

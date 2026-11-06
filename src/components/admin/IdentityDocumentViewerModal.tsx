@@ -146,7 +146,7 @@ export function IdentityDocumentViewerModal({
                     </div>
                 </div>
 
-                <div className="relative flex-1 min-h-[320px] max-h-[58vh] overflow-auto flex items-center justify-center p-4 bg-slate-950/90">
+                <div className="relative flex-1 min-h-[320px] max-h-[58vh] overflow-auto flex items-center justify-center p-4 bg-slate-950">
                     {isPdf ? (
                         <iframe
                             src={url}
@@ -168,7 +168,7 @@ export function IdentityDocumentViewerModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-slate-950 animate-in fade-in duration-200">
             <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">

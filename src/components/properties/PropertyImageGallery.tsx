@@ -36,15 +36,15 @@ export default function PropertyImageGallery({ images }: { images: PropertyImage
                 />
                 
                 {/* Overlay Controls */}
-                <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-x-0 bottom-0 p-6 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity">
                    <div className="flex justify-between items-center text-white">
-                        <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1 rounded-full">
+                        <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">
                             {activeIndex + 1} / {images.length}
                         </span>
                         <button 
                             onClick={() => setShowModal(true)}
                             title="Agrandir l'image"
-                            className="p-2 bg-white/20 backdrop-blur-md rounded-full hover:bg-white/40 transition-colors"
+                            className="p-2 bg-white/20 rounded-full hover:bg-white/40 transition-colors"
                         >
                             <Maximize2 size={16} />
                         </button>
@@ -56,14 +56,14 @@ export default function PropertyImageGallery({ images }: { images: PropertyImage
                         <button 
                             onClick={(e) => { e.stopPropagation(); prevImage(); }}
                             title="Image précédente"
-                            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full text-slate-800 shadow-xl opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white rounded-full text-slate-800 shadow-xl opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
                         >
                             <ChevronLeft size={20} />
                         </button>
                         <button 
                             onClick={(e) => { e.stopPropagation(); nextImage(); }}
                             title="Image suivante"
-                            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/90 backdrop-blur-sm rounded-full text-slate-800 shadow-xl opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white rounded-full text-slate-800 shadow-xl opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
                         >
                             <ChevronRight size={20} />
                         </button>
@@ -89,7 +89,7 @@ export default function PropertyImageGallery({ images }: { images: PropertyImage
 
             {/* Fullscreen Modal/Lightbox */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <button 
                         onClick={() => setShowModal(false)}
                         title="Fermer"

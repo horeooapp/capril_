@@ -80,7 +80,7 @@ export default async function TenantPaymentPage() {
                     </div>
                 )}
 
-                <div className="bg-[linear-gradient(135deg,#0D2B6E_0%,#1F4E79_100%)] p-6 rounded-[1.5rem] flex items-center gap-4 text-white shadow-lg">
+                <div className="bg-slate-50 p-6 rounded-[1.5rem] flex items-center gap-4 text-white shadow-lg">
                      <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center shrink-0 border border-white/20">
                          <AlertCircle size={20} />
                      </div>

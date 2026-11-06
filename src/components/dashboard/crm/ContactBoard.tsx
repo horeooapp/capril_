@@ -37,7 +37,7 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
   return (
     <div className="space-y-6">
       {/* Search & Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-900/50 p-6 border border-gray-800 rounded-3xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-900/50 p-6 border border-gray-800 rounded-3xl">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
           <input 
@@ -82,7 +82,7 @@ export default function ContactBoard({ contacts }: ContactBoardProps) {
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 rounded-full -mr-16 -mt-16 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-black text-xl shadow-lg ring-4 ring-gray-900">
+                <div className="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center text-white font-black text-xl shadow-lg ring-4 ring-gray-900">
                   {contact.fullName?.[0] || <User />}
                 </div>
                 <div className="flex-1">

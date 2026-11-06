@@ -55,7 +55,7 @@ export default function AboutPage() {
                     whileHover={{ x: 10 }}
                     className="flex items-center space-x-6 p-6 rounded-[2rem] border border-black/5 shadow-xl bg-white"
                   >
-                    <div className="w-12 h-12 rounded-2xl text-white flex-shrink-0 flex items-center justify-center font-black shadow-lg" style={{ background: 'linear-gradient(135deg, var(--mango), var(--coral))' }}>1</div>
+                    <div className="w-12 h-12 rounded-2xl text-white flex-shrink-0 flex items-center justify-center font-black shadow-lg" style={{ background: "transparent" }}>1</div>
                     <p className="text-lg font-black text-ink uppercase tracking-tight">Normalisation Nationale</p>
                   </motion.div>
                   <motion.div 
@@ -69,7 +69,7 @@ export default function AboutPage() {
               </div>
               <div className="relative group">
                 <div className="absolute -inset-8 rounded-[4rem] -z-10 rotate-3 group-hover:rotate-0 transition-transform duration-700" style={{ background: 'var(--sky-l)' }}></div>
-                <div className="p-12 rounded-[3.5rem] border border-white shadow-2xl relative overflow-hidden backdrop-blur-2xl" style={{ background: 'rgba(255,255,255,0.7)' }}>
+                <div className="p-12 rounded-[3.5rem] border border-white shadow-2xl relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.7)' }}>
                   <div className="absolute top-0 right-0 w-32 h-32 blur-3xl -mr-16 -mt-16" style={{ background: 'var(--sky)' }}></div>
                   <h3 className="text-3xl font-black uppercase text-ink mb-10 italic">Notre Engagement</h3>
                   <blockquote className="text-xl font-black leading-tight text-ink mb-10 relative">

@@ -17,7 +17,7 @@ export default function AdminError({
   }, [error])
 
   return (
-    <div className="p-12 bg-red-50/30 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center backdrop-blur-xl">
+    <div className="p-12 bg-red-50/30 border-2 border-red-100 rounded-[3rem] flex flex-col items-center text-center">
       <div className="w-20 h-20 bg-red-100 text-red-600 rounded-3xl flex items-center justify-center mb-8 shadow-xl rotate-3">
         <AlertTriangle size={40} />
       </div>

@@ -116,7 +116,7 @@ export default function GenerateReceiptForm({
             {/* Modale plein écran sécurisée avec backdrop cliquable et propagation bloquée */}
             {isModalOpen && (
                 <div 
-                    className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+                    className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-6 bg-slate-950 animate-in fade-in duration-200"
                     onClick={handleClose}
                     role="dialog"
                     aria-modal="true"
@@ -127,7 +127,7 @@ export default function GenerateReceiptForm({
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* En-tête de la modale */}
-                        <div className="bg-gradient-to-r from-orange-600 to-amber-600 p-6 text-white relative shrink-0">
+                        <div className="bg-[#D97706] p-6 text-white relative shrink-0">
                             <button 
                                 type="button"
                                 onClick={handleClose}

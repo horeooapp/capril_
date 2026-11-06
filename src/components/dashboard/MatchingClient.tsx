@@ -318,7 +318,7 @@ export function MatchingClient({ userRole, properties, userId }: MatchingClientP
                     <motion.div 
                         initial={{ opacity: 0 }} 
                         animate={{ opacity: 1 }} 
-                        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
+                        className="absolute inset-0 bg-gray-900/60"
                         onClick={() => setInvitationModal({ open: false, locataire: null })}
                     />
                     <motion.div 

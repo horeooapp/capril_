@@ -40,7 +40,7 @@ export default async function MigrationPage() {
                     { label: "En Attente", value: pendingSessions.toString(), icon: <Clock size={24} />, color: "bg-amber-50 text-amber-600" },
                     { label: "Validées / Commitées", value: committedSessions.toString(), icon: <CheckCircle size={24} />, color: "bg-emerald-50 text-emerald-600" },
                 ].map((stat, i) => (
-                    <div key={i} className="p-6 rounded-[2.5rem] bg-white/50 border border-white/50 backdrop-blur-xl shadow-sm hover:shadow-md transition-all group">
+                    <div key={i} className="p-6 rounded-[2.5rem] bg-white/50 border border-white/50 shadow-sm hover:shadow-md transition-all group">
                         <div className="flex justify-between items-start mb-4">
                             <div className={`p-3 rounded-2xl ${stat.color} transition-transform group-hover:scale-110`}>
                                 {stat.icon}
@@ -53,10 +53,10 @@ export default async function MigrationPage() {
             </div>
 
             {/* Recent Sessions List */}
-            <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl shadow-sm overflow-hidden p-8">
+            <div className="rounded-[3rem] bg-white/40 border border-white/60 shadow-sm overflow-hidden p-8">
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-xl font-black text-slate-800 uppercase tracking-wider">Sessions Récentes</h2>
-                    <span className="px-4 py-2 bg-white/60 rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border border-white/50">Derniers 30 jours</span>
+                    <span className="px-4 py-2 bg-white rounded-full text-xs font-black text-gray-500 uppercase tracking-widest border border-white/50">Derniers 30 jours</span>
                 </div>
 
                 {sessions.length === 0 ? (
@@ -80,7 +80,7 @@ export default async function MigrationPage() {
                             </thead>
                             <tbody>
                                 {sessions.map((session: any) => (
-                                    <tr key={session.id} className="bg-white/60 hover:bg-white transition-colors group">
+                                    <tr key={session.id} className="bg-white hover:bg-white transition-colors group">
                                         <td className="px-6 py-4 rounded-l-2xl font-bold text-gray-700">{session.fichierNom}</td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${

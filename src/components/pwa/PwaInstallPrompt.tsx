@@ -105,7 +105,7 @@ export default function PwaInstallPrompt() {
             aria-label="Installation de l'application QAPRIL par rôle"
             className="fixed bottom-20 lg:bottom-6 left-3 right-3 sm:left-auto sm:right-6 sm:w-[420px] z-[95] animate-in fade-in slide-in-from-bottom-5 duration-300 font-sans"
         >
-            <div className="bg-slate-950/95 backdrop-blur-2xl text-white p-4 sm:p-5 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-col gap-3.5 ring-1 ring-white/10">
+            <div className="bg-slate-950/95 text-white p-4 sm:p-5 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-col gap-3.5 ring-1 ring-white/10">
                 {/* Header avec Logo, Rôle Actif et Bouton Fermer */}
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function PwaInstallPrompt() {
                 </div>
 
                 {/* Sélecteur rapide des 4 Rôles (Locataire, Propriétaire, Agence, Intermédiaire) */}
-                <div className="bg-slate-900/90 p-1 rounded-xl border border-slate-800 flex items-center justify-between gap-1">
+                <div className="bg-slate-900 p-1 rounded-xl border border-slate-800 flex items-center justify-between gap-1">
                     {(Object.keys(PWA_ROLES) as PwaRoleId[]).map((rId) => {
                         const r = PWA_ROLES[rId]
                         const isSelected = selectedRole === rId
@@ -176,7 +176,7 @@ export default function PwaInstallPrompt() {
 
                 {/* Guide iOS Safari */}
                 {showIosGuide ? (
-                    <div className="bg-slate-900/90 rounded-xl p-3.5 text-xs text-slate-200 space-y-2.5 border border-slate-800">
+                    <div className="bg-slate-900 rounded-xl p-3.5 text-xs text-slate-200 space-y-2.5 border border-slate-800">
                         <p className="font-bold text-amber-300 flex items-center gap-1.5">
                             <PlusSquare size={16} /> Installation sur iPhone & iPad :
                         </p>
@@ -188,7 +188,7 @@ export default function PwaInstallPrompt() {
                         <div className="flex items-center gap-2 pt-1">
                             <button 
                                 onClick={handleDirectAccess}
-                                className="flex-1 py-2 bg-gradient-to-r from-[#FF8200] to-amber-500 text-slate-950 rounded-xl text-xs font-bold text-center transition-transform active:scale-95 flex items-center justify-center gap-1.5"
+                                className="flex-1 py-2 bg-slate-900 text-slate-950 rounded-xl text-xs font-bold text-center transition-transform active:scale-95 flex items-center justify-center gap-1.5"
                             >
                                 <span>Accéder à {currentRoleConfig.shortLabel}</span>
                                 <ArrowRight size={13} />
@@ -204,7 +204,7 @@ export default function PwaInstallPrompt() {
                 ) : (
                     <>
                         {/* Description du rôle sélectionné */}
-                        <div className="bg-slate-900/70 p-2.5 rounded-xl border border-slate-800/70 text-[11.5px] text-slate-300 flex items-start gap-2">
+                        <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800/70 text-[11.5px] text-slate-300 flex items-start gap-2">
                             <span className="mt-0.5 text-amber-400 shrink-0">
                                 <Sparkles size={14} />
                             </span>
@@ -218,7 +218,7 @@ export default function PwaInstallPrompt() {
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-0.5">
                             <button
                                 onClick={handleInstallClick}
-                                className={`flex-1 bg-gradient-to-r ${currentRoleConfig.gradient} text-slate-950 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 uppercase tracking-wider`}
+                                className={`flex-1  ${currentRoleConfig.gradient} text-slate-950 font-black text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95 uppercase tracking-wider`}
                             >
                                 <Download size={15} strokeWidth={2.5} />
                                 <span>Installer {currentRoleConfig.shortLabel}</span>

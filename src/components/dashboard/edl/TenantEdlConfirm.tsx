@@ -35,7 +35,7 @@ export default function TenantEdlConfirm({ edl, onClose }: TenantEdlConfirmProps
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
       <motion.div 
         initial={{ opacity: 0, scale: 0.9, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -56,7 +56,7 @@ export default function TenantEdlConfirm({ edl, onClose }: TenantEdlConfirmProps
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8 lg:p-12 bg-gradient-to-b from-gray-900 to-black space-y-10">
+        <div className="flex-1 overflow-y-auto p-8 lg:p-12 bg-slate-900 space-y-10">
           
           {/* Summary Banner */}
           <div className="grid md:grid-cols-3 gap-6">

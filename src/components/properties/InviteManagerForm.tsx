@@ -55,7 +55,7 @@ export default function InviteManagerForm({ propertyId }: { propertyId: string }
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
             <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 my-auto relative border border-gray-100 animate-in fade-in zoom-in duration-300">
                 <button 
                     onClick={() => setIsOpen(false)}

@@ -66,7 +66,7 @@ const TabBtn = ({ id, active, icon: Icon, label, onClick }: any) => (
 const KpiCard = ({ label, value, unit, icon: Icon, color, bg, sub }: any) => (
   <div className="premium-stat-card bg-white p-4 flex flex-col justify-between min-h-[130px]">
     <div className="flex justify-between items-start">
-      <div className="p-2 rounded-xl bg-white/80 shadow-sm">
+      <div className="p-2 rounded-xl bg-white shadow-sm">
         <Icon size={16} style={{ color }} />
       </div>
       <div className="text-[9px] font-black uppercase tracking-widest" style={{ color }}>{sub}</div>
@@ -95,7 +95,7 @@ const Sheet = ({ open, onClose, title, children }: any) => (
         <motion.div 
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100]"
+          className="fixed inset-0 bg-slate-900/60 z-[100]"
         />
         <motion.div 
           initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
@@ -129,7 +129,7 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
 
     return (
         <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
-            <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
+            <div className="fixed inset-0 bg-white/40 -[100px] -z-10 pointer-events-none"></div>
 
             <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
                 
@@ -165,13 +165,13 @@ export default function IntermediairePortalDashboard({ data: dashboardData, sess
                         ].map((m, i) => {
                           const inner = (
                             <>
-                              <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-transparent pointer-events-none"></div>
+                              <div className="absolute inset-0 bg-slate-900 pointer-events-none"></div>
                               <div 
                                 className={`absolute -right-6 -top-6 w-28 h-28 rounded-full blur-2xl transition-opacity duration-500 pointer-events-none ${m.active ? 'opacity-40' : 'opacity-10 group-hover:opacity-30'}`} 
                                 style={{ backgroundColor: m.color }}
                               ></div>
                               <div className={`relative z-10 w-16 h-16 rounded-[1.25rem] flex items-center justify-center transform transition-transform duration-500 shadow-sm border ${m.active ? 'scale-110 border-white shadow-md' : 'border-white/60 group-hover:scale-110'}`}
-                                style={{ background: `linear-gradient(135deg, ${m.color}${m.active ? '30' : '15'}, ${m.color}${m.active ? '50' : '30'})`, color: m.color }}
+                                style={{ background: m.color + (m.active ? "25" : "10"), color: m.color }}
                               >
                                 {m.icon}
                               </div>

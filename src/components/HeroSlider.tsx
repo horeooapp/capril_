@@ -36,7 +36,7 @@ export default function HeroSlider() {
                     />
                 </div>
             ))}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white via-white/30 to-transparent"></div>
+            <div className="absolute inset-0 bg-slate-900"></div>
             
             {/* Slide Indicators */}
             <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3 z-20">

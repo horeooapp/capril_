@@ -42,7 +42,7 @@ const ModuleCard = ({ id, name, description, icon: Icon, status, href, delay }: 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay }}
-            className="group relative overflow-hidden glass-panel p-6 rounded-[2.5rem] border border-white/20 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5 bg-white/40 backdrop-blur-md"
+            className="group relative overflow-hidden glass-panel p-6 rounded-[2.5rem] border border-white/20 hover:border-primary/30 transition-all hover:shadow-2xl hover:shadow-primary/5 bg-white/40"
         >
             <div className="flex justify-between items-start mb-6">
                 <div className={`p-4 rounded-[1.5rem] ${statusColors[status]} transition-transform group-hover:scale-110 duration-500`}>

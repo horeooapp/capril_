@@ -89,7 +89,7 @@ export default function MandateDetailModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[130] bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[130] bg-slate-950 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.96, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -97,7 +97,7 @@ export default function MandateDetailModal({
                 className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-3xl my-auto overflow-hidden flex flex-col max-h-[92vh] print:max-h-none print:shadow-none print:border-none"
             >
                 {/* Header */}
-                <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white flex justify-between items-center border-b border-slate-800 print:text-slate-900 print:bg-none">
+                <div className="px-6 py-5 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800 print:text-slate-900 print:bg-none">
                     <div className="flex items-center gap-3.5">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner print:hidden">
                             <FileSignature size={24} />
@@ -218,29 +218,29 @@ export default function MandateDetailModal({
                     </div>
 
                     {/* Financial Terms & Calendar */}
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-4">
+                    <div className="bg-[#D97706] border border-amber-200/80 rounded-2xl p-4">
                         <h4 className="text-xs font-black uppercase tracking-wider text-amber-900 mb-3 flex items-center gap-2">
                             <BookOpen size={14} /> Modalités Financières & Calendrier du Contrat
                         </h4>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                            <div className="bg-white/90 p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                            <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Honoraires</p>
                                 <p className="text-base font-black text-slate-900 mt-0.5">{mandate.commissionPct}%</p>
                                 <p className="text-[10px] text-slate-500">du loyer mensuel encaissé</p>
                             </div>
-                            <div className="bg-white/90 p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                            <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Date Début</p>
                                 <p className="text-xs font-black text-slate-900 mt-1">
                                     {mandate.startDate ? new Date(mandate.startDate).toLocaleDateString('fr-FR') : "Immédiat"}
                                 </p>
                             </div>
-                            <div className="bg-white/90 p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                            <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Échéance</p>
                                 <p className="text-xs font-black text-slate-900 mt-1">
                                     {mandate.endDate ? new Date(mandate.endDate).toLocaleDateString('fr-FR') : "1 an renouvelable"}
                                 </p>
                             </div>
-                            <div className="bg-white/90 p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                            <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Résiliation</p>
                                 <p className="text-xs font-black text-slate-900 mt-1">Préavis 3 mois</p>
                                 <p className="text-[10px] text-slate-500">Sans pénalité</p>
@@ -286,7 +286,7 @@ export default function MandateDetailModal({
                                 type="button"
                                 onClick={handleSign}
                                 disabled={isLoading}
-                                className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                                className="px-5 py-2.5 bg-[#059669] hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                             >
                                 <Check size={16} /> Signer le Mandat
                             </button>

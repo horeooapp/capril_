@@ -87,7 +87,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 md:p-6 relative overflow-hidden">
             {/* Trame architecturale filigrane */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#0F172A08_1px,transparent_1px),linear-gradient(to_bottom,#0F172A08_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+            <div className="absolute inset-0 bg-slate-50 bg-[size:48px_48px] pointer-events-none z-0" />
             <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-200/50 rounded-full blur-3xl pointer-events-none z-0" />
 

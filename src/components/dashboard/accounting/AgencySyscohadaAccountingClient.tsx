@@ -316,7 +316,7 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-6 bg-white/70 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-slate-200/60">
+                            <div className="flex items-center gap-6 bg-white px-4 py-2.5 rounded-xl border border-slate-200/60">
                                 <div>
                                     <div className="text-[11px] text-slate-500 font-medium">Taux de Couverture</div>
                                     <div className="text-xl font-extrabold text-slate-900">
@@ -943,7 +943,7 @@ export default function AgencySyscohadaAccountingClient({ initialData, agencyNam
 
             {/* MODAL NOUVELLE ÉCRITURE */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 overflow-y-auto">
                     <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
                         <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                             <div>

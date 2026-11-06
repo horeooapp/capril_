@@ -159,7 +159,7 @@ export default function ReportsDashboardClient({ initialReports = [] }: { initia
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <div className="mb-2 bg-gradient-to-r from-emerald-600 to-emerald-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-flex items-center gap-2 shadow-sm">
+                    <div className="mb-2 bg-[#059669] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-flex items-center gap-2 shadow-sm">
                         <ChartPie size={12} /> B2B Finance & Gérance
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3 mt-1">
@@ -223,7 +223,7 @@ export default function ReportsDashboardClient({ initialReports = [] }: { initia
                     value={`${totalComActuelle.toLocaleString()} XOF`} 
                     sub="Honoraires de gestion (8%)" 
                 />
-                <div className="bg-gradient-to-br from-emerald-800 to-emerald-950 p-5 rounded-2xl shadow-lg flex flex-col justify-between relative overflow-hidden text-white border border-emerald-700">
+                <div className="bg-[#059669] p-5 rounded-2xl shadow-lg flex flex-col justify-between relative overflow-hidden text-white border border-emerald-700">
                     <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-widest mb-1 relative z-10 flex items-center gap-1.5">
                         <SendHorizontal size={14}/> À Virer aux Propriétaires
                     </span>

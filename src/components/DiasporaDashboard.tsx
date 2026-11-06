@@ -299,7 +299,7 @@ const Content = ({tab, bp, totalFCFA, affMontant, encFCFA, impayesN, alertesSLA,
         )}
 
         {/* Treasury Card */}
-        <Card style={{background:`linear-gradient(135deg,${T.navy}05,${T.teal}05)`,border:`1px solid ${T.navy}10`,padding:"24px 28px"}}>
+        <Card style={{background:"#F8FAFC",border:`1px solid ${T.navy}10`,padding:"24px 28px"}}>
           <CardTitle label="💶 Analyse de Trésorerie"/>
           <div style={{display:"grid",gridTemplateColumns:bp.isDesktop?"1.5fr 1fr":"1fr",gap:24}}>
             <div style={{display:"flex",flexDirection:"column",justifyContent:"center"}}>
@@ -562,7 +562,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
   return (
     <>
       <div className="flex min-h-screen relative overflow-hidden font-sans text-gray-900 institutional-gradient-bg">
-      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
+      <div className="fixed inset-0 bg-white/40 -[100px] -z-10 pointer-events-none"></div>
 
       <Sidebar bp={bp} sideOpen={sideOpen} tab={tab} goTab={goTab} data={data} />
 
@@ -576,7 +576,7 @@ export default function DiasporaDashboard({ data, user }: DiasporaDashboardProps
       </div>
 
       {bp.isMobile && (
-        <div className="h-20 bg-gray-900/90 backdrop-blur-xl fixed bottom-0 left-0 right-0 flex items-center justify-around border-t border-white/10 z-[400] px-4">
+        <div className="h-20 bg-gray-900 fixed bottom-0 left-0 right-0 flex items-center justify-around border-t border-white/10 z-[400] px-4">
           {TABS.slice(0,4).map(t=>(
             <button key={t.id} onClick={()=>goTab(t.id)} className={`flex flex-col items-center gap-1.5 transition-all ${tab===t.id ? 'text-primary' : 'text-white/40'}`}>
               <div className={`p-2 rounded-xl ${tab===t.id ? 'bg-primary/10' : ''}`}>{t.icon}</div>

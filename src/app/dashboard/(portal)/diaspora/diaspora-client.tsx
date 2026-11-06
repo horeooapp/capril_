@@ -78,7 +78,7 @@ export default function DiasporaClient({ data }: { data: any }) {
                         
                         {/* Plan VIP */}
                         <div className="bg-slate-900 p-8 rounded-[2rem] border border-slate-800 shadow-2xl flex flex-col items-center relative overflow-hidden transform md:-translate-y-4">
-                            <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                            <div className="absolute top-0 inset-x-0 h-2 bg-[#D97706]"></div>
                             <h3 className="text-xl font-black text-white uppercase tracking-widest mb-2 mt-4">VIP Diaspora</h3>
                             <div className="text-4xl font-black text-amber-500 mb-6">12% <span className="text-sm text-slate-400">/loyer encaissé</span></div>
                             <ul className="space-y-4 text-left w-full mb-8 text-sm font-bold text-slate-300">
@@ -91,7 +91,7 @@ export default function DiasporaClient({ data }: { data: any }) {
                             </ul>
                             <button 
                                 onClick={() => setIsSubscribed(true)}
-                                className="w-full py-4 mt-auto bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-black uppercase tracking-widest shadow-lg hover:shadow-orange-500/25 transition-all"
+                                className="w-full py-4 mt-auto bg-[#D97706] text-white rounded-xl font-black uppercase tracking-widest shadow-lg hover:shadow-orange-500/25 transition-all"
                             >
                                 Activer VIP
                             </button>

@@ -31,7 +31,7 @@ export default function EDLComparatorPage() {
                     </div>
                     <div className="w-full aspect-video bg-slate-100 rounded-[16px] flex items-center justify-center border-2 border-dashed border-slate-200 relative overflow-hidden group">
                         <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&q=80" alt="Room Before" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
+                        <div className="absolute inset-0 bg-slate-900/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity -[2px]">
                             <Camera className="text-white mb-2" size={32}/>
                             <p className="text-white text-[10px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1.5 rounded-[8px]">Voir Original</p>
                         </div>

@@ -51,7 +51,7 @@ export default function VaultClient({ data }: { data: any }) {
                     </div>
 
                     <div className="flex flex-col gap-4 w-full md:w-auto shrink-0">
-                        <div className="bg-slate-800/50 backdrop-blur-md p-6 rounded-[2rem] border border-slate-700 w-full md:w-[300px]">
+                        <div className="bg-slate-800/50 p-6 rounded-[2rem] border border-slate-700 w-full md:w-[300px]">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-2">
                                 <Lock size={12} /> Cautions Sécurisées
                             </p>
@@ -152,7 +152,7 @@ export default function VaultClient({ data }: { data: any }) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
+                            className="absolute inset-0 bg-slate-900" 
                             onClick={() => setModalOpen(false)} 
                         />
                         <motion.div 

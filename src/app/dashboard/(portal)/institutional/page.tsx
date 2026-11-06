@@ -167,7 +167,7 @@ export default function InstitutionalDashboardPage() {
             <AnimatePresence>
                 {isModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isSubscribing && setIsModalOpen(false)} />
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60" onClick={() => !isSubscribing && setIsModalOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-lg rounded-[24px] shadow-2xl relative z-[101] overflow-hidden border border-slate-200">
                             <div className="p-6 border-b border-slate-100 bg-indigo-50 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-white text-indigo-600 rounded-full flex items-center justify-center shadow-sm">

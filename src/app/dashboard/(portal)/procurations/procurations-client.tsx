@@ -105,7 +105,7 @@ export default function ProcurationDashboardClient({ initialProcurations }: { in
             </div>
 
             {/* Informative Hero Banner */}
-            <div className="bg-gradient-to-br from-purple-900 to-slate-900 rounded-3xl p-6 sm:p-10 text-white relative shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-purple-800">
+            <div className="bg-slate-900 rounded-3xl p-6 sm:p-10 text-white relative shadow-xl overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-purple-800">
                 <div className="relative z-10 max-w-xl space-y-3">
                     <div className="bg-white/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-2 text-purple-200">
                         <ShieldCheck size={13} /> Protection Juridique Validée
@@ -177,7 +177,7 @@ export default function ProcurationDashboardClient({ initialProcurations }: { in
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col border border-slate-200 max-h-[92vh]">
                         {/* Header */}
                         <div className="flex justify-between items-center p-6 border-b border-slate-100 bg-purple-50/60 shrink-0">

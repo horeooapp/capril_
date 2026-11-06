@@ -442,7 +442,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
             {/* MODAL 1 : MODIFIER LE BAIL DÉCLARATIF                    */}
             {/* ======================================================== */}
             {editingBdq && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-150">
                     <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden p-6 relative">
                         {/* Header */}
                         <div className="flex items-start justify-between pb-4 border-b border-slate-100">
@@ -647,7 +647,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
             {/* MODAL 2 : APERÇU DÉTAILLÉ DU BAIL DÉCLARATIF             */}
             {/* ======================================================== */}
             {viewingBdq && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-150">
                     <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 relative">
                         <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                             <div>
@@ -773,7 +773,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
             {/* MODAL 3 : CONFIRMATION DE SUPPRESSION                     */}
             {/* ======================================================== */}
             {deletingLease && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-150">
                     <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-md w-full p-6 relative">
                         <div className="flex items-center gap-3 pb-3">
                             <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">

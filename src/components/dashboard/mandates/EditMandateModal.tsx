@@ -195,7 +195,7 @@ export default function EditMandateModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[140] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[140] bg-slate-950 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.96, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -203,7 +203,7 @@ export default function EditMandateModal({
                 className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-3xl my-auto overflow-hidden flex flex-col max-h-[92vh]"
             >
                 {/* Header */}
-                <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex justify-between items-center border-b border-indigo-900/40">
+                <div className="px-6 py-5 bg-slate-900 text-white flex justify-between items-center border-b border-indigo-900/40">
                     <div className="flex items-center gap-3.5">
                         <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
                             <Edit3 size={22} />
@@ -390,7 +390,7 @@ export default function EditMandateModal({
                             </div>
 
                             {/* Simulation Card */}
-                            <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/60 rounded-2xl p-4">
+                            <div className="bg-slate-900 border border-amber-300/60 rounded-2xl p-4">
                                 <p className="text-xs font-black uppercase tracking-wider text-amber-900 mb-2 flex items-center gap-1.5">
                                     <Sparkles size={14} className="text-amber-500" /> Simulation sur le loyer indicatif du bien ({rentAmount.toLocaleString()} XOF/mois)
                                 </p>
@@ -571,7 +571,7 @@ export default function EditMandateModal({
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                                    className="px-6 py-2.5 bg-[#D97706] hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
                                 >
                                     <Check size={16} /> {isSubmitting ? "Enregistrement..." : "Enregistrer les Modifications"}
                                 </button>

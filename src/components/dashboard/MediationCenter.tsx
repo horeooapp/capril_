@@ -75,7 +75,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
 
     if (showInitForm) {
         return (
-            <div className="p-6 sm:p-8 bg-gradient-to-br from-indigo-50/60 via-white to-blue-50/40 border border-indigo-100 rounded-[24px] shadow-sm animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-6 sm:p-8 bg-slate-900 border border-indigo-100 rounded-[24px] shadow-sm animate-in fade-in zoom-in-95 duration-300">
                 <div className="flex items-start gap-4 mb-6">
                     <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
                         <span className="text-xl">🤝</span>
@@ -126,7 +126,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
                         <button
                             type="submit"
                             disabled={loading || !subject.trim()}
-                            className="flex-1 py-3.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer"
+                            className="flex-1 py-3.5 bg-[#0284C7] hover:from-indigo-700 hover:to-blue-700 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all active:scale-[0.98] uppercase tracking-wider cursor-pointer"
                         >
                             {loading ? "Ouverture en cours..." : "Démarrer le dialogue amiable"}
                         </button>
@@ -152,7 +152,7 @@ export default function MediationCenter({ leaseId, userId, initialMediation }: M
     return (
         <div className="flex flex-col h-[500px] border border-gray-100 rounded-2xl overflow-hidden shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 shrink-0 shadow-md">
+            <div className="bg-[#D97706] p-4 shrink-0 shadow-md">
                 <div className="flex justify-between items-center">
                     <div>
                         <h3 className="text-white font-black uppercase tracking-tight text-lg">{initialMediation.subject}</h3>

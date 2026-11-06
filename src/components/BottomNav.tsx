@@ -79,7 +79,7 @@ export default function BottomNav({ items }: BottomNavProps) {
     return (
         <>
             <nav className="fixed bottom-0 left-0 right-0 z-[100] lg:hidden safe-bottom">
-                <div className="bg-white/95 backdrop-blur-2xl border-t border-gray-100/50 flex items-center justify-around px-4 pb-8 pt-4 shadow-[0_-20px_60px_rgba(0,0,0,0.1)]">
+                <div className="bg-white border-t border-slate-200 flex items-center justify-around px-4 pb-8 pt-4 shadow-[0_-20px_60px_rgba(0,0,0,0.1)]">
                     {coreItems.map((item) => (
                         <NavItem 
                             key={item.label} 
@@ -113,7 +113,7 @@ export default function BottomNav({ items }: BottomNavProps) {
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
                         className="fixed inset-x-4 bottom-[100px] z-[90] lg:hidden focus:outline-none"
                     >
-                        <div className="bg-white/98 backdrop-blur-3xl border border-gray-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] p-8 overflow-hidden max-h-[70vh] flex flex-col">
+                        <div className="bg-white/98 border border-gray-100 rounded-[2.5rem] shadow-[0_20px_80px_rgba(0,0,0,0.15)] p-8 overflow-hidden max-h-[70vh] flex flex-col">
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-8 text-center shrink-0">Sections Additionnelles</h3>
                             <div className="grid grid-cols-3 gap-4 overflow-y-auto no-scrollbar pb-4 -mx-4 px-4">
                                 {moreItems.map((item, i) => (
@@ -141,7 +141,7 @@ export default function BottomNav({ items }: BottomNavProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[80] lg:hidden"
+                    className="fixed inset-0 bg-black/50 z-[80] lg:hidden"
                     onClick={() => setIsMenuOpen(false)}
                 />
             )}

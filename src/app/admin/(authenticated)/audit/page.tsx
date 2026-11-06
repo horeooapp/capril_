@@ -62,7 +62,7 @@ export default function AuditPage() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header section with Premium Ivory Style */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1 relative p-8 rounded-[2.5rem] overflow-hidden bg-white/50 border border-white/80 shadow-2xl backdrop-blur-md flex flex-col justify-center">
+                <div className="lg:col-span-1 relative p-8 rounded-[2.5rem] overflow-hidden bg-white/50 border border-white/80 shadow-2xl flex flex-col justify-center">
                     <div className="absolute top-0 right-0 p-8 opacity-10">
                         <ShieldCheck size={80} className="text-ivoire-dark" />
                     </div>
@@ -112,7 +112,7 @@ export default function AuditPage() {
             </div>
 
             {/* Smart Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/40 backdrop-blur-sm p-4 rounded-2xl border border-white/60 shadow-inner">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/40 p-4 rounded-2xl border border-white/60 shadow-inner">
                 <div className="relative group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-ivoire-dark transition-colors" size={18} />
                     <input 
@@ -120,7 +120,7 @@ export default function AuditPage() {
                         placeholder="Rechercher action, utilisateur, ID..."
                         value={filter.search}
                         onChange={(e) => setFilter({...filter, search: e.target.value})}
-                        className="w-full bg-white/80 border-white/20 focus:border-ivoire-dark/50 text-gray-900 rounded-xl pl-10 pr-3 py-3 outline-none transition-all shadow-sm focus:ring-4 focus:ring-ivoire-dark/5"
+                        className="w-full bg-white border-white/20 focus:border-ivoire-dark/50 text-gray-900 rounded-xl pl-10 pr-3 py-3 outline-none transition-all shadow-sm focus:ring-4 focus:ring-ivoire-dark/5"
                     />
                 </div>
                 <div>
@@ -129,7 +129,7 @@ export default function AuditPage() {
                         <select 
                             value={filter.module}
                             onChange={(e) => setFilter({...filter, module: e.target.value})}
-                            className="w-full bg-white/80 border-white/20 text-gray-900 rounded-xl pl-10 pr-3 py-3 outline-none transition-all shadow-sm focus:ring-4 focus:ring-ivoire-dark/5 appearance-none"
+                            className="w-full bg-white border-white/20 text-gray-900 rounded-xl pl-10 pr-3 py-3 outline-none transition-all shadow-sm focus:ring-4 focus:ring-ivoire-dark/5 appearance-none"
                         >
                             <option value="">Tous les domaines</option>
                             {modules.map(m => <option key={m} value={m}>{m}</option>)}
@@ -137,14 +137,14 @@ export default function AuditPage() {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <div className="flex-1 px-4 py-3 bg-white/60 rounded-xl border border-white/20 text-xs font-black text-ivoire-dark uppercase tracking-widest text-center flex items-center justify-center">
+                    <div className="flex-1 px-4 py-3 bg-white rounded-xl border border-white/20 text-xs font-black text-ivoire-dark uppercase tracking-widest text-center flex items-center justify-center">
                         {filteredLogs.length} Événements
                     </div>
                 </div>
             </div>
 
             {/* Registry Table */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white/100 shadow-2xl overflow-hidden">
+            <div className="bg-white rounded-[2.5rem] border border-white/100 shadow-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -282,7 +282,7 @@ export default function AuditPage() {
 
             {/* Floating Detail Overlay (Simple implementation) */}
             {selectedLog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60">
                     <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-white/50 animate-in zoom-in-95 duration-200">
                         <div className="p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start">
                             <div>

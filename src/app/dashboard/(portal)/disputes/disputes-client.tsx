@@ -106,7 +106,7 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-rose-700 to-rose-900 text-white rounded-3xl p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
+                <div className="bg-slate-900 text-white rounded-3xl p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
                     <Gavel className="absolute -right-4 -bottom-4 text-white opacity-10" size={90} />
                     <div className="relative z-10 flex items-center gap-2 text-rose-200 text-xs font-bold uppercase tracking-wider mb-2">
                         <FileCheck2 size={16} /> Procédures d'Avertissement
@@ -204,7 +204,7 @@ export default function CertifieDisputesClient({ initialDisputes, activeLeases }
 
             {/* OPEN DISPUTE MODAL */}
             {isDlcModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200">
                         {/* Modal Header */}
                         <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">

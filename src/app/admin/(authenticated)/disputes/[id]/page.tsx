@@ -109,7 +109,7 @@ export default async function DisputeDetailPage({ params }: { params: Promise<{ 
 
                 {/* Main timeline */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white/50 backdrop-blur-sm border border-gray-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden">
+                    <div className="bg-white/50 border border-gray-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl -mr-32 -mt-32 rounded-full"></div>
                         
                         <div className="flex items-center justify-between mb-10 pb-6 border-b border-gray-100">

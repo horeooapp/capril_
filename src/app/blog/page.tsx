@@ -32,7 +32,7 @@ export default function BlogPage() {
             
             {/* ARTICLE 1 */}
             <motion.div whileHover={{ y: -5 }} className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-black/5 flex flex-col group cursor-pointer transition-all">
-                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--mango), var(--coral))' }}>
+                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: "transparent" }}>
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-ink shadow-sm">Guide Pratique</div>
                 </div>
                 <div className="flex justify-between items-center mb-4 text-[11px] font-bold text-ink3 uppercase tracking-wider">
@@ -50,7 +50,7 @@ export default function BlogPage() {
 
             {/* ARTICLE 2 */}
             <motion.div whileHover={{ y: -5 }} className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-black/5 flex flex-col group cursor-pointer transition-all">
-                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--sky), var(--teal))' }}>
+                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: "transparent" }}>
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-ink shadow-sm">Actualité</div>
                 </div>
                 <div className="flex justify-between items-center mb-4 text-[11px] font-bold text-ink3 uppercase tracking-wider">
@@ -68,7 +68,7 @@ export default function BlogPage() {
 
             {/* ARTICLE 3 */}
             <motion.div whileHover={{ y: -5 }} className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-black/5 flex flex-col group cursor-pointer transition-all">
-                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, var(--lime-d), var(--lime))' }}>
+                <div className="w-full h-48 bg-gray-100 rounded-2xl mb-6 relative overflow-hidden" style={{ background: "transparent" }}>
                     <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-ink shadow-sm">Réglementation</div>
                 </div>
                 <div className="flex justify-between items-center mb-4 text-[11px] font-bold text-ink3 uppercase tracking-wider">

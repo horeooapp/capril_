@@ -38,9 +38,7 @@ export default function Header() {
   };
 
   // Classe de fond : toujours opaque sauf sur la home avant scroll
-  const navBgClass = !isHome || scrolled
-    ? "bg-[#09090B]/97 backdrop-blur-xl border-b border-white/10 shadow-2xl"
-    : "bg-[#09090B]/60 backdrop-blur-md border-b border-white/5";
+  const navBgClass = !isHome || scrolled ? "bg-[#090D16] border-b border-slate-800 shadow-md" : "bg-[#090D16] border-b border-slate-900";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
@@ -58,7 +56,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden lg:flex items-center gap-1 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
+        <div className="hidden lg:flex items-center gap-1 bg-slate-900 border border-slate-800 px-4 py-1.5 rounded-full">
           {navLinks.map(({ href, label }) => {
             const active = isActive(href);
             return (
@@ -107,7 +105,7 @@ export default function Header() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#09090B]/98 backdrop-blur-2xl border-b border-white/10 px-6 py-8 space-y-5 shadow-2xl">
+        <div className="lg:hidden bg-[#090D16] border-b border-white/10 px-6 py-8 space-y-5 shadow-2xl">
           <div className="flex flex-col space-y-1">
             {navLinks.map(({ href, label }) => {
               const active = isActive(href);

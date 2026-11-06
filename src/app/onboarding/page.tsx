@@ -128,7 +128,7 @@ function OnboardingContent() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
             <Sparkles className="w-4 h-4 text-qgreen-light" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Configuration Excellence</span>
           </div>
@@ -145,7 +145,7 @@ function OnboardingContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="w-full bg-white/5 backdrop-blur-[40px] border border-white/10 rounded-[2.5rem] shadow-[0_32px_120px_-20px_rgba(0,0,0,0.5)] overflow-hidden"
+            className="w-full bg-white/5 -[40px] border border-white/10 rounded-[2.5rem] shadow-[0_32px_120px_-20px_rgba(0,0,0,0.5)] overflow-hidden"
         >
           {/* Progress Bar (Subtle) */}
           <div className="h-1 w-full bg-white/5 overflow-hidden">
@@ -153,7 +153,7 @@ function OnboardingContent() {
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 1.5 }}
-                className="h-full bg-gradient-to-r from-qnavy to-qgreen-light"
+                className="h-full bg-slate-900"
              />
           </div>
 

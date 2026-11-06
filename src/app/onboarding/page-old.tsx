@@ -69,7 +69,7 @@ export default function OnboardingPage() {
                     <img src="/logo.png" alt="QAPRIL Logo" className="h-16 w-auto drop-shadow-2xl" />
                 </div>
                 <div className="text-center space-y-4 mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 backdrop-blur-md border border-white/50 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-amber-600 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/50 border border-white/50 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-amber-600 shadow-sm">
                         Certification État Ivroirien
                     </div>
                     <h2 className="text-5xl lg:text-6xl font-[1000] text-slate-800 tracking-tighter uppercase leading-none">
@@ -84,7 +84,7 @@ export default function OnboardingPage() {
                     {renderProgress()}
                     
                     {error && (
-                        <div className="bg-red-50/50 backdrop-blur-md border border-red-100 text-red-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-10 flex items-center gap-3 animate-shake">
+                        <div className="bg-red-50/50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-10 flex items-center gap-3 animate-shake">
                             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                             {error}
                         </div>

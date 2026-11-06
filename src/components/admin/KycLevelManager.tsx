@@ -218,7 +218,7 @@ export default function KycLevelManager({
                         className={`px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all shadow-md active:scale-95 ${
                             isMasterDisabled
                                 ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                                : "bg-gradient-to-r from-red-600 to-rose-700 text-white hover:from-red-700 hover:to-rose-800 shadow-red-600/20 hover:shadow-lg"
+                                : "bg-slate-900 text-white hover:from-red-700 hover:to-rose-800 shadow-red-600/20 hover:shadow-lg"
                         }`}
                         title="Désactiver tous les niveaux de KYC (bypasser les exigences d'identité et de documents)"
                     >
@@ -234,7 +234,7 @@ export default function KycLevelManager({
                         className={`px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all shadow-md active:scale-95 ${
                             !isMasterDisabled && activeLevelsCount === 4
                                 ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
-                                : "bg-gradient-to-r from-emerald-600 to-teal-700 text-white hover:from-emerald-700 hover:to-teal-800 shadow-emerald-600/20 hover:shadow-lg"
+                                : "bg-[#059669] text-white hover:from-emerald-700 hover:to-teal-800 shadow-emerald-600/20 hover:shadow-lg"
                         }`}
                         title="Réactiver tous les niveaux de KYC (rétablir l'obligation stricte des 4 niveaux)"
                     >
@@ -315,7 +315,7 @@ export default function KycLevelManager({
                             </div>
 
                             {/* Ce que ça débloque */}
-                            <div className="p-3 rounded-xl bg-white/80 border border-slate-200/60 text-[11px] text-slate-600 space-y-1">
+                            <div className="p-3 rounded-xl bg-white border border-slate-200/60 text-[11px] text-slate-600 space-y-1">
                                 <span className="font-bold text-slate-800 block text-[10px] uppercase tracking-wider">
                                     Impact opérationnel :
                                 </span>

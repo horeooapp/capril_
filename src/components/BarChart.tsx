@@ -39,7 +39,7 @@ export default function BarChart({ data, title, unit, color = "#1F4E79" }: BarCh
                                 className="h-full rounded-full relative overflow-hidden"
                                 style={{ backgroundColor: color }}
                             >
-                                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 animate-shimmer"></div>
+                                <div className="absolute inset-0 bg-slate-900 animate-shimmer"></div>
                             </motion.div>
                         </div>
                     </div>

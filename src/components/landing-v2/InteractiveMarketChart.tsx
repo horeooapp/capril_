@@ -48,7 +48,7 @@ export default function InteractiveMarketChart() {
         </div>
 
         {/* Sélecteurs de Période (Style Apple Segmented Control) */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-xl border border-slate-800 self-start md:self-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-slate-800 self-start md:self-auto">
           {(["12M", "24M", "LIVE"] as const).map((t) => (
             <button
               key={t}
@@ -102,7 +102,7 @@ export default function InteractiveMarketChart() {
                       transition={{ duration: 0.8, ease: "easeOut" }}
                       className={`w-full rounded-t-lg transition-all duration-300 relative ${
                         isSelected
-                          ? "bg-gradient-to-t from-amber-600 via-amber-500 to-amber-300 shadow-lg shadow-amber-500/40"
+                          ? "bg-[#D97706]"
                           : "bg-slate-700/80 group-hover:bg-slate-600"
                       }`}
                     >
@@ -129,7 +129,7 @@ export default function InteractiveMarketChart() {
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1 px-1">
             <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-r from-amber-500 to-amber-400 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#D97706] inline-block" />
               Secteur sélectionné
             </span>
             <span>Unité : XOF / Mois</span>
@@ -137,7 +137,7 @@ export default function InteractiveMarketChart() {
         </div>
 
         {/* Colonne Droite (5 cols) : Carte Métrique du Quartier Actif */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-900/90 rounded-2xl p-6 border border-slate-800 relative shadow-xl">
+        <div className="lg:col-span-5 bg-slate-900 rounded-2xl p-6 border border-slate-800 relative shadow-xl">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
@@ -158,14 +158,14 @@ export default function InteractiveMarketChart() {
 
           {/* Grille de stats */}
           <div className="grid grid-cols-2 gap-3 my-5">
-            <div className="p-3.5 bg-slate-950/70 rounded-xl border border-slate-800/80">
+            <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800/80">
               <span className="text-[10px] font-semibold text-slate-400 block mb-1">Loyer Médian</span>
               <div className="text-lg sm:text-xl font-black text-white font-mono">
                 {activeDistrict.avgRent.toLocaleString("fr-FR")}
                 <span className="text-[10px] text-slate-400 font-normal ml-1">XOF</span>
               </div>
             </div>
-            <div className="p-3.5 bg-slate-950/70 rounded-xl border border-slate-800/80">
+            <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800/80">
               <span className="text-[10px] font-semibold text-slate-400 block mb-1">Rendement Brut</span>
               <div className="text-lg sm:text-xl font-black text-amber-400 font-mono">
                 {activeDistrict.yieldRate}%

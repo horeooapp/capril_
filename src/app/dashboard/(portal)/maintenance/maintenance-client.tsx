@@ -280,7 +280,7 @@ export default function MaintenanceDashboardClient({ initialIncidents }: { initi
 
             {/* MODALE DE MESSAGERIE DIRECTE AVEC LE LOCATAIRE */}
             {activeChatIncident && (
-              <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
+              <div className="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
                 <div className="w-full max-w-2xl h-[640px] max-h-[90vh]">
                   <TenantLandlordChatView
                     leaseId={activeChatIncident.leaseId || "lease-emeraude-a1"}

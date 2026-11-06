@@ -232,8 +232,7 @@ export default function SolutionsPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",
+              backgroundImage: "none",
               backgroundSize: "60px 60px"
             }}
           />
@@ -241,8 +240,7 @@ export default function SolutionsPage() {
             className="absolute inset-0 z-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 40% 30%, rgba(245,158,11,0.14) 0%, transparent 60%), radial-gradient(circle at 80% 70%, rgba(2,132,199,0.12) 0%, transparent 55%)"
+              backgroundImage: "none"
             }}
           />
 
@@ -273,7 +271,7 @@ export default function SolutionsPage() {
               </p>
 
               {/* Onglets de sélection de rôle */}
-              <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xl max-w-4xl mx-auto">
+              <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-2xl bg-white/10 border border-white/15 max-w-4xl mx-auto">
                 {ROLES.map((role) => {
                   const isSelected = selectedRole === role.id;
                   return (
@@ -480,8 +478,7 @@ export default function SolutionsPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 50%, rgba(245,158,11,0.15) 0%, transparent 70%)"
+              backgroundImage: "none"
             }}
           />
           <div className="max-w-3xl mx-auto relative z-10">

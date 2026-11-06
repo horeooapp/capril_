@@ -92,8 +92,8 @@ export default function SuccessionDashboardClient({ initialSuccessions, activeLe
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-3xl shadow-xl flex items-center gap-4 relative overflow-hidden text-white">
-                    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white font-bold shrink-0 backdrop-blur-sm">
+                <div className="bg-slate-900 p-6 rounded-3xl shadow-xl flex items-center gap-4 relative overflow-hidden text-white">
+                    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white font-bold shrink-0">
                         <ShieldCheck size={24} />
                     </div>
                     <div className="relative z-10">
@@ -165,7 +165,7 @@ export default function SuccessionDashboardClient({ initialSuccessions, activeLe
 
             {/* Modal */}
             {isSuccModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200">
                         {/* Header */}
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">

@@ -67,14 +67,14 @@ export default function TenantLeasesPage() {
                     <h1 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight uppercase">Mes Baux.</h1>
                     <p className="text-xs sm:text-sm text-gray-500 font-medium">Consultez et gérez vos engagements locatifs en toute transparence.</p>
                 </div>
-                <div className="bg-white/80 backdrop-blur shadow-sm border border-gray-100 px-6 py-3 rounded-2xl flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
+                <div className="bg-white shadow-sm border border-gray-100 px-6 py-3 rounded-2xl flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
                     <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
                     <span className="text-xs sm:text-sm font-bold text-gray-700">{leases.length} Contrat(s) Certifié(s)</span>
                 </div>
             </div>
 
             {leases.length === 0 ? (
-                <div className="bg-white/60 backdrop-blur-xl border-2 border-dashed border-gray-200 rounded-3xl p-20 text-center space-y-4">
+                <div className="bg-white border-2 border-dashed border-gray-200 rounded-3xl p-20 text-center space-y-4">
                     <div className="text-6xl text-gray-200">🏠</div>
                     <h2 className="text-2xl font-bold text-gray-400 uppercase">Aucun bail trouvé</h2>
                     <p className="text-gray-400 max-w-md mx-auto">
@@ -97,7 +97,7 @@ export default function TenantLeasesPage() {
                                 className="group relative bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500"
                             >
                                 {/* Accent Bar */}
-                                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-ivoire-orange via-ivoire-white to-ivoire-green"></div>
+                                <div className="absolute top-0 left-0 right-0 h-2 bg-slate-900"></div>
                                 
                                 <div className="p-6 sm:p-8 space-y-6">
                                     {/* Header: Property Type & Status */}
@@ -221,7 +221,7 @@ export default function TenantLeasesPage() {
             )}
 
             {/* Educational Banner */}
-            <div className="bg-gradient-to-br from-ivoire-orange/10 to-ivoire-green/10 border border-white/50 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="bg-slate-900 border border-white/50 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-10">
                 <div className="h-40 w-40 flex-shrink-0 bg-white rounded-full shadow-2xl flex items-center justify-center text-6xl">
                     📜
                 </div>

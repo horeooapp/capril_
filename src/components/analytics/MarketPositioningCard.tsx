@@ -11,7 +11,7 @@ export function MarketPositioningCard({ benchmark }: { benchmark: BenchmarkResul
   const isOverMarket = benchmark.gapPct < 0;
   
   return (
-    <div className="bg-gradient-to-br from-slate-900 to-black border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden relative group">
+    <div className="bg-slate-900 border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden relative group">
       {/* Abstract Background Glow */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] group-hover:bg-blue-500/20 transition-all duration-700" />
       

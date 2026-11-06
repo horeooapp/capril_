@@ -62,7 +62,7 @@ const Sheet = ({ open, onClose, title, tc, children }: any) => {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[500] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white w-full sm:max-w-lg max-h-[85vh] overflow-y-auto rounded-t-[32px] sm:rounded-[32px] p-6 z-10 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-sm font-black uppercase tracking-widest" style={{ color: tc || T.navy }}>{title}</h3>
@@ -174,7 +174,7 @@ export function OwnerPortalDashboard({
 
   return (
     <div className="min-h-screen relative overflow-hidden institutional-gradient-bg">
-      <div className="fixed inset-0 bg-white/40 backdrop-blur-[100px] -z-10 pointer-events-none"></div>
+      <div className="fixed inset-0 bg-white/40 -[100px] -z-10 pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 relative z-10">
 
@@ -258,13 +258,13 @@ export function OwnerPortalDashboard({
               <Link key={i} href={m.href}
                 className="relative overflow-hidden glass-card-premium p-5 rounded-3xl group flex flex-col items-center justify-center gap-3 transition-all hover:scale-[1.02]"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-transparent pointer-events-none"></div>
+                <div className="absolute inset-0 bg-slate-900 pointer-events-none"></div>
                 <div 
                   className="absolute -right-6 -top-6 w-28 h-28 rounded-full blur-2xl opacity-10 group-hover:opacity-30 transition-opacity duration-500 pointer-events-none" 
                   style={{ backgroundColor: m.color }}
                 ></div>
                 <div className="relative z-10 w-16 h-16 rounded-[1.25rem] flex items-center justify-center transform group-hover:scale-110 transition-transform duration-500 shadow-sm border border-white/60"
-                  style={{ background: `linear-gradient(135deg, ${m.color}15, ${m.color}30)`, color: m.color }}
+                  style={{ background: `${m.color}15`, color: m.color }}
                 >
                   {m.icon}
                 </div>

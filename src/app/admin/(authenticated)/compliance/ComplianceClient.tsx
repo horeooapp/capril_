@@ -42,7 +42,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Risky Profiles */}
-            <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl p-8 shadow-sm">
+            <div className="rounded-[3rem] bg-white/40 border border-white/60 p-8 shadow-sm">
                 <h3 className="text-xl font-black text-slate-800 uppercase tracking-wider mb-8 flex items-center gap-3">
                     <Users size={24} className="opacity-50" />
                     Profils Suspects
@@ -52,7 +52,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
                     {profiles.length === 0 ? (
                         <p className="text-gray-400 italic font-medium bg-gray-50 p-6 rounded-2xl text-center">Aucun profil suspect détecté.</p>
                     ) : profiles.map((user: any, i: number) => (
-                        <div key={i} className="flex flex-col sm:flex-row items-center justify-between p-5 rounded-3xl bg-white/60 border border-red-100 hover:border-red-300 transition-all group gap-4">
+                        <div key={i} className="flex flex-col sm:flex-row items-center justify-between p-5 rounded-3xl bg-white border border-red-100 hover:border-red-300 transition-all group gap-4">
                             <div className="flex items-center gap-4 w-full sm:w-auto">
                                 <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 font-black text-xl shrink-0">
                                     {user.score}
@@ -85,7 +85,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
             </div>
 
             {/* Audit Log / Activity */}
-            <div className="rounded-[3rem] bg-white/40 border border-white/60 backdrop-blur-2xl p-8 shadow-sm">
+            <div className="rounded-[3rem] bg-white/40 border border-white/60 p-8 shadow-sm">
                 <h3 className="text-xl font-black text-slate-800 uppercase tracking-wider mb-8 flex items-center gap-3">
                     <Activity size={24} className="opacity-50" />
                     Journal de Surveillance
@@ -110,7 +110,7 @@ export default function ComplianceClient({ initialProfiles, logs }: { initialPro
             </div>
 
             {selectedProfile && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60">
                     <div className="bg-white max-w-lg w-full rounded-[2.5rem] p-8 shadow-2xl relative">
                         <button onClick={() => setSelectedProfile(null)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold">X</button>
                         

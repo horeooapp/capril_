@@ -48,7 +48,7 @@ export default function LocataireLayoutClient({
         <SessionProvider session={session}>
             <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-x-hidden">
             {/* Trame architecturale filigrane */}
-            <div className="fixed inset-0 bg-[linear-gradient(to_right,#0F172A08_1px,transparent_1px),linear-gradient(to_bottom,#0F172A08_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+            <div className="fixed inset-0 bg-slate-50 bg-[size:48px_48px] pointer-events-none z-0" />
             <div className="fixed top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none z-0" />
             
             {/* Vertical Sidebar - Only for Desktop */}
@@ -64,7 +64,7 @@ export default function LocataireLayoutClient({
             <div className="flex-1 flex flex-col lg:pl-[280px] transition-all duration-300">
                 {/* Mobile Header pour Espace Locataire */}
                 {session?.user && (
-                    <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shrink-0 shadow-xs">
+                    <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shrink-0 shadow-xs">
                         <div className="flex items-center gap-2 min-w-0">
                             {/* Bouton Retour Accueil Public */}
                             <Link 

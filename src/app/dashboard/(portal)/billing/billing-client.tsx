@@ -69,7 +69,7 @@ export default function BillingDashboardClient({ userPlan }: { userPlan: any }) 
                  </div>
 
                  {/* Premium Tier */}
-                 <div className={`bg-gradient-to-br from-slate-800 to-slate-900 border ${currentTier === 'PRO' ? 'border-emerald-500 border-2' : 'border-slate-700'} rounded-[16px] p-8 shadow-lg flex flex-col items-center text-center relative transform md:-translate-y-4`}>
+                 <div className={`bg-slate-900 border ${currentTier === 'PRO' ? 'border-emerald-500 border-2' : 'border-slate-700'} rounded-[16px] p-8 shadow-lg flex flex-col items-center text-center relative transform md:-translate-y-4`}>
                      <div className="absolute -top-4 bg-amber-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Recommandé</div>
                      <h3 className="text-[15px] font-black text-sky-400 uppercase tracking-widest mb-2">Agence Intermédiaire</h3>
                      <div className="text-4xl font-black text-white mb-6">0 <span className="text-[13.5px] text-slate-400 font-bold">XOF / mois</span></div>

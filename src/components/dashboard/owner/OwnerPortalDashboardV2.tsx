@@ -102,7 +102,7 @@ export function OwnerPortalDashboardV2({
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       
       {/* ── TOP HEADER / GREETING & QUICK ACTIONS (Apple / FinTech Precision) ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -121,21 +121,21 @@ export function OwnerPortalDashboardV2({
         <div className="flex flex-wrap items-center gap-2.5">
           <Link 
             href="/dashboard/leases/new" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200 "
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all duration-200"
           >
             <Plus size={15} />
             <span>Nouveau Bail</span>
           </Link>
           <Link 
             href="/dashboard/properties/new" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200 "
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold shadow-sm transition-all duration-200"
           >
             <Building2 size={15} className="text-slate-400" />
             <span>Ajouter un Bien</span>
           </Link>
           <Link 
             href="/dashboard/receipts" 
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200 "
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200"
           >
             <Receipt size={15} className="text-slate-500" />
             <span>Quittances</span>
@@ -308,7 +308,7 @@ export function OwnerPortalDashboardV2({
         <div className="overflow-x-auto relative rounded-xl border border-slate-200/70">
           {/* Skeleton Overlay */}
           {isPending && (
-            <div className="absolute inset-0 z-10 bg-white/70 backdrop-blur-[2px] flex items-center justify-center">
+            <div className="absolute inset-0 z-10 bg-white -[2px] flex items-center justify-center">
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                 <span className="text-xs font-bold text-slate-700">Actualisation de la Marketplace...</span>

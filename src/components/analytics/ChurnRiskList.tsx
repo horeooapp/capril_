@@ -10,7 +10,7 @@ import { AlertTriangle, Clock, MessageSquare, ArrowRight } from "lucide-react";
  */
 export function ChurnRiskList({ risks }: { risks: ChurnRisk[] }) {
   return (
-    <div className="bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[40px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]">
+    <div className="bg-black/40 border border-white/10 rounded-[40px] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]">
       <div className="p-10 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h3 className="text-3xl font-black text-white tracking-tighter">Analyse de Rétention</h3>
@@ -33,7 +33,7 @@ export function ChurnRiskList({ risks }: { risks: ChurnRisk[] }) {
             risks.map((risk) => (
             <div key={risk.leaseId} className="p-10 hover:bg-white/[0.03] transition-all duration-500 group relative">
                 {/* Background Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/0 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                <div className="absolute inset-0 bg-slate-900 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 
                 <div className="flex flex-col lg:flex-row justify-between gap-10 relative z-10">
                 <div className="flex gap-8">
@@ -76,7 +76,7 @@ export function ChurnRiskList({ risks }: { risks: ChurnRisk[] }) {
                 </div>
 
                 {/* AI Advice Card */}
-                <div className="flex-1 max-w-lg bg-white/5 backdrop-blur-md border border-white/5 p-6 rounded-[24px] transform group-hover:translate-x-[-8px] transition-transform">
+                <div className="flex-1 max-w-lg bg-white/5 border border-white/5 p-6 rounded-[24px] transform group-hover:translate-x-[-8px] transition-transform">
                     <div className="flex items-center gap-3 mb-3">
                     <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                         <MessageSquare className="w-3 h-3 text-white fill-white" />

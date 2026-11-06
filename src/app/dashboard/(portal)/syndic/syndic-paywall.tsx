@@ -66,7 +66,7 @@ export default function SyndicPaywall() {
                     </ul>
                 </div>
                 
-                <div className="p-10 md:w-2/5 bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col justify-center relative overflow-hidden">
+                <div className="p-10 md:w-2/5 bg-slate-900 text-white flex flex-col justify-center relative overflow-hidden">
                     <Zap size={150} className="absolute -bottom-10 -right-10 text-white opacity-5" />
                     
                     <div className="relative z-10 text-center">

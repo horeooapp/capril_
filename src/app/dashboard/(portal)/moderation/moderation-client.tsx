@@ -53,7 +53,7 @@ export default function AntiFraudSentinelClient({ initialLogs }: { initialLogs: 
                     <span className="text-2xl font-black text-amber-700">{auditLogs.length} <span className="text-[10px] font-bold opacity-70">Actes</span></span>
                 </div>
 
-                <div className="bg-[linear-gradient(135deg,#0F172A_0%,#000000_100%)] p-5 rounded-[2rem] shadow-lg flex flex-col justify-center relative overflow-hidden">
+                <div className="bg-slate-50 p-5 rounded-[2rem] shadow-lg flex flex-col justify-center relative overflow-hidden">
                      <ShieldAlert className="absolute -right-4 -bottom-4 text-white opacity-5" size={100} />
                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 relative z-10 flex items-center gap-1.5"><Database size={10}/> Intégrité Blockchain</span>
                      <span className="text-2xl font-black text-emerald-400 relative z-10">99.98%</span>

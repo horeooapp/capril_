@@ -217,12 +217,12 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
         <div className="space-y-8 animate-fade-in pb-16">
             
             {/* 1. HERO BANNER */}
-            <div className="relative rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-6 md:p-10 text-white overflow-hidden shadow-2xl border border-slate-800">
+            <div className="relative rounded-3xl bg-slate-900 p-6 md:p-10 text-white overflow-hidden shadow-2xl border border-slate-800">
                 <div className="absolute -right-10 -top-10 w-72 h-72 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="absolute -left-10 -bottom-10 w-72 h-72 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="relative z-10 max-w-3xl space-y-3">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-300 uppercase tracking-widest shadow-inner">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-amber-300 uppercase tracking-widest shadow-inner">
                         <Sparkles size={14} className="text-amber-400" />
                         Logements Certifiés & Baux Sécurisés
                     </div>
@@ -236,7 +236,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
             </div>
 
             {/* 2. BANNIÈRE ALERTE AUTOMATIQUE LINK TO PROFIL PUBLIC */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-50 to-orange-500/10 border border-amber-300/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-amber-300/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-sm">
                         <Bell size={20} className="animate-pulse" />
@@ -517,7 +517,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                                             <Badge color="emerald">Vérifié QAPRIL ✓</Badge>
                                         )}
                                     </div>
-                                    <div className="absolute bottom-4 right-4 bg-slate-900/90 backdrop-blur-md text-white px-4 py-1.5 rounded-full text-sm font-black border border-white/20 shadow-md font-mono">
+                                    <div className="absolute bottom-4 right-4 bg-slate-900 text-white px-4 py-1.5 rounded-full text-sm font-black border border-white/20 shadow-md font-mono">
                                         {formatXof(rentPrice)} / mois
                                     </div>
                                 </div>
@@ -571,9 +571,9 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
 
             {/* MODAL DE DÉPÔT DE CANDIDATURE */}
             {isApplying && selectedAnnonce && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 animate-fade-in">
                     <div className="bg-white rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl border border-slate-100 animate-scale-up">
-                        <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-8 text-white relative">
+                        <div className="bg-slate-900 p-8 text-white relative">
                             <button 
                                 onClick={() => setIsApplying(false)}
                                 className="absolute top-6 right-6 w-8 h-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"

@@ -69,7 +69,7 @@ export default async function TenantLeaseDetailPage({ params }: { params: Promis
                 {/* Main Info */}
                 <div className="lg:col-span-2 space-y-8">
                     <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-                        <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6 text-white flex justify-between items-center">
+                        <div className="bg-gray-900 p-6 text-white flex justify-between items-center">
                             <div>
                                 <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Référence du bien</p>
                                 <h2 className="text-xl font-bold uppercase">{lease.property.address}</h2>

@@ -106,7 +106,7 @@ export default function RevokeMandateModal({
     }
 
     return (
-        <div className="fixed inset-0 z-[150] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-[150] bg-slate-950 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.96, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -114,7 +114,7 @@ export default function RevokeMandateModal({
                 className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-2xl my-auto overflow-hidden flex flex-col max-h-[92vh]"
             >
                 {/* Header with warning styling */}
-                <div className="px-6 py-5 bg-gradient-to-r from-rose-950 via-rose-900 to-slate-900 text-white flex justify-between items-center border-b border-rose-800/40">
+                <div className="px-6 py-5 bg-slate-900 text-white flex justify-between items-center border-b border-rose-800/40">
                     <div className="flex items-center gap-3.5">
                         <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-center text-rose-400 shadow-inner">
                             <ShieldAlert size={24} />
@@ -281,7 +281,7 @@ export default function RevokeMandateModal({
                         <button
                             type="submit"
                             disabled={isSubmitting || !hasConfirmed}
-                            className="px-6 py-2.5 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2.5 bg-slate-900 hover:from-rose-700 hover:to-rose-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
                         >
                             <ShieldAlert size={16} /> {isSubmitting ? "Révocation en cours..." : "Confirmer la Révocation du Mandat"}
                         </button>

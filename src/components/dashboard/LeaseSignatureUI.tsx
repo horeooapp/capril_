@@ -138,8 +138,8 @@ export default function LeaseSignatureUI({ leaseId, leaseRef, fullLease }: { lea
             </div>
         )}
 
-        <Card className="max-w-lg mx-auto shadow-2xl border-2 border-amber-300 rounded-3xl overflow-hidden print:hidden bg-gradient-to-b from-white to-amber-50/20">
-            <CardHeader className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-b border-amber-100 p-6">
+        <Card className="max-w-lg mx-auto shadow-2xl border-2 border-amber-300 rounded-3xl overflow-hidden print:hidden bg-slate-900">
+            <CardHeader className="bg-slate-900 border-b border-amber-100 p-6">
                 <div className="flex items-center gap-3">
                     <div className="p-3 bg-amber-500 text-slate-950 rounded-2xl shadow-sm">
                         <ShieldCheck className="w-6 h-6" />
@@ -182,7 +182,7 @@ export default function LeaseSignatureUI({ leaseId, leaseRef, fullLease }: { lea
                     />
 
                     <Button 
-                        className="w-full h-13 text-sm sm:text-base font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-2xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]" 
+                        className="w-full h-13 text-sm sm:text-base font-black uppercase tracking-wider bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 rounded-2xl shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]" 
                         onClick={handleSign}
                         disabled={loading || otp.trim().length !== 6}
                     >

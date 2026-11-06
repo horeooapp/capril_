@@ -206,7 +206,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
         </div>
 
         {/* HEADER */}
-        <div style={{ background: `linear-gradient(145deg,${T.navy} 0%,${T.teal} 100%)`, padding: "14px 20px 18px", position: "relative", overflow: "hidden" }}>
+        <div style={{ background: `${T.navy}`, padding: "14px 20px 18px", position: "relative", overflow: "hidden" }}>
           <div style={{ display: "flex", justifySelf: "space-between", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
@@ -258,7 +258,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           {/* logement */}
           <div style={{padding:"12px 16px 0"}}>
             <SecTitle label="Mon logement"/>
-            <div onClick={()=>go("bail")} style={{background:`linear-gradient(135deg,${T.navy}08,${T.teal}08)`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,cursor:"pointer"}}>
+            <div onClick={()=>go("bail")} style={{background:`#F8FAFC`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,cursor:"pointer"}}>
               <div style={{fontSize:12,fontWeight:800,color:T.text,marginBottom:4}}>{bail.logement}</div>
               <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
                 <Badge label={bail.type} color={T.teal} bg={T.tealPale}/>
@@ -334,7 +334,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
       {/* ══ MON BAIL ══ */}
       {tab==="bail"&&(
         <div style={{padding:"12px 16px 0"}}>
-          <div style={{background:`linear-gradient(135deg,${T.navy}08,${T.teal}08)`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,marginBottom:12}}>
+          <div style={{background:`#F8FAFC`,border:`1px solid ${T.navy}15`,borderRadius:14,padding:13,marginBottom:12}}>
             <div style={{fontSize:13,fontWeight:800,color:T.text,marginBottom:4}}>{bail.logement}</div>
             <div style={{fontSize:10,color:T.textLight,marginBottom:8}}>{bail.adresse}</div>
             <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:10}}>
@@ -549,7 +549,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
                     <span>⏳ 144h</span><span style={{color:T.orange,fontWeight:700}}>{t.heures || 0}h restantes</span>
                   </div>
                   <div style={{height:5,background:T.grey1,borderRadius:4,overflow:"hidden"}}>
-                    <div style={{height:"100%",width:`${Math.round((1-(t.heures||0)/144)*100)}%`,background:`linear-gradient(90deg,${T.green},${T.orange})`,borderRadius:4}}/>
+                    <div style={{height:"100%",width:`${Math.round((1-(t.heures||0)/144)*100)}%`,background:`${T.teal}`,borderRadius:4}}/>
                   </div>
                   <div style={{fontSize:8,color:T.textLight,marginTop:2,textAlign:"right"}}>Clôture auto : {t.echeance}</div>
                 </div>
@@ -802,7 +802,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
       {tab==="profil"&&(
         <div style={{padding:"12px 16px 0"}}>
           {/* avatar */}
-          <div style={{background:`linear-gradient(135deg,${T.navy},${T.teal})`,borderRadius:14,padding:14,marginBottom:12,textAlign:"center"}}>
+          <div style={{background:`${T.navy}`,borderRadius:14,padding:14,marginBottom:12,textAlign:"center"}}>
             <div style={{width:56,height:56,borderRadius:"50%",background:T.white+"20",border:`2px solid ${T.white}30`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,margin:"0 auto 8px"}}>👤</div>
             <div style={{fontSize:15,fontWeight:800,color:T.white}}>{loc.nom}</div>
             <div style={{fontSize:11,color:T.white,opacity:.7}}>{loc.tel}</div>
@@ -827,7 +827,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
               </div>
             </div>
             <div style={{height:5,background:T.grey1,borderRadius:4,overflow:"hidden"}}>
-              <div style={{height:"100%",width:`${Math.round((sc-300)/700*100)}%`,background:`linear-gradient(90deg,${T.red},${T.orange},${T.green})`,borderRadius:4}}/>
+              <div style={{height:"100%",width:`${Math.round((sc-300)/700*100)}%`,background:scColor,borderRadius:4}}/>
             </div>
             <div style={{display:"flex",gap:6,marginTop:8}}>
               {[{l:"Inscrit",v:loc.scoreBase,c:T.navy},{l:"KYC ✓",v:loc.scoreKyc,c:T.teal},{l:"Actuel",v:sc,c:scColor}].map((j,i)=>(
@@ -895,7 +895,7 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
       <div style={{background:scColor+"10",border:`1.5px solid ${scColor}25`,borderRadius:12,padding:12,marginBottom:12,textAlign:"center"}}>
         <div style={{fontSize:40,fontWeight:900,color:scColor,fontFamily:"monospace"}}>{sc}</div>
         <div style={{height:8,background:T.grey1,borderRadius:4,overflow:"hidden",marginTop:8,marginBottom:4}}>
-          <div style={{height:"100%",width:`${Math.round((sc-300)/700*100)}%`,background:`linear-gradient(90deg,${T.red},${T.orange},${T.green})`,borderRadius:4}}/>
+          <div style={{height:"100%",width:`${Math.round((sc-300)/700*100)}%`,background:scColor,borderRadius:4}}/>
         </div>
         <div style={{display:"flex",justifyContent:"space-between",fontSize:8,color:T.textLight}}><span>300</span><span>550</span><span>700</span><span>850</span><span>1000</span></div>
       </div>

@@ -38,7 +38,7 @@ export default async function InviteAcceptPage({ params }: { params: Promise<{ t
                 <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-qorange-pale/40 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2" />
                 <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-qnavy-pale/40 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2" />
                 
-                <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-10 max-w-xl w-full shadow-[0_32px_80px_rgba(13,43,110,0.08)] space-y-8 text-center border border-white relative z-10">
+                <div className="bg-white rounded-[2.5rem] p-10 max-w-xl w-full shadow-[0_32px_80px_rgba(13,43,110,0.08)] space-y-8 text-center border border-white relative z-10">
                     <ProtectedLogo src="/logo.png" alt="QAPRIL" className="h-10 w-auto mx-auto mb-8" />
                     
                     <div className="mx-auto w-20 h-20 bg-qgreen-pale rounded-full flex items-center justify-center text-qgreen shadow-inner">

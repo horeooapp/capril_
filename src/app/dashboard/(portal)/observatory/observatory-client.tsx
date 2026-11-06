@@ -347,7 +347,7 @@ export default function GeoRadarDashboardClient({
                 <div className="flex-1 bg-white rounded-[24px] border border-slate-200 overflow-hidden relative min-h-[520px] shadow-sm flex items-center justify-center">
                     {/* Map Grid Background */}
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-multiply"></div>
-                    <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at center, transparent 0%, #f8fafc 100%)" }}></div>
+                    <div className="absolute inset-0" style={{ backgroundImage: "none" }}></div>
 
                     {/* Simulated Radar Sweep */}
                     <div className="absolute top-1/2 left-1/2 w-[700px] h-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-500/10 animate-[spin_12s_linear_infinite] flex items-center justify-center pointer-events-none">
@@ -356,21 +356,21 @@ export default function GeoRadarDashboardClient({
                         </div>
                         {/* Sweeper arm */}
                         <div
-                            className="absolute top-1/2 left-1/2 w-1/2 h-[2px] bg-gradient-to-r from-indigo-500/0 via-indigo-500/20 to-indigo-400 origin-left"
+                            className="absolute top-1/2 left-1/2 w-1/2 h-[2px] bg-slate-900 origin-left"
                             style={{ clipPath: "polygon(0 0, 100% -5000%, 100% 5000%)" }}
                         ></div>
                     </div>
 
                     {/* Top Left GPS indicator */}
                     <div className="absolute top-4 left-4 flex gap-2 z-10">
-                        <div className="bg-white/90 backdrop-blur-md border border-slate-200 px-3 py-1.5 rounded-[8px] flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-indigo-700 shadow-sm">
+                        <div className="bg-white border border-slate-200 px-3 py-1.5 rounded-[8px] flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-indigo-700 shadow-sm">
                             <Crosshair size={14} className="text-indigo-600" /> Télémétrie Active ({filteredProperties.length} actifs)
                         </div>
                     </div>
 
                     {/* Empty State Overlay */}
                     {filteredProperties.length === 0 && (
-                        <div className="relative z-10 text-center p-8 max-w-md bg-white/90 backdrop-blur-md rounded-2xl border border-slate-200 shadow-lg">
+                        <div className="relative z-10 text-center p-8 max-w-md bg-white rounded-2xl border border-slate-200 shadow-lg">
                             <Building2 className="mx-auto text-slate-400 mb-3" size={36} />
                             <h3 className="font-bold text-slate-800 text-base">Aucun actif affiché</h3>
                             <p className="text-xs text-slate-500 mt-1">

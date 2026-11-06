@@ -22,7 +22,7 @@ export default function AgencyLoginPage() {
                     />
                     
                     {/* Overlay architectural élégant bleu marine & ardoise */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-sky-950/40" />
+                    <div className="absolute inset-0 bg-slate-900" />
 
                     {/* Top Branding */}
                     <div className="relative z-10">
@@ -49,7 +49,7 @@ export default function AgencyLoginPage() {
                         transition={{ duration: 0.6, ease: "easeOut" }}
                         className="relative z-10 max-w-xl text-white"
                     >
-                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-[10px] font-black uppercase tracking-wider text-sky-300 mb-6 backdrop-blur-md">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 border border-sky-400/30 text-[10px] font-black uppercase tracking-wider text-sky-300 mb-6">
                             <Sparkles className="w-3.5 h-3.5 text-sky-400" />
                             Mandats Exclusifs & Gestion Déléguée
                         </div>
@@ -64,7 +64,7 @@ export default function AgencyLoginPage() {
                         </p>
 
                         {/* Trust Badges */}
-                        <div className="flex items-center gap-6 bg-slate-900/80 px-6 py-3.5 rounded-xl border border-slate-700/80 inline-flex shadow-xl backdrop-blur-md">
+                        <div className="flex items-center gap-6 bg-slate-900 px-6 py-3.5 rounded-xl border border-slate-700/80 inline-flex shadow-xl">
                             <div className="flex items-center gap-3">
                                 <ClipboardList className="w-7 h-7 text-sky-400" />
                                 <div>
@@ -87,7 +87,7 @@ export default function AgencyLoginPage() {
                 {/* Form Right Side — Blanc épuré lumineux */}
                 <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center p-6 lg:p-12 relative z-20 bg-[#F8FAFC]">
                     {/* Grille fine vectorielle */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+                    <div className="absolute inset-0 bg-slate-50 bg-[size:48px_48px] pointer-events-none z-0" />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.98 }}

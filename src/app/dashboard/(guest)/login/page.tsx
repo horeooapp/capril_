@@ -22,7 +22,7 @@ export default function LandlordLoginPage() {
                     />
                     
                     {/* Overlay architectural sombre élégant */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/40" />
+                    <div className="absolute inset-0 bg-slate-950/40" />
 
                     {/* Top Branding */}
                     <div className="relative z-10">
@@ -64,7 +64,7 @@ export default function LandlordLoginPage() {
                         </p>
 
                         {/* Trust Badges */}
-                        <div className="flex items-center gap-6 bg-slate-900/80 px-6 py-3.5 rounded-xl border border-slate-700/80 inline-flex shadow-xl">
+                        <div className="flex items-center gap-6 bg-slate-900 px-6 py-3.5 rounded-xl border border-slate-700/80 inline-flex shadow-xl">
                             <div>
                                 <div className="text-xl xl:text-2xl font-black text-white">99.4%</div>
                                 <div className="text-[9px] uppercase tracking-wider text-amber-400 font-bold">Taux Recouvrement</div>
@@ -81,7 +81,7 @@ export default function LandlordLoginPage() {
                 {/* Form Right Side — Blanc épuré lumineux */}
                 <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center p-6 lg:p-12 relative z-20 bg-[#F8FAFC]">
                     {/* Grille fine vectorielle */}
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+                    <div className="absolute inset-0 bg-slate-50 bg-[size:48px_48px] pointer-events-none z-0" />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.98 }}

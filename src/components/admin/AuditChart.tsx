@@ -26,7 +26,7 @@ export default function AuditChart({ logs }: AuditChartProps) {
     const maxCount = Math.max(...data.map(d => d.count), 1)
 
     return (
-        <div className="bg-white/50 backdrop-blur-md border border-white/80 rounded-[2.5rem] p-8 shadow-xl">
+        <div className="bg-white/50 border border-white/80 rounded-[2.5rem] p-8 shadow-xl">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Activité Système (7j)</h3>

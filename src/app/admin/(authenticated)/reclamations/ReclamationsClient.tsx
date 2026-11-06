@@ -155,7 +155,7 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
 
 
             {selectedTicket && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60">
                     <div className="bg-white max-w-lg w-full rounded-[2.5rem] p-8 shadow-2xl relative">
                         <button onClick={() => setSelectedTicket(null)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold">✕</button>
                         
@@ -190,7 +190,7 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
             )}
 
             {selectedSignalement && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60">
                     <div className="bg-white max-w-lg w-full rounded-[2.5rem] p-8 shadow-2xl relative">
                         <button onClick={() => setSelectedSignalement(null)} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center font-bold">X</button>
                         

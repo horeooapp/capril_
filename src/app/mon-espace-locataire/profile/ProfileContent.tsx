@@ -59,7 +59,7 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
 
              {/* Hero Card */}
              <motion.div variants={itemVariants} className="bg-white p-6 sm:p-10 rounded-[2rem] border border-qgrey-2 shadow-[0_12px_40px_rgba(13,43,110,0.04)] relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle_at_top_right,var(--color-qnavy-pale),transparent_70%)] pointer-events-none blur-xl"></div>
+                <div className="absolute top-0 right-0 w-64 h-64  pointer-events-none blur-xl"></div>
                 
                 <div className="w-24 h-24 sm:w-32 sm:h-32 bg-qnavy-pale rounded-[1.8rem] sm:rounded-[2rem] flex items-center justify-center border-4 border-white shadow-xl rotate-3 relative z-10 shrink-0">
                     {user?.avatarUrl ? (
@@ -177,8 +177,8 @@ export default function ProfileContent({ user, primaryDoc, isIdentityLocked }: a
             )}
 
             {/* Alert / Notice */}
-            <motion.div variants={itemVariants} className="bg-[linear-gradient(135deg,#FDF6E3_0%,#F5E6BE_100%)] p-6 sm:p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm flex items-start gap-4">
-                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 rounded-xl flex items-center justify-center backdrop-blur-sm shrink-0 border border-white/50 mt-1">
+            <motion.div variants={itemVariants} className="bg-slate-50 p-6 sm:p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm flex items-start gap-4">
+                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/50 rounded-xl flex items-center justify-center shrink-0 border border-white/50 mt-1">
                      <ShieldCheck className="text-[#97782A]" size={22} />
                  </div>
                  <div>

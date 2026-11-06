@@ -209,7 +209,7 @@ export const EnergyDashboard: React.FC<{ leaseId?: string, utilities?: any[] }> 
                     animate={{ height: `${(d.val / maxVal) * 100}%` }}
                     transition={{ delay: i * 0.1 + 0.5, duration: 0.8, ease: "easeOut" }}
                     className={`w-full max-w-[60px] rounded-t-2xl relative cursor-pointer hover:brightness-110 transition-all ${
-                      activeProvider === 'cie' ? "bg-gradient-to-t from-orange-400 to-orange-500" : "bg-gradient-to-t from-blue-400 to-blue-500"
+                      activeProvider === 'cie' ? "bg-slate-900" : "bg-slate-900"
                     }`}
                   >
                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-white/10 rounded-t-2xl"></div>

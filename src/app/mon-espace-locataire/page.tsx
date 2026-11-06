@@ -230,7 +230,7 @@ export default function LocataireDashboardPage() {
                              </div>
                         </div>
                     ) : (
-                        <div className="bg-white/80 backdrop-blur-md p-10 rounded-3xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)]">
+                        <div className="bg-white p-10 rounded-3xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)]">
                             <div className="w-16 h-16 bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-center text-slate-700 mb-6 mx-auto">
                                 <Home size={32} />
                             </div>
@@ -244,7 +244,7 @@ export default function LocataireDashboardPage() {
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link 
                                     href="/valider-bail" 
-                                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                                    className="bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
                                 >
                                     <span>Valider un code de bail reçu</span>
                                     <Key size={14} />
@@ -304,7 +304,7 @@ export default function LocataireDashboardPage() {
             className="max-w-6xl mx-auto px-4 py-8 space-y-8"
         >
             {/* 1. Header & Quick Status */}
-            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)] relative z-40">
+            <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)] relative z-40">
                 <div>
                     <div className="flex items-center gap-2 mb-1.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -356,12 +356,12 @@ export default function LocataireDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-min">
                 
                 {/* PRIMARY HERO: Rent & Payment (8 cols) */}
-                <BentoItem className="md:col-span-8 p-7 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-[#0F172A] via-[#0B1222] to-[#020617] text-white border-none shadow-[0_20px_50px_rgba(15,23,42,0.25)] min-h-[260px]">
+                <BentoItem className="md:col-span-8 p-7 sm:p-8 flex flex-col justify-between bg-slate-900] text-white border-none shadow-[0_20px_50px_rgba(15,23,42,0.25)] min-h-[260px]">
                     {/* Calm dark surface */}
                     
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
-                            <span className="bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-white/10 text-white/90">
+                            <span className="bg-white/10 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border border-white/10 text-white/90">
                                 Loyer en cours
                             </span>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -757,7 +757,7 @@ export default function LocataireDashboardPage() {
                 </BentoItem>
 
                 {/* MATCHING TINDER IMMO CARD (12 cols) */}
-                <BentoItem className="md:col-span-12 p-8 flex flex-col md:flex-row items-center justify-between bg-gradient-to-r from-amber-500/10 via-amber-50 to-white border border-amber-200/60 shadow-sm group overflow-hidden" delay={0.65}>
+                <BentoItem className="md:col-span-12 p-8 flex flex-col md:flex-row items-center justify-between bg-slate-900 border border-amber-200/60 shadow-sm group overflow-hidden" delay={0.65}>
                     <div className="flex items-center gap-5 relative z-10 w-full md:w-auto mb-6 md:mb-0">
                         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-amber-100 shrink-0">
                             🔥

@@ -39,9 +39,9 @@ export default async function TenantRightsPage() {
             </div>
 
             {/* Educational Banner */}
-            <div className="bg-[linear-gradient(135deg,#FDF6E3_0%,#F5E6BE_100%)] p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm relative overflow-hidden group">
+            <div className="bg-slate-50 p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm relative overflow-hidden group">
                 <div className="flex items-start gap-4 z-10 relative">
-                    <div className="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/50 shrink-0 mt-1">
+                    <div className="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center border border-white/50 shrink-0 mt-1">
                         <ShieldCheck className="text-[#C9A84C]" size={24} />
                     </div>
                     <div>

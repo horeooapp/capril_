@@ -981,7 +981,7 @@ export default function NewPropertyClient() {
                                     <X size={14} />
                                 </button>
                                 {index === 0 && (
-                                    <div className="absolute bottom-0 inset-x-0 bg-slate-900/80 backdrop-blur-xs text-white text-[9px] font-black uppercase tracking-wider py-1 text-center">
+                                    <div className="absolute bottom-0 inset-x-0 bg-slate-900 text-white text-[9px] font-black uppercase tracking-wider py-1 text-center">
                                         Photo principale
                                     </div>
                                 )}

@@ -114,7 +114,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                    <div className="mb-2 bg-gradient-to-r from-sky-500 to-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
+                    <div className="mb-2 bg-[#0284C7] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
                         <Zap size={12} /> Module Intelligence Factures
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3 mt-2">
@@ -150,9 +150,9 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
                      label="Index SODECI Relevés"
                      value={`${properties.length} compteurs`}
                  />
-                 <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-[16px] shadow-md flex items-center gap-4 relative overflow-hidden border border-slate-700">
+                 <div className="bg-slate-900 p-6 rounded-[16px] shadow-md flex items-center gap-4 relative overflow-hidden border border-slate-700">
                     <Calculator className="absolute -right-4 -bottom-4 text-white/5" size={100} />
-                    <div className="bg-white/10 p-3.5 rounded-[12px] backdrop-blur-sm relative z-10 border border-white/10">
+                    <div className="bg-white/10 p-3.5 rounded-[12px] relative z-10 border border-white/10">
                         <CreditCard className="text-emerald-400" size={24} />
                     </div>
                     <div className="relative z-10">
@@ -318,7 +318,7 @@ export default function ChargesDashboardClient({ properties, factures }: { prope
             </div>
 
             {isInvoiceModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-300">
                     <div className="bg-white rounded-[20px] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-200">
                         
                         <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 relative overflow-hidden">

@@ -115,7 +115,7 @@ export default function PendingLeaseValidationCard({ lease, onSuccess }: Pending
     }
 
     return (
-        <section className="relative overflow-hidden rounded-3xl border-2 border-amber-400/90 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30 p-6 sm:p-8 shadow-[0_12px_36px_-6px_rgba(217,119,6,0.18)]">
+        <section className="relative overflow-hidden rounded-3xl border-2 border-amber-400/90 bg-slate-900 p-6 sm:p-8 shadow-[0_12px_36px_-6px_rgba(217,119,6,0.18)]">
             {/* Background Glow */}
             <div className="absolute -top-16 -right-16 w-56 h-56 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
             
@@ -135,7 +135,7 @@ export default function PendingLeaseValidationCard({ lease, onSuccess }: Pending
                 </div>
 
                 {lease.leaseReference && (
-                    <div className="text-left md:text-right shrink-0 bg-white/80 backdrop-blur px-4 py-2.5 rounded-2xl border border-amber-200 shadow-sm">
+                    <div className="text-left md:text-right shrink-0 bg-white px-4 py-2.5 rounded-2xl border border-amber-200 shadow-sm">
                         <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Référence Bail</span>
                         <span className="block font-mono font-black text-sm text-amber-700">{lease.leaseReference}</span>
                     </div>
@@ -147,7 +147,7 @@ export default function PendingLeaseValidationCard({ lease, onSuccess }: Pending
                 
                 {/* Details Box */}
                 <div className="lg:col-span-6 space-y-4">
-                    <div className="p-4 bg-white/90 rounded-2xl border border-amber-200/70 shadow-sm space-y-3">
+                    <div className="p-4 bg-white rounded-2xl border border-amber-200/70 shadow-sm space-y-3">
                         <div className="flex items-start gap-3">
                             <div className="p-2.5 rounded-xl bg-amber-50 text-amber-700 shrink-0">
                                 <Building2 size={20} />
@@ -219,7 +219,7 @@ export default function PendingLeaseValidationCard({ lease, onSuccess }: Pending
                         <button 
                             type="submit"
                             disabled={loading || otp.trim().length !== 6}
-                            className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]"
+                            className="w-full h-12 rounded-xl bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-md shadow-amber-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99]"
                         >
                             {loading ? (
                                 <>

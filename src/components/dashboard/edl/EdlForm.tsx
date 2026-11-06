@@ -83,7 +83,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -108,7 +108,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
         </div>
 
         {/* Progress System */}
-        <div className="px-6 py-4 bg-gray-900/80 border-b border-gray-800/50 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div className="px-6 py-4 bg-gray-900 border-b border-gray-800/50 flex items-center gap-2 overflow-x-auto no-scrollbar">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div 
               key={i} 
@@ -121,7 +121,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-10 bg-gradient-to-b from-gray-900 to-black">
+        <div className="flex-1 overflow-y-auto p-10 bg-slate-900">
           <AnimatePresence mode="wait">
             {step < roomsCount ? (
               <motion.div 
@@ -353,7 +353,7 @@ export default function EdlForm({ leaseId, typeEdl, onClose }: EdlFormProps) {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-8 border-t border-gray-800 bg-gray-900/80 backdrop-blur-xl flex justify-between items-center">
+        <div className="p-8 border-t border-gray-800 bg-gray-900 flex justify-between items-center">
           <button
             onClick={() => setStep(prev => Math.max(0, prev - 1))}
             disabled={step === 0 || loading}

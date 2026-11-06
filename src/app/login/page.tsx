@@ -41,7 +41,7 @@ export default function LoginPage() {
             {/* Version Web Desktop — Design Exécutif Lumineux Architectural */}
             <div className="hidden md:flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden bg-[#F8FAFC] font-sans tracking-tight">
                 {/* Grille fine vectorielle d'architecture */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none z-0" />
+                <div className="absolute inset-0 bg-slate-50 bg-[size:48px_48px] pointer-events-none z-0" />
                 
                 {/* Lueur ambrée très subtile et nette */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-amber-500/5 rounded-full blur-[140px] pointer-events-none z-0" />

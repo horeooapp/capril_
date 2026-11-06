@@ -186,7 +186,7 @@ export default function InteractiveModulesGrid() {
             >
               {/* Gradient d'ambiance en coin */}
               <div
-                className={`absolute top-0 right-0 w-44 h-44 bg-gradient-to-bl ${m.gradient} rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500`}
+                className={`absolute top-0 right-0 w-44 h-44 bg-slate-800/20 rounded-bl-full pointer-events-none transition-transform group-hover:scale-125 duration-500`}
               />
 
               <div>
@@ -222,12 +222,12 @@ export default function InteractiveModulesGrid() {
                     alt={m.title}
                     className="w-full h-full object-cover object-center filter brightness-[0.8] contrast-[1.05] group-hover:scale-105 group-hover:brightness-[0.9] transition-all duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent" />
+                  <div className="absolute inset-0 bg-slate-950" />
                   <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-white">
                     <span className="font-semibold truncate max-w-[170px] drop-shadow-sm">
                       {m.interactiveDetails.title}
                     </span>
-                    <span className="text-[10px] font-mono text-amber-300 font-bold bg-white/10 backdrop-blur-md px-2 py-0.5 rounded border border-white/15">
+                    <span className="text-[10px] font-mono text-amber-300 font-bold bg-slate-900 border border-slate-800 px-2 py-0.5 rounded border border-white/15">
                       Actif
                     </span>
                   </div>

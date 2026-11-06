@@ -16,7 +16,7 @@ export default async function ProfilPublicPage() {
     return (
         <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
             {/* Header & Fil d'Ariane */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)]">
                 <div>
                     <div className="flex items-center gap-2 mb-1.5">
                         <Link 

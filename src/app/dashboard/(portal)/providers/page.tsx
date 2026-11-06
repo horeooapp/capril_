@@ -134,7 +134,7 @@ export default function ProvidersDashboardPage() {
                     </div>
                     <button 
                         onClick={() => setIsAddModalOpen(true)} 
-                        className="bg-gradient-to-r from-slate-900 to-slate-800 text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:from-amber-600 hover:to-amber-500 hover:text-slate-950 transition-all shadow-md flex items-center gap-2"
+                        className="bg-slate-900 text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest hover:from-amber-600 hover:to-amber-500 hover:text-slate-950 transition-all shadow-md flex items-center gap-2"
                     >
                         <Plus size={16} /> Ajouter un Artisan
                     </button>
@@ -150,7 +150,7 @@ export default function ProvidersDashboardPage() {
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-500/30">
+                        <div className="bg-slate-900 text-white rounded-3xl p-6 shadow-xl border border-indigo-500/30">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
@@ -409,7 +409,7 @@ export default function ProvidersDashboardPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[140] bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4"
+                        className="fixed inset-0 z-[140] bg-slate-950 flex items-center justify-center p-4"
                     >
                         <motion.div 
                             initial={{ scale: 0.95, y: 20 }}

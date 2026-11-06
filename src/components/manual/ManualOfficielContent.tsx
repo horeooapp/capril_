@@ -35,7 +35,7 @@ export default function ManualOfficielContent() {
     return (
         <div className="max-w-7xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header / Cover */}
-            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white/60 border border-white/80 shadow-xl backdrop-blur-md mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
+            <div className="relative p-10 md:p-14 rounded-[2.5rem] overflow-hidden bg-white border border-white/80 shadow-xl mb-12 print:shadow-none print:border-none print:bg-transparent print:p-0 print:mb-8">
                 <style dangerouslySetInnerHTML={{__html: `
                     @media print {
                         @page { margin: 2cm; }
@@ -94,7 +94,7 @@ export default function ManualOfficielContent() {
             <div className="flex flex-col lg:flex-row gap-12 print:gap-0">
                 {/* Table of Contents - Sidebar */}
                 <div className="lg:w-1/4 shrink-0 print:hidden">
-                    <div className="sticky top-24 bg-white/60 border border-white/80 p-6 rounded-3xl shadow-lg backdrop-blur-md">
+                    <div className="sticky top-24 bg-white border border-white/80 p-6 rounded-3xl shadow-lg">
                         <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                             <Book size={18} className="text-ivoire-dark" /> Sommaire
                         </h3>
@@ -133,7 +133,7 @@ export default function ManualOfficielContent() {
                 <div className="lg:w-3/4 space-y-16 print:w-full print:space-y-10">
                     
                     {/* SECTION 1 */}
-                    <div id="section-1" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-1" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">1. Qu&apos;est-ce que QAPRIL ?</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
                             <p className="print:text-black">QAPRIL est une application numérique Fintech qui permet aux propriétaires et locataires de gérer leurs locations de façon simple, sécurisée et autonome en Côte d&apos;Ivoire.</p>
@@ -169,7 +169,7 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 2 */}
-                    <div id="section-2" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-2" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">2. S&apos;inscrire sur QAPRIL</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
                             <p className="print:text-black">L&apos;inscription est gratuite. Vous avez besoin uniquement de votre numéro de téléphone ivoirien.</p>
@@ -189,7 +189,7 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 3 */}
-                    <div id="section-3" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-3" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">3. Guide du Propriétaire & Vault Caution</h2>
                         <div className="space-y-10 text-gray-600 print:text-black">
                             
@@ -212,7 +212,7 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 4 */}
-                    <div id="section-4" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-4" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">4. Guide du Locataire & Passeport</h2>
                         <div className="space-y-8 text-gray-600 text-sm leading-relaxed print:text-black">
                             
@@ -229,7 +229,7 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 5 */}
-                    <div id="section-5" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-5" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">5. Abonnements Internet & Utilités</h2>
                         <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 print:text-black">
                             <p className="print:text-black">QAPRIL connecte directement la maison aux opérateurs nationaux. Fini les files d'attente en agence.</p>
@@ -247,13 +247,13 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 6 */}
-                    <div id="section-6" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-6" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">6. Agences & Agents</h2>
                         <p className="text-gray-600 mb-6">Les agences immobilières bénéficient du mode <strong>Syndic de Copropriété</strong>, permettant d'agréger plusieurs propriétaires, de voter des budgets et de gérer les millièmes.</p>
                     </div>
 
                     {/* SECTION 7 */}
-                    <div id="section-7" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-7" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">7. Le Portail Diaspora</h2>
                         <div className="p-6 bg-ivoire-dark/5 border border-ivoire-dark/20 rounded-2xl">
                             <h3 className="font-bold text-ivoire-dark mb-2">Formule "Sérénité" ou "VIP"</h3>
@@ -262,7 +262,7 @@ export default function ManualOfficielContent() {
                     </div>
 
                     {/* SECTION 8 */}
-                    <div id="section-8" className="bg-white/70 border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl backdrop-blur-md scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
+                    <div id="section-8" className="bg-white border border-white/80 p-8 md:p-12 rounded-[2.5rem] shadow-xl scroll-mt-24 print:bg-transparent print:shadow-none print:border-none print:p-0 print:m-0">
                         <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-8 uppercase print:text-2xl print:mb-4">8. Paiement Autonome (Open Banking)</h2>
                         <p className="text-gray-600 mb-4">Le <strong>cerveau Fintech</strong> de QAPRIL.</p>
                         <p className="text-sm text-gray-600 bg-gray-50 p-6 rounded-2xl border border-gray-100">

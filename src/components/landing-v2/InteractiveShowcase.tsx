@@ -259,11 +259,11 @@ export default function InteractiveShowcase() {
                 alt={activeStory.title}
                 className="w-full h-full object-cover object-center filter brightness-[0.75] contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              <div className="absolute inset-0 bg-slate-950" />
             </div>
 
             {/* Widget Glassmorphism flottant par-dessus l'image (Style Apple / iOS) */}
-            <div className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl p-6 border border-white/40 shadow-2xl">
+            <div className="relative z-10 w-full max-w-md bg-white rounded-2xl p-6 border border-slate-200 shadow-xl">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
                 <span className="text-[11px] font-black text-slate-900 tracking-wide truncate max-w-[220px]">
                   {activeStory.mockup.title}

@@ -80,7 +80,7 @@ export function CollaboratorInvitationModal() {
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-qnavy/40 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-qnavy/40">
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-200">
                         <button 
                             onClick={resetAndClose}

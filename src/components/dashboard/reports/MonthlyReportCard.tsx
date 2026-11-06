@@ -25,7 +25,7 @@ export default function MonthlyReportCard({ report }: MonthlyReportCardProps) {
       className="glass-card-premium overflow-hidden rounded-[3rem] border border-white/50 shadow-2xl shadow-indigo-100 flex flex-col md:flex-row"
     >
       {/* Visual Side */}
-      <div className="w-full md:w-1/3 bg-gradient-to-br from-indigo-600 to-blue-800 p-8 text-white flex flex-col justify-between relative overflow-hidden">
+      <div className="w-full md:w-1/3 bg-[#0284C7] p-8 text-white flex flex-col justify-between relative overflow-hidden">
         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 blur-3xl rounded-full" />
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-4">

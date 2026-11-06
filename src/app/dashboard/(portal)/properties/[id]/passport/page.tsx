@@ -60,7 +60,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                         </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white shadow-xl">
+                    <div className="bg-gray-900 rounded-xl p-6 text-white shadow-xl">
                         <h3 className="text-orange-400 font-bold text-sm mb-2">Mémoire Numérique</h3>
                         <p className="text-xs text-gray-300 leading-relaxed">
                             Ce passeport centralise tous les événements de la vie du logement. Il protège la valeur de votre patrimoine en attestant de sa bonne gestion.

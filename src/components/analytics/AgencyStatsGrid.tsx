@@ -11,7 +11,7 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {/* Taux de Recouvrement (TR) */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
+      <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-400 text-xs font-semibold tracking-wider uppercase">Taux de Recouvrement</p>
@@ -25,7 +25,7 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
         </div>
         <div className="mt-6 h-1 w-full bg-white/10 rounded-full overflow-hidden">
             <div 
-                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-1000"
+                className="h-full bg-[#0284C7] transition-all duration-1000"
                 style={{ width: `${kpis.tauxRecouvrementMois}%` }}
             />
         </div>
@@ -35,7 +35,7 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
       </div>
 
       {/* Taux d'Occupation (TO) */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
+      <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-400 text-xs font-semibold tracking-wider uppercase">Taux d'Occupation</p>
@@ -57,7 +57,7 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
       </div>
 
       {/* Impayés (Encours) */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
+      <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-400 text-xs font-semibold tracking-wider uppercase">Encours Impayés</p>
@@ -78,7 +78,7 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
       </div>
 
       {/* Santé Financière */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
+      <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-2xl transition-all hover:scale-[1.02] hover:bg-white/10 group">
         <div className="flex justify-between items-start">
           <div>
             <p className="text-gray-400 text-xs font-semibold tracking-wider uppercase">Score Portfolio</p>

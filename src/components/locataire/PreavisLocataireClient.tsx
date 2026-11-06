@@ -136,7 +136,7 @@ export default function PreavisLocataireClient({ preavisList, bail, userId }: an
                             <button 
                                 type="submit"
                                 disabled={loading || !formData.dateDepartPrevue}
-                                className="px-8 py-3.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs shadow-lg shadow-amber-600/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                                className="px-8 py-3.5 bg-[#D97706] hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs shadow-lg shadow-amber-600/20 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                             >
                                 <Send size={16} />
                                 {loading ? "Certification en cours..." : "Transmettre mon préavis officiel"}

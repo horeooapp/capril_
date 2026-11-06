@@ -60,7 +60,7 @@ export default function LocataireHeader({ session, onLogout }: LocataireHeaderPr
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-black uppercase tracking-widest transition-all duration-300 ${
                                         isActive 
                                         ? "bg-slate-800 text-white shadow-lg shadow-[#1F4E79]/20" 
-                                        : "text-gray-500 hover:text-slate-800 hover:bg-white/60"
+                                        : "text-gray-500 hover:text-slate-800 hover:bg-white"
                                     }`}
                                 >
                                     {link.icon}

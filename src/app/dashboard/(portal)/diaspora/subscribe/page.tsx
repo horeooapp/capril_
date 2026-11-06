@@ -15,7 +15,7 @@ export default async function SubscribePage() {
         </div>
         
         <div className="space-y-2">
-          <h1 className="text-3xl font-black text-ivoire-dark bg-clip-text text-transparent bg-gradient-to-r from-ivoire-dark to-ivoire-orange">
+          <h1 className="text-3xl font-black text-ivoire-dark text-slate-900">
             Activation du Package
           </h1>
           <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">

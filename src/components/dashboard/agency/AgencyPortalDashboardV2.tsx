@@ -42,7 +42,7 @@ export function AgencyPortalDashboardV2({
     <div className="space-y-6">
       
       {/* ── TOP BANNER AGENCE AVEC NOM OFFICIEL DE L'AGENCE ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 backdrop-blur-md p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-2 h-2 rounded-full bg-sky-600"></span>

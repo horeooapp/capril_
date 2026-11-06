@@ -150,8 +150,7 @@ export default function ServicesPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",
+              backgroundImage: "none",
               backgroundSize: "60px 60px"
             }}
           />
@@ -159,8 +158,7 @@ export default function ServicesPage() {
             className="absolute inset-0 z-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 30%, rgba(245,158,11,0.14) 0%, transparent 65%), radial-gradient(circle at 85% 75%, rgba(5,150,105,0.12) 0%, transparent 55%)"
+              backgroundImage: "none"
             }}
           />
 
@@ -228,7 +226,7 @@ export default function ServicesPage() {
                     className={`w-full p-4 sm:p-5 text-left rounded-xl border transition-all flex items-center justify-between group ${
                       isSelected
                         ? "bg-white border-[#D97706] shadow-md ring-1 ring-[#D97706]/30"
-                        : "bg-white/60 border-slate-200 hover:bg-white hover:border-slate-300"
+                        : "bg-white border-slate-200 hover:bg-white hover:border-slate-300"
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
@@ -391,8 +389,7 @@ export default function ServicesPage() {
             className="absolute inset-0"
             aria-hidden
             style={{
-              backgroundImage:
-                "radial-gradient(circle at 50% 50%, rgba(245,158,11,0.15) 0%, transparent 70%)"
+              backgroundImage: "none"
             }}
           />
           <div className="max-w-3xl mx-auto relative z-10">

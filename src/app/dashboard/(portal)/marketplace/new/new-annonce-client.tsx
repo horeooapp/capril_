@@ -379,7 +379,7 @@ export default function NewAnnonceClient({ properties }: { properties: any[] }) 
                                 </div>
                             )}
                             {form.isMeuble && (
-                                <span className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full shadow-sm">
+                                <span className="absolute top-3 right-3 bg-slate-900 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full shadow-sm">
                                     Meublé
                                 </span>
                             )}

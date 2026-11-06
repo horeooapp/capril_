@@ -52,7 +52,7 @@ export const MediationTimeline: React.FC<MediationTimelineProps> = ({ events }) 
   }
 
   return (
-    <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+    <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before: before:from-transparent before:via-gray-200 before:to-transparent">
       {events.map((event, idx) => (
         <motion.div 
           key={idx}

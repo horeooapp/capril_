@@ -102,7 +102,7 @@ export default function UploadPreuvePaiement({ leaseId }: { leaseId: string }) {
                     <button 
                         type="submit" 
                         disabled={isScanning || !file}
-                        className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl uppercase tracking-widest shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed group flex items-center justify-center gap-3 cursor-pointer active:scale-[0.98]"
+                        className="w-full py-4 bg-[#059669] hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs rounded-xl uppercase tracking-widest shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed group flex items-center justify-center gap-3 cursor-pointer active:scale-[0.98]"
                     >
                         {isScanning ? (
                             <>

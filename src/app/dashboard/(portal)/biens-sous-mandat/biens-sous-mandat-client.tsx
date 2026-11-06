@@ -120,7 +120,7 @@ export default function BiensSousMandatClient({
             </div>
 
             {/* Banner: Règle Métier Mandat Reçu */}
-            <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-5 shadow-lg border border-indigo-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="bg-slate-900 text-white rounded-2xl p-5 shadow-lg border border-indigo-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5">
                     <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 flex-shrink-0">
                         <ShieldCheck size={22} />
@@ -425,7 +425,7 @@ export default function BiensSousMandatClient({
 
             {/* Modal: Inviter un Propriétaire */}
             {isInviteModalOpen && (
-                <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

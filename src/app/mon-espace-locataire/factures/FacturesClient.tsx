@@ -76,7 +76,7 @@ export default function FacturesClient({ initialFactures = [], lease, user }: Fa
     <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* 1. Header & Actions Rapides */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -95,7 +95,7 @@ export default function FacturesClient({ initialFactures = [], lease, user }: Fa
         <div className="flex items-center gap-3">
           <button
             onClick={() => openPaymentFor("EAU")}
-            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-amber-500/20 flex items-center gap-2"
+            className="bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md shadow-amber-500/20 flex items-center gap-2"
           >
             <Plus size={16} />
             <span>Nouveau règlement</span>

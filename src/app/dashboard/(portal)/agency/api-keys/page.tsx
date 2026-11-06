@@ -67,7 +67,7 @@ export default function ApiKeysPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-[24px] text-white shadow-xl md:col-span-2 relative overflow-hidden">
+                <div className="bg-slate-900 p-8 rounded-[24px] text-white shadow-xl md:col-span-2 relative overflow-hidden">
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
                             <div>

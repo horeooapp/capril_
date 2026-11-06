@@ -237,7 +237,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
             <div className="lg:col-span-8 space-y-6">
 
                 {/* 1. CARTE PARTAGE DU PROFIL / CV LOCATIF */}
-                <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-sky-500/10 border border-amber-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-amber-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -267,7 +267,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                 </div>
 
                 {/* 1.5. SYSTÈME D'ALERTE IMMOBILIÈRE INTELLIGENTE & NOTIFICATION AUTOMATIQUE */}
-                <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl relative overflow-hidden border border-slate-800">
+                <div className="p-6 rounded-3xl bg-slate-900 text-white shadow-xl relative overflow-hidden border border-slate-800">
                     <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="space-y-2.5 max-w-xl">
@@ -298,7 +298,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                         <div className="flex flex-col gap-2 shrink-0">
                             <Link
                                 href="/mon-espace-locataire/marketplace"
-                                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-0.5"
+                                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/20 transition-all hover:-translate-y-0.5"
                             >
                                 <Search size={14} />
                                 <span>Voir les Biens Disponibles</span>
@@ -711,7 +711,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
                     </div>
 
                     {/* Carte Badgée */}
-                    <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-xl space-y-4">
+                    <div className="p-5 rounded-2xl bg-slate-900 text-white shadow-xl space-y-4">
                         <div className="flex items-start justify-between gap-3">
                             <div>
                                 <span className="text-[10px] font-extrabold text-[#FF8200] uppercase tracking-widest block">

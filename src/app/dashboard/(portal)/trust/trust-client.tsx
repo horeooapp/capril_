@@ -72,7 +72,7 @@ export default function TrustVaultDashboardClient({ initialCautions }: { initial
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                  <div className="bg-slate-900 border border-slate-800 p-8 rounded-[24px] shadow-sm flex items-center gap-4 relative overflow-hidden text-white">
                     <Lock className="absolute -right-4 -bottom-4 text-white opacity-10" size={120} />
-                    <div className="bg-amber-500/20 p-4 rounded-[12px] backdrop-blur-sm relative z-10 border border-amber-500/30">
+                    <div className="bg-amber-500/20 p-4 rounded-[12px] relative z-10 border border-amber-500/30">
                         <CircleDollarSign className="text-amber-400" size={24} />
                     </div>
                     <div className="relative z-10">

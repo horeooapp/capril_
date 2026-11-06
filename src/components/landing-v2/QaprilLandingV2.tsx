@@ -153,8 +153,8 @@ export default function QaprilLandingV2({
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
           scrolled
-            ? "bg-white/95 backdrop-blur-md border-slate-200 shadow-sm"
-            : "bg-slate-950/70 backdrop-blur-md border-white/10"
+            ? "bg-white border-slate-200 shadow-sm"
+            : "bg-[#090D16] border-slate-800"
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
@@ -263,7 +263,7 @@ export default function QaprilLandingV2({
             ))}
 
             {/* OVERLAY SOUVERAIN ÉLÉGANT & HAUTE LISIBILITÉ */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-slate-950/60 z-10" />
+            <div className="absolute inset-0 bg-slate-950 z-10" />
           </div>
 
           {/* CONTENU PRINCIPAL DU HERO (FOREGROUND) */}
@@ -271,7 +271,7 @@ export default function QaprilLandingV2({
 
             {/* Haut : Pitch Institutionnel & Titre Épuré */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700 text-amber-300 text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
                 <BadgeCheck className="w-4 h-4 text-amber-400" />
                 Conforme à la loi sur le bail d'habitation · Côte d'Ivoire
               </div>
@@ -288,7 +288,7 @@ export default function QaprilLandingV2({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <button
                   onClick={() => handleLogin("BAILLEUR")}
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-amber-400/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center text-amber-300 shadow-sm group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
@@ -308,7 +308,7 @@ export default function QaprilLandingV2({
 
                 <button
                   onClick={() => handleLogin("LOCATAIRE")}
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-sky-400/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/40 shadow-sm transition-colors duration-200 group cursor-pointer overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-sky-500/15 border border-sky-400/20 flex items-center justify-center text-sky-300 shadow-sm group-hover:bg-sky-400 group-hover:text-slate-950 transition-colors">
@@ -328,7 +328,7 @@ export default function QaprilLandingV2({
 
                 <Link
                   href="/dashboard/login/agency"
-                  className="relative p-5 text-left rounded-2xl bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl border border-white/10 hover:border-emerald-400/40 shadow-sm transition-colors duration-200 group cursor-pointer block overflow-hidden"
+                  className="relative p-5 text-left rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 shadow-sm transition-colors duration-200 group cursor-pointer block overflow-hidden"
                 >
                   <div className="flex items-center justify-between mb-3 relative z-10">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-400/20 flex items-center justify-center text-emerald-300 shadow-sm group-hover:bg-emerald-400 group-hover:text-slate-950 transition-colors">
@@ -372,7 +372,7 @@ export default function QaprilLandingV2({
               </div>
 
               {/* Ticker & Navigation Minimaliste du Slide (Style Apple/Luxury Architectural) */}
-              <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 self-start md:self-auto">
+              <div className="flex items-center gap-4 bg-slate-900 px-4 py-2 rounded-xl border border-slate-800 self-start md:self-auto">
                 <div className="text-right">
                   <p className="text-[11px] font-bold text-white truncate max-w-[200px]">
                     {SLIDES[currentSlide].title}
@@ -389,7 +389,7 @@ export default function QaprilLandingV2({
                       onClick={() => setCurrentSlide(i)}
                       aria-label={`Slide ${i + 1}`}
                       className={`h-1.5 transition-all duration-300 rounded-full cursor-pointer ${
-                        currentSlide === i ? "w-6 bg-amber-400" : "w-1.5 bg-white/40 hover:bg-white/60"
+                        currentSlide === i ? "w-6 bg-amber-400" : "w-1.5 bg-white/40 hover:bg-white"
                       }`}
                     />
                   ))}

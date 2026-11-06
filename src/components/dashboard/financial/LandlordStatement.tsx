@@ -118,7 +118,7 @@ export default function LandlordStatement({ data }: { data: StatementData }) {
 
         {/* Right Info / Security */}
         <div className="flex flex-col justify-between">
-           <div className="bg-gray-900/50 border border-gray-800 rounded-[2.5rem] p-10 backdrop-blur-md">
+           <div className="bg-gray-900/50 border border-gray-800 rounded-[2.5rem] p-10">
               <h4 className="text-white font-black uppercase text-sm mb-6 flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-indigo-500" /> Sécurité & Conformité
               </h4>

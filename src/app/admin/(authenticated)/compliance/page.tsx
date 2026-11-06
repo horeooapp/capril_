@@ -55,7 +55,7 @@ export default async function CompliancePage() {
                     { label: "Certifiés", value: stats?.certified || 0, icon: <ShieldCheck size={24} />, color: "bg-emerald-50 text-emerald-600" },
                     { label: "Blacklistés", value: stats?.blacklisted || 0, icon: <Ban size={24} />, color: "bg-gray-900 text-white" },
                 ].map((stat, i) => (
-                    <div key={i} className="p-6 rounded-[2.5rem] bg-white/50 border border-white/50 backdrop-blur-xl shadow-sm hover:shadow-md transition-all">
+                    <div key={i} className="p-6 rounded-[2.5rem] bg-white/50 border border-white/50 shadow-sm hover:shadow-md transition-all">
                         <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 ${stat.color}`}>
                             {stat.icon}
                         </div>

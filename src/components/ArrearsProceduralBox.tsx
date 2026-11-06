@@ -79,7 +79,7 @@ export default function ArrearsProceduralBox({ leaseId, proceduralState }: Arrea
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden"
+            className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 relative overflow-hidden"
         >
             <div className="absolute top-0 right-0 p-4 opacity-10">
                 <ShieldAlert size={80} className="text-red-500" />

@@ -33,7 +33,7 @@ export default function ReconDashboardClient({ initialRecons }: { initialRecons:
         <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-8 animate-in fade-in duration-500">
              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div>
-                     <div className="mb-2 bg-gradient-to-r from-blue-500 to-slate-800 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
+                     <div className="mb-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-2 shadow-sm">
                         <ShieldCheck size={12} /> Audit & Sécurité
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-black text-slate-800 uppercase tracking-tighter flex items-center gap-3 mt-2">

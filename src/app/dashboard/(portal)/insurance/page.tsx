@@ -201,7 +201,7 @@ export default function InsuranceDashboardPage() {
             <AnimatePresence>
                 {isSubscribingModalOpen && (
                     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !isSubmitting && setIsSubscribingModalOpen(false)} />
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-900/60" onClick={() => !isSubmitting && setIsSubscribingModalOpen(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white w-full max-w-md rounded-[24px] shadow-2xl relative z-[101] overflow-hidden border border-slate-200">
                             <div className="p-6 text-center border-b border-slate-100 bg-slate-50">
                                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -234,7 +234,7 @@ export default function InsuranceDashboardPage() {
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
                             exit={{ opacity: 0 }} 
-                            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+                            className="fixed inset-0 bg-slate-900/60"
                             onClick={() => !isSubmitting && setIsModalOpen(false)}
                         />
 

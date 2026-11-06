@@ -114,11 +114,11 @@ export default function ContactPage() {
         {/* ─── HERO ─── */}
         <section className="relative pt-40 pb-28 overflow-hidden" style={{ background: "var(--ink)" }}>
           <div className="absolute inset-0" aria-hidden style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)",
+            backgroundImage: "none",
             backgroundSize: "60px 60px"
           }} />
           <div className="absolute inset-0 z-0" aria-hidden style={{
-            backgroundImage: "radial-gradient(circle at 50% 30%, rgba(245,158,11,0.12) 0%, transparent 60%), radial-gradient(circle at 85% 70%, rgba(5,150,105,0.08) 0%, transparent 50%)"
+            backgroundImage: "none"
           }} />
 
           <div className="max-w-5xl mx-auto px-6 relative z-10 text-center">
