@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   Platform,
   View,
@@ -107,8 +108,10 @@ export default function BailleurAndAgencePrototypeScreen() {
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
 
-  useEffect(() => {
-    const init = async () => {
+  // Synchronisation dynamique : actualise toutes les données dès que l'écran reprend le focus
+  useFocusEffect(
+    useCallback(() => {
+      const init = async () => {
       try {
         let activeProfile: string | undefined = params.profile;
         if (!activeProfile) {
@@ -183,11 +186,20 @@ export default function BailleurAndAgencePrototypeScreen() {
       }
     };
     init();
-  }, [params.profile]);
+    }, [params.profile])
+  );
 
   const userName = dashData?.user
     ? (`${dashData.user.firstName || ''} ${dashData.user.lastName || ''}`.trim() || dashData.user.email || 'Propriétaire')
     : 'Propriétaire';
+
+  // Calculs en direct pour le mode Agence
+  const agencyOfficialName = dashData?.user?.nomAgence || dashData?.user?.agencyName || userName || 'Mon Agence';
+  const agencyOfficialRef = dashData?.user?.numeroAgrement ? `AGR-${dashData.user.numeroAgrement}` : 'Agence Agréée QAPRIL';
+  const totalLoyerAgence = bBiens.reduce((sum, b) => sum + (Number(b.loyer) || 0), 0);
+  const totalEncaisseAgence = bReceipts.filter(r => (r.status || '').toLowerCase() === 'paid').reduce((sum, r) => sum + (Number(r.totalAmount) || 0), 0);
+  const txRecouvrementAgence = totalLoyerAgence > 0 ? Math.round((totalEncaisseAgence / totalLoyerAgence) * 100) : 0;
+  const aReverserAgence = Math.round(totalEncaisseAgence * (1 - HON));
   const userInitials = userName
     .split(' ')
     .filter(Boolean)
@@ -293,7 +305,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
               <View style={{ marginTop: 12 }}>
                 <Text style={styles.drawerUser}>
-                  {isBailleur ? userName : 'Cabinet Agence Riviera'}
+                  {isBailleur ? userName : agencyOfficialName}
                 </Text>
                 <View style={styles.drawerBadgeRow}>
                   <View style={[styles.certifBadge, { backgroundColor: isBailleur ? '#FEF3C7' : '#EFF6FF' }]}>
@@ -807,7 +819,7 @@ export default function BailleurAndAgencePrototypeScreen() {
             {/* BASCULE VUE CHEF / VUE COLLABORATEUR (RG-CONF-02 à 05) */}
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.subMuted}>Agence Riviera · AGR-2021-0133 · CPRAIMA-CI</Text>
+                <Text style={styles.subMuted}>{agencyOfficialName} · {agencyOfficialRef}</Text>
                 <Text style={styles.h1}>
                   {roleView === 'chef' ? 'Chef d’agence' : 'Gestionnaire'}
                 </Text>
@@ -838,14 +850,14 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={[styles.sectionGap, { marginTop: 12 }]}>
                 <View style={[styles.heroCard, { backgroundColor: '#1F2A44' }]}>
                   <View style={styles.rowBetween}>
-                    <Text style={styles.heroSub}>LOYERS DU PORTEFEUILLE · NOV. 2026</Text>
-                    <Text style={styles.heroSub}>55 %</Text>
+                    <Text style={styles.heroSub}>LOYERS DU PORTEFEUILLE · {new Date().toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }).toUpperCase()}</Text>
+                    <Text style={styles.heroSub}>{txRecouvrementAgence} %</Text>
                   </View>
                   <Text style={styles.heroBig}>
-                    810 000 F <Text style={{ fontSize: 15, fontWeight: '500' }}>/ 1 460 000 F</Text>
+                    {totalEncaisseAgence.toLocaleString('fr-FR')} F <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {totalLoyerAgence.toLocaleString('fr-FR')} F</Text>
                   </Text>
                   <Text style={styles.heroSub}>
-                    À reverser aux bailleurs (net − 8 % d’honoraires) : 506 000 F
+                    À reverser aux bailleurs (net − 8 % d’honoraires) : {aReverserAgence.toLocaleString('fr-FR')} F
                   </Text>
                 </View>
 
@@ -866,54 +878,84 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {aTab === 'biens' && (
               <View style={[styles.sectionGap, { marginTop: 12 }]}>
-                <Text style={styles.h1}>Portefeuille multi-bailleurs</Text>
-                {mandants.map((m) => (
-                  <View key={m.id} style={styles.card}>
-                    <View style={styles.rowBetween}>
-                      <Text style={styles.boldText}>
-                        Bailleur : {roleView === 'collab' && m.mask ? m.bai : m.nom}
-                      </Text>
-                      <Text style={styles.subMuted}>Mandat {m.ref}</Text>
-                    </View>
-                    <Text style={styles.subMuted}>
-                      {roleView === 'collab' && m.mask
-                        ? 'Identité masquée par le chef d’agence (RG-CONF-04)'
-                        : `Code collaborateurs : ${m.bai} · Encaissé : ${m.enc.toLocaleString('fr-FR')} F`}
+                <View style={styles.rowBetween}>
+                  <Text style={styles.h1}>Portefeuille de l'agence ({bBiens.length})</Text>
+                  <Pressable 
+                    style={styles.btnSmallGreen} 
+                    onPress={() => router.push('/create-property')}
+                  >
+                    <Plus size={14} color="#fff" />
+                    <Text style={styles.btnSmallGreenText}>+ Bien</Text>
+                  </Pressable>
+                </View>
+                {bBiens.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <Building2 color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#64748B', marginTop: 8 }}>
+                      Aucun bien sous gestion
                     </Text>
+                    <Text style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', marginTop: 4, paddingHorizontal: 20 }}>
+                      Votre agence n'a pas encore de bien enregistré. Utilisez le bouton + Bien pour en créer un.
+                    </Text>
+                    <Pressable
+                      style={[styles.btnPrimary, { marginTop: 16 }]}
+                      onPress={() => router.push('/create-property')}
+                    >
+                      <Text style={styles.btnPrimaryText}>Créer un bien</Text>
+                    </Pressable>
                   </View>
-                ))}
+                ) : (
+                  bBiens.map((b) => (
+                    <View key={b.id} style={styles.card}>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.boldText}>{b.name || b.struct || 'Bien immobilier'}</Text>
+                        <Text style={[styles.badge, b.statut === 'loue' ? styles.badgeGreen : styles.badgeGrey]}>
+                          {b.statut === 'loue' ? 'Loué' : 'Vacant'}
+                        </Text>
+                      </View>
+                      <Text style={styles.subMuted}>
+                        {b.struct} · {b.type} · Loyer : {Number(b.loyer || 0).toLocaleString('fr-FR')} XOF
+                      </Text>
+                      <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                        Locataire : {roleView === 'collab' && b.masque ? 'Locataire Masqué (RG-CONF-04)' : b.loc}
+                      </Text>
+                    </View>
+                  ))
+                )}
               </View>
             )}
 
             {aTab === 'mandants' && (
               <View style={[styles.sectionGap, { marginTop: 12 }]}>
-                <Text style={styles.h1}>Mes bailleurs mandants</Text>
-                {mandants.map((m) => (
-                  <View key={m.id} style={styles.card}>
-                    <View style={styles.rowBetween}>
-                      <Text style={styles.boldText}>
-                        {roleView === 'chef' || !m.mask ? m.nom : m.bai}
-                      </Text>
-                      <Text style={styles.subMuted}>{m.ref}</Text>
-                    </View>
-                    {roleView === 'chef' && (
-                      <Pressable
-                        style={[styles.pillGold, { marginTop: 6, alignSelf: 'flex-start' }]}
-                        onPress={() =>
-                          setMandants((prev) =>
-                            prev.map((x) => (x.id === m.id ? { ...x, mask: !x.mask } : x))
-                          )
-                        }
-                      >
-                        <Text style={styles.pillGoldText}>
-                          {m.mask
-                            ? `Masqué aux collaborateurs (${m.bai})`
-                            : 'Visible aux collaborateurs'}
-                        </Text>
-                      </Pressable>
-                    )}
+                <Text style={styles.h1}>Bailleurs mandants ({bBiens.length > 0 ? bBiens.length : 0})</Text>
+                {bBiens.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <Users color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#64748B', marginTop: 8 }}>
+                      Aucun mandat enregistré
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', marginTop: 4, paddingHorizontal: 20 }}>
+                      Les mandats de gestion confiés par vos bailleurs apparaîtront automatiquement ici.
+                    </Text>
                   </View>
-                ))}
+                ) : (
+                  bBiens.map((b, idx) => {
+                    const baiCode = `BAI-${String(idx + 1).padStart(4, '0')}`;
+                    return (
+                      <View key={b.id} style={styles.card}>
+                        <View style={styles.rowBetween}>
+                          <Text style={styles.boldText}>
+                            {roleView === 'chef' ? (b.bailleurNom || userName) : baiCode}
+                          </Text>
+                          <Text style={styles.subMuted}>Mandat ACTIF</Text>
+                        </View>
+                        <Text style={styles.subMuted}>
+                          {roleView === 'collab' ? 'Identité protégée (RG-CONF-04)' : `Code collaborateur : ${baiCode}`} · Bien : {b.name}
+                        </Text>
+                      </View>
+                    );
+                  })
+                )}
               </View>
             )}
 

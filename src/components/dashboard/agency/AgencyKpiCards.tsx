@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { T, biens } from '@/constants/agency-data';
+import { T } from '@/constants/agency-data';
 import { TrendingUp, ShieldAlert, Home, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 

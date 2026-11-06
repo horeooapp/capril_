@@ -9,8 +9,13 @@ import { sendSMS } from '@/lib/sms';
 export async function POST(request: Request) {
     try {
         const user = await authenticateMobileRequest(request);
-        if (!user || user.role !== 'PROPRIETAIRE') {
-            return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+        if (!user) {
+            return NextResponse.json({ error: "Non autorisé. Jeton invalide ou expiré." }, { status: 401 });
+        }
+
+        const allowedRoles = ['PROPRIETAIRE', 'LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT', 'ADMIN', 'SUPER_ADMIN'];
+        if (user.role && !allowedRoles.includes(user.role)) {
+            return NextResponse.json({ error: "Accès réservé aux bailleurs et agences gestionnaires." }, { status: 403 });
         }
 
         const body = await request.json();

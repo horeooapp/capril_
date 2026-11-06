@@ -82,21 +82,13 @@ export const AgencyToolsGrid: React.FC = () => {
         })}
       </div>
 
-      <div className="institutional-header rounded-3xl p-6 mt-8">
-        <div className="flex justify-between items-center mb-4">
-           <h3 className="text-sm font-black text-slate-800 tracking-widest uppercase italic">Lock-in Cumulative</h3>
-           <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">87 / 100</span>
+      <div className="institutional-header rounded-3xl p-6 mt-8 border border-slate-200/80 bg-white">
+        <div className="flex justify-between items-center mb-2">
+           <h3 className="text-sm font-black text-slate-800 tracking-widest uppercase">Garantie & Conformité Opérationnelle</h3>
+           <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest px-2.5 py-1 bg-emerald-50 rounded-lg border border-emerald-100">Certifié QAPRIL</span>
         </div>
-        <div className="h-2 bg-slate-200 rounded-full overflow-hidden mb-3 shadow-inner">
-           <motion.div 
-             initial={{ width: 0 }}
-             animate={{ width: "87%" }}
-             transition={{ duration: 1.5, ease: "easeOut" }}
-             className="h-full bg-[#0284C7]"
-           />
-        </div>
-        <p className="text-[10px] font-medium text-slate-400 italic">
-          Indice de dépendance technologique élevé. Coût de transition estimé à 12 mois de restructuration.
+        <p className="text-[11px] font-medium text-slate-500 leading-relaxed">
+          Tous les modules respectent scrupuleusement la loi n° 2019-576 du CCH de Côte d'Ivoire, les barèmes fiscaux DGI en vigueur et les normes comptables SYSCOHADA.
         </p>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { T, biens } from '@/constants/agency-data';
+import { T } from '@/constants/agency-data';
 import { Badge } from './Badge';
 import { ChevronRight, Home, User } from 'lucide-react';
 import { motion } from 'framer-motion';

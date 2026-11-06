@@ -24,86 +24,13 @@ export const T = {
   textLight: "#64748B",
 };
 
-export const biens = [
-  { 
-    id: "B-001", 
-    code: "LOG-0041", 
-    adresse: "Villa 7 · Résidence Palmier · Cocody", 
-    type: "Villa 4P", 
-    loyer: 320000, 
-    statut: "occupé", 
-    locataire: "Mme Bamba Fatou", 
-    tel: "+225 07 11 22 33", 
-    echeance: "05/04/2026", 
-    paiement: "À jour", 
-    retard: 0, 
-    bail: { ref: "BAIL-CI-2026-0041", type: "Écrit" }, 
-    caution: { statut: "Consignée CDC" }, 
-    proprio: "BAI-041" 
-  },
-  { 
-    id: "B-002", 
-    code: "LOG-0042", 
-    adresse: "Appt 3B · Résid. Lagune · Plateau", 
-    type: "F3", 
-    loyer: 150000, 
-    statut: "occupé", 
-    locataire: "M. Traoré Souleymane", 
-    tel: "+225 05 44 55 66", 
-    echeance: "01/04/2026", 
-    paiement: "Impayé", 
-    retard: 12, 
-    bail: { ref: "BAIL-CI-2026-0042", type: "BDQ" }, 
-    caution: { statut: "Non consignée" }, 
-    proprio: "BAI-042" 
-  },
-  { 
-    id: "B-003", 
-    code: "LOG-0043", 
-    adresse: "Cour Konaté · Bloc B · Yopougon", 
-    type: "Cour Entière", 
-    loyer: 265000, 
-    statut: "occupé", 
-    locataire: "6 portes actives", 
-    tel: null, 
-    echeance: "—", 
-    paiement: "Partiel", 
-    retard: 5, 
-    bail: { ref: "BAIL-CI-2025-0043", type: "Écrit" }, 
-    caution: { statut: "Sans caution" }, 
-    proprio: "BAI-043" 
-  },
-  { 
-    id: "B-004", 
-    code: "LOG-0044", 
-    adresse: "Studio A2 · Résid. Green Park · Marcory", 
-    type: "Studio", 
-    loyer: 75000, 
-    statut: "vacant", 
-    locataire: null, 
-    tel: null, 
-    echeance: "—", 
-    paiement: "—", 
-    retard: 0, 
-    bail: null, 
-    caution: { statut: "—" }, 
-    proprio: "BAI-044" 
-  },
-];
-
-export const candidats = [
-  { id: "C-001", nom: "Mme Diabaté Fatou", emploi: "Enseignante", loyerMax: 200000, score: 820, autorisation: "accordée", autoDate: "15/03/2026" },
-  { id: "C-002", nom: "M. Koné Adama", emploi: "Ingénieur", loyerMax: 350000, score: null, autorisation: "non_demandée", autoDate: null },
-  { id: "C-003", nom: "Mme Coulibaly Aïcha", emploi: "Commerçante", loyerMax: 150000, score: 690, autorisation: "accordée", autoDate: "10/03/2026" },
-];
-
 export const modules = [
-  { icon: "📸", code: "M-EDL",      label: "États des lieux",       sub: "Photos · comparatif · retenues",    color: "#27AE60",  bg: "#EDF7F1",  kpi: "3 en cours" },
-  { icon: "🔏", code: "M-SIGN",     label: "Signatures électroniques", sub: "Baux · Mandats · EDL · Avenants",   color: "#16A085",  bg: "#ECF6F5",  kpi: "2 en attente" },
-  { icon: "🔧", code: "M-MAINT",    label: "Suivi maintenance",      sub: "Tickets · prestataires · coûts",    color: "#E67E22",  bg: "#FEF5ED",  kpi: "1 urgent" },
-  { icon: "💰", code: "M-CHARGES",  label: "Gestion des charges",    sub: "Calculs · régularisations",          color: "#071A45",  bg: "#F0F3F9",  kpi: "Régul. Avril due" },
-  { icon: "📒", code: "M-COMPTA",   label: "Comptabilité",           sub: "CRG · liasse fiscale · export",      color: "#8E44AD",  bg: "#F4EDF7",  kpi: "Mars 2026 prêt" },
-  { icon: "📅", code: "M-AGENDA",   label: "Agenda & CRM",           sub: "Visites · contacts · relances",      color: "#0D2B6E",  bg: "#F0F3F9",  kpi: "4 RDV cette semaine" },
-  { icon: "📣", code: "M-ANNONCES", label: "Annonces vacance",       sub: "Publication · diffusion · stats",    color: "#D4AF37",  bg: "#FAF7ED",  kpi: "1 bien vacant" },
-  { icon: "⚖️", code: "M-RCL",      label: "Révisions Loyer",       sub: "Délai 144h · auto-clôture · malus", color: "#C55A11",  bg: "#FEF5ED",  kpi: "1 critique" },
+  { icon: "📸", code: "M-EDL",      label: "États des lieux",          sub: "Photos horodatées · comparatif entrée/sortie", color: "#27AE60", bg: "#EDF7F1", kpi: "Conforme CCH" },
+  { icon: "🔏", code: "M-SIGN",     label: "Signatures électroniques", sub: "Baux · Mandats · EDL · Avenants certifiés",   color: "#16A085", bg: "#ECF6F5", kpi: "Scellement OTP" },
+  { icon: "🔧", code: "M-MAINT",    label: "Suivi maintenance",         sub: "Tickets incidents · prestataires agréés",     color: "#E67E22", bg: "#FEF5ED", kpi: "Suivi Direct" },
+  { icon: "💰", code: "M-CHARGES",  label: "Gestion des charges",       sub: "Calculs de répartition · régularisations",    color: "#071A45", bg: "#F0F3F9", kpi: "Régularisation" },
+  { icon: "📒", code: "M-COMPTA",   label: "Comptabilité",              sub: "CRG mensuels · journal SYSCOHADA · export",   color: "#8E44AD", bg: "#F4EDF7", kpi: "SYSCOHADA" },
+  { icon: "📅", code: "M-AGENDA",   label: "Agenda & Visites",          sub: "Planification visites · contacts · relances", color: "#0D2B6E", bg: "#F0F3F9", kpi: "Planification" },
+  { icon: "📣", code: "M-ANNONCES", label: "Portefeuille & Vacance",    sub: "Diffusion d'annonces · candidatures vérifiées", color: "#D4AF37", bg: "#FAF7ED", kpi: "Multicanal" },
+  { icon: "⚖️", code: "M-RCL",      label: "Révisions Loyer",          sub: "Surveillance délai légal 144h · conciliation", color: "#C55A11", bg: "#FEF5ED", kpi: "Délai Légal 144h" },
 ];

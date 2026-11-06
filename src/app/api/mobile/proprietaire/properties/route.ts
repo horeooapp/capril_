@@ -88,16 +88,33 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'address et commune sont obligatoires.' }, { status: 400 });
         }
 
-        // Génération du code propriété
+        // Génération d'un code propriété garanti unique (Format QAPRIL HAB-ABJ-XXX-NNNNN)
         const count = await prisma.property.count({ where: { commune } });
-        const communeCode = commune.substring(0, 3).toUpperCase();
-        const typePrefix = leaseType === 'commercial' ? 'COM' : 'RES';
-        const propertyCode = `${typePrefix}-${communeCode}-${String(count + 1).padStart(4, '0')}`;
+        const communeCode = (commune || 'ABJ').substring(0, 3).toUpperCase();
+        const typePrefix = leaseType === 'commercial' ? 'COM' : 'HAB';
+        let seq = count + 1;
+        let candidateCode = `${typePrefix}-ABJ-${communeCode}-${String(seq).padStart(5, '0')}`;
+        
+        // Boucle de sécurité d'unicité
+        let exists = await prisma.property.findUnique({ where: { propertyCode: candidateCode } });
+        while (exists) {
+            seq += 1;
+            candidateCode = `${typePrefix}-ABJ-${communeCode}-${String(seq).padStart(5, '0')}`;
+            exists = await prisma.property.findUnique({ where: { propertyCode: candidateCode } });
+        }
+
+        const finalPropertyCode = parentPropertyId && unitLabel 
+            ? `${candidateCode}-${unitLabel.replace(/\s+/g, '').toUpperCase()}`
+            : candidateCode;
+
+        const isAgencyUser = ['AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT'].includes(user.role);
 
         const property = await prisma.property.create({
             data: {
-                propertyCode:     parentPropertyId && unitLabel ? `${propertyCode}-${unitLabel.replace(/\s/g, '').toUpperCase()}` : propertyCode,
+                propertyCode:     finalPropertyCode,
                 ownerUserId:      user.userId,
+                managedByUserId:  isAgencyUser ? user.userId : null,
+                managementMode:   isAgencyUser ? 'AGENCE' : 'DIRECT',
                 name:             name ?? address,
                 address,
                 commune,

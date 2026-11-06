@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -49,9 +50,12 @@ export default function PropertiesScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
+  // Synchronisation dynamique : recharge les biens dès que l'écran reprend le focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchProperties();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
