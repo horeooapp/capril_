@@ -45,7 +45,13 @@ export default function DashboardOverviewClient({
         const payload = agencyData ? {
             ...agencyData,
             candidates: agencyData.candidatures || []
-        } : undefined;
+        } : {
+            user: { ...user, agencyRole: "chef" },
+            properties: properties || [],
+            candidatures: [],
+            candidates: [],
+            kpis: null
+        };
         return <AgencyPortalWrapper initialData={payload} aggregates={aggregates} />;
     }
 

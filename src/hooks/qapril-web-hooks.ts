@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAgencyDashboardData } from '@/actions/agency-actions';
 
 async function apiFetch(path: string, opts: any = {}) {
   const url = `/api/v1${path}`;
@@ -15,23 +16,44 @@ async function apiFetch(path: string, opts: any = {}) {
  * Hook for Agency (Agence)
  */
 export function useAgencyData(initialData?: any) {
-  const [data, setData] = useState<{ user: any, properties: any[], candidates: any[] } | null>(initialData || null);
+  const [data, setData] = useState<{ user: any, properties: any[], candidates: any[], kpis?: any } | null>(initialData || null);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialData) return;
+    if (initialData) {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
     async function load() {
       try {
         setLoading(true);
-        const [user, properties, candidates] = await Promise.all([
-          apiFetch('/agences/me'),
-          apiFetch('/agences/portfolio'),
-          apiFetch('/agences/candidates').catch(() => ({ candidates: [] })), // Fallback if candidates endpoint not fully ready
-        ]);
-        setData({ user, properties, candidates: candidates.candidates || [] });
+        const res = await getAgencyDashboardData();
+        if (res?.success && res.data) {
+          setData({
+            user: res.data.user,
+            properties: res.data.properties || [],
+            candidates: res.data.candidatures || [],
+            kpis: res.data.kpis || null,
+          });
+        } else {
+          // Fallback gracieux pour afficher l'interface agence même sans données initiales
+          setData({
+            user: { agencyRole: 'chef' },
+            properties: [],
+            candidates: [],
+            kpis: null,
+          });
+        }
       } catch (e: any) {
-        setError("Impossible de charger les données Agence via l'API client obsolète. Veuillez rafraîchir la page ou contacter l'admin.");
+        console.warn('[useAgencyData] Fallback server action:', e);
+        setData({
+          user: { agencyRole: 'chef' },
+          properties: [],
+          candidates: [],
+          kpis: null,
+        });
       } finally {
         setLoading(false);
       }
