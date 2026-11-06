@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Platform,
   View,
   Text,
   StyleSheet,
@@ -458,14 +459,36 @@ export default function BailleurAndAgencePrototypeScreen() {
 
               <Pressable
                 style={[styles.drawerItem, styles.drawerLogoutItem]}
-                onPress={async () => {
+                onPress={() => {
                   setMenuOpen(false);
-                  await clearAppSessionAndCache();
-                  if (typeof window !== 'undefined') {
-                    window.location.replace('/');
-                  } else {
-                    router.replace('/');
-                  }
+                  Alert.alert(
+                    'Changer de profil / Déconnexion',
+                    'Voulez-vous fermer cette session pour changer de profil (Propriétaire ou Agence) ou vous reconnecter ?',
+                    [
+                      { text: 'Annuler', style: 'cancel' },
+                      {
+                        text: 'Déconnexion',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            await clearAppSessionAndCache();
+                          } catch (err) {
+                            console.warn('Erreur clearAppSessionAndCache:', err);
+                          }
+                          if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+                            window.location.href = '/';
+                          } else {
+                            try {
+                              if (router.canDismiss()) {
+                                router.dismissAll();
+                              }
+                            } catch {}
+                            router.replace('/');
+                          }
+                        },
+                      },
+                    ]
+                  );
                 }}
               >
                 <View style={[styles.drawerItemIconWrap, { backgroundColor: '#FEE2E2' }]}>

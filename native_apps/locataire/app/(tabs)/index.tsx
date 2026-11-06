@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Platform,
   View,
   Text,
   StyleSheet,
@@ -450,14 +451,36 @@ export default function LocatairePrototypeScreen() {
 
               <Pressable
                 style={[styles.drawerItem, { marginTop: 8 }]}
-                onPress={async () => {
+                onPress={() => {
                   setMenuOpen(false);
-                  await clearAppSessionAndCache();
-                  if (typeof window !== 'undefined') {
-                    window.location.replace('/');
-                  } else {
-                    router.replace('/');
-                  }
+                  Alert.alert(
+                    'Déconnexion',
+                    'Voulez-vous fermer votre session mobile locataire ?',
+                    [
+                      { text: 'Annuler', style: 'cancel' },
+                      {
+                        text: 'Se déconnecter',
+                        style: 'destructive',
+                        onPress: async () => {
+                          try {
+                            await clearAppSessionAndCache();
+                          } catch (err) {
+                            console.warn('Erreur clearAppSessionAndCache:', err);
+                          }
+                          if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
+                            window.location.href = '/';
+                          } else {
+                            try {
+                              if (router.canDismiss()) {
+                                router.dismissAll();
+                              }
+                            } catch {}
+                            router.replace('/');
+                          }
+                        },
+                      },
+                    ]
+                  );
                 }}
               >
                 <View style={[styles.drawerItemIconWrap, { backgroundColor: '#FEE2E2' }]}>

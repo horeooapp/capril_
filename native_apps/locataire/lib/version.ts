@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL Locataire';
 export const APP_KEY = 'locataire';
-export const APP_VERSION = '1.1.0';
-export const BUILD_NUMBER = 2;
+export const APP_VERSION = '1.1.1';
+export const BUILD_NUMBER = 3;
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;
@@ -35,3 +35,4 @@ export function getFullVersionString(): string {
   const ch = Updates.channel || 'prod';
   return `v${APP_VERSION} (b${BUILD_NUMBER}) · OTA ${ota} · ${ch}`;
 }
+

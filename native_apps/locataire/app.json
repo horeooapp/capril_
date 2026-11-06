@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qapril-Locataires",
     "slug": "locataire",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -33,7 +33,7 @@
         "USE_BIOMETRIC",
         "USE_FINGERPRINT"
       ],
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"

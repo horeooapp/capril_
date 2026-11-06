@@ -47,15 +47,16 @@ export async function removeStoredToken(): Promise<void> {
             if (typeof window !== 'undefined' && window.localStorage) {
                 window.localStorage.removeItem('userToken');
             }
-            await AsyncStorage.removeItem('userToken');
-            return;
+        } else {
+            try {
+                await SecureStore.deleteItemAsync('userToken');
+            } catch {}
         }
-        await SecureStore.deleteItemAsync('userToken');
-    } catch {
-        try {
-            await AsyncStorage.removeItem('userToken');
-        } catch {}
-    }
+    } catch {}
+
+    try {
+        await AsyncStorage.removeItem('userToken');
+    } catch {}
 }
 
 /**
