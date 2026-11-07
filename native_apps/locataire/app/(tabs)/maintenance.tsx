@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState } from 'react';
 import {
   View,
@@ -101,6 +102,7 @@ export default function MaintenanceScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Signalements" subtitle="Gestion des incidents" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}

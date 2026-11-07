@@ -17,3 +17,4 @@ export default async function SimulateurConversationnelPage() {
 
   return <SimulatorClient user={session.user} />;
 }
+

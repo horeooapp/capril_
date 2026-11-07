@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -43,6 +44,7 @@ export default function ReceiptsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Mes Quittances" subtitle="Quittances certifiées SHA-256" />
       <View style={styles.header}>
         <Text style={styles.sub}>Historique infalsifiable SHA-256 (RG-QUI-04)</Text>
         <Text style={styles.title}>Mes quittances</Text>

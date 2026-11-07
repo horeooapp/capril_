@@ -653,3 +653,4 @@ export default function SimulatorClient({ user }: { user: any }) {
     </div>
   );
 }
+

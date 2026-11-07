@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../components/TopNavHeader';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useEffect } from 'react';
@@ -52,6 +53,7 @@ export default function NotificationsScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Notifications" subtitle="Alertes & rappels" />
             {/* Header */}
             <View style={styles.header}>
                 <Pressable onPress={() => router.back()} style={styles.backButton}>

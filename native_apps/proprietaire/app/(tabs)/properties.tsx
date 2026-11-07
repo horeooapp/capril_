@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import {
@@ -134,6 +135,7 @@ export default function PropertiesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Mes Biens" subtitle="Patrimoine & Conformité" />
       <View style={styles.header}>
         {/* TITRE + BOUTONS D'ACTION RAPIDE (NOUVEAU BIEN / NOUVEAU BAIL) */}
         <View style={styles.headerTopRow}>

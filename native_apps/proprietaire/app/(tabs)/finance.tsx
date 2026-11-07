@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -53,6 +54,7 @@ export default function FinanceScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Flux & Rapports" subtitle="Comptabilité & Reversements" />
       <View style={styles.header}>
         <View>
           <Text style={styles.sub}>Réconciliation webhooks HMAC-SHA256</Text>

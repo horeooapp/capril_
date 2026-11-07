@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../components/TopNavHeader';
 import React, { useState } from 'react';
 import {
   View,
@@ -165,6 +166,7 @@ export default function CreatePropertyScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Nouveau Bien" subtitle="Enregistrement patrimoine" />
       {/* HEADER */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>

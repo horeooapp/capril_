@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Upload, ShieldCheck, Users, Building2, Wallet, Plus, Home } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 import { useFocusEffect, useRouter } from 'expo-router';
+import { TopNavHeader } from '../../components/TopNavHeader';
 
 const HON = 0.08;
 const FRAIS_QAPRIL = 2000;
@@ -77,6 +78,7 @@ export default function AgencePrototypeHomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="QAPRIL AGENCE" subtitle="Console de Gestion Immobilière" />
       <View style={styles.subNav}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
           {(

@@ -11,12 +11,14 @@ import {
   Pressable,
   Modal,
   TextInput,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
+import { confirmExitApp } from '../../components/TopNavHeader';
 import {
   Building2,
   FileText,
@@ -31,6 +33,7 @@ import {
   AlertCircle,
   Plus,
   Menu,
+  ArrowLeft,
   X,
   ChevronDown,
   ChevronRight,
@@ -79,6 +82,7 @@ export default function BailleurAndAgencePrototypeScreen() {
   const params = useLocalSearchParams<{ profile?: string }>();
   const [loading, setLoading] = useState(true);
   const [appMode, setAppMode] = useState<'bailleur' | 'agence'>('bailleur');
+  const isBailleur = appMode === 'bailleur';
   const [menuOpen, setMenuOpen] = useState(false);
 
   // --- ÉTATS PROTOTYPE BAILLEUR ---
@@ -107,6 +111,30 @@ export default function BailleurAndAgencePrototypeScreen() {
 
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
+
+
+  // Gestion du retour physique Android et confirmation de sortie
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const onBackPress = () => {
+      if (menuOpen) {
+        setMenuOpen(false);
+        return true;
+      }
+      if (isBailleur && bTab !== 'home') {
+        setBTab('home');
+        return true;
+      }
+      if (!isBailleur && aTab !== 'home') {
+        setATab('home');
+        return true;
+      }
+      confirmExitApp();
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [menuOpen, bTab, aTab, isBailleur]);
 
   // Synchronisation dynamique : actualise toutes les données dès que l'écran reprend le focus
   useFocusEffect(
@@ -221,7 +249,6 @@ export default function BailleurAndAgencePrototypeScreen() {
     );
   }
 
-  const isBailleur = appMode === 'bailleur';
   const primaryColor = isBailleur ? '#1B4D3E' : '#1F2A44';
   const bgColor = isBailleur ? '#F5F2EC' : '#F3F4F8';
 
@@ -229,6 +256,33 @@ export default function BailleurAndAgencePrototypeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* HEADER MOBILE NOUVELLE GÉNÉRATION */}
       <View style={[styles.mobileHeader, { backgroundColor: primaryColor }]}>
+        {/* BOUTONS RETOUR & ACCUEIL */}
+        <Pressable
+          style={styles.headerNavIconBtn}
+          onPress={() => {
+            if (isBailleur && bTab !== 'home') {
+              setBTab('home');
+            } else if (!isBailleur && aTab !== 'home') {
+              setATab('home');
+            } else {
+              confirmExitApp();
+            }
+          }}
+          accessibilityLabel="Retour en arrière"
+        >
+          <ArrowLeft color="#FFFFFF" size={18} />
+        </Pressable>
+
+        <Pressable
+          style={styles.headerNavIconBtn}
+          onPress={() => {
+            if (isBailleur) setBTab('home');
+            else setATab('home');
+          }}
+          accessibilityLabel="Accueil"
+        >
+          <Home color="#FFFFFF" size={18} />
+        </Pressable>
         <Pressable
           style={styles.menuBurgerBtn}
           onPress={() => setMenuOpen(true)}
@@ -270,6 +324,14 @@ export default function BailleurAndAgencePrototypeScreen() {
           >
             <User color="#FFFFFF" size={18} />
           </Pressable>
+          <Pressable
+            style={styles.headerExitBtn}
+            onPress={confirmExitApp}
+            accessibilityLabel="Quitter l'application"
+          >
+            <LogOut color="#FCA5A5" size={17} />
+          </Pressable>
+
         </View>
       </View>
 
@@ -1174,6 +1236,37 @@ export default function BailleurAndAgencePrototypeScreen() {
 }
 
 const styles = StyleSheet.create({
+  btnSmallGreen: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#10B981',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  btnSmallGreenText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    fontSize: 11,
+    fontWeight: '600',
+    overflow: 'hidden',
+  },
+  badgeGreen: {
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    color: '#059669',
+  },
+  badgeGrey: {
+    backgroundColor: 'rgba(156, 163, 175, 0.15)',
+    color: '#4B5563',
+  },
+
   container: { flex: 1 },
   center: { justifyContent: 'center', alignItems: 'center' },
   mobileHeader: {
@@ -1189,6 +1282,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  headerNavIconBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
+  },
+  headerExitBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(239, 68, 68, 0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
   },
   menuBurgerBtn: {
     width: 42,

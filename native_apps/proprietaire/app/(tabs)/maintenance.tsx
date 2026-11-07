@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState, useEffect } from 'react';
 import { fetchWithAuth } from '../../lib/api';
 import {
@@ -103,6 +104,7 @@ export default function ProprietaireMaintenanceScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Incidents & Travaux" subtitle="Maintenance en direct" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* BANDEAU RÔLE : RÉCEPTION PROPRIÉTAIRE */}
         <View style={styles.roleBanner}>

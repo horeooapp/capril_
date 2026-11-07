@@ -324,7 +324,7 @@ export async function handleIncomingMessage(params: {
       codeCourt: parsed.codeBail
     });
 
-    let declaration = await prisma.declarationPaiement.findFirst({
+    const declaration = await prisma.declarationPaiement.findFirst({
       where: {
         ...(lease ? { bailId: lease.id } : {}),
         statut: 'DECLARE'
@@ -413,7 +413,7 @@ export async function handleIncomingMessage(params: {
       codeCourt: parsed.codeBail
     });
 
-    let declaration = await prisma.declarationPaiement.findFirst({
+    const declaration = await prisma.declarationPaiement.findFirst({
       where: {
         ...(lease ? { bailId: lease.id } : {}),
         statut: 'DECLARE'

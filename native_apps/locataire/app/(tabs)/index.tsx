@@ -11,12 +11,14 @@ import {
   Modal,
   TextInput,
   Image,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
+import { confirmExitApp } from '../../components/TopNavHeader';
 import {
   Bell,
   CheckCircle2,
@@ -32,6 +34,7 @@ import {
   CreditCard,
   Share2,
   Menu,
+  ArrowLeft,
   X,
   Home,
   Folder,
@@ -208,6 +211,26 @@ export default function LocatairePrototypeScreen() {
 
   const router = useRouter();
 
+  // Gestion du retour physique Android et confirmation de sortie
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const onBackPress = () => {
+      if (menuOpen) {
+        setMenuOpen(false);
+        return true;
+      }
+      if (screen !== 'accueil') {
+        setScreen('accueil');
+        return true;
+      }
+      confirmExitApp();
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [menuOpen, screen]);
+
+
   useEffect(() => {
     const loadDashboard = async () => {
       try {
@@ -334,6 +357,28 @@ export default function LocatairePrototypeScreen() {
     <SafeAreaView style={styles.container}>
       {/* HEADER NOUVELLE GÉNÉRATION AVEC BOUTON MENU MOBILE */}
       <View style={styles.mobileHeader}>
+        {/* BOUTONS RETOUR & ACCUEIL */}
+        <Pressable
+          style={styles.headerNavIconBtn}
+          onPress={() => {
+            if (screen !== 'accueil') {
+              setScreen('accueil');
+            } else {
+              confirmExitApp();
+            }
+          }}
+          accessibilityLabel="Retour en arrière"
+        >
+          <ArrowLeft color="#FFFFFF" size={18} />
+        </Pressable>
+
+        <Pressable
+          style={styles.headerNavIconBtn}
+          onPress={() => setScreen('accueil')}
+          accessibilityLabel="Accueil"
+        >
+          <Home color="#FFFFFF" size={18} />
+        </Pressable>
         <Pressable
           style={styles.menuBurgerBtn}
           onPress={() => setMenuOpen(true)}
@@ -1513,6 +1558,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  headerNavIconBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
+  },
+  headerExitBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(239, 68, 68, 0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
   },
   menuBurgerBtn: {
     width: 42,

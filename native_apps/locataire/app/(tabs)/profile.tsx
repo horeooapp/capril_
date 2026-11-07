@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import { AppVersionBadge } from '../../components/AppVersionBadge';
 import React, { useState, useEffect } from 'react';
 import {
@@ -142,6 +143,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Mon Profil" subtitle="Espace Locataire" />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sub}>Confidentialité & Passeport Locatif</Text>
         <Text style={styles.title}>Mon Profil</Text>

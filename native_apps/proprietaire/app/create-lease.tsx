@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../components/TopNavHeader';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -170,6 +171,7 @@ export default function CreateLeaseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Nouveau Bail" subtitle="Contrat conforme Loi 2019-576" />
       {/* HEADER */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>

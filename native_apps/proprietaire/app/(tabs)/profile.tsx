@@ -1,3 +1,4 @@
+import { TopNavHeader } from '../../components/TopNavHeader';
 import { AppVersionBadge } from '../../components/AppVersionBadge';
 import React, { useState, useEffect } from 'react';
 import {
@@ -143,6 +144,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TopNavHeader title="Mon Compte" subtitle="Espace Bailleur Propriétaire" />
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sub}>Espace Bailleur & Gestion Immobilière</Text>
         <Text style={styles.title}>Mon Compte</Text>

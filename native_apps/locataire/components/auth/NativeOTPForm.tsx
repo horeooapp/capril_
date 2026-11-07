@@ -130,7 +130,7 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
                 body: JSON.stringify({
                     provider,
                     email: trimmedEmail,
-                    role: role || (profile === 'proprietaire' ? 'LANDLORD' : 'TENANT'),
+                    role: role || 'TENANT',
                     name: trimmedEmail.split('@')[0],
                 }),
             });
@@ -138,9 +138,6 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
             const result = await response.json();
 
             if (response.ok && result.success && result.token) {
-                if (profile) {
-                    await setStoredProfile(profile);
-                }
                 await setStoredToken(result.token);
                 registerForPushNotificationsAsync().catch(console.error);
                 router.replace('/(tabs)');
