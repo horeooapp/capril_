@@ -34,6 +34,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
         profession: initialData?.profession || "",
         salary: initialData?.salary || "",
         phone: initialData?.phone || "",
+        email: initialData?.email || "",
         avatarUrl: initialData?.avatarUrl || "",
         docType: initialData?.docType || "CNI_CI",
         docNumber: initialData?.docNumber || "",
@@ -75,6 +76,7 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                 profession: formData.profession,
                 salary: formData.salary ? parseFloat(formData.salary.toString()) : null,
                 phone: formData.phone,
+                email: formData.email,
                 avatarUrl: formData.avatarUrl,
                 docType: formData.docType,
                 docNumber: formData.docNumber,
@@ -249,6 +251,31 @@ export const ProfileUpdateForm = ({ initialData, isIdentityLocked = false, activ
                     {error && error.toLowerCase().includes('téléphone') && (
                         <p className="text-[11px] font-semibold text-red-600 pl-2 flex items-center gap-1">
                             ⚠️ Ce numéro est déjà utilisé par un autre compte. Veuillez en saisir un autre.
+                        </p>
+                    )}
+                </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 pl-2">Adresse e-mail</label>
+                    <input 
+                        required 
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        value={formData.email}
+                        onChange={(e) => {
+                            setFormData({...formData, email: e.target.value});
+                            if (error && error.toLowerCase().includes('e-mail')) setError(null);
+                        }}
+                        className={`w-full bg-gray-50 border rounded-2xl p-4 font-bold text-gray-800 outline-none transition-all ${
+                            error && error.toLowerCase().includes('e-mail')
+                                ? 'border-red-400 focus:ring-2 focus:ring-red-400 bg-red-50/20'
+                                : 'border-gray-200 focus:ring-2 focus:ring-[#1F4E79]'
+                        }`} 
+                        placeholder="nom@exemple.com"
+                    />
+                    {error && error.toLowerCase().includes('e-mail') && (
+                        <p className="text-[11px] font-semibold text-red-600 pl-2 flex items-center gap-1">
+                            ⚠️ {error}
                         </p>
                     )}
                 </div>

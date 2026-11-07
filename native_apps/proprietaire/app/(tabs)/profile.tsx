@@ -9,11 +9,13 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
-import { ShieldCheck, Globe, LogOut, RefreshCw } from 'lucide-react-native';
+import { ShieldCheck, Globe, LogOut, RefreshCw, Mail, Edit2 } from 'lucide-react-native';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 
 export default function ProfileScreen() {
@@ -22,6 +24,11 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
   const [diaspora, setDiaspora] = useState(true);
   const [loading, setLoading] = useState(true);
+
+  // Modification email
+  const [editEmailVisible, setEditEmailVisible] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [isSavingEmail, setIsSavingEmail] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -39,6 +46,38 @@ export default function ProfileScreen() {
     };
     fetchUserProfile();
   }, []);
+
+  const handleSaveEmail = async () => {
+    const trimmed = newEmail.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmed || !emailRegex.test(trimmed)) {
+      Alert.alert('Format invalide', 'Veuillez saisir une adresse e-mail valide.');
+      return;
+    }
+
+    try {
+      setIsSavingEmail(true);
+      const res = await fetchWithAuth('/auth/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        Alert.alert('Erreur', data.error || "Impossible de mettre à jour l'adresse e-mail.");
+        return;
+      }
+
+      setUser((prev: any) => ({ ...prev, email: trimmed }));
+      setEditEmailVisible(false);
+      Alert.alert('Succès', 'Votre adresse e-mail a été mise à jour avec succès.');
+    } catch (e: any) {
+      Alert.alert('Erreur', 'Erreur de connexion au serveur.');
+    } finally {
+      setIsSavingEmail(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -118,7 +157,16 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
-                <Text style={styles.email}>{user?.email || 'Non renseigné'}</Text>
+                
+                <Pressable 
+                  onPress={() => { setNewEmail(user?.email || ''); setEditEmailVisible(true); }}
+                  style={styles.emailRow}
+                >
+                  <Mail color="#6E6E73" size={13} />
+                  <Text style={styles.email} numberOfLines={1}>{user?.email || 'Définir un e-mail'}</Text>
+                  <Edit2 color="#1B4D3E" size={12} style={{ marginLeft: 2 }} />
+                </Pressable>
+
                 <View style={styles.pillOk}>
                   <Text style={styles.pillOkText}>
                     {user?.isCertified ? 'Bailleur certifié · Identité validée' : 'Compte actif · Espace Bailleur'}
@@ -174,6 +222,49 @@ export default function ProfileScreen() {
         )}
         <AppVersionBadge />
       </ScrollView>
+
+      {/* Modal Modification Adresse Mail */}
+      <Modal visible={editEmailVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
+            <Text style={styles.modalSubtitle}>Entrez votre adresse e-mail pour vos notifications et quittances de loyer.</Text>
+            
+            <TextInput
+              style={styles.modalInput}
+              value={newEmail}
+              onChangeText={setNewEmail}
+              placeholder="nom@exemple.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoFocus
+            />
+
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+              <Pressable 
+                style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} 
+                onPress={() => setEditEmailVisible(false)}
+                disabled={isSavingEmail}
+              >
+                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
+              </Pressable>
+
+              <Pressable 
+                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]} 
+                onPress={handleSaveEmail}
+                disabled={isSavingEmail}
+              >
+                {isSavingEmail ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -198,19 +289,26 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 28,
     backgroundColor: '#1B4D3E',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '600' },
-  name: { fontSize: 17, fontWeight: '600', color: '#1C1C1E' },
-  email: { fontSize: 12, color: '#6E6E73', marginTop: 2 },
+  avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
+  name: { fontSize: 16, fontWeight: '700', color: '#1C1C1E' },
+  emailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginVertical: 3,
+    paddingVertical: 2,
+  },
+  email: { fontSize: 12, color: '#6E6E73', flexShrink: 1 },
   pillOk: {
-    marginTop: 6,
-    alignSelf: 'flex-start',
-    backgroundColor: '#E3F5EC',
-    paddingHorizontal: 9,
-    paddingVertical: 4,
+    backgroundColor: '#E8F5E9',
     borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    alignSelf: 'flex-start',
+    marginTop: 2,
   },
   pillOkText: { color: '#1E7E4E', fontSize: 11, fontWeight: '600' },
   card: {
@@ -258,4 +356,41 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   btnDangerText: { color: '#C0392B', fontSize: 13, fontWeight: '600' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalBox: {
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+    maxWidth: 380,
+    borderRadius: 20,
+    padding: 22,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalTitle: { fontSize: 17, fontWeight: '800', color: '#111827', marginBottom: 6 },
+  modalSubtitle: { fontSize: 12, color: '#6B7280', marginBottom: 16, lineHeight: 17 },
+  modalInput: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#111827',
+  },
+  modalBtn: {
+    flex: 1,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });

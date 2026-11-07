@@ -37,6 +37,7 @@ export async function updateUserProfile(data: {
     profession?: string;
     salary?: number | null;
     phone: string;
+    email?: string;
     avatarUrl?: string;
     docType?: string;
     docNumber?: string;
@@ -143,6 +144,33 @@ export async function updateUserProfile(data: {
             }
         }
 
+        // ────────────────────────────────────────────────────────
+        // GESTION DE L'EMAIL & CONFLITS D'UNICITÉ
+        // ────────────────────────────────────────────────────────
+        let finalEmail: string | undefined = undefined;
+        if (data.email) {
+            const normalizedEmail = data.email.trim().toLowerCase();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(normalizedEmail)) {
+                return { error: "Veuillez saisir une adresse e-mail valide." };
+            }
+
+            if (normalizedEmail !== user.email) {
+                const existingUserWithEmail = await prisma.user.findFirst({
+                    where: {
+                        email: normalizedEmail,
+                        id: { not: session.user.id }
+                    }
+                });
+
+                if (existingUserWithEmail) {
+                    return { error: "Cette adresse e-mail est déjà associée à un autre compte QAPRIL. Veuillez en choisir une autre." };
+                }
+
+                finalEmail = normalizedEmail;
+            }
+        }
+
         await prisma.$transaction(async (tx) => {
             // Update User
             await tx.user.update({
@@ -156,6 +184,7 @@ export async function updateUserProfile(data: {
                     profession: data.profession,     // Allowed
                     salary: data.salary,             // Allowed
                     phone: normalizedPhone,          // Normalized
+                    ...(finalEmail && { email: finalEmail }),
                     ...(data.avatarUrl && { avatarUrl: data.avatarUrl }), // Allowed
                     kycLevel: newKycLevel
                 }
