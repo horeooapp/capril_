@@ -72,10 +72,10 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
     const handleRequestOTP = async () => {
         setFeedback(null);
-        const trimmedEmail = email.trim();
+        const trimmedIdentifier = email.trim();
         
-        if (!trimmedEmail) {
-            setFeedback({ type: 'error', text: "Veuillez saisir votre adresse email ou identifiant." });
+        if (!trimmedIdentifier) {
+            setFeedback({ type: 'error', text: "Veuillez saisir votre adresse e-mail ou votre numéro de téléphone ivoirien." });
             return;
         }
 
@@ -88,7 +88,11 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
             const response = await fetch(`${API_URL}/auth/request-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: trimmedEmail }),
+                body: JSON.stringify({
+                    identifier: trimmedIdentifier,
+                    email: trimmedIdentifier,
+                    phone: trimmedIdentifier
+                }),
                 signal: controller.signal,
             });
 
@@ -97,10 +101,11 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
             if (response.ok && result.success) {
                 setOtp('');
-                setFeedback({ type: 'success', text: "Code de sécurité envoyé par e-mail !" });
+                const channelMsg = result.channel === 'PHONE' ? 'par SMS / WhatsApp' : 'par e-mail';
+                setFeedback({ type: 'success', text: `Code de sécurité envoyé ${channelMsg} !` });
                 setStep('OTP');
             } else {
-                setFeedback({ type: 'error', text: result.error || "Impossible d'envoyer le code de sécurité. Vérifiez votre adresse e-mail." });
+                setFeedback({ type: 'error', text: result.error || "Impossible d'envoyer le code de sécurité. Vérifiez votre saisie." });
             }
         } catch (error) {
             clearTimeout(timeoutId);
@@ -173,7 +178,7 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
             const response = await fetch(`${API_URL}/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim(), otp, role }),
+                body: JSON.stringify({ identifier: email.trim(), email: email.trim(), phone: email.trim(), otp, role }),
                 signal: controller.signal,
             });
 
@@ -222,16 +227,16 @@ export default function NativeOTPForm({ role, title, subtitle }: NativeOTPFormPr
 
                 {step === 'EMAIL' ? (
                     <Animated.View entering={FadeInDown} exiting={FadeOutUp} style={styles.form}>
-                        <Text style={styles.label}>IDENTIFIANT EMAIL OU TÉLÉPHONE</Text>
+                        <Text style={styles.label}>E-MAIL OU TÉLÉPHONE IVOIRIEN (07, 05, 01)</Text>
                         <View style={styles.inputContainer}>
                             <Mail color="#9ca3af" size={20} style={styles.icon} />
                             <TextInput
                                 style={styles.input}
-                                placeholder="votre@email.com"
+                                placeholder="07XXXXXXXX ou email@exemple.ci"
                                 placeholderTextColor="#6b7280"
                                 value={email}
                                 onChangeText={setEmail}
-                                keyboardType="email-address"
+                                keyboardType="default"
                                 autoCapitalize="none"
                                 editable={!isPending}
                                 onSubmitEditing={handleRequestOTP}

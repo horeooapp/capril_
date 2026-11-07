@@ -2,75 +2,91 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { redis } from '@/lib/redis';
 import { signJWT } from '@/lib/jwt';
+import { normalizePhone } from '@/lib/phone';
 
 export async function POST(req: Request) {
   try {
-    const { email, otp, role } = await req.json();
-    if (!email || !otp) {
-      return NextResponse.json({ error: 'Email and OTP are required' }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const identifier = (body?.identifier || body?.email || body?.phone || '').trim();
+    const otp = (body?.otp || '').trim();
+    const requestedRole = body?.role || 'TENANT';
+
+    if (!identifier || !otp) {
+      return NextResponse.json({ error: 'Identifiant et code OTP requis' }, { status: 400 });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const requestedRole = role || 'TENANT';
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    const cleanPhone = identifier.replace(/[\s-]/g, '');
+    const isPhone = !isEmail && /^\+?[0-9]{8,15}$/.test(cleanPhone);
+
+    const normalizedEmail = isEmail ? identifier.toLowerCase() : null;
+    const normalizedPhone = isPhone ? normalizePhone(cleanPhone) : null;
 
     // 1. Verify OTP in Redis
-    let storedOtp: string | null = null;
+    let isValid = false;
     if (redis) {
-      storedOtp = await redis.get(`otp:${normalizedEmail}`);
-    }
-
-    if (!storedOtp || storedOtp !== otp) {
-      return NextResponse.json({ error: 'Invalid or expired OTP' }, { status: 401 });
-    }
-
-    // 2. Clear OTP
-    if (redis) await redis.del(`otp:${normalizedEmail}`);
-
-    // 3. Find or Create User
-    let user;
-    try {
-      user = await prisma.user.findFirst({
-        where: { email: normalizedEmail }
-      });
-
-      if (!user) {
-        console.log(`[API AUTH] Creating new user for ${normalizedEmail}`);
-        // Ensure the dummy phone is short enough and unique
-        const timestamp = Date.now().toString().slice(-8);
-        user = await prisma.user.create({
-          data: {
-            email: normalizedEmail,
-            role: requestedRole as any,
-            status: 'PENDING_PROFILE',
-            phone: `TEMP_${timestamp}`
-          }
-        });
+      if (isEmail && normalizedEmail) {
+        const stored = await redis.get(`otp:${normalizedEmail}`);
+        if (stored === otp) {
+          isValid = true;
+          await redis.del(`otp:${normalizedEmail}`);
+        }
+      } else if (normalizedPhone) {
+        const stored1 = await redis.get(`otp:${normalizedPhone}`);
+        const stored2 = await redis.get(`otp:${cleanPhone}`);
+        if (stored1 === otp || stored2 === otp) {
+          isValid = true;
+          await redis.del(`otp:${normalizedPhone}`);
+          await redis.del(`otp:${cleanPhone}`);
+        }
       }
-    } catch (dbError: any) {
-      console.error('[API AUTH] Database Error (User Lookup/Create):', dbError.message);
-      return NextResponse.json({ error: 'Database synchronization error' }, { status: 500 });
     }
 
-    // 4. Generate JWT
-    try {
-      const token = await signJWT({ userId: user.id, role: user.role });
+    if (!isValid) {
+      return NextResponse.json({ error: 'Code de sécurité incorrect ou expiré' }, { status: 401 });
+    }
 
-      return NextResponse.json({
-        success: true,
-        token,
-        profile: user.role.toLowerCase(),
-        userId: user.id,
-        onboardingComplete: !!(user as any).onboardingComplete
+    // 2. Find or Create User
+    let user = await prisma.user.findFirst({
+      where: isEmail
+        ? { email: normalizedEmail! }
+        : {
+            OR: [
+              { phone: normalizedPhone! },
+              { phone: normalizedPhone!.replace('+', '') },
+              { phone: cleanPhone }
+            ]
+          }
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: normalizedEmail,
+          phone: normalizedPhone || `PENDING_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          role: requestedRole as any,
+          status: 'PENDING_PROFILE',
+          onboardingComplete: requestedRole === 'TENANT',
+          capaciteActive: requestedRole
+        }
       });
-    } catch (jwtError: any) {
-      console.error('[API AUTH] JWT Signing Error:', jwtError.message);
-      return NextResponse.json({ 
-        error: 'Security token generation failed', 
-        details: process.env.NODE_ENV === 'development' ? jwtError.message : undefined 
-      }, { status: 500 });
     }
+
+    // 3. Generate JWT
+    const token = await signJWT({ userId: user.id, role: user.role });
+
+    return NextResponse.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      }
+    });
   } catch (error: any) {
-    console.error('[API AUTH] Unexpected OTP Verify Error:', error);
-    return NextResponse.json({ error: 'Internal server error', details: error.message }, { status: 500 });
+    console.error('[API AUTH] OTP Verify Error:', error?.message || error);
+    return NextResponse.json({ error: 'Erreur interne lors de la vérification' }, { status: 500 });
   }
 }

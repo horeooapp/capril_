@@ -222,3 +222,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(239, 68, 68, 0.25)',
   },
 });
+

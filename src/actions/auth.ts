@@ -14,6 +14,7 @@ function generateOTP(): string {
 }
 
 import { sendOpenWAOTP } from "@/lib/openwa";
+import { normalizePhone } from "@/lib/phone";
 
 /**
  * Part 3.3: Request Email / WhatsApp OTP (Server Action)
@@ -22,12 +23,17 @@ import { sendOpenWAOTP } from "@/lib/openwa";
 export async function requestOTP(identifier: string) {
     console.log("[SERVER ACTION] requestOTP called for:", identifier);
 
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    const cleanPhone = identifier.replace(/[\s-]/g, '');
-    const isPhone = /^\+?[0-9]{8,15}$/.test(cleanPhone);
+    if (!identifier || typeof identifier !== 'string') {
+        return { error: "Veuillez renseigner votre adresse e-mail ou votre numéro de téléphone ivoirien." };
+    }
+
+    const trimmed = identifier.trim();
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    const cleanPhone = trimmed.replace(/[\s-]/g, '');
+    const isPhone = !isEmail && /^\+?[0-9]{8,15}$/.test(cleanPhone);
 
     if (!isEmail && !isPhone) {
-        return { error: "Veuillez saisir une adresse e-mail ou un numéro de téléphone valide." };
+        return { error: "Veuillez saisir une adresse e-mail ou un numéro de téléphone ivoirien valide (ex: 07 XX XX XX XX)." };
     }
 
     try {
@@ -40,38 +46,38 @@ export async function requestOTP(identifier: string) {
         }
 
         if (isPhone) {
-            // Stocker pour le numéro de téléphone
+            const normalizedPhone = normalizePhone(cleanPhone);
+            await redis.set(`otp:${normalizedPhone}`, otp, 'EX', ttl);
             await redis.set(`otp:${cleanPhone}`, otp, 'EX', ttl);
-            const waResult = await sendOpenWAOTP(cleanPhone, otp, "Connexion");
-            console.log(`[AUTH] OTP ${otp} sent via OpenWA to ${cleanPhone} (Success: ${waResult.success})`);
-            return { success: true, channel: "WHATSAPP" };
+
+            const waResult = await sendOpenWAOTP(normalizedPhone, otp, "Connexion / Inscription QAPRIL");
+            console.log(`[AUTH] OTP ${otp} sent via OpenWA to ${normalizedPhone} (Success: ${waResult.success})`);
+            return { success: true, channel: "PHONE" };
         }
 
         // Si c'est un email
-        const normalizedEmail = identifier.toLowerCase().trim();
+        const normalizedEmail = trimmed.toLowerCase();
         await redis.set(`otp:${normalizedEmail}`, otp, 'EX', ttl);
 
-        // Envoyer par OpenWA si l'utilisateur a un numéro de téléphone associé
         try {
             const user = await prisma.user.findFirst({
                 where: { email: normalizedEmail },
                 select: { phone: true }
             });
             if (user?.phone) {
-                await sendOpenWAOTP(user.phone, otp, "Connexion");
+                await sendOpenWAOTP(user.phone, otp, "Connexion / Inscription QAPRIL");
             }
         } catch (dbErr) {
             console.warn("[AUTH] Could not lookup user phone for OpenWA notification:", dbErr);
         }
 
-        // Envoyer également l'email en parallèle
         const emailResult = await sendOTPEmail(normalizedEmail, otp);
         if (!emailResult.success) {
             console.error(`[SERVER ACTION] Failed to send email to ${normalizedEmail}:`, emailResult.error);
         }
 
         console.log(`[AUTH] OTP ${otp} generated for ${normalizedEmail} (TTL: ${ttl}s)`);
-        return { success: true };
+        return { success: true, channel: "EMAIL" };
     } catch (error: any) {
         console.error("[SERVER ACTION] requestOTP error:", error?.message || error);
         return { error: `Erreur technique lors de l'envoi du code (${error?.message?.substring(0, 50)}).` };
@@ -82,19 +88,27 @@ export async function requestOTP(identifier: string) {
  * Part 3.4: Login with Email OTP (Server Action)
  * Finalizes authentication via NextAuth.
  */
-export async function loginWithOTP(email: string, otp: string, role?: string) {
-    console.log("[SERVER ACTION] loginWithOTP called for email:", email, "intended role:", role);
+export async function loginWithOTP(identifier: string, otp: string, role?: string) {
+    console.log("[SERVER ACTION] loginWithOTP called for:", identifier, "intended role:", role);
 
-    if (!email || !otp) return { error: "Email et code OTP requis" }
+    if (!identifier || !otp) return { error: "Identifiant et code OTP requis" };
+
+    const trimmed = identifier.trim();
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    const cleanPhone = trimmed.replace(/[\s-]/g, '');
+    const isPhone = !isEmail && /^\+?[0-9]{8,15}$/.test(cleanPhone);
+
+    const normalizedEmail = isEmail ? trimmed.toLowerCase() : null;
+    const normalizedPhone = isPhone ? normalizePhone(cleanPhone) : null;
 
     try {
-        let normalizedEmail = email.toLowerCase().trim();
-        if (normalizedEmail === 'admin') {
-            normalizedEmail = 'admin@qapril.ci';
+        let authId = trimmed;
+        if (authId.toLowerCase() === 'admin') {
+            authId = 'admin@qapril.ci';
         }
 
         const result = await signIn("email-otp", {
-            email: normalizedEmail,
+            email: authId,
             otp,
             role,
             redirect: false,
@@ -107,13 +121,21 @@ export async function loginWithOTP(email: string, otp: string, role?: string) {
 
         // Get user status to determine redirection
         const user = await prisma.user.findFirst({
-            where: { email: email.toLowerCase().trim() },
+            where: isEmail
+                ? { email: normalizedEmail! }
+                : {
+                    OR: [
+                        { phone: normalizedPhone! },
+                        { phone: normalizedPhone!.replace('+', '') },
+                        { phone: cleanPhone }
+                    ]
+                },
             select: { onboardingComplete: true }
         });
 
         return { 
             success: true, 
-            onboardingComplete: user?.onboardingComplete || false 
+            onboardingComplete: user?.onboardingComplete ?? true 
         };
     } catch (error: any) {
         // Explicitly handle failures with detailed logging

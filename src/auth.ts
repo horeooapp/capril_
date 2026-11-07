@@ -15,6 +15,7 @@ class CustomAuthError extends CredentialsSignin {
 import { authConfig } from "./auth.config"
 import { redis } from "@/lib/redis"
 import { writeAuditLog } from "@/lib/audit"
+import { normalizePhone } from "@/lib/phone"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -50,7 +51,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.otp) return null;
 
-                const email = (credentials.email as string).toLowerCase().trim();
+                const rawIdentifier = (credentials.email as string).trim();
+                const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawIdentifier);
+                const cleanPhone = rawIdentifier.replace(/[\s-]/g, '');
+                const isPhone = !isEmail && /^\+?[0-9]{8,15}$/.test(cleanPhone);
+
+                if (!isEmail && !isPhone) {
+                    throw new CustomAuthError("invalid_identifier");
+                }
+
+                const normalizedEmail = isEmail ? rawIdentifier.toLowerCase() : null;
+                const normalizedPhone = isPhone ? normalizePhone(cleanPhone) : null;
+                const email = normalizedEmail || normalizedPhone!;
                 const otp = credentials.otp as string;
                 const requestedRole = (credentials.role as string) || 'TENANT';
 
@@ -69,7 +81,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // 1. Verify OTP in Redis
                 let storedOtp: string | null = null;
                 if (redis) {
-                    storedOtp = await redis.get(`otp:${email}`);
+                    if (isEmail) {
+                        storedOtp = await redis.get(`otp:${normalizedEmail}`);
+                    } else if (normalizedPhone) {
+                        storedOtp = (await redis.get(`otp:${normalizedPhone}`)) || (await redis.get(`otp:${cleanPhone}`));
+                    }
                 }
 
                 const isValid = storedOtp === otp;
@@ -85,11 +101,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 try {
                     // 2. Clear OTP
-                    if (redis) await redis.del(`otp:${email}`);
+                    if (redis) {
+                        if (isEmail) {
+                            await redis.del(`otp:${normalizedEmail}`);
+                        } else if (normalizedPhone) {
+                            await redis.del(`otp:${normalizedPhone}`);
+                            await redis.del(`otp:${cleanPhone}`);
+                        }
+                    }
 
                     // 3. Find or Create User
                     const user = await prisma.user.findFirst({
-                        where: { email },
+                        where: isEmail
+                            ? { email: normalizedEmail! }
+                            : {
+                                OR: [
+                                    { phone: normalizedPhone! },
+                                    { phone: normalizedPhone!.replace('+', '') },
+                                    { phone: cleanPhone },
+                                    { phone: rawIdentifier }
+                                ]
+                            },
                         include: {
                             diasporaProfile: true,
                             capacites: { where: { actif: true } },
@@ -260,16 +292,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         const newUser = await prisma.user.create({
                             data: {
-                                email,
+                                email: normalizedEmail,
+                                phone: normalizedPhone || `PENDING_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                                 role: roleBase,
                                 status: 'PENDING_PROFILE',
-                                phone: `PENDING_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
                                 onboardingComplete: roleBase === "TENANT",
                                 capaciteActive: roleBase
                             }
                         });
 
-                        const defaultDisplayName = roleBase === "AGENCY" ? "Mon Agence" : (newUser.email?.split('@')[0] || "Nouvel Utilisateur");
+                        const defaultDisplayName = roleBase === "AGENCY"
+                            ? "Mon Agence"
+                            : (newUser.firstName || (newUser.email ? newUser.email.split('@')[0] : newUser.phone) || "Nouvel Utilisateur");
 
                         return {
                             id: newUser.id,

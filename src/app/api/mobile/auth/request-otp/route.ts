@@ -3,23 +3,30 @@ import { requestOTP } from '@/actions/auth';
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const { email } = body;
+        const body = await request.json().catch(() => ({}));
+        const identifier = (body.identifier || body.email || body.phone || '').trim();
 
-        if (!email) {
-            return NextResponse.json({ error: "L'email est requis" }, { status: 400 });
+        if (!identifier) {
+            return NextResponse.json(
+                { error: "Veuillez renseigner votre adresse e-mail ou votre numéro de téléphone ivoirien." },
+                { status: 400 }
+            );
         }
 
-        // Call the existing server action logic
-        const result = await requestOTP(email);
+        // Appel de l'action centralisée supportant e-mail et numéro ivoirien
+        const result = await requestOTP(identifier);
 
         if (result.error) {
             return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({
+            success: true,
+            channel: result.channel || "PHONE",
+            message: "Code de sécurité envoyé avec succès."
+        });
     } catch (error: any) {
         console.error("[MOBILE API] request-otp error:", error);
-        return NextResponse.json({ error: "Erreur interne du serveur" }, { status: 500 });
+        return NextResponse.json({ error: "Erreur interne du serveur lors de la demande OTP." }, { status: 500 });
     }
 }
