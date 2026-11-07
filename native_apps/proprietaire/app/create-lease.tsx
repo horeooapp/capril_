@@ -172,17 +172,7 @@ export default function CreateLeaseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavHeader title="Nouveau Bail" subtitle="Contrat conforme Loi 2019-576" />
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft color="#1C1C1E" size={26} />
-        </Pressable>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Nouveau Bail Certifié</Text>
-          <Text style={styles.headerSub}>Rédiger un contrat conforme à la Loi 2019-576</Text>
-        </View>
-      </View>
+      <TopNavHeader title="Nouveau Bail Certifié" subtitle="Contrat conforme Loi 2019-576" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

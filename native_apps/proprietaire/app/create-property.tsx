@@ -167,17 +167,7 @@ export default function CreatePropertyScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavHeader title="Nouveau Bien" subtitle="Enregistrement patrimoine" />
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft color="#1C1C1E" size={26} />
-        </Pressable>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.headerTitle}>Nouveau Bien</Text>
-          <Text style={styles.headerSub}>Ajouter un logement ou un local à votre patrimoine</Text>
-        </View>
-      </View>
+      <TopNavHeader title="Nouveau Bien" subtitle="Ajouter un logement à votre patrimoine" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

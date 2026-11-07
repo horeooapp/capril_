@@ -31,7 +31,10 @@ export async function POST(request: Request) {
 
         const dbUser = await prisma.user.findUnique({
             where: { id: user.userId },
-            include: { properties: { select: { id: true }, take: 1 } }
+            include: {
+                propertiesOwned: { select: { id: true }, take: 1 },
+                propertiesManaged: { select: { id: true }, take: 1 }
+            }
         });
         if (!dbUser) {
             return NextResponse.json({ error: "Compte utilisateur introuvable." }, { status: 401 });
@@ -69,7 +72,8 @@ export async function POST(request: Request) {
         const effectiveRole = String(dbUser.role || user.role || '').toUpperCase();
         const allowedRoles = ['PROPRIETAIRE', 'BAILLEUR', 'LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'AGENCE', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT', 'ADMIN', 'SUPER_ADMIN'];
 
-        const hasAccess = isOwnerOrManager || allowedRoles.includes(effectiveRole) || dbUser.properties.length > 0;
+        const hasOwnedOrManaged = (dbUser.propertiesOwned?.length || 0) > 0 || (dbUser.propertiesManaged?.length || 0) > 0;
+        const hasAccess = isOwnerOrManager || allowedRoles.includes(effectiveRole) || hasOwnedOrManaged;
         if (!hasAccess) {
             return NextResponse.json({ error: "Accès réservé aux bailleurs et agences gestionnaires." }, { status: 403 });
         }
