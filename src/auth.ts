@@ -24,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     secret: process.env.AUTH_SECRET,
     trustHost: true,
     debug: process.env.NODE_ENV === "development",
-    adapter: PrismaAdapter(prisma),
+    // adapter omitted for custom schema JWT mode
     providers: [
         Google({
             clientId: process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || "google-client-id",
@@ -400,4 +400,82 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
         })
     ],
+    callbacks: {
+        ...authConfig.callbacks,
+        async signIn({ user, account, profile }) {
+            if (account?.provider === "google" || account?.provider === "facebook" || account?.provider === "apple") {
+                if (!user.email) return false;
+                const email = user.email.toLowerCase().trim();
+                
+                try {
+                    let dbUser = await prisma.user.findUnique({
+                        where: { email },
+                        include: { accounts: true }
+                    });
+
+                    if (!dbUser) {
+                        const rawName = user.name || (profile as any)?.name || (profile as any)?.login || email.split('@')[0];
+                        const parts = rawName.trim().split(/\s+/);
+                        const firstName = parts[0] || 'Utilisateur';
+                        const lastName = parts.slice(1).join(' ') || '';
+                        const avatarUrl = user.image || (profile as any)?.picture || (profile as any)?.avatar_url || null;
+
+                        dbUser = await prisma.user.create({
+                            data: {
+                                email,
+                                firstName,
+                                lastName,
+                                avatarUrl,
+                                emailVerified: true,
+                                role: "LANDLORD",
+                                status: "ACTIVE",
+                                capaciteActive: "PROPRIETAIRE",
+                            }
+                        });
+                    }
+
+                    const existingAccount = await prisma.account.findFirst({
+                        where: {
+                            provider: account.provider,
+                            providerAccountId: account.providerAccountId
+                        }
+                    });
+
+                    if (!existingAccount) {
+                        await prisma.account.create({
+                            data: {
+                                userId: dbUser.id,
+                                type: account.type || "oauth",
+                                provider: account.provider,
+                                providerAccountId: account.providerAccountId,
+                                refresh_token: (account.refresh_token as string) || null,
+                                access_token: (account.access_token as string) || null,
+                                expires_at: account.expires_at || null,
+                                token_type: (account.token_type as string) || null,
+                                scope: (account.scope as string) || null,
+                                id_token: (account.id_token as string) || null,
+                                session_state: (account.session_state as string) || null,
+                            }
+                        });
+                    }
+
+                    user.id = dbUser.id;
+                    (user as any).role = dbUser.role;
+                    (user as any).chosenRole = dbUser.role;
+                    (user as any).capaciteActive = dbUser.capaciteActive || dbUser.role;
+                    (user as any).firstName = dbUser.firstName;
+                    (user as any).lastName = dbUser.lastName;
+                    (user as any).avatarUrl = dbUser.avatarUrl;
+                    (user as any).status = dbUser.status;
+                    (user as any).onboardingComplete = dbUser.onboardingComplete;
+
+                    return true;
+                } catch (err) {
+                    console.error("[OAuth signIn error]:", err);
+                    return false;
+                }
+            }
+            return true;
+        }
+    },
 })
