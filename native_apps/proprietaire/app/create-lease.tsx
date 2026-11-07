@@ -1,5 +1,5 @@
 import { TopNavHeader } from '../components/TopNavHeader';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -37,6 +37,7 @@ const DURATION_OPTIONS = [
 
 export default function CreateLeaseScreen() {
   const router = useRouter();
+  const scrollViewRef = useRef<ScrollView>(null);
   const params = useLocalSearchParams<{
     propertyId?: string;
     propertyName?: string;
@@ -184,13 +185,16 @@ export default function CreateLeaseScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 20}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          ref={scrollViewRef}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 380 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
           {/* BANDEAU RÈGLEMENTAIRE */}
           <View style={styles.legalNotice}>
@@ -291,7 +295,7 @@ export default function CreateLeaseScreen() {
               onChangeText={setTenantPhone}
             />
 
-            <Text style={styles.fieldLabel}>Email du locataire *</Text>
+            <Text style={styles.fieldLabel}>Email du locataire (optionnel)</Text>
             <TextInput
               style={styles.input}
               placeholder="Ex: locataire@gmail.com"
@@ -308,28 +312,67 @@ export default function CreateLeaseScreen() {
             <Text style={styles.sectionTitle}>3. CONDITIONS FINANCIÈRES (LOI 2019-576)</Text>
 
             <Text style={styles.fieldLabel}>Loyer Mensuel (FCFA) *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 250000"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="numeric"
-              value={rentAmount}
-              onChangeText={setRentAmount}
-            />
+            <View style={styles.inputWithSuffixContainer}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder="Ex: 250000"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                returnKeyType="next"
+                value={rentAmount}
+                onChangeText={setRentAmount}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }, 150);
+                }}
+              />
+              <View style={styles.suffixBadge}>
+                <Text style={styles.suffixBadgeText}>FCFA</Text>
+              </View>
+            </View>
 
-            <View style={{ marginTop: 6 }}>
+            {rentAmount.trim().length > 0 && (
+              <View style={styles.valuePreviewCard}>
+                <Text style={styles.valuePreviewLabel}>Loyer mensuel saisi :</Text>
+                <Text style={styles.valuePreviewText}>
+                  {Number(rentAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                </Text>
+              </View>
+            )}
+
+            <View style={{ marginTop: 8 }}>
               <View style={styles.rowBetween}>
                 <Text style={styles.fieldLabel}>Dépôt de garantie / Caution (FCFA)</Text>
                 <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
               </View>
-              <TextInput
-                style={[styles.input, isDepositOverLimit && styles.inputError]}
-                placeholder={`Ex: ${maxLegalCaution}`}
-                placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
-                value={depositAmount}
-                onChangeText={setDepositAmount}
-              />
+              <View style={styles.inputWithSuffixContainer}>
+                <TextInput
+                  style={[styles.input, styles.inputFlex, isDepositOverLimit && styles.inputError]}
+                  placeholder={`Ex: ${maxLegalCaution}`}
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  returnKeyType="next"
+                  value={depositAmount}
+                  onChangeText={setDepositAmount}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 150);
+                  }}
+                />
+                <View style={styles.suffixBadge}>
+                  <Text style={styles.suffixBadgeText}>FCFA</Text>
+                </View>
+              </View>
+              {depositAmount.trim().length > 0 && !isDepositOverLimit && (
+                <View style={styles.valuePreviewCard}>
+                  <Text style={styles.valuePreviewLabel}>Caution saisie :</Text>
+                  <Text style={styles.valuePreviewText}>
+                    {Number(depositAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                  </Text>
+                </View>
+              )}
               {isDepositOverLimit && (
                 <Text style={styles.errorText}>
                   ⚠️ La caution ne peut dépasser 2 mois de loyer selon la loi ivoirienne.
@@ -337,19 +380,38 @@ export default function CreateLeaseScreen() {
               )}
             </View>
 
-            <View style={{ marginTop: 6 }}>
+            <View style={{ marginTop: 8 }}>
               <View style={styles.rowBetween}>
                 <Text style={styles.fieldLabel}>Avance sur Loyer (FCFA)</Text>
                 <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
               </View>
-              <TextInput
-                style={[styles.input, isAdvanceOverLimit && styles.inputError]}
-                placeholder={`Ex: ${maxLegalCaution}`}
-                placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
-                value={advanceAmount}
-                onChangeText={setAdvanceAmount}
-              />
+              <View style={styles.inputWithSuffixContainer}>
+                <TextInput
+                  style={[styles.input, styles.inputFlex, isAdvanceOverLimit && styles.inputError]}
+                  placeholder={`Ex: ${maxLegalCaution}`}
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  value={advanceAmount}
+                  onChangeText={setAdvanceAmount}
+                  onFocus={() => {
+                    setTimeout(() => {
+                      scrollViewRef.current?.scrollToEnd({ animated: true });
+                    }, 150);
+                  }}
+                />
+                <View style={styles.suffixBadge}>
+                  <Text style={styles.suffixBadgeText}>FCFA</Text>
+                </View>
+              </View>
+              {advanceAmount.trim().length > 0 && !isAdvanceOverLimit && (
+                <View style={styles.valuePreviewCard}>
+                  <Text style={styles.valuePreviewLabel}>Avance saisie :</Text>
+                  <Text style={styles.valuePreviewText}>
+                    {Number(advanceAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                  </Text>
+                </View>
+              )}
               {isAdvanceOverLimit && (
                 <Text style={styles.errorText}>
                   ⚠️ L'avance sur loyer ne peut dépasser 2 mois selon la loi ivoirienne.
@@ -357,8 +419,8 @@ export default function CreateLeaseScreen() {
               )}
             </View>
 
-            <Text style={styles.fieldLabel}>Durée du bail</Text>
-            <View style={styles.chipsWrap}>
+            <Text style={[styles.fieldLabel, { marginTop: 12 }]}>Durée du bail</Text>
+            <View style={styles.chipsWrapHorizontal}>
               {DURATION_OPTIONS.map((d) => {
                 const active = durationMonths === d.id;
                 return (
@@ -430,7 +492,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: 16,
-    paddingBottom: 40,
     gap: 16,
   },
   rowBetween: {
@@ -502,9 +563,55 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 14,
+    paddingVertical: 12,
+    fontSize: 15,
     color: '#111827',
+  },
+  inputWithSuffixContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  inputFlex: {
+    flex: 1,
+  },
+  suffixBadge: {
+    backgroundColor: '#E5E7EB',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  suffixBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  valuePreviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginTop: 4,
+  },
+  valuePreviewLabel: {
+    fontSize: 12,
+    color: '#166534',
+    fontWeight: '500',
+  },
+  valuePreviewText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1B4D3E',
   },
   inputError: {
     borderColor: '#EF4444',
@@ -517,6 +624,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   chipsWrap: {
+    gap: 8,
+    marginTop: 4,
+  },
+  chipsWrapHorizontal: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginTop: 4,
   },
