@@ -7,9 +7,9 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { provider, email, name, providerAccountId, role, avatarUrl } = body;
 
-    if (!provider || !["google", "facebook", "apple"].includes(provider.toLowerCase())) {
+    if (!provider || !["google", "facebook"].includes(provider.toLowerCase())) {
       return NextResponse.json(
-        { error: "Fournisseur d'authentification invalide (google, facebook ou apple requis)" },
+        { error: "Fournisseur d'authentification invalide (google ou facebook requis)" },
         { status: 400 }
       );
     }
@@ -49,22 +49,22 @@ export async function POST(request: Request) {
             provider: normalizedProvider,
             providerAccountId: targetAccountId,
           }
-        });
+        }).catch(err => console.warn("[OAuth link warning]:", err?.message));
       }
 
-      // Si l'utilisateur se connecte sur l'application propriétaire et a encore le rôle TENANT par défaut
-      if (isLandlordRole && user.role === "TENANT") {
-        user = await prisma.user.update({
+      // Si le rôle de l'utilisateur n'est pas encore défini ou profil incomplet
+      if (avatarUrl && !user.avatarUrl) {
+        await prisma.user.update({
           where: { id: user.id },
-          data: { role: "LANDLORD" },
-          include: { accounts: true }
-        });
+          data: { avatarUrl }
+        }).catch(() => null);
       }
     } else {
-      // 2. Création d'un nouvel utilisateur
-      const nameParts = (name || "").trim().split(" ");
-      const firstName = nameParts[0] || normalizedEmail.split("@")[0];
-      const lastName = nameParts.slice(1).join(" ") || "";
+      // 2. Création automatique de l'utilisateur
+      const rawName = name || normalizedEmail.split("@")[0] || "Utilisateur QAPRIL";
+      const parts = rawName.trim().split(/\s+/);
+      const firstName = parts[0] || "Utilisateur";
+      const lastName = parts.slice(1).join(" ") || "";
 
       user = await prisma.user.create({
         data: {
@@ -73,8 +73,10 @@ export async function POST(request: Request) {
           lastName,
           avatarUrl: avatarUrl || null,
           role: targetRole,
-          emailVerified: new Date(),
           status: "ACTIVE",
+          emailVerified: true,
+          capaciteActive: targetRole === "LANDLORD" ? "PROPRIETAIRE" : "LOCATAIRE",
+          onboardingComplete: targetRole === "TENANT",
           accounts: {
             create: {
               type: "oauth",
@@ -87,11 +89,11 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Génération du JWT mobile sécurisé
+    // 3. Génération du JWT mobile
     const token = await signMobileToken({
       userId: user.id,
-      email: user.email,
-      role: user.role
+      email: user.email!,
+      role: user.role,
     });
 
     return NextResponse.json({
@@ -100,18 +102,20 @@ export async function POST(request: Request) {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role,
         firstName: user.firstName,
         lastName: user.lastName,
-        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email
+        avatarUrl: user.avatarUrl,
+        role: user.role,
+        capaciteActive: user.capaciteActive,
+        onboardingComplete: user.onboardingComplete,
       }
     });
+
   } catch (error: any) {
-    console.error("[MOBILE API] /auth/oauth error:", error);
+    console.error("[Mobile OAuth error]:", error);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'authentification sociale mobile" },
+      { error: "Échec du traitement de la connexion sociale mobile", details: error?.message },
       { status: 500 }
     );
   }
 }
-

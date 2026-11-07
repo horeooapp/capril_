@@ -105,12 +105,12 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
     };
 
     
-    const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
+    const handleSocialAuth = async (provider: 'google' | 'facebook') => {
         const trimmedEmail = email.trim().toLowerCase();
         if (!trimmedEmail) {
             setFeedback({
                 type: 'info',
-                text: `Veuillez renseigner votre adresse e-mail ci-dessus puis appuyez sur Continuer avec ${provider === 'google' ? 'Google' : provider === 'apple' ? 'Apple' : 'Facebook'}.`
+                text: `Veuillez renseigner votre adresse e-mail ci-dessus puis appuyez sur Continuer avec ${provider === 'google' ? 'Google' : 'Facebook'}.`
             });
             return;
         }
@@ -271,15 +271,6 @@ export default function NativeOTPForm({ role, title, subtitle, profile = 'propri
                             >
                                 <Text style={styles.socialGoogleIcon}>G</Text>
                                 <Text style={styles.socialButtonTextDark}>Continuer avec Google</Text>
-                            </Pressable>
-
-                            <Pressable
-                                style={[styles.socialButton, { backgroundColor: '#000000', borderColor: '#000000' }]}
-                                onPress={() => handleSocialAuth('apple')}
-                                disabled={isPending}
-                            >
-                                <Text style={{ color: '#FFF', fontSize: 16, fontWeight: '900', marginRight: 8 }}></Text>
-                                <Text style={styles.socialButtonTextLight}>Continuer avec Apple</Text>
                             </Pressable>
 
                             <Pressable

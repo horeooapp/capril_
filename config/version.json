@@ -10,14 +10,14 @@
       "version": "1.1.6",
       "versionCode": 6,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Connexion Google, Apple, Facebook et mise à jour OTA automatique"
+      "releaseNotes": "Connexion Google et Facebook et mise à jour OTA automatique"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
       "version": "1.1.6",
       "versionCode": 6,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Connexion Google, Apple, Facebook et mise à jour OTA automatique"
+      "releaseNotes": "Connexion Google et Facebook et mise à jour OTA automatique"
     }
   }
 }

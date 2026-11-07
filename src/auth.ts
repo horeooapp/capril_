@@ -4,8 +4,6 @@ import { prisma } from "@/lib/prisma"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import Facebook from "next-auth/providers/facebook"
-import Apple from "next-auth/providers/apple"
-
 class CustomAuthError extends CredentialsSignin {
   code: string;
   constructor(code: string) {
@@ -39,11 +37,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     scope: "public_profile,email"
                 }
             },
-            allowDangerousEmailAccountLinking: true,
-        }),
-        Apple({
-            clientId: process.env.AUTH_APPLE_ID || process.env.APPLE_CLIENT_ID || "apple-client-id",
-            clientSecret: process.env.AUTH_APPLE_SECRET || process.env.APPLE_CLIENT_SECRET || "apple-client-secret",
             allowDangerousEmailAccountLinking: true,
         }),
         Credentials({
@@ -403,22 +396,46 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     callbacks: {
         ...authConfig.callbacks,
         async signIn({ user, account, profile }) {
-            if (account?.provider === "google" || account?.provider === "facebook" || account?.provider === "apple") {
-                if (!user.email) return false;
-                const email = user.email.toLowerCase().trim();
-                
+            if (account?.provider === "google" || account?.provider === "facebook") {
+                const providerId = account.providerAccountId || user.id || "unknown";
+                const profileEmail = user.email || (profile as any)?.email;
+                const email = (profileEmail && typeof profileEmail === "string" && profileEmail.includes("@"))
+                    ? profileEmail.toLowerCase().trim()
+                    : `${account.provider}_${providerId}@oauth.qapril.net`;
+
+                user.email = email;
+
                 try {
-                    let dbUser = await prisma.user.findUnique({
-                        where: { email },
-                        include: { accounts: true }
+                    // 1. Chercher par compte OAuth existant
+                    let dbUser: any = null;
+                    const existingAccount = await prisma.account.findFirst({
+                        where: {
+                            provider: account.provider,
+                            providerAccountId: providerId
+                        },
+                        include: { user: true }
                     });
 
+                    if (existingAccount?.user) {
+                        dbUser = existingAccount.user;
+                    } else {
+                        // 2. Chercher par email
+                        dbUser = await prisma.user.findUnique({
+                            where: { email },
+                            include: { accounts: true }
+                        });
+                    }
+
                     if (!dbUser) {
-                        const rawName = user.name || (profile as any)?.name || (profile as any)?.login || email.split('@')[0];
+                        const rawName = user.name || (profile as any)?.name || (profile as any)?.login || "Utilisateur QAPRIL";
                         const parts = rawName.trim().split(/\s+/);
                         const firstName = parts[0] || 'Utilisateur';
                         const lastName = parts.slice(1).join(' ') || '';
-                        const avatarUrl = user.image || (profile as any)?.picture || (profile as any)?.avatar_url || null;
+                        const avatarUrl = user.image 
+                            || (profile as any)?.picture?.data?.url 
+                            || (profile as any)?.picture 
+                            || (profile as any)?.avatar_url 
+                            || null;
 
                         dbUser = await prisma.user.create({
                             data: {
@@ -434,29 +451,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         });
                     }
 
-                    const existingAccount = await prisma.account.findFirst({
-                        where: {
-                            provider: account.provider,
-                            providerAccountId: account.providerAccountId
-                        }
-                    });
-
+                    // Lier le compte s'il n'est pas encore enregistré
                     if (!existingAccount) {
+                        const expAt = account.expires_at ? Math.round(Number(account.expires_at)) : null;
                         await prisma.account.create({
                             data: {
                                 userId: dbUser.id,
                                 type: account.type || "oauth",
                                 provider: account.provider,
-                                providerAccountId: account.providerAccountId,
+                                providerAccountId: providerId,
                                 refresh_token: (account.refresh_token as string) || null,
                                 access_token: (account.access_token as string) || null,
-                                expires_at: account.expires_at || null,
+                                expires_at: expAt,
                                 token_type: (account.token_type as string) || null,
                                 scope: (account.scope as string) || null,
                                 id_token: (account.id_token as string) || null,
                                 session_state: (account.session_state as string) || null,
                             }
-                        });
+                        }).catch(e => console.warn("[OAuth account link notice]:", e?.message));
                     }
 
                     user.id = dbUser.id;
@@ -471,8 +483,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                     return true;
                 } catch (err) {
-                    console.error("[OAuth signIn error]:", err);
-                    return false;
+                    console.error("[OAuth signIn handled error]:", err);
+                    return true;
                 }
             }
             return true;
