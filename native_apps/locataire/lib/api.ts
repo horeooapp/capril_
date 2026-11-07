@@ -138,6 +138,31 @@ const getApiUrl = () => {
 
 export const API_URL = getApiUrl();
 
+export async function getHasSeenOnboarding(): Promise<boolean> {
+    try {
+        if (Platform.OS === 'web') {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                return window.localStorage.getItem('hasSeenOnboarding') === 'true';
+            }
+            const item = await AsyncStorage.getItem('hasSeenOnboarding');
+            return item === 'true';
+        }
+        const item = await AsyncStorage.getItem('hasSeenOnboarding');
+        return item === 'true';
+    } catch {
+        return false;
+    }
+}
+
+export async function setHasSeenOnboarding(): Promise<void> {
+    try {
+        if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+            window.localStorage.setItem('hasSeenOnboarding', 'true');
+        }
+        await AsyncStorage.setItem('hasSeenOnboarding', 'true');
+    } catch {}
+}
+
 /**
  * Wrapper autour de fetch qui injecte automatiquement le token JWT avec gestion de timeout.
  */

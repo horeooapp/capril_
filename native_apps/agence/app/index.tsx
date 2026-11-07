@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, StatusBar, Pressable, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { getHasSeenOnboarding } from '../lib/api';
 
 export default function AgenceLoginScreen() {
   const router = useRouter();
+
+  useEffect(() => {
+    getHasSeenOnboarding().then((hasSeen) => {
+      if (!hasSeen) {
+        router.replace('/onboarding' as any);
+      }
+    });
+  }, []);
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1F2A44" />
