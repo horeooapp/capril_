@@ -1,39 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
-import { APP_NAME, APP_VERSION, BUILD_NUMBER, getFullVersionString, checkBackendVersionAsync, VersionCheckResult } from '../lib/version';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
+import * as Updates from 'expo-updates';
+import { APP_NAME, APP_VERSION, BUILD_NUMBER, getFullVersionString } from '../lib/version';
 
 export function AppVersionBadge() {
-  const [remoteCheck, setRemoteCheck] = useState<VersionCheckResult | null>(null);
+  const [checking, setChecking] = useState(false);
 
-  useEffect(() => {
-    checkBackendVersionAsync().then((res) => {
-      if (res && res.isUpdateAvailable) {
-        setRemoteCheck(res);
-      }
-    });
-  }, []);
+  const handlePress = async () => {
+    if (checking) return;
+    setChecking(true);
 
-  const handleCopy = () => {
-    const full = getFullVersionString();
     try {
+      if (__DEV__ || !Updates.isEnabled) {
+        Alert.alert(
+          APP_NAME,
+          `${getFullVersionString()}\n\nMode développement actif ou environnement sans support OTA.`
+        );
+        return;
+      }
+
+      const check = await Updates.checkForUpdateAsync();
+      if (check.isAvailable) {
+        Alert.alert(
+          'Mise à jour détectée',
+          'Une nouvelle mise à jour est en cours de téléchargement...',
+          [{ text: 'Patienter' }]
+        );
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      } else {
+        const updateIdStr = Updates.updateId ? Updates.updateId.substring(0, 8) : 'Base';
+        Alert.alert(
+          'Application à jour',
+          `${APP_NAME} v${APP_VERSION} (b${BUILD_NUMBER})\nOTA ID: ${updateIdStr} (Canal: ${Updates.channel || 'preview'})\n\nVous utilisez la version la plus récente de QAPRIL.`
+        );
+      }
+    } catch (e: any) {
       Alert.alert(
         APP_NAME,
-        `${full}\nPlateforme certifiée QAPRIL CI.\nToutes les données sont synchronisées.`
+        `${getFullVersionString()}\n\nErreur de vérification : ${e?.message || 'Problème de connexion réseau'}`
       );
-    } catch {}
+    } finally {
+      setChecking(false);
+    }
   };
 
   return (
-    <Pressable style={styles.container} onPress={handleCopy}>
+    <Pressable style={styles.container} onPress={handlePress}>
       <View style={styles.row}>
-        <View style={styles.dot} />
+        {checking ? (
+          <ActivityIndicator size="small" color="#10B981" style={{ marginRight: 6 }} />
+        ) : (
+          <View style={styles.dot} />
+        )}
         <Text style={styles.text}>{getFullVersionString()}</Text>
       </View>
-      {remoteCheck?.isUpdateAvailable && (
-        <View style={styles.updateAvailablePill}>
-          <Text style={styles.updateAvailableText}>v{remoteCheck.latestVersion} dispo</Text>
-        </View>
-      )}
+      <Text style={styles.subtext}>Appuyez pour vérifier les mises à jour</Text>
     </Pressable>
   );
 }
@@ -43,7 +65,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    gap: 4,
+    gap: 3,
   },
   row: {
     flexDirection: 'row',
@@ -58,22 +80,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 11,
-    color: '#6B7280',
-    fontWeight: '500',
-    fontVariant: ['tabular-nums'],
+    color: '#9CA3AF',
+    fontFamily: 'monospace',
     letterSpacing: 0.2,
   },
-  updateAvailablePill: {
-    backgroundColor: '#EFF6FF',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  updateAvailableText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: '#1D4ED8',
+  subtext: {
+    fontSize: 9,
+    color: '#6B7280',
+    fontStyle: 'italic',
   },
 });
