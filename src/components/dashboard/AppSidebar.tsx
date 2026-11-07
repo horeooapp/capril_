@@ -35,6 +35,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
             return [
                 { href: "/mon-espace-locataire", label: "Mon logement", icon: <LayoutDashboard size={18} /> },
                 { href: "/mon-espace-locataire/messages", label: "Messagerie Bailleur", icon: <MessageSquare size={18} /> },
+                { href: "/dashboard/simulateur-conversationnel", label: "Canal Sans App (ADD-26)", icon: <Smartphone size={18} /> },
                 { href: "/mon-espace-locataire/leases", label: "Documents", icon: <FileText size={18} /> },
                 { href: "/mon-espace-locataire/receipts", label: "Mes loyers", icon: <Receipt size={18} /> },
                 { href: "/mon-espace-locataire/cie-sodeci", label: "Utilities", icon: <Zap size={18} /> },
@@ -58,6 +59,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 { href: "/dashboard/properties", label: "Biens Confiés", icon: <Building2 size={18} /> },
                 { href: "/dashboard/agenda", label: "Visites & Agenda", icon: <CalendarDays size={18} /> },
                 { href: "/dashboard/messages", label: "Messagerie Locataires", icon: <MessageSquare size={18} /> },
+            { href: "/dashboard/simulateur-conversationnel", label: "Canal Sans App (ADD-26)", icon: <Smartphone size={18} /> },
                 { href: "/dashboard/receipts", label: "Mes Commissions", icon: <BarChart3 size={18} /> },
                 { href: "/dashboard/wallet", label: "Mon Wallet", icon: <Wallet size={18} /> },
                 { href: "/dashboard/profile", label: "Paramètres Profil", icon: <Settings size={18} /> },

@@ -178,6 +178,8 @@ model User {
   championsSupervised         ChampionProfile[]        @relation("ChampionSupervisor")
   prospectConversions         ChampionProspect[]       @relation("ProspectConvertedUser")
   accounts                    Account[]
+  cnvContacts                 CnvContact[]
+  declarationsPaiementLocataire DeclarationPaiement[] @relation("LocataireDeclarationsPaiement")
 
   @@index([phone])
   @@index([role])
@@ -506,6 +508,9 @@ model Lease {
   successions               SuccessionLocataire[]
   ticketsMaintenance        TicketMaintenance[]
   ventilationFrais          VentilationFrais[]
+  declarationsPaiement      DeclarationPaiement[]
+  codeBailCourt             CodeBailCourt?
+  cnvConversations          CnvConversation[]
 
   @@index([status, createdAt])
   @@index([propertyId])
@@ -4236,4 +4241,184 @@ model Account {
   @@unique([provider, providerAccountId])
   @@index([userId])
   @@map("accounts")
+}
+
+
+// ==============================================================================
+// ADD-26 : CANAL CONVERSATIONNEL — MODE SANS APPLICATION (SMS, WhatsApp, USSD)
+// Règles RG-CNV-01 à RG-CNV-30 | Référence QAPRIL/SPEC/001/2026 — ADD-26
+// ==============================================================================
+
+enum CnvTransport {
+  SMS
+  WHATSAPP
+  USSD
+}
+
+enum CnvSens {
+  IN
+  OUT
+}
+
+enum CnvIntention {
+  CONFIRM_YES
+  CONFIRM_NO
+  ASK_QUIT
+  ASK_ATTEST
+  SIGNAL
+  RELANCE
+  PLAN
+  CONGE
+  PIN_INPUT
+  STOP
+  STOP_SAUF_BAIL
+  CANAL
+  AIDE
+  ID_PHOTO
+  BAIL_CREATE
+  DGI_REGISTER
+  INCONNU
+}
+
+enum DeclarationPaiementStatut {
+  DECLARE
+  CONFIRME
+  CONTESTE
+  NON_CONFIRME
+  LITIGE
+}
+
+model CnvContact {
+  id               String            @id @default(uuid()) @map("contact_id")
+  numero           String            @unique @map("numero")
+  compteId         String?           @map("compte_id")
+  canalPrefere     CnvTransport      @default(WHATSAPP) @map("canal_prefere")
+  statutStop       Boolean           @default(false) @map("statut_stop")
+  stopSaufBail     Boolean           @default(false) @map("stop_sauf_bail")
+  niveau           Int               @default(0) @map("niveau")
+  derniereActivite DateTime          @default(now()) @map("derniere_activite")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  compte           User?             @relation(fields: [compteId], references: [id], onDelete: SetNull)
+  conversations    CnvConversation[]
+  pin              CnvPin?
+
+  @@index([numero])
+  @@index([compteId])
+  @@map("cnv_contacts")
+}
+
+model CnvConversation {
+  id             String          @id @default(uuid()) @map("conversation_id")
+  contactId      String          @map("contact_id")
+  transport      CnvTransport    @default(WHATSAPP) @map("transport")
+  scenario       String          @default("PAIEMENT_CONFIRMATION") @map("scenario")
+  etat           String          @default("OUVERTE") @map("etat")
+  bailId         String?         @map("bail_id")
+  declarationId  String?         @map("declaration_id")
+  ouverteLe      DateTime        @default(now()) @map("ouverte_le")
+  fermeeLe       DateTime?       @map("fermee_le")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  contact        CnvContact      @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  bail           Lease?          @relation(fields: [bailId], references: [id], onDelete: SetNull)
+  messages       CnvMessage[]
+
+  @@index([contactId])
+  @@index([bailId])
+  @@map("cnv_conversations")
+}
+
+model CnvMessage {
+  id                String          @id @default(uuid()) @map("message_id")
+  conversationId    String          @map("conversation_id")
+  sens              CnvSens         @map("sens")
+  transport         CnvTransport    @map("transport")
+  texteBrut         String          @map("texte_brut") @db.Text
+  texteInterprete   String?         @map("texte_interprete") @db.Text
+  intention         CnvIntention?   @map("intention")
+  motsCles          String?         @map("mots_cles")
+  referenceMessage  String?         @map("reference_message")
+  horodatageServeur DateTime        @default(now()) @map("horodatage_serveur")
+  sha256            String          @map("sha256")
+  cout              Float           @default(0) @map("cout")
+
+  conversation      CnvConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([sha256])
+  @@map("cnv_messages")
+}
+
+model DeclarationPaiement {
+  id                    String                    @id @default(uuid()) @map("declaration_id")
+  bailId                String                    @map("bail_id")
+  locataireId           String                    @map("locataire_id")
+  montant               Float                     @map("montant")
+  mois                  String                    @map("mois")
+  termeDate             DateTime?                 @map("terme_date")
+  moyen                 String                    @default("MOBILE_MONEY") @map("moyen")
+  datePaiement          DateTime                  @default(now()) @map("date_paiement")
+  statut                DeclarationPaiementStatut @default(DECLARE) @map("statut")
+  preuveUrl             String?                   @map("preuve_url")
+  messageConfirmationId String?                   @map("message_confirmation_id")
+  quittanceId           String?                   @map("quittance_id")
+  decideLe              DateTime?                 @map("decide_le")
+  codeBailCourt         String?                   @map("code_bail_court")
+  tentativesNon         Int                       @default(0) @map("tentatives_non")
+  createdAt             DateTime                  @default(now()) @map("created_at")
+  updatedAt             DateTime                  @updatedAt @map("updated_at")
+
+  bail                  Lease                     @relation(fields: [bailId], references: [id], onDelete: Cascade)
+  locataire             User                      @relation("LocataireDeclarationsPaiement", fields: [locataireId], references: [id], onDelete: Cascade)
+
+  @@index([bailId])
+  @@index([locataireId])
+  @@index([statut])
+  @@map("declarations_paiement")
+}
+
+model CodeBailCourt {
+  id            String   @id @default(uuid()) @map("code_bail_id")
+  bailId        String   @unique @map("bail_id")
+  bailleurPhone String   @map("bailleur_phone")
+  codeCourt     String   @map("code_court")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  bail          Lease    @relation(fields: [bailId], references: [id], onDelete: Cascade)
+
+  @@unique([bailleurPhone, codeCourt])
+  @@index([bailleurPhone])
+  @@map("codes_bail")
+}
+
+model CnvPin {
+  id           String     @id @default(uuid()) @map("pin_id")
+  contactId    String     @unique @map("contact_id")
+  hashPin      String     @map("hash_pin")
+  definiLe     DateTime   @default(now()) @map("defini_le")
+  erreurs      Int        @default(0) @map("erreurs")
+  bloqueJusque DateTime?  @map("bloque_jusque")
+
+  contact      CnvContact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("cnv_pins")
+}
+
+model ModeleMessageCnv {
+  id             String       @id @default(uuid()) @map("modele_id")
+  cle            String       @map("cle")
+  transport      CnvTransport @default(SMS) @map("transport")
+  langue         String       @default("fr") @map("langue")
+  texte          String       @map("texte") @db.Text
+  version        String       @default("1.0") @map("version")
+  metaTemplateId String?      @map("meta_template_id")
+  approuvePar    String?      @map("approuve_par")
+  approuveLe     DateTime?    @map("approuve_le")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  @@unique([cle, transport, langue, version])
+  @@map("modeles_messages")
 }
