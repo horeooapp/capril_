@@ -34,6 +34,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Facebook({
             clientId: process.env.AUTH_FACEBOOK_ID || process.env.FACEBOOK_CLIENT_ID || "facebook-client-id",
             clientSecret: process.env.AUTH_FACEBOOK_SECRET || process.env.FACEBOOK_CLIENT_SECRET || "facebook-client-secret",
+            authorization: {
+                params: {
+                    scope: "public_profile,email"
+                }
+            },
             allowDangerousEmailAccountLinking: true,
         }),
         Apple({
