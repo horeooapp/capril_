@@ -144,7 +144,7 @@ export async function loginWithOTP(identifier: string, otp: string, role?: strin
             message: error?.message,
             code: errorCode,
             type: error?.type,
-            email: email,
+            identifier: identifier,
             role: role
         });
         
