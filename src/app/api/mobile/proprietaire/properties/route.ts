@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { formatUserFriendlyError } from '@/lib/friendly-error';
 
 /**
  * GET  /api/mobile/proprietaire/properties
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
         } = body;
 
         if (!address || !commune) {
-            return NextResponse.json({ error: 'address et commune sont obligatoires.' }, { status: 400 });
+            return NextResponse.json({ error: "L'adresse et la commune sont obligatoires. Veuillez renseigner la localisation exacte du bien." }, { status: 400 });
         }
 
         const cleanCommune = String(commune).trim();
@@ -206,6 +207,6 @@ export async function POST(request: Request) {
         }, { status: 201 });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/properties POST error:', error);
-        return NextResponse.json({ error: 'Erreur interne du serveur: ' + (error?.message || 'Erreur base de données') }, { status: 500 });
+        return NextResponse.json({ error: formatUserFriendlyError(error, "Impossible de créer le bien. Veuillez vérifier les informations saisies.") }, { status: 500 });
     }
 }

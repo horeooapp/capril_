@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
+import { formatUserFriendlyError } from '@/lib/friendly-error';
 
 export async function POST(req: Request) {
     try {
@@ -61,6 +62,6 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error("Erreur API Création Bail Mobile:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: formatUserFriendlyError(error, "Impossible de créer le bail.") }, { status: 500 });
     }
 }

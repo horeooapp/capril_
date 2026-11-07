@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { formatUserFriendlyError } from '@/lib/friendly-error';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fs from 'fs/promises';
 import fsSync from 'fs';
@@ -53,9 +54,38 @@ export async function POST(request: Request) {
             chargesAmount
         } = body;
 
-        if (!propertyId || (!tenantEmail && !tenantPhone) || !rentAmount) {
+        if (!propertyId) {
             return NextResponse.json({ 
-                error: "Le bien immobilier, les coordonnées du locataire et le montant du loyer sont requis." 
+                error: "Veuillez sélectionner un bien immobilier dans la liste." 
+            }, { status: 400 });
+        }
+
+        const cleanPhone = tenantPhone ? String(tenantPhone).trim() : '';
+        const cleanEmail = tenantEmail ? String(tenantEmail).trim().toLowerCase() : '';
+        const cleanName = tenantName ? String(tenantName).trim() : '';
+
+        if (!cleanPhone && !cleanEmail) {
+            return NextResponse.json({ 
+                error: "Numéro de téléphone ou email absent. Veuillez ajouter au moins un numéro de téléphone pour le locataire." 
+            }, { status: 400 });
+        }
+
+        if (!cleanPhone) {
+            return NextResponse.json({ 
+                error: "Numéro de téléphone du locataire absent. Veuillez ajouter un numéro de téléphone pour l'envoi du contrat et de la signature par code SMS." 
+            }, { status: 400 });
+        }
+
+        if (!cleanName) {
+            return NextResponse.json({ 
+                error: "Nom complet du locataire absent. Veuillez renseigner le prénom et nom du locataire." 
+            }, { status: 400 });
+        }
+
+        const rentNum = Math.round(parseFloat(String(rentAmount || '').replace(/\s/g, '')));
+        if (isNaN(rentNum) || rentNum <= 0) {
+            return NextResponse.json({ 
+                error: "Montant du loyer mensuel absent ou invalide. Veuillez renseigner le montant du loyer en FCFA." 
             }, { status: 400 });
         }
 
@@ -87,11 +117,6 @@ export async function POST(request: Request) {
         }
 
         // 3. Traitement financier & plafonnements légaux (Loi 2019-576 Arts. 415 & 416 CCH)
-        const rentNum = Math.round(parseFloat(String(rentAmount).replace(/\s/g, '')));
-        if (isNaN(rentNum) || rentNum <= 0) {
-            return NextResponse.json({ error: "Montant du loyer mensuel invalide." }, { status: 400 });
-        }
-
         const maxLegalLimit = rentNum * 2;
         const requestedDeposit = depositAmount ? Math.round(parseFloat(String(depositAmount).replace(/\s/g, ''))) : maxLegalLimit;
         const requestedAdvance = avanceLoyer ? Math.round(parseFloat(String(avanceLoyer).replace(/\s/g, ''))) : maxLegalLimit;
@@ -106,24 +131,24 @@ export async function POST(request: Request) {
         );
 
         // 4. Recherche ou création du locataire
-        const cleanEmail = tenantEmail ? String(tenantEmail).trim().toLowerCase() : null;
-        const cleanPhone = tenantPhone ? String(tenantPhone).trim() : null;
+        const tenantLookupEmail = cleanEmail || null;
+        const tenantLookupPhone = cleanPhone || null;
 
         let tenant = await prisma.user.findFirst({
             where: {
                 OR: [
-                    ...(cleanEmail ? [{ email: cleanEmail }] : []),
-                    ...(cleanPhone ? [{ phone: cleanPhone }] : []),
+                    ...(tenantLookupEmail ? [{ email: tenantLookupEmail }] : []),
+                    ...(tenantLookupPhone ? [{ phone: tenantLookupPhone }] : []),
                 ],
             },
         });
 
         if (!tenant) {
-            const nameParts = (tenantName || "Locataire").trim().split(' ');
+            const nameParts = (cleanName || "Locataire").split(' ');
             tenant = await prisma.user.create({
                 data: {
-                    email: cleanEmail || `tenant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@qapril.net`,
-                    phone: cleanPhone,
+                    email: tenantLookupEmail || `tenant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}@qapril.net`,
+                    phone: tenantLookupPhone,
                     firstName: nameParts[0] || 'Locataire',
                     lastName: nameParts.slice(1).join(' ') || '',
                     role: 'TENANT', // Enum Prisma strict (pas 'LOCATAIRE')
@@ -279,7 +304,7 @@ export async function POST(request: Request) {
     } catch (error: any) {
         console.error("[MOBILE API] proprietaire/leases/create error:", error);
         return NextResponse.json({ 
-            error: "Erreur lors de la création du bail: " + (error?.message || "Erreur base de données") 
+            error: formatUserFriendlyError(error, "Impossible de générer le bail. Veuillez vérifier les informations saisies.") 
         }, { status: 500 });
     }
 }

@@ -112,15 +112,24 @@ export default function CreateLeaseScreen() {
 
   const handleCreate = async () => {
     if (!selectedPropertyId) {
-      Alert.alert('Erreur', 'Veuillez sélectionner un bien immobilier.');
+      Alert.alert('Bien requis', 'Veuillez sélectionner un bien immobilier dans la liste.');
       return;
     }
-    if (!tenantEmail.trim() && !tenantPhone.trim()) {
-      Alert.alert('Erreur', 'Veuillez renseigner au moins un email ou un téléphone pour le locataire.');
+    if (!tenantName.trim()) {
+      Alert.alert('Nom absent', 'Veuillez renseigner le nom complet du locataire.');
+      return;
+    }
+    if (!tenantPhone.trim()) {
+      Alert.alert('Numéro de téléphone absent', 'Veuillez ajouter le numéro de téléphone du locataire pour l’envoi de la quittance et la signature du bail par code SMS.');
+      return;
+    }
+    const cleanDigits = tenantPhone.replace(/\D/g, '');
+    if (cleanDigits.length < 8) {
+      Alert.alert('Numéro de téléphone invalide', 'Veuillez renseigner un numéro de téléphone valide à 10 chiffres (ex: 07 00 00 00 00 ou 05 00 00 00 00).');
       return;
     }
     if (!rentAmount.trim() || rentNum <= 0) {
-      Alert.alert('Erreur', 'Veuillez préciser le montant du loyer mensuel en FCFA.');
+      Alert.alert('Montant requis', 'Veuillez préciser le montant du loyer mensuel en FCFA.');
       return;
     }
     if (isDepositOverLimit || isAdvanceOverLimit) {

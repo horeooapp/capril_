@@ -91,16 +91,40 @@ export default function CreatePropertyScreen() {
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      Alert.alert('Champ requis', 'Veuillez saisir un nom ou une désignation pour votre bien.');
+      Alert.alert('Désignation requise', 'Veuillez saisir un nom ou une désignation pour votre bien (ex: Villa Orchidée ou Studio A1).');
       return;
     }
     if (!address.trim()) {
-      Alert.alert('Champ requis', "Veuillez préciser l'adresse, quartier ou repère du bien.");
+      Alert.alert('Adresse requise', "Veuillez préciser l'adresse, le quartier ou un repère géographique du bien.");
       return;
     }
     if (commune === 'Autre' && !customCommune.trim()) {
-      Alert.alert('Champ requis', 'Veuillez préciser la commune.');
+      Alert.alert('Commune requise', 'Veuillez préciser la commune de situation du bien.');
       return;
+    }
+    if (isForSale) {
+      const parsedPrix = parseFloat(rent.replace(/\s/g, ''));
+      if (!rent.trim() || isNaN(parsedPrix) || parsedPrix <= 0) {
+        Alert.alert('Prix de vente requis', 'Veuillez préciser le prix de vente en FCFA.');
+        return;
+      }
+      if (!numeroTitre.trim()) {
+        Alert.alert('Titre de propriété absent', 'Veuillez renseigner le numéro du titre de propriété (ACD, Titre Foncier ou Lettre d\'attribution).');
+        return;
+      }
+    } else if (rent.trim()) {
+      const parsedLoyer = parseFloat(rent.replace(/\s/g, ''));
+      if (isNaN(parsedLoyer) || parsedLoyer <= 0) {
+        Alert.alert('Loyer invalide', 'Veuillez saisir un montant de loyer mensuel valide en chiffres (FCFA).');
+        return;
+      }
+    }
+    if (surface.trim()) {
+      const parsedSurf = parseFloat(surface.replace(/\s/g, ''));
+      if (isNaN(parsedSurf) || parsedSurf <= 0) {
+        Alert.alert('Superficie invalide', 'Veuillez saisir une superficie valide en mètres carrés (m²).');
+        return;
+      }
     }
 
     setLoading(true);
