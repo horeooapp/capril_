@@ -1,5 +1,5 @@
 import { TopNavHeader } from '../components/TopNavHeader';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -67,6 +67,7 @@ const LEASE_TYPES = [
 
 export default function CreatePropertyScreen() {
   const router = useRouter();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // Form states
   const [name, setName] = useState('');
@@ -179,13 +180,16 @@ export default function CreatePropertyScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 20}
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          ref={scrollViewRef}
+          contentContainerStyle={[styles.scroll, { paddingBottom: 380 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
           {/* BANDEAU CONFORMITÉ SOUVERAINE */}
           <View style={styles.legalNotice}>
@@ -376,27 +380,71 @@ export default function CreatePropertyScreen() {
 
           {/* 3. CONDITIONS FINANCIÈRES & CARACTÉRISTIQUES */}
           <View style={styles.formSection}>
-            <Text style={styles.sectionTitle}>3. CARACTÉRISTIQUES & LOYER</Text>
+            <Text style={styles.sectionTitle}>3. CARACTÉRISTIQUES & FINANCES</Text>
 
-            <Text style={styles.fieldLabel}>Loyer mensuel prévu (FCFA)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 250000"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="numeric"
-              value={rent}
-              onChangeText={setRent}
-            />
+            <Text style={styles.fieldLabel}>
+              {isForSale ? 'Prix de vente souhaité (FCFA) *' : 'Loyer mensuel prévu (FCFA)'}
+            </Text>
+            <View style={styles.inputWithSuffixContainer}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder={isForSale ? 'Ex: 45000000' : 'Ex: 250000'}
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                returnKeyType="next"
+                value={rent}
+                onChangeText={setRent}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }, 150);
+                }}
+              />
+              <View style={styles.suffixBadge}>
+                <Text style={styles.suffixBadgeText}>FCFA</Text>
+              </View>
+            </View>
 
-            <Text style={styles.fieldLabel}>Superficie en m² (optionnel)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ex: 85"
-              placeholderTextColor="#9CA3AF"
-              keyboardType="numeric"
-              value={surface}
-              onChangeText={setSurface}
-            />
+            {rent.trim().length > 0 && (
+              <View style={styles.valuePreviewCard}>
+                <Text style={styles.valuePreviewLabel}>
+                  {isForSale ? 'Prix de vente saisi :' : 'Loyer mensuel saisi :'}
+                </Text>
+                <Text style={styles.valuePreviewText}>
+                  {Number(rent.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                </Text>
+              </View>
+            )}
+
+            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Superficie en m² (optionnel)</Text>
+            <View style={styles.inputWithSuffixContainer}>
+              <TextInput
+                style={[styles.input, styles.inputFlex]}
+                placeholder="Ex: 85"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                returnKeyType="done"
+                value={surface}
+                onChangeText={setSurface}
+                onFocus={() => {
+                  setTimeout(() => {
+                    scrollViewRef.current?.scrollToEnd({ animated: true });
+                  }, 150);
+                }}
+              />
+              <View style={styles.suffixBadge}>
+                <Text style={styles.suffixBadgeText}>m²</Text>
+              </View>
+            </View>
+
+            {surface.trim().length > 0 && (
+              <View style={styles.valuePreviewCard}>
+                <Text style={styles.valuePreviewLabel}>Superficie saisie :</Text>
+                <Text style={styles.valuePreviewText}>
+                  {surface.trim()} m²
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* BOUTON DE SOUMISSION */}
@@ -453,7 +501,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: 16,
-    paddingBottom: 40,
     gap: 16,
   },
   legalNotice: {
@@ -504,9 +551,54 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
     borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 11,
-    fontSize: 14,
+    paddingVertical: 12,
+    fontSize: 15,
     color: '#111827',
+  },
+  inputWithSuffixContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  inputFlex: {
+    flex: 1,
+  },
+  suffixBadge: {
+    backgroundColor: '#E5E7EB',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  suffixBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  valuePreviewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    marginTop: 4,
+  },
+  valuePreviewLabel: {
+    fontSize: 12,
+    color: '#166534',
+    fontWeight: '500',
+  },
+  valuePreviewText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#1B4D3E',
   },
   chipsWrap: {
     flexDirection: 'row',
@@ -572,4 +664,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-

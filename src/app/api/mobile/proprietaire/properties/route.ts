@@ -4,11 +4,10 @@ import { authenticateMobileRequest } from '@/lib/mobile-auth';
 
 /**
  * GET  /api/mobile/proprietaire/properties
- * Liste les propriétés du propriétaire (déjà existant — enrichi avec POST)
+ * Liste les propriétés du propriétaire
  *
  * POST /api/mobile/proprietaire/properties
  * Créer une nouvelle propriété
- * Body: { name, address, commune, propertyType, leaseType, declaredRentFcfa?, superficieM2?, typeStructure? }
  */
 export async function GET(request: Request) {
     try {
@@ -81,6 +80,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
         }
 
+        const dbUser = await prisma.user.findUnique({
+            where: { id: user.userId },
+            select: { id: true, role: true }
+        });
+        if (!dbUser) {
+            return NextResponse.json({ error: 'Compte utilisateur introuvable.' }, { status: 401 });
+        }
+
         const body = await request.json();
         const { 
             name, 
@@ -107,9 +114,12 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'address et commune sont obligatoires.' }, { status: 400 });
         }
 
+        const cleanCommune = String(commune).trim();
+        const cleanAddress = String(address).trim();
+
         // Génération d'un code propriété garanti unique (Format QAPRIL HAB-ABJ-XXX-NNNNN)
-        const count = await prisma.property.count({ where: { commune } });
-        const communeCode = (commune || 'ABJ').substring(0, 3).toUpperCase();
+        const count = await prisma.property.count({ where: { commune: cleanCommune } });
+        const communeCode = (cleanCommune || 'ABJ').substring(0, 3).toUpperCase();
         const typePrefix = leaseType === 'commercial' ? 'COM' : 'HAB';
         let seq = count + 1;
         let candidateCode = `${typePrefix}-ABJ-${communeCode}-${String(seq).padStart(5, '0')}`;
@@ -123,25 +133,26 @@ export async function POST(request: Request) {
         }
 
         const finalPropertyCode = parentPropertyId && unitLabel 
-            ? `${candidateCode}-${unitLabel.replace(/\s+/g, '').toUpperCase()}`
+            ? `${candidateCode}-${String(unitLabel).replace(/\s+/g, '').toUpperCase()}`
             : candidateCode;
 
-        const isAgencyUser = ['AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT'].includes(user.role);
+        const effectiveRole = dbUser.role || user.role;
+        const isAgencyUser = ['AGENCY', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT'].includes(effectiveRole);
 
         // RG-VTE-05 : CONTRÔLE D'UNICITÉ DU TITRE
         if (forSale && titre_numero && titre_type) {
             const titreClean = String(titre_numero).trim().toUpperCase();
             const doublon = await prisma.property.findFirst({
                 where: {
-                    titre_type,
-                    titre_numero: titreClean,
-                    city: { contains: commune.trim(), mode: 'insensitive' }
+                    titreType: titre_type,
+                    titreNumero: titreClean,
+                    city: { contains: cleanCommune, mode: 'insensitive' }
                 }
             });
 
             if (doublon) {
                 return NextResponse.json({
-                    error: `RG-VTE-05 : Le titre ${titre_type} N° ${titreClean} est déjà enregistré sur la plateforme pour un bien sur ${commune}. La double mise en vente est strictement proscrite.`
+                    error: `RG-VTE-05 : Le titre ${titre_type} N° ${titreClean} est déjà enregistré sur la plateforme pour un bien sur ${cleanCommune}. La double mise en vente est strictement proscrite.`
                 }, { status: 409 });
             }
         }
@@ -150,35 +161,40 @@ export async function POST(request: Request) {
         if (titre_type === 'ACD' || titre_type === 'TITRE_FONCIER') niveauVerif = 3;
         else if (titre_type) niveauVerif = 2;
 
+        const parsedRent = declaredRentFcfa ? Math.round(Number(declaredRentFcfa)) : 0;
+        const parsedSurface = superficieM2 ? parseFloat(String(superficieM2)) : null;
+        const parsedPrixVente = prixVenteFcfa ? parseFloat(String(prixVenteFcfa)) : null;
+
         const property = await prisma.property.create({
             data: {
                 propertyCode:     finalPropertyCode,
-                ownerUserId:      user.userId,
-                managedByUserId:  isAgencyUser ? user.userId : null,
+                ownerUserId:      dbUser.id,
+                managedByUserId:  isAgencyUser ? dbUser.id : null,
                 managementMode:   isAgencyUser ? 'AGENCE' : 'DIRECT',
-                name:             name ?? address,
-                address,
-                commune,
-                city:             commune,
+                name:             name ? String(name).trim() : cleanAddress,
+                address:          cleanAddress,
+                commune:          cleanCommune,
+                city:             cleanCommune,
                 propertyType:     propertyType ?? 'APARTMENT',
                 typeStructure:    typeStructure ?? 'INDEPENDANT',
                 leaseType:        leaseType ?? 'residential',
-                declaredRentFcfa: declaredRentFcfa ? Number(declaredRentFcfa) : 0,
-                superficieM2:     superficieM2 ? Number(superficieM2) : undefined,
+                declaredRentFcfa: parsedRent,
+                superficieM2:     parsedSurface,
                 parentPropertyId: parentPropertyId ?? null,
-                unitLabel:        unitLabel ?? null,
-                status:           'active',
-                // ADD-25 Vente & Terrains
-                forSale:          Boolean(forSale),
-                prixVenteFcfa:    prixVenteFcfa ? Number(prixVenteFcfa) : null,
-                price:            prixVenteFcfa ? Number(prixVenteFcfa) : (declaredRentFcfa ? Number(declaredRentFcfa) : 0),
-                categorie_vente:  categorie_vente ?? (forSale ? propertyType : null),
-                titre_type:       titre_type ?? null,
-                titre_numero:     titre_numero ? String(titre_numero).trim().toUpperCase() : null,
-                numero_lot:       numero_lot ?? null,
-                numero_ilot:      numero_ilot ?? null,
-                est_viabilise:    Boolean(est_viabilise),
-                niveau_verif_vente: forSale ? niveauVerif : 1,
+                unitLabel:        unitLabel ? String(unitLabel).trim() : null,
+                status:           'ACTIVE',
+                // ADD-25 Vente & Terrains (mapping exact Prisma schema)
+                enVente:          Boolean(forSale),
+                prixVenteFcfa:    parsedPrixVente,
+                categorieVente:   categorie_vente ?? (forSale ? propertyType : null),
+                titreType:        titre_type ?? null,
+                titreNumero:      titre_numero ? String(titre_numero).trim().toUpperCase() : null,
+                numeroLot:        numero_lot ? String(numero_lot).trim() : null,
+                numeroIlot:       numero_ilot ? String(numero_ilot).trim() : null,
+                viabilisationEau:         Boolean(est_viabilise),
+                viabilisationElectricite: Boolean(est_viabilise),
+                viabilisationVoirie:      Boolean(est_viabilise),
+                niveauVerifVente:         forSale ? (niveauVerif || 1) : 0,
             },
         });
 
@@ -190,6 +206,6 @@ export async function POST(request: Request) {
         }, { status: 201 });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/properties POST error:', error);
-        return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
+        return NextResponse.json({ error: 'Erreur interne du serveur: ' + (error?.message || 'Erreur base de données') }, { status: 500 });
     }
 }
