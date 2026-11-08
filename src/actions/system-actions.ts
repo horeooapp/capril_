@@ -5,6 +5,7 @@ import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
 import { logAction } from "./audit"
 import { AppFeature, invalidateFeaturesCache } from "@/lib/features"
+import { disconnectAllConnectedUsers, getLastRevocationInfo } from "@/lib/session-revocation"
 
 /**
  * Toggles a system feature (M17, M16, etc.)
@@ -80,4 +81,46 @@ export async function getFeatureFlags(): Promise<Record<string, boolean>> {
         console.error("[SYSTEM] Get flags error:", error)
         return {}
     }
+}
+
+export type ForceDisconnectResponse = {
+    success: boolean;
+    revokedAt?: string;
+    totalUsersImpacted?: number;
+    message?: string;
+    error?: string;
+};
+
+/**
+ * Action Souveraine : Déconnecte tous les comptes connectés (Web & Mobile)
+ * pour forcer leur reconnexion immédiate.
+ */
+export async function forceDisconnectAllAccounts(reason?: string): Promise<ForceDisconnectResponse> {
+    const session = await auth()
+    if (session?.user?.role !== "SUPER_ADMIN" && session?.user?.role !== "ADMIN") {
+        return { success: false, error: "Action réservée aux administrateurs autorisés." }
+    }
+
+    try {
+        const result = await disconnectAllConnectedUsers(session.user.id, reason);
+        revalidatePath("/admin/system");
+        revalidatePath("/admin");
+        revalidatePath("/admin/users");
+        revalidatePath("/");
+        return {
+            success: true,
+            revokedAt: result.revokedAt,
+            totalUsersImpacted: result.totalUsersImpacted,
+            message: result.message
+        };
+    } catch (error: any) {
+        return { success: false, error: error.message || "Erreur lors de la déconnexion globale." };
+    }
+}
+
+/**
+ * Récupère le statut de la dernière révocation générale des sessions
+ */
+export async function getRevocationStatusAction() {
+    return await getLastRevocationInfo();
 }

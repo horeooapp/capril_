@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
+import { isGlobalAuthRevoked } from '@/lib/session-revocation';
 
 const getJwtSecretKey = () => {
     const secret = process.env.AUTH_SECRET;
@@ -41,6 +42,15 @@ export async function authenticateMobileRequest(request: Request) {
 
     const token = authHeader.split(' ')[1];
     const decoded = await verifyMobileToken(token);
+    if (!decoded) {
+        return null;
+    }
+
+    // [ADD-27/28/29] Vérifier si une déconnexion globale des comptes a été ordonnée
+    const isRevoked = await isGlobalAuthRevoked(decoded);
+    if (isRevoked) {
+        return null;
+    }
     
     return decoded;
 }

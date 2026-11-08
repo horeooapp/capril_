@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth"
 import type { Role } from "@prisma/client"
+import { isGlobalAuthRevoked } from "@/lib/session-revocation"
 
 export const authConfig = {
     session: {
@@ -69,6 +70,12 @@ export const authConfig = {
             return token
         },
         async session({ session, token }) {
+            // [ADD-27/28/29] Vérifier si une déconnexion générale forcée a été déclenchée
+            const isRevoked = await isGlobalAuthRevoked(token);
+            if (isRevoked) {
+                return { ...session, user: undefined as any };
+            }
+
             if (session.user) {
                 const activeRole = ((token.chosenRole as string) || (token.role as string) || 'TENANT') as Role;
                 session.user.id = token.id as string

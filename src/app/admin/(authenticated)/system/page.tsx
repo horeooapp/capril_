@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { toggleFeature, getFeatureFlags } from "@/actions/system-actions"
+import { toggleFeature, getFeatureFlags, getRevocationStatusAction } from "@/actions/system-actions"
 import { AppFeature } from "@/lib/features"
 import { motion } from "framer-motion"
 import KycLevelManager from "@/components/admin/KycLevelManager"
+import GlobalSessionRevokeCard from "@/components/admin/GlobalSessionRevokeCard"
 import { 
     Search, Filter, ShieldCheck, CheckCircle2, XCircle, 
     Smartphone, CreditCard, Landmark, FileText, Briefcase, 
@@ -224,11 +225,13 @@ export default function SystemPage() {
     const [updating, setUpdating] = useState<string | null>(null)
     const [selectedCategory, setSelectedCategory] = useState<string>("ALL")
     const [searchQuery, setSearchQuery] = useState<string>("")
+    const [revocationInfo, setRevocationInfo] = useState<any>(null)
 
     async function loadFlags() {
         const data = await getFeatureFlags()
         setFlags(data)
         setLoading(false)
+        getRevocationStatusAction().then(setRevocationInfo).catch(() => {})
     }
 
     useEffect(() => {
@@ -304,6 +307,13 @@ export default function SystemPage() {
                     </div>
                 </div>
             </div>
+
+            {/* ACTION SOUVERAINE : DÉCONNEXION GÉNÉRALE DES COMPTES */}
+            <GlobalSessionRevokeCard 
+                initialLastRevokedAt={revocationInfo?.revokedAt}
+                initialRevokedBy={revocationInfo?.revokedBy}
+                initialImpactedCount={revocationInfo?.totalUsersImpacted}
+            />
 
             {/* CONTRÔLE PRINCIPAL DES NIVEAUX KYC */}
             <KycLevelManager showBulkUserActions={true} />

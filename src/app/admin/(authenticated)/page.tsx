@@ -43,6 +43,9 @@ import ModuleRegistryGrid from "@/components/admin/ModuleRegistryGrid"
 import SyncButton from "@/components/admin/SyncButton"
 import AdminMarketWidget from "@/components/admin/AdminMarketWidget"
 import { getNationalMarketComparison } from "@/actions/observatory-national"
+import AddendaOverviewWidget from "@/components/admin/AddendaOverviewWidget"
+import GlobalSessionRevokeCard from "@/components/admin/GlobalSessionRevokeCard"
+import { getLastRevocationInfo } from "@/lib/session-revocation"
 
 export const dynamic = "force-dynamic"
 
@@ -109,7 +112,21 @@ export default async function AdminDashboardOverview() {
             championsRes,
             diasporaRes,
             abonnementsRes,
-            signalementsRes
+            signalementsRes,
+            // Métriques ADD-27, ADD-28, ADD-29
+            vocalSessionsCount,
+            vocalIntentsCount,
+            geolocatedPropsCount,
+            gpsCapturesCount,
+            maPosteAddressesCount,
+            declaredOccupantsCount,
+            confirmedOccupantsCount,
+            attestationsCount,
+            qrVerifsCount,
+            attestA_Count,
+            attestB_Count,
+            attestC_Count,
+            lastRevocationInfo
         ] = await Promise.all([
             prisma.user.count().catch(() => 0),
             prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -175,7 +192,23 @@ export default async function AdminDashboardOverview() {
             ((prisma as any).championProfile?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).userDiasporaProfile?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).abonnementOperateur?.count?.() || Promise.resolve(0)).catch(() => 0),
-            ((prisma as any).signalementLocataire?.count?.({ where: { statut: { in: ['ENVOYE', 'EN_COURS'] } } }) || Promise.resolve(0)).catch(() => 0)
+            ((prisma as any).signalementLocataire?.count?.({ where: { statut: { in: ['ENVOYE', 'EN_COURS'] } } }) || Promise.resolve(0)).catch(() => 0),
+            // Queries ADD-27 (Vocal)
+            ((prisma as any).sessionPiloteVocal?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).intentionVocale?.count?.() || Promise.resolve(0)).catch(() => 0),
+            // Queries ADD-28 (Géolocalisation & MaPoste)
+            prisma.property.count({ where: { statutPosition: { in: ['CONFIRMEE', 'PROVISOIRE'] } } }).catch(() => 0),
+            ((prisma as any).capturePosition?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).adresseMaPoste?.count?.() || Promise.resolve(0)).catch(() => 0),
+            // Queries ADD-29 (Occupants & Attestations)
+            ((prisma as any).occupant?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).occupant?.count?.({ where: { statutConfirmation: 'CONFIRME' } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).attestationResidence?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).verificationAttestation?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'A' } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'B' } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'C' } }) || Promise.resolve(0)).catch(() => 0),
+            getLastRevocationInfo().catch(() => null)
         ]);
         
         // Process trends with safety guards
@@ -316,6 +349,33 @@ export default async function AdminDashboardOverview() {
                         <div className="kpi-delta up">Vérification Conforme</div>
                     </div>
                 </div>
+
+                {/* SÉCURITÉ SOUVERAINE : DÉCONNEXION GÉNÉRALE DES COMPTES */}
+                <div style={{ marginTop: '16px', marginBottom: '20px' }}>
+                    <GlobalSessionRevokeCard
+                        initialLastRevokedAt={lastRevocationInfo?.revokedAt}
+                        initialRevokedBy={lastRevocationInfo?.revokedBy}
+                        initialImpactedCount={lastRevocationInfo?.totalUsersImpacted}
+                    />
+                </div>
+
+                {/* SUPERVISION INNOVATIONS 2026 : ADD-27, ADD-28, ADD-29 */}
+                <AddendaOverviewWidget
+                    vocalSessionsCount={vocalSessionsCount}
+                    vocalIntentsCount={vocalIntentsCount}
+                    geolocatedPropertiesCount={geolocatedPropsCount}
+                    gpsCapturesCount={gpsCapturesCount}
+                    maPosteAddressesCount={maPosteAddressesCount}
+                    declaredOccupantsCount={declaredOccupantsCount}
+                    confirmedOccupantsCount={confirmedOccupantsCount}
+                    attestationsCount={attestationsCount}
+                    qrVerificationsCount={qrVerifsCount}
+                    levelCounts={{
+                        A: attestA_Count,
+                        B: attestB_Count,
+                        C: attestC_Count,
+                    }}
+                />
 
                 {marketIntelligence?.success && marketIntelligence.data && (
                     <AdminMarketWidget data={marketIntelligence.data} />
