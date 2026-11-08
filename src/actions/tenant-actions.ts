@@ -35,12 +35,13 @@ export async function getTenantDashboard() {
             return serializeObject({ success: false, error: "Profil utilisateur introuvable." })
         }
 
-        // 3. Trouver le bail ou le contrat en entente
+        // 3. Trouver le bail actif prioritairement (ACTIVE, ACTIVE_DECLARATIF, LOYER_IMPAYE)
         let activeLease = await prisma.lease.findFirst({
             where: {
                 tenantId: userId,
-                status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_CONFIRMATION"] }
+                status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] }
             },
+            orderBy: { createdAt: "desc" },
             include: {
                 property: true,
                 landlord: { 
@@ -66,6 +67,96 @@ export async function getTenantDashboard() {
                 caution: true
             }
         })
+
+        // 3.1 Si aucun bail actif direct, chercher par téléphone ou email du locataire
+        const normalized = user.phone ? normalizePhone(user.phone) : null;
+        if (!activeLease && (normalized || user.email)) {
+            activeLease = await prisma.lease.findFirst({
+                where: {
+                    OR: [
+                        ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                        ...(user.email ? [{ tenant: { email: user.email } }] : [])
+                    ],
+                    status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] }
+                },
+                orderBy: { createdAt: "desc" },
+                include: {
+                    property: true,
+                    landlord: { 
+                        select: { 
+                            lastName: true, 
+                            firstName: true, 
+                            phone: true,
+                            walletConfig: { select: { landlordCode: true } }
+                        } 
+                    },
+                    receipts: {
+                        orderBy: { createdAt: "desc" },
+                        take: 24
+                    },
+                    arrears: {
+                        where: { status: { in: ["unpaid", "UNPAID"] } }
+                    },
+                    openingState: true,
+                    etatsDesLieux: {
+                        orderBy: { createdAt: "desc" },
+                        take: 2
+                    },
+                    caution: true
+                }
+            });
+
+            // Rattacher le bail au compte connecté si besoin
+            if (activeLease && activeLease.tenantId !== userId) {
+                try {
+                    await prisma.lease.update({
+                        where: { id: activeLease.id },
+                        data: { tenantId: userId }
+                    });
+                } catch (linkErr) {
+                    console.warn("[getTenantDashboard] Could not update lease tenantId:", linkErr);
+                }
+            }
+        }
+
+        // 3.2 Si toujours aucun bail actif, chercher un bail en cours (PENDING_SIGNATURE, PENDING_CONFIRMATION, DRAFT)
+        if (!activeLease) {
+            activeLease = await prisma.lease.findFirst({
+                where: {
+                    OR: [
+                        { tenantId: userId },
+                        ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                        ...(user.email ? [{ tenant: { email: user.email } }] : [])
+                    ],
+                    status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] }
+                },
+                orderBy: { createdAt: "desc" },
+                include: {
+                    property: true,
+                    landlord: { 
+                        select: { 
+                            lastName: true, 
+                            firstName: true, 
+                            phone: true,
+                            walletConfig: { select: { landlordCode: true } }
+                        } 
+                    },
+                    receipts: {
+                        orderBy: { createdAt: "desc" },
+                        take: 5
+                    },
+                    arrears: {
+                        where: { status: { in: ["unpaid", "UNPAID"] } }
+                    },
+                    openingState: true,
+                    etatsDesLieux: {
+                        orderBy: { createdAt: "desc" },
+                        take: 2
+                    },
+                    caution: true
+                }
+            });
+        }
 
         // ────────────────────────────────────────────────────────
         // LOGIQUE D'AUTORÉPARATION (C-MERGE-AUTO)
@@ -136,8 +227,7 @@ export async function getTenantDashboard() {
             }
         }
 
-        // 3.1 Détecter les Déclarations M-SIGN (Situations A/B/C) en attente
-        const normalized = user.phone ? normalizePhone(user.phone) : null;
+        // 3.3 Détecter les Déclarations M-SIGN (Situations A/B/C) en attente
         const pendingDeclarations = normalized ? await prisma.bailDeclaratif.findMany({
             where: {
                 telephoneLocataire: normalized,
@@ -153,7 +243,7 @@ export async function getTenantDashboard() {
             }
         }) : [];
 
-        // Détecter un éventuel contrat de bail en attente de signature
+        // Détecter un éventuel contrat de bail en attente de signature DISTINCT du bail actif
         const pendingSignatureLease = await prisma.lease.findFirst({
             where: {
                 OR: [
@@ -161,7 +251,8 @@ export async function getTenantDashboard() {
                     ...(normalized ? [{ tenant: { phone: normalized } }] : []),
                     ...(user.email ? [{ tenant: { email: user.email } }] : [])
                 ],
-                status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] }
+                status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] },
+                ...(activeLease ? { id: { not: activeLease.id } } : {})
             },
             include: {
                 property: true,

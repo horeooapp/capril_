@@ -287,14 +287,17 @@ export default function LocataireDashboardPage() {
     }
 
     // Bento Grid Item Wrapper
-    const BentoItem = ({ children, className = "", delay = 0 }: { children: React.ReactNode, className?: string, delay?: number }) => (
-        <motion.div 
-            variants={itemVariants}
-            className={`rounded-3xl border border-slate-200/90 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_24px_-4px_rgba(15,23,42,0.06)] transition-all duration-300 relative bg-white overflow-hidden group ${className}`}
-        >
-            {children}
-        </motion.div>
-    )
+    const BentoItem = ({ children, className = "", delay = 0 }: { children: React.ReactNode, className?: string, delay?: number }) => {
+        const hasBg = /\bbg-/.test(className);
+        return (
+            <motion.div 
+                variants={itemVariants}
+                className={`rounded-3xl border border-slate-200/90 shadow-[0_2px_12px_-2px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_24px_-4px_rgba(15,23,42,0.06)] transition-all duration-300 relative ${hasBg ? '' : 'bg-white'} overflow-hidden group ${className}`}
+            >
+                {children}
+            </motion.div>
+        );
+    }
 
     return (
         <motion.div 
@@ -343,7 +346,7 @@ export default function LocataireDashboardPage() {
             </header>
 
             {/* Carte Prioritaire : Signature de Bail en Attente */}
-            {(dashboardData.pendingSignatureLease || ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'DRAFT'].includes(lease?.status) || !lease?.isSignedElectronically) && (
+            {((dashboardData.pendingSignatureLease && dashboardData.pendingSignatureLease.id !== lease?.id) || ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'DRAFT'].includes(lease?.status)) && (
                 <div className="animate-in fade-in slide-in-from-top-4 duration-500">
                     <PendingLeaseValidationCard 
                         lease={dashboardData.pendingSignatureLease || lease} 
@@ -356,7 +359,7 @@ export default function LocataireDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-min">
                 
                 {/* PRIMARY HERO: Rent & Payment (8 cols) */}
-                <BentoItem className="md:col-span-8 p-7 sm:p-8 flex flex-col justify-between bg-slate-900] text-white border-none shadow-[0_20px_50px_rgba(15,23,42,0.25)] min-h-[260px]">
+                <BentoItem className="md:col-span-8 p-7 sm:p-8 flex flex-col justify-between bg-slate-900 text-white border border-slate-800 shadow-[0_20px_50px_rgba(15,23,42,0.25)] min-h-[260px]">
                     {/* Calm dark surface */}
                     
                     <div className="relative z-10">
@@ -371,7 +374,7 @@ export default function LocataireDashboardPage() {
                         
                         <div className="flex items-baseline gap-2">
                             <span className="text-4xl sm:text-6xl font-black tracking-tight text-white font-mono">
-                                {lease.rentAmount.toLocaleString()}
+                                {Number(lease?.rentAmount || 0).toLocaleString('fr-FR')}
                             </span>
                             <span className="text-base sm:text-xl font-bold text-amber-400 font-mono">
                                 XOF
@@ -382,7 +385,7 @@ export default function LocataireDashboardPage() {
                             <Clock size={13} className="text-amber-400" />
                             <span>Date limite :</span>
                             <span className="font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-lg">
-                                {new Date(lease.rentDeadline).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {lease?.rentDeadline ? new Date(lease.rentDeadline).toLocaleDateString('fr-CI', { day: 'numeric', month: 'long', year: 'numeric' }) : "10 de chaque mois"}
                             </span>
                         </div>
                     </div>
@@ -390,7 +393,7 @@ export default function LocataireDashboardPage() {
                     <div className="mt-8 flex flex-wrap gap-3 relative z-10">
                         <Link 
                             href="/mon-espace-locataire/payment" 
-                            className="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-xl px-6 py-3 text-xs transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-xl px-6 py-3 text-xs transition-colors flex items-center justify-center gap-2 shadow-xs"
                         >
                             <span>Régler maintenant</span>
                             <ArrowUpRight size={16} />
@@ -757,23 +760,23 @@ export default function LocataireDashboardPage() {
                 </BentoItem>
 
                 {/* MATCHING TINDER IMMO CARD (12 cols) */}
-                <BentoItem className="md:col-span-12 p-8 flex flex-col md:flex-row items-center justify-between bg-slate-900 border border-amber-200/60 shadow-sm group overflow-hidden" delay={0.65}>
+                <BentoItem className="md:col-span-12 p-8 flex flex-col md:flex-row items-center justify-between bg-amber-50/70 border border-amber-200/80 shadow-xs group overflow-hidden" delay={0.65}>
                     <div className="flex items-center gap-5 relative z-10 w-full md:w-auto mb-6 md:mb-0">
-                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-amber-100 shrink-0">
+                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-xs border border-amber-200 shrink-0">
                             🔥
                         </div>
                         <div>
                             <h3 className="text-base font-black text-slate-900 tracking-tight mb-1">
                                 QAPRIL Match · Trouver mon futur logement
                             </h3>
-                            <p className="text-xs font-medium text-slate-500 max-w-xl leading-relaxed">
+                            <p className="text-xs font-medium text-slate-600 max-w-xl leading-relaxed">
                                 Définissez vos critères (communes, budget max, typologie) et recevez des propositions directes de bailleurs vérifiés sans intermédiaire.
                             </p>
                         </div>
                     </div>
                     <Link 
                         href="/mon-espace-locataire/profil-public" 
-                        className="w-full md:w-auto relative z-10 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-sm transition-all hover:-translate-y-0.5"
+                        className="w-full md:w-auto relative z-10 px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-xs transition-all hover:-translate-y-0.5"
                     >
                         <Search size={15} />
                         <span>Configurer mes critères</span>

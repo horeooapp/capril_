@@ -58,7 +58,7 @@ export default function InteractiveBackground() {
             
             {/* Glassmorphism subtle noise overlay to add texture */}
             <div className="absolute inset-0 bg-ivory-pattern opacity-10"></div>
-            <div className="absolute inset-0 bg-slate-900]"></div>
+            <div className="absolute inset-0 bg-slate-900"></div>
         </div>
     )
 }

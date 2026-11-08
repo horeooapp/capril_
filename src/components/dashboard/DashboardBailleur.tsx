@@ -121,7 +121,7 @@ export default function DashboardBailleur({ data }: Props) {
               <div className="text-[26px] font-bold text-white font-mono mb-1">{data.walletBalance.toLocaleString("fr-FR")} XOF</div>
               <div className="text-xs text-[#7A9AC0] mb-2.5">{data.biensActifs} baux · Besoin : {(data.biensActifs * 90).toLocaleString("fr-FR")} XOF/mois</div>
               <div className="bg-white/10 rounded-full h-1.5 mb-1 overflow-hidden">
-                <div className="h-full bg-slate-900] rounded-full transition-all" style={{width:`${pct}%`}} />
+                <div className="h-full bg-slate-900 rounded-full transition-all" style={{width:`${pct}%`}} />
               </div>
               <div className="flex justify-between text-[9px] text-[#7A9AC0] mb-3">
                 <span>0</span>

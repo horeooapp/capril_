@@ -36,7 +36,7 @@ export default function WalletSidebar({userId,solde,nbBails,seuilAlerte=1000,ope
       <div className="text-xs text-[#7A9AC0] mb-2.5">{nbBails} baux · Besoin : {besoinMois.toLocaleString("fr-FR")} XOF/mois</div>
       {/* Barre progression */}
       <div className="bg-white/10 rounded-full h-2 mb-1 overflow-hidden">
-        <div className="h-full rounded-full bg-slate-900] transition-all duration-500" style={{width:`${pct}%`}} />
+        <div className="h-full rounded-full bg-slate-900 transition-all duration-500" style={{width:`${pct}%`}} />
       </div>
       <div className="flex justify-between text-[9px] text-[#7A9AC0] mb-3">
         <span>0</span>

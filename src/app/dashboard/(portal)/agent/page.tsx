@@ -154,7 +154,7 @@ export default function AiAgentPage() {
             {/* Colonne Principale : Chat Conversationnel */}
             <div className="lg:col-span-2 flex flex-col h-[calc(100vh-140px)] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
                 {/* Header */}
-                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900] text-white">
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-900 text-white">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-white/15 rounded-2xl">
                             <Bot size={22} />

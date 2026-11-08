@@ -810,7 +810,7 @@ function LeaseModeSelector() {
                 {/* Mode IA — Assistant conversationnel */}
                 <div
                     onClick={() => setMode("agent")}
-                    className="bg-slate-900] rounded-3xl p-8 cursor-pointer active:scale-[0.99] hover:shadow-2xl hover:shadow-blue-900/30 transition-all border border-blue-800/50 flex flex-col justify-between group"
+                    className="bg-slate-900 rounded-3xl p-8 cursor-pointer active:scale-[0.99] hover:shadow-2xl hover:shadow-blue-900/30 transition-all border border-blue-800/50 flex flex-col justify-between group"
                 >
                     <div>
                         <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">

@@ -316,3 +316,4 @@ def create_manuel_docx(output_path):
 if __name__ == "__main__":
     out_file = r"QAPRIL_Manuel_Utilisation_v2.0.docx"
     create_manuel_docx(out_file)
+

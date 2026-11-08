@@ -139,7 +139,7 @@ export default function ChampionDashboardPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900] text-white p-6 rounded-3xl shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 text-white p-6 rounded-3xl shadow-lg">
                 <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-black uppercase tracking-widest mb-2">
                         <Trophy className="w-3.5 h-3.5" /> QAPRIL Champion · Zone {data?.champion?.zone_principale || "Abidjan"}
@@ -273,7 +273,7 @@ export default function ChampionDashboardPage() {
 
                     <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-slate-900] rounded-full transition-all duration-500"
+                            className="h-full bg-slate-900 rounded-full transition-all duration-500"
                             style={{ width: `${Math.min(100, b2.progression_pct || 0)}%` }}
                         />
                     </div>
