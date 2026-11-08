@@ -8,7 +8,9 @@ import path from 'path';
  */
 export async function GET() {
     try {
-        const filePath = path.join(process.cwd(), 'QAPRIL_Manuel_Utilisation_v2.0.docx');
+        const publicPath = path.join(process.cwd(), 'public', 'QAPRIL_Manuel_Utilisation_v2.0.docx');
+        const rootPath = path.join(process.cwd(), 'QAPRIL_Manuel_Utilisation_v2.0.docx');
+        const filePath = fs.existsSync(publicPath) ? publicPath : rootPath;
         
         if (!fs.existsSync(filePath)) {
             return NextResponse.json({ error: "Fichier du manuel introuvable." }, { status: 404 });
@@ -29,3 +31,4 @@ export async function GET() {
         return NextResponse.json({ error: "Erreur serveur lors du téléchargement." }, { status: 500 });
     }
 }
+

@@ -68,7 +68,8 @@ export default function ManuelUtilisationPage() {
                         {/* BOUTON TÉLÉCHARGER LE MANUEL DOCX */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             <a
-                                href="/api/manuel/download"
+                                href="/QAPRIL_Manuel_Utilisation_v2.0.docx"
+                                download="QAPRIL_Manuel_Utilisation_v2.0.docx"
                                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#FF8200] hover:bg-[#e67500] text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-xs"
                             >
                                 <Download size={15} />
