@@ -16,6 +16,7 @@ import { authConfig } from "./auth.config"
 import { redis } from "@/lib/redis"
 import { writeAuditLog } from "@/lib/audit"
 import { normalizePhone } from "@/lib/phone"
+import { isGlobalAuthRevoked } from "@/lib/session-revocation"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
@@ -429,6 +430,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
+        async session(params: any) {
+            const isRevoked = await isGlobalAuthRevoked(params.token);
+            if (isRevoked) {
+                return { ...params.session, user: undefined as any };
+            }
+            if (authConfig.callbacks?.session) {
+                return (authConfig.callbacks.session as any)(params);
+            }
+            return params.session;
+        },
         async signIn({ user, account, profile }) {
             if (account?.provider === "google" || account?.provider === "facebook") {
                 const providerId = account.providerAccountId || user.id || "unknown";
