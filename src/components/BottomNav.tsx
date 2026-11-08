@@ -37,22 +37,16 @@ export default function BottomNav({ items }: BottomNavProps) {
     const NavItem = ({ item, isActive, isMore = false }: { item: BottomNavItem, isActive: boolean, isMore?: boolean }) => {
         const content = (
             <>
-                <div className={`${isActive ? "scale-110 text-slate-800" : "scale-100 text-gray-400"} transition-all duration-300 relative`}>
+                <div className={`${isActive ? "text-slate-900" : "text-slate-400"} transition-colors relative`}>
                     {item.icon}
-                    {isActive && (
-                        <motion.div 
-                            layoutId="nav-glow"
-                            className="absolute -inset-2 bg-slate-800/5 blur-lg rounded-full -z-10"
-                        />
-                    )}
                 </div>
-                <span className={`text-[9px] font-black uppercase tracking-widest truncate w-full text-center whitespace-nowrap ${isActive ? "text-slate-800 opacity-100" : "text-gray-400 opacity-60"}`}>
+                <span className={`text-[10px] font-medium truncate w-full text-center whitespace-nowrap ${isActive ? "text-slate-900" : "text-slate-400"}`}>
                     {item.label}
                 </span>
             </>
         )
 
-        const className = `flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl transition-all relative flex-1 min-w-0 ${isMore ? "p-4 bg-gray-50/50 border border-gray-100/50" : ""}`
+        const className = `flex flex-col items-center gap-1 px-1 py-1.5 rounded-lg transition-colors relative flex-1 min-w-0 ${isMore ? "p-3 bg-slate-50 border border-slate-200" : ""}`
 
         if (item.onClick) {
             return (

@@ -178,8 +178,14 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
+    const targetUrl = endpoint.startsWith('http')
+        ? endpoint
+        : endpoint.startsWith('/api/')
+            ? `${API_URL.replace(/\/api\/mobile$/, '')}${endpoint}`
+            : `${API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
     try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
+        const response = await fetch(targetUrl, {
             ...options,
             signal: controller.signal,
             headers,

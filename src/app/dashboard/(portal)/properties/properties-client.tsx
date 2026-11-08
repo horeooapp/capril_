@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Building2, Search, Plus, CheckCircle, Clock, Home, Filter, ChevronRight, ChevronDown } from "lucide-react"
+import { Building2, Search, Plus, CheckCircle, Clock, Home, Filter, ChevronRight, ChevronDown, Lock } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner";
@@ -111,19 +111,19 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                     </div>
                 </td>
                 <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
-                    {(p.isOccupied || p.status === 'rented' || p.leases?.some((l:any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status))) ? (
+                    {p.isOccupied || p.status === 'rented' || p.leases?.some((l:any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status)) ? (
                         <span 
                             title="Ce bien est sous contrat de location actif. Il ne peut être ni modifié ni supprimé."
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-md text-[11px] font-semibold tracking-wide cursor-not-allowed"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-md text-[11px] font-medium tracking-normal cursor-not-allowed"
                         >
-                            🔒 Verrouillé
+                            <Lock size={11} className="text-amber-700" /> Verrouillé
                         </span>
                     ) : (
                         <Link
                             href={`/dashboard/properties/${p.id}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-semibold transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-[11px] font-medium transition-colors"
                         >
-                            Gérer / Modifier
+                            Gérer
                         </Link>
                     )}
                 </td>
@@ -205,20 +205,19 @@ export default function PropertiesDashboardClient({ initialProperties }: { initi
                 </div>
 
                 <div className="space-y-4">
-                    <div className="p-6 bg-slate-800 rounded-[12px] text-white relative shadow-sm overflow-hidden">
-                        <Building2 size={120} className="absolute -right-6 -bottom-6 text-white opacity-5" />
-                        <h3 className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">Revenu Mensuel (Est.)</h3>
-                        <p className="text-3xl font-black tracking-tight mt-1">{(properties.reduce((acc, p) => acc + (p.declaredRentFcfa || 0), 0) || 0).toLocaleString()} <span className="text-sm font-medium text-slate-300">XOF</span></p>
+                    <div className="p-5 bg-slate-900 rounded-xl text-white shadow-xs border border-slate-800">
+                        <h3 className="text-xs font-normal text-slate-400 mb-1">Revenu mensuel estimé</h3>
+                        <p className="text-2xl font-semibold tracking-tight mt-1 tabular-nums">{(properties.reduce((acc, p) => acc + (p.declaredRentFcfa || 0), 0) || 0).toLocaleString('fr-FR')} <span className="text-xs font-normal text-slate-400">FCFA</span></p>
                         
-                        <div className="mt-8">
-                            <p className="text-[11px] font-medium text-slate-300 flex justify-between">
-                                Occupation globale
-                                <span className="text-emerald-400 font-bold">
+                        <div className="mt-6 pt-4 border-t border-slate-800">
+                            <p className="text-xs font-normal text-slate-300 flex justify-between">
+                                <span>Taux d'occupation</span>
+                                <span className="text-emerald-400 font-semibold tabular-nums">
                                     {properties.length > 0 ? Math.round((properties.filter(p => p.status === 'active' || p.leases?.length > 0).length / properties.length) * 100) : 0}%
                                 </span>
                             </p>
-                            <div className="w-full bg-slate-700 rounded-full h-1.5 mt-2 overflow-hidden">
-                                <div className="bg-emerald-400 h-full rounded-full" style={{width: `${properties.length > 0 ? Math.round((properties.filter(p => p.status === 'active' || p.leases?.length > 0).length / properties.length) * 100) : 0}%`}}></div>
+                            <div className="w-full bg-slate-800 rounded h-1.5 mt-2 overflow-hidden">
+                                <div className="bg-emerald-400 h-full rounded" style={{width: `${properties.length > 0 ? Math.round((properties.filter(p => p.status === 'active' || p.leases?.length > 0).length / properties.length) * 100) : 0}%`}}></div>
                             </div>
                         </div>
                     </div>

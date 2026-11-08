@@ -18,6 +18,7 @@ import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
+import { VoiceAssistantFAB } from '../../components/VoiceAssistantFAB';
 import { confirmExitApp } from '../../components/TopNavHeader';
 import {
   Building2,
@@ -1231,6 +1232,9 @@ export default function BailleurAndAgencePrototypeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Assistant Vocal QAPRIL (ADD-27) */}
+      <VoiceAssistantFAB moduleName={isBailleur ? 'BAILLEUR' : 'AGENCE'} primaryColor={primaryColor} />
     </SafeAreaView>
   );
 }

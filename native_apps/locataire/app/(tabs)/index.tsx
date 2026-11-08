@@ -12,12 +12,14 @@ import {
   TextInput,
   Image,
   BackHandler,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
+import { VoiceAssistantFAB } from '../../components/VoiceAssistantFAB';
 import { confirmExitApp } from '../../components/TopNavHeader';
 import {
   Bell,
@@ -53,6 +55,9 @@ import {
   Clock,
   Receipt,
   ArrowUpDown,
+  Users,
+  UserPlus,
+  ExternalLink,
 } from 'lucide-react-native';
 
 const formatImageUrl = (uri?: string | null) => {
@@ -118,6 +123,22 @@ export default function LocatairePrototypeScreen() {
 
   // Recherche, tri et filtres pour "Trouver un logement"
   const [marketSearchQuery, setMarketSearchQuery] = useState('');
+
+  // États pour Attestation & Occupants Déclarés (ADD-29)
+  const [generatingAttestation, setGeneratingAttestation] = useState(false);
+  const [attestationResult, setAttestationResult] = useState<any>(null);
+  const [occupantsModal, setOccupantsModal] = useState(false);
+  const [occupantsList, setOccupantsList] = useState<any[]>([]);
+  const [loadingOccupants, setLoadingOccupants] = useState(false);
+  const [newOccupantModal, setNewOccupantModal] = useState(false);
+  const [occNom, setOccNom] = useState('');
+  const [occPrenoms, setOccPrenoms] = useState('');
+  const [occTypeLien, setOccTypeLien] = useState('CONJOINT');
+  const [occBirth, setOccBirth] = useState('');
+  const [occTel, setOccTel] = useState('');
+  const [occNni, setOccNni] = useState('');
+  const [occHonneur, setOccHonneur] = useState(false);
+  const [submittingOcc, setSubmittingOcc] = useState(false);
   const [marketSortPrice, setMarketSortPrice] = useState<'none' | 'asc' | 'desc'>('none');
   const [marketCommune, setMarketCommune] = useState<string>('TOUTES');
   const [marketType, setMarketType] = useState<string>('TOUS');
@@ -335,6 +356,93 @@ export default function LocatairePrototypeScreen() {
       Alert.alert('Erreur', 'Impossible de contacter le service de règlement.');
     } finally {
       setFacturePaying(false);
+    }
+  };
+
+  const handleGenerateAttestation = async () => {
+    if (!data?.lease?.id || !data?.user?.id) {
+      Alert.alert('Information', 'Aucun contrat de bail actif associé à votre compte.');
+      return;
+    }
+    setGeneratingAttestation(true);
+    try {
+      const res = await fetchWithAuth(`/api/v1/users/${data.user.id}/attestations`, {
+        method: 'POST',
+        body: JSON.stringify({
+          bailId: data.lease.id,
+          raisonUsage: 'ADMINISTRATIF',
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setAttestationResult(json.attestation);
+      } else {
+        Alert.alert('Erreur', json.error || 'Impossible de générer l’attestation.');
+      }
+    } catch (err: any) {
+      Alert.alert('Erreur', err.message || 'Erreur réseau');
+    } finally {
+      setGeneratingAttestation(false);
+    }
+  };
+
+  const loadOccupants = async () => {
+    if (!data?.lease?.id) return;
+    setLoadingOccupants(true);
+    try {
+      const res = await fetchWithAuth(`/api/v1/bails/${data.lease.id}/occupants`);
+      const json = await res.json();
+      if (res.ok && json.occupants) {
+        setOccupantsList(json.occupants);
+      }
+    } catch (e) {
+      console.warn('Erreur chargement occupants:', e);
+    } finally {
+      setLoadingOccupants(false);
+    }
+  };
+
+  const handleAddOccupant = async () => {
+    if (!data?.lease?.id) return;
+    if (!occNom.trim() || !occPrenoms.trim()) {
+      Alert.alert('Champs requis', 'Veuillez saisir le nom et les prénoms de l’occupant.');
+      return;
+    }
+    if (!occHonneur) {
+      Alert.alert('Engagement requis', 'Veuillez cocher la déclaration sur l’honneur (Art. 14 Loi 2013-546).');
+      return;
+    }
+    setSubmittingOcc(true);
+    try {
+      const res = await fetchWithAuth(`/api/v1/bails/${data.lease.id}/occupants`, {
+        method: 'POST',
+        body: JSON.stringify({
+          nom: occNom.trim(),
+          prenoms: occPrenoms.trim(),
+          typeLien: occTypeLien,
+          dateNaissance: occBirth.trim() || undefined,
+          telephone: occTel.trim() || undefined,
+          numeroPiece: occNni.trim() || undefined,
+          declarationHonneurSignee: true,
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        Alert.alert('Occupant déclaré', 'L’occupant a été enregistré avec succès.');
+        setNewOccupantModal(false);
+        setOccNom('');
+        setOccPrenoms('');
+        setOccTel('');
+        setOccNni('');
+        setOccHonneur(false);
+        loadOccupants();
+      } else {
+        Alert.alert('Erreur', json.error || 'Impossible de déclarer cet occupant.');
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur', e.message || 'Erreur réseau');
+    } finally {
+      setSubmittingOcc(false);
     }
   };
 
@@ -1144,6 +1252,25 @@ export default function LocatairePrototypeScreen() {
               </Text>
             </Pressable>
 
+            {data?.hasLease && (
+              <Pressable
+                style={[styles.cardRow, { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#CBD5E1' }]}
+                onPress={() => {
+                  loadOccupants();
+                  setOccupantsModal(true);
+                }}
+              >
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}>
+                  <Users color="#1B4D3E" size={20} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.boldText, { color: '#0F172A' }]}>Occupants déclarés du logement</Text>
+                  <Text style={styles.subMuted}>Déclarer conjoint, enfants majeurs ou co-résidents (ADD-29)</Text>
+                </View>
+                <ChevronRight color="#64748B" size={18} />
+              </Pressable>
+            )}
+
             {data?.hasLease ? (
               [
                 { t: `Contrat de bail certifié (${bailRef})`, s: `${propName} · Enregistré · SHA-256` },
@@ -1490,35 +1617,236 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : ATTESTATION DE RÉSIDENCE QR EN 10 SECONDES */}
+      {/* MODALE : ATTESTATION DE RÉSIDENCE QR (ADD-29) */}
       <Modal visible={attestationModal} transparent animationType="slide" onRequestClose={() => setAttestationModal(false)}>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
-            <Text style={styles.h2}>Attestation de résidence QR</Text>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Attestation de résidence officielle</Text>
             <Text style={[styles.subMuted, { marginTop: 4 }]}>
-              Certifiée par QAPRIL · bail enregistré DGI et loyer à jour
+              Certifiée par QAPRIL · Conforme Décret n° 2019-576 et Loi 2013-546
             </Text>
+
             <View style={styles.recapBox}>
               <Text style={styles.boldText}>Titulaire : {userName}</Text>
               <Text style={styles.subMuted}>Logement : {propName}</Text>
-              <Text style={styles.subMuted}>Bail : {bailRef} (Enregistré DGI · art. 414 CCH)</Text>
+              <Text style={styles.subMuted}>Bail : {bailRef}</Text>
+              {attestationResult && (
+                <View style={{ marginTop: 8, padding: 8, backgroundColor: '#E2E8F0', borderRadius: 8 }}>
+                  <Text style={{ fontWeight: '700', color: '#1B4D3E', fontSize: 13 }}>
+                    NIVEAU OBTENU : NIVEAU {attestationResult.niveau}
+                  </Text>
+                  <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                    N° {attestationResult.numero} · Valide 3 mois
+                  </Text>
+                </View>
+              )}
               <Text style={[styles.subMuted, { marginTop: 6, fontWeight: '700', color: '#1E7E4E' }]}>
-                ✓ Empreinte SHA-256 vérifiable par QR Code
+                ✓ Sceau cryptographique SHA-256 · QR Code vérifiable
               </Text>
             </View>
-            <Pressable
-              style={styles.btnPrimary}
-              onPress={() => {
-                setAttestationModal(false);
-                Alert.alert('Attestation téléchargée', 'Votre attestation PDF avec QR Code est prête.');
-              }}
-            >
-              <Text style={styles.btnPrimaryText}>Télécharger le PDF signé</Text>
-            </Pressable>
+
+            {attestationResult ? (
+              <View style={{ gap: 10, width: '100%' }}>
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+                  onPress={() => {
+                    if (attestationResult.pdfUrl) {
+                      Linking.openURL(attestationResult.pdfUrl);
+                    }
+                  }}
+                >
+                  <Text style={styles.btnPrimaryText}>Ouvrir l'attestation PDF</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#0F172A' }]}
+                  onPress={() => {
+                    if (attestationResult.verificationUrl) {
+                      Linking.openURL(attestationResult.verificationUrl);
+                    }
+                  }}
+                >
+                  <Text style={styles.btnPrimaryText}>Voir la vérification QR Code</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+                disabled={generatingAttestation}
+                onPress={handleGenerateAttestation}
+              >
+                {generatingAttestation ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Générer l'attestation certifiée</Text>
+                )}
+              </Pressable>
+            )}
+
             <Pressable style={styles.btnGhost} onPress={() => setAttestationModal(false)}>
               <Text style={styles.btnGhostText}>Fermer</Text>
             </Pressable>
           </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : OCCUPANTS DECLARÉS (ADD-29) */}
+      <Modal visible={occupantsModal} transparent animationType="slide" onRequestClose={() => setOccupantsModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '85%' }]}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.h2}>Occupants du logement</Text>
+              <Pressable onPress={() => setOccupantsModal(false)}>
+                <X color="#64748B" size={24} />
+              </Pressable>
+            </View>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Liste certifiée des co-résidents (conjoint, enfants, colocataires).
+            </Text>
+
+            <ScrollView style={{ maxHeight: 260, width: '100%', marginVertical: 10 }}>
+              {loadingOccupants ? (
+                <ActivityIndicator color="#1B4D3E" style={{ padding: 20 }} />
+              ) : occupantsList.length === 0 ? (
+                <View style={{ padding: 16, alignItems: 'center' }}>
+                  <Text style={styles.subMuted}>Aucun occupant déclaré pour ce bail.</Text>
+                </View>
+              ) : (
+                occupantsList.map((occ: any) => (
+                  <View key={occ.id} style={[styles.cardRow, { marginBottom: 8 }]}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.boldText}>{occ.nom} {occ.prenoms}</Text>
+                      <Text style={styles.subMuted}>
+                        {occ.typeLien} · {occ.statutConfirmation === 'CONFIRME' ? '✓ Confirmé' : 'En attente'}
+                      </Text>
+                      {occ.telephone && <Text style={styles.subMuted}>Tél : {occ.telephone}</Text>}
+                    </View>
+                    <View style={styles.pillOk}>
+                      <Text style={styles.pillOkText}>{occ.typeLien}</Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+
+            <Pressable
+              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', width: '100%' }]}
+              onPress={() => setNewOccupantModal(true)}
+            >
+              <Text style={styles.btnPrimaryText}>+ Déclarer un nouvel occupant</Text>
+            </Pressable>
+
+            <Pressable style={styles.btnGhost} onPress={() => setOccupantsModal(false)}>
+              <Text style={styles.btnGhostText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : FORMULAIRE DÉCLARATION OCCUPANT (ADD-29) */}
+      <Modal visible={newOccupantModal} transparent animationType="slide" onRequestClose={() => setNewOccupantModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
+            <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+              <View style={styles.rowBetween}>
+                <Text style={styles.h2}>Déclarer un occupant</Text>
+                <Pressable onPress={() => setNewOccupantModal(false)}>
+                  <X color="#64748B" size={24} />
+                </Pressable>
+              </View>
+              <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                Conformément à la Loi 2013-546, toute fausse déclaration engage la responsabilité du déclarant.
+              </Text>
+
+              <View style={{ width: '100%', gap: 10, marginVertical: 12 }}>
+                <TextInput
+                  placeholder="Nom de famille *"
+                  placeholderTextColor="#94A3B8"
+                  value={occNom}
+                  onChangeText={setOccNom}
+                  style={styles.searchBarInput}
+                />
+                <TextInput
+                  placeholder="Prénoms *"
+                  placeholderTextColor="#94A3B8"
+                  value={occPrenoms}
+                  onChangeText={setOccPrenoms}
+                  style={styles.searchBarInput}
+                />
+
+                <Text style={[styles.boldText, { fontSize: 12, marginTop: 4 }]}>Lien avec le titulaire :</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {['CONJOINT', 'ENFANT_MAJEUR', 'ENFANT_MINEUR', 'COLOCATAIRE', 'AUTRE'].map((lien) => (
+                    <Pressable
+                      key={lien}
+                      onPress={() => setOccTypeLien(lien)}
+                      style={[
+                        styles.filterChip,
+                        occTypeLien === lien && { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' }
+                      ]}
+                    >
+                      <Text style={[styles.filterChipText, occTypeLien === lien && { color: '#FFF' }]}>
+                        {lien}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  placeholder="Téléphone mobile (si majeur)"
+                  placeholderTextColor="#94A3B8"
+                  value={occTel}
+                  onChangeText={setOccTel}
+                  keyboardType="phone-pad"
+                  style={styles.searchBarInput}
+                />
+                <TextInput
+                  placeholder="Numéro CNI ou Passeport (si majeur)"
+                  placeholderTextColor="#94A3B8"
+                  value={occNni}
+                  onChangeText={setOccNni}
+                  style={styles.searchBarInput}
+                />
+
+                <Pressable
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}
+                  onPress={() => setOccHonneur(!occHonneur)}
+                >
+                  <View style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 4,
+                    borderWidth: 1.5,
+                    borderColor: occHonneur ? '#1B4D3E' : '#94A3B8',
+                    backgroundColor: occHonneur ? '#1B4D3E' : 'transparent',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {occHonneur && <Check color="#fff" size={14} />}
+                  </View>
+                  <Text style={[styles.subMuted, { flex: 1, fontSize: 11 }]}>
+                    Je certifie sur l’honneur que cette personne réside effectivement dans ce logement.
+                  </Text>
+                </Pressable>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', width: '100%' }]}
+                disabled={submittingOcc}
+                onPress={handleAddOccupant}
+              >
+                {submittingOcc ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Enregistrer la déclaration</Text>
+                )}
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setNewOccupantModal(false)}>
+                <Text style={styles.btnGhostText}>Annuler</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
         </View>
       </Modal>
 
@@ -1542,6 +1870,9 @@ export default function LocatairePrototypeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Assistant Vocal QAPRIL (ADD-27) */}
+      <VoiceAssistantFAB moduleName="LOCATAIRE" primaryColor="#1B4D3E" />
     </SafeAreaView>
   );
 }

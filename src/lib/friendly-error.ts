@@ -114,3 +114,4 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
 
     return fallbackMessage;
 }
+
