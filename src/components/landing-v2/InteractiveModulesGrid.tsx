@@ -13,7 +13,10 @@ import {
   Sparkles,
   CheckCircle2,
   ShieldCheck,
-  Smartphone
+  Smartphone,
+  Mic,
+  MapPin,
+  FileCheck2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -160,6 +163,69 @@ const MODULES: FeatureModule[] = [
         { k: "Délivrabilité", v: "99.8% réception immédiate" },
       ],
       hint: "Préserve la convivialité entre bailleur et locataire",
+    },
+  },
+  {
+    id: "vocal",
+    number: "07",
+    title: "Assistant intelligent & pilotage vocal",
+    shortDesc: "Guidez l'application à la voix pour créer un bien, consulter un loyer ou émettre une quittance sans friction.",
+    tag: "ADD-27 Vocal",
+    tagColor: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    icon: Mic,
+    badge: "Sécurité RG-AST-01",
+    gradient: "from-emerald-500/15 via-transparent to-transparent",
+    previewImage: "/images/feature_dashboard.jpg",
+    interactiveDetails: {
+      title: "Cockpit Vocal QAPRIL",
+      metrics: [
+        { k: "Compréhension", v: "Langage naturel ivoirien" },
+        { k: "Contrôle Légal", v: "Validation tactile obligatoire" },
+        { k: "Gain de temps", v: "Création de bien en 90 secondes" },
+      ],
+      hint: "Zero compromis juridique : aucune signature automatique par la voix",
+    },
+  },
+  {
+    id: "maposte",
+    number: "08",
+    title: "Géolocalisation & adresse MaPoste",
+    shortDesc: "Relevé GPS terrain certifié (≤ 50 m), anti-usurpation et attribution de boîte postale numérique La Poste CI.",
+    tag: "ADD-28 Adressage",
+    tagColor: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    icon: MapPin,
+    badge: "Partenariat La Poste CI",
+    gradient: "from-amber-500/15 via-transparent to-transparent",
+    previewImage: "/images/hero_abidjan_modern_district_1773609699145.png",
+    interactiveDetails: {
+      title: "Adressage Numérique National",
+      metrics: [
+        { k: "Code Localisation", v: "QAP-COMMUNE-XXXX officiel" },
+        { k: "Boîte MaPoste", v: "CI-ABJ-XXXX rattachée au bail" },
+        { k: "Précision GPS", v: "Concordance ≤ 30m validée" },
+      ],
+      hint: "Conforme au Décret n° 2019-576 sur l'adressage républicain",
+    },
+  },
+  {
+    id: "attestation",
+    number: "09",
+    title: "Attestation de résidence certifiée (A / B / C)",
+    shortDesc: "Justificatif officiel infalsifiable de domicile avec QR code public et sceau SHA-256 pour banques, visas et concours.",
+    tag: "ADD-29 Domicile",
+    tagColor: "bg-sky-500/10 text-sky-600 border-sky-500/20",
+    icon: FileCheck2,
+    badge: "Sceau SHA-256",
+    gradient: "from-sky-500/15 via-transparent to-transparent",
+    previewImage: "/images/qr_visual_fcfa.png",
+    interactiveDetails: {
+      title: "Attestation Officielle Opposable",
+      metrics: [
+        { k: "Niveaux A / B / C", v: "Titulaire (A), Résidents (B)" },
+        { k: "Validité Légale", v: "3 mois · Sceau cryptographique" },
+        { k: "Contrôle Public", v: "QR Code temps réel sans identité bailleur" },
+      ],
+      hint: "Opposable aux banques, ambassades, CIE, SODECI et concours d'État",
     },
   },
 ];

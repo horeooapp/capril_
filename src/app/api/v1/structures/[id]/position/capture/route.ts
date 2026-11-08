@@ -127,3 +127,4 @@ export async function POST(
         return NextResponse.json({ error: "Erreur lors de l'enregistrement de la capture GPS." }, { status: 500 });
     }
 }
+

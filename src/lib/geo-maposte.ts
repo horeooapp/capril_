@@ -190,3 +190,4 @@ export async function confirmerPositionParConcordance(propertyId: string): Promi
         message: `Écart de ${distance} m supérieur au seuil de 30 m. Veuillez refaire une capture sur place.`
     };
 }
+

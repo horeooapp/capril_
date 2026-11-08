@@ -261,3 +261,4 @@ export async function genererPdfAttestationResidence(params: {
 
     return { pdfBytes, sha256, publicUrl };
 }
+

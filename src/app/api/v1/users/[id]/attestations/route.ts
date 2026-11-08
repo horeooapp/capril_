@@ -129,3 +129,4 @@ export async function POST(
         return NextResponse.json({ error: "Erreur lors de la génération de l'attestation de résidence." }, { status: 500 });
     }
 }
+

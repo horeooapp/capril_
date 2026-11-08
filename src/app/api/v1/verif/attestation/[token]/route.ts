@@ -87,3 +87,4 @@ export async function GET(
         return NextResponse.json({ error: "Erreur lors de la vérification du document." }, { status: 500 });
     }
 }
+

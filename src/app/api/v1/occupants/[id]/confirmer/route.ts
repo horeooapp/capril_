@@ -125,3 +125,4 @@ export async function POST(
         return NextResponse.json({ error: "Erreur lors de la confirmation de résidence." }, { status: 500 });
     }
 }
+

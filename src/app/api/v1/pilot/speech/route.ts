@@ -75,3 +75,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Erreur lors du traitement de l'instruction vocale." }, { status: 500 });
     }
 }
+

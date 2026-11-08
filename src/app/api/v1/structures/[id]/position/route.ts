@@ -47,3 +47,4 @@ export async function GET(
         return NextResponse.json({ error: "Erreur lors de la récupération de la position." }, { status: 500 });
     }
 }
+

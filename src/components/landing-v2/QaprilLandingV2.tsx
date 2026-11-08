@@ -36,7 +36,10 @@ import {
   LogOut,
   MessageSquare,
   Receipt,
-  LayoutDashboard
+  LayoutDashboard,
+  Mic,
+  MapPin,
+  FileCheck2,
 } from "lucide-react";
 
 const SLIDES = [
@@ -487,6 +490,14 @@ export default function QaprilLandingV2({
                   <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
                   <span>CIE & SODECI</span>
                 </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#1B4D3E] shrink-0" />
+                  <span>La Poste CI (MaPoste)</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-sky-600 shrink-0" />
+                  <span>Attestation Résidence SHA-256</span>
+                </div>
 
                 {/* ── Set 2 (Duplication pour boucle infinie sans saut) ── */}
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
@@ -521,6 +532,14 @@ export default function QaprilLandingV2({
                   <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />
                   <span>CIE & SODECI</span>
                 </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-[#1B4D3E] shrink-0" />
+                  <span>La Poste CI (MaPoste)</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-sky-600 shrink-0" />
+                  <span>Attestation Résidence SHA-256</span>
+                </div>
               </div>
             </div>
           </div>
@@ -549,6 +568,140 @@ export default function QaprilLandingV2({
 
           <div className="mt-8">
             <InteractiveShowcase />
+          </div>
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            4bis. NOUVELLES NORMES & INNOVATIONS 2026 (ADD-27 · ADD-28 · ADD-29)
+        ══════════════════════════════════════════════════════════════════ */}
+        <section id="innovations" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
+          <div className="mb-12 max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[#064E3B] text-xs font-semibold uppercase tracking-wider mb-3">
+              <BadgeCheck className="w-4 h-4 text-emerald-600" />
+              Réformes 2026 & Décret n° 2019-576
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
+              Trois avancées majeures pour la sécurité notariale et le confort de gestion
+            </h2>
+            <p className="text-base text-slate-600 font-normal mt-3 leading-relaxed">
+              QAPRIL intègre les dernières directives de l'État ivoirien et innove pour simplifier chaque acte locatif, de la recherche d'adresse au justificatif de domicile certifié.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* CARTE 1 : PILOTAGE VOCAL (ADD-27) */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                    <Mic className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
+                    ADD-27 · Pilotage Vocal
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  Assistant intelligent & saisie vocale
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  Décrivez un logement, enregistrez les caractéristiques d'un bail ou demandez le statut des loyers à la voix. Le moteur comprend le langage naturel ivoirien et pré-remplit les formulaires sans manipulation fastidieuse.
+                </p>
+                <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Création d'un bien complet en 90 secondes à la voix</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Règle RG-AST-01 : confirmation tactile obligatoire pour tout acte légal</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>Accessible sur mobile Propriétaire & Locataire</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
+                <span>Contrôle vocal sécurisé</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
+
+            {/* CARTE 2 : GÉOLOCALISATION & MAPOSTE (ADD-28) */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                    <MapPin className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-md">
+                    ADD-28 · La Poste CI
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  GPS certifié & Adresse MaPoste
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  Fin des imprécisions d'adressage à Abidjan et en région. Relevé GPS in situ avec contrôle de concordance (≤ 30 m) et attribution directe de la boîte postale numérique officielle de La Poste de Côte d'Ivoire.
+                </p>
+                <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Précision GPS ≤ 50 m avec détection anti-usurpation</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Génération du Code Localisation National souverain</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Boîte postale numérique MaPoste rattachée au bail</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+                <span>Adressage officiel Décret 2019-576</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
+
+            {/* CARTE 3 : ATTESTATION DE RÉSIDENCE (ADD-29) */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700">
+                    <FileCheck2 className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium text-sky-800 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-md">
+                    ADD-29 · Justificatif Opposable
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  Attestation de résidence officielle
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  Remplace les certificats de complaisance. Justificatif de domicile à trois niveaux (A, B, C) avec sceau cryptographique SHA-256 et QR Code public, opposable aux banques, ambassades, concours et services publics.
+                </p>
+                <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <span>Niveau A (titulaire bail actif DGI) & Niveau B (résidents vérifiés)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <span>Vérification publique instantanée par QR code en temps réel</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <span>Confidentialité totale : identité du bailleur protégée (RG-CONF-01)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-sky-700">
+                <span>Conforme Loi 2013-546 & DGI</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1025,6 +1178,18 @@ export default function QaprilLandingV2({
                     <span className="text-[#059669] font-bold">Entente à l'amiable encadrée :</span> Tous les reçus et le contrat sont sous la main pour régler la situation rapidement.
                   </td>
                 </tr>
+
+                <tr className="hover:bg-slate-50 transition-colors">
+                  <td className="p-4 sm:p-5 font-bold text-slate-900">
+                    Justificatif de domicile & attestation
+                  </td>
+                  <td className="p-4 sm:p-5 text-slate-600">
+                    Certificats manuscrits ou de complaisance, démarches longues et refus fréquents en banque ou consulat.
+                  </td>
+                  <td className="p-4 sm:p-5 text-slate-900 font-semibold">
+                    <span className="text-[#059669] font-bold">Attestation officielle QR (Niveaux A/B/C) :</span> Scellée SHA-256 en 10 secondes, vérifiable en ligne et opposable aux institutions.
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -1112,6 +1277,14 @@ export default function QaprilLandingV2({
               {
                 q: "Est-ce qu'une agence ou un démarcheur peut utiliser QAPRIL ?",
                 a: "Oui, bien sûr. QAPRIL dispose d'un espace dédié aux agences immobilières et aux démarcheurs pour gérer facilement plusieurs maisons, calculer leurs commissions automatiquement et envoyer des bilans clairs aux propriétaires.",
+              },
+              {
+                q: "Comment obtenir une Attestation de Résidence officielle et est-elle acceptée par les consulats et banques ?",
+                a: "L'attestation de résidence QAPRIL remplace les certificats de complaisance. Elle est générée en 10 secondes avec un niveau de certification clair (Niveau A pour le titulaire d'un bail enregistré DGI, Niveau B pour les résidents vérifiés sur le terrain, Niveau C sur déclaration sur l'honneur). Dotée d'un sceau cryptographique SHA-256 et d'un QR Code vérifiable en temps réel, elle est pleinement opposable aux banques, ambassades et administrations, tout en protégeant l'identité privée du propriétaire.",
+              },
+              {
+                q: "À quoi sert la géolocalisation certifiée et l'adresse numérique La Poste CI ?",
+                a: "Conformément au Décret n° 2019-576 sur l'adressage national, QAPRIL certifie la position exacte du bien sur le terrain (précision ≤ 50 m avec détection anti-usurpation). Le logement bénéficie d'un Code Localisation National souverain (ex. QAP-COCODY-XXXX) et d'une boîte postale numérique officielle de La Poste de Côte d'Ivoire rattachée au bail.",
               },
             ].map((faq, index) => (
               <div

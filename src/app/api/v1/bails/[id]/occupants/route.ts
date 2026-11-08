@@ -202,3 +202,4 @@ export async function GET(
         return NextResponse.json({ error: "Erreur lors de la récupération des occupants." }, { status: 500 });
     }
 }
+
