@@ -97,6 +97,57 @@ export default function CreatePropertyScreen() {
   const [isLocating, setIsLocating] = useState(false);
   const [gpsMessage, setGpsMessage] = useState<string | null>(null);
 
+  // Résolution administrative : Ville, Commune, Quartier
+  const [detectedVille, setDetectedVille] = useState<string | null>(null);
+  const [detectedCommune, setDetectedCommune] = useState<string | null>(null);
+  const [detectedQuartier, setDetectedQuartier] = useState<string | null>(null);
+
+  const resolveLocationDetails = async (lat: number, lng: number) => {
+    try {
+      // 1. Appel API hybride QAPRIL
+      const res = await fetchWithAuth(`/api/geo/reverse?lat=${lat}&lng=${lng}`);
+      const data = await res.json();
+      if (data && data.success && data.data) {
+        const info = data.data;
+        if (info.ville) setDetectedVille(info.ville);
+        if (info.commune) {
+          setDetectedCommune(info.commune);
+          if (COMMUNES_ABIDJAN.includes(info.commune)) {
+            setCommune(info.commune);
+          } else {
+            setCommune('Autre');
+            setCustomCommune(info.commune);
+          }
+        }
+        if (info.quartier) {
+          setDetectedQuartier(info.quartier);
+          setAddress(prev => prev.trim().length === 0 ? info.quartier : prev);
+        }
+        return;
+      }
+    } catch (_e) {
+      // Fallback natif Expo Location si déconnecté
+      try {
+        const results = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+        if (results && results.length > 0) {
+          const r = results[0];
+          const v = r.city || r.region || 'Abidjan';
+          const c = r.subregion || r.district || r.city || 'Cocody';
+          const q = [r.name, r.street].filter(Boolean).join(', ') || r.district || '';
+          setDetectedVille(v);
+          setDetectedCommune(c);
+          setDetectedQuartier(q);
+          if (COMMUNES_ABIDJAN.includes(c)) {
+            setCommune(c);
+          }
+          if (q) {
+            setAddress(prev => prev.trim().length === 0 ? q : prev);
+          }
+        }
+      } catch (_err) {}
+    }
+  };
+
   // Tentative de géolocalisation automatique à l'ouverture du formulaire
   useEffect(() => {
     let isMounted = true;
@@ -109,10 +160,13 @@ export default function CreatePropertyScreen() {
             accuracy: Location.Accuracy.Balanced,
           });
           if (isMounted && pos?.coords) {
-            setGpsLatitude(pos.coords.latitude);
-            setGpsLongitude(pos.coords.longitude);
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            setGpsLatitude(lat);
+            setGpsLongitude(lng);
             setPrecisionM(Math.round(pos.coords.accuracy || 15));
             setGpsMessage('Position GPS détectée automatiquement.');
+            await resolveLocationDetails(lat, lng);
           }
         }
       } catch (_e) {
@@ -150,6 +204,7 @@ export default function CreatePropertyScreen() {
         setGpsLongitude(lng);
         setPrecisionM(acc);
         setGpsMessage(`Position GPS acquise : ${lat.toFixed(5)}°, ${lng.toFixed(5)}° (±${acc}m)`);
+        await resolveLocationDetails(lat, lng);
       }
     } catch (_err) {
       Alert.alert(
@@ -209,6 +264,7 @@ export default function CreatePropertyScreen() {
           name: name.trim(),
           address: address.trim(),
           commune: finalCommune,
+          city: detectedVille || 'Abidjan',
           propertyType,
           leaseType,
           declaredRentFcfa: !isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : 0,
@@ -490,15 +546,35 @@ export default function CreatePropertyScreen() {
 
               {gpsLatitude !== null && gpsLongitude !== null ? (
                 <View style={styles.geoSuccessCard}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Check color="#1E7E4E" size={16} />
-                    <Text style={styles.geoCoordsText}>
-                      {gpsLatitude.toFixed(5)}° N, {gpsLongitude.toFixed(5)}° W
-                    </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Check color="#1E7E4E" size={16} />
+                      <Text style={styles.geoCoordsText}>
+                        {gpsLatitude.toFixed(5)}° N, {gpsLongitude.toFixed(5)}° W
+                      </Text>
+                    </View>
+                    <View style={styles.geoAccuracyBadge}>
+                      <Text style={styles.geoAccuracyBadgeText}>±{precisionM ?? 15}m</Text>
+                    </View>
                   </View>
-                  <Text style={styles.geoAccuracyText}>
-                    Précision satellite : ±{precisionM ?? 15}m {precisionM && precisionM <= 20 ? '(Excellente)' : '(Conforme)'}
-                  </Text>
+
+                  {/* Résolution administrative certifiée : Ville, Commune, Quartier */}
+                  <View style={styles.geoAdminCard}>
+                    <View style={styles.geoAdminRow}>
+                      <Text style={styles.geoAdminLabel}>Ville</Text>
+                      <Text style={styles.geoAdminValue}>{detectedVille || 'Abidjan'}</Text>
+                    </View>
+                    <View style={styles.geoAdminRow}>
+                      <Text style={styles.geoAdminLabel}>Commune</Text>
+                      <Text style={[styles.geoAdminValue, { color: '#1B4D3E', fontWeight: '800' }]}>{detectedCommune || finalCommune}</Text>
+                    </View>
+                    <View style={styles.geoAdminRow}>
+                      <Text style={styles.geoAdminLabel}>Quartier</Text>
+                      <Text style={[styles.geoAdminValue, { flex: 1, textAlign: 'right', marginLeft: 8 }]} numberOfLines={1}>
+                        {detectedQuartier || address || 'Zone détectée par satellite'}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               ) : (
                 <Text style={styles.geoHelpText}>
@@ -866,7 +942,43 @@ const styles = StyleSheet.create({
     borderColor: '#C6E7D4',
     borderRadius: 10,
     padding: 10,
+    gap: 8,
+  },
+  geoAccuracyBadge: {
+    backgroundColor: '#C6E7D4',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  geoAccuracyBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#1B4D3E',
+  },
+  geoAdminCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D1EAE0',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     gap: 4,
+  },
+  geoAdminRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  geoAdminLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#64748B',
+    textTransform: 'uppercase',
+  },
+  geoAdminValue: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0F172A',
   },
   geoCoordsText: {
     fontSize: 13,

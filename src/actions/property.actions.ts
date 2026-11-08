@@ -11,6 +11,7 @@ import { generatePropertyCode as generatePropertyCodeLegacy } from "@/lib/proper
 import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } from "@/lib/property-utils";
 import { isUserKycSufficient } from "@/lib/kyc-config";
 import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence, confirmerPositionParConcordance } from "@/lib/geo-maposte";
+import { reverseGeocodeCoordinates } from "@/lib/reverse-geocoding";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
@@ -799,5 +800,32 @@ export async function enregistrerPositionGpsBien(params: {
   } catch (error: any) {
     console.error("[PRP-GEO-ERR] Erreur enregistrement GPS bien:", error);
     return { success: false, error: error.message || "Erreur interne lors de l'enregistrement de la position." };
+  }
+}
+
+export interface ReverseGeocodingActionResult {
+  success: boolean;
+  ville?: string;
+  commune?: string;
+  quartier?: string;
+  adresseComplete?: string;
+  precisionEstimee?: string;
+  source?: "OSM_NOMINATIM" | "REFERENTIEL_LOCAL";
+  error?: string;
+}
+
+/**
+ * [ADD-28] Résout des coordonnées GPS en Ville, Commune et Quartier officiels ivoiriens.
+ */
+export async function getReverseGeocodingAction(lat: number, lng: number): Promise<ReverseGeocodingActionResult> {
+  try {
+    if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+      return { success: false, error: "Coordonnées GPS invalides." };
+    }
+    const result = await reverseGeocodeCoordinates(lat, lng);
+    return { success: true, ...result };
+  } catch (error: any) {
+    console.error("[ACTION-GEO] Erreur reverse geocoding:", error);
+    return { success: false, error: error.message || "Erreur lors de la résolution géographique." };
   }
 }

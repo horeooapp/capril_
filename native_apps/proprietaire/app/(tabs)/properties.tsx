@@ -325,7 +325,7 @@ export default function PropertiesScreen() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.propertyName} numberOfLines={1}>{item.name}</Text>
                     <Text style={styles.propertyAddress} numberOfLines={1}>
-                      {item.address ? `${item.address} · ` : ''}{item.commune || 'Abidjan'}
+                      {item.address ? `${item.address} · ` : ''}{item.commune || 'Abidjan'}{item.city && item.city !== item.commune ? ` (${item.city})` : ''}
                     </Text>
                   </View>
                 </View>

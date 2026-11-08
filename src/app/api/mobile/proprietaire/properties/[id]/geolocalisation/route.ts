@@ -8,6 +8,7 @@ import {
     validateCaptureCoherence,
     confirmerPositionParConcordance 
 } from '@/lib/geo-maposte';
+import { reverseGeocodeCoordinates } from '@/lib/reverse-geocoding';
 
 /**
  * POST /api/mobile/proprietaire/properties/[id]/geolocalisation
@@ -102,6 +103,13 @@ export async function POST(
         // 3. Tenter confirmation par concordance si locataire a déjà capturé
         const concordance = await confirmerPositionParConcordance(propertyId).catch(() => null);
 
+        // 4. Résolution administrative inverse (Ville, Commune, Quartier)
+        const geoInfo = await reverseGeocodeCoordinates(lat, lng).catch(() => null);
+
+        const villeNom = geoInfo?.ville || 'Abidjan';
+        const communeNom = geoInfo?.commune || effectiveCommune;
+        const quartierNom = geoInfo?.quartier || property.address || '';
+
         return NextResponse.json({
             success: true,
             propertyId,
@@ -111,9 +119,13 @@ export async function POST(
             codeLocalisation,
             w3w,
             statutPosition: concordance?.confirmee ? 'CONFIRMEE' : nextStatut,
+            ville: villeNom,
+            commune: communeNom,
+            quartier: quartierNom,
+            adresseComplete: geoInfo?.adresseComplete,
             message: concordance?.confirmee
                 ? concordance.message
-                : `Position GPS (${lat.toFixed(5)}°, ${lng.toFixed(5)}°) enregistrée avec succès. Code : ${codeLocalisation}`
+                : `Position GPS (${lat.toFixed(5)}°, ${lng.toFixed(5)}°) enregistrée avec succès.\nVille : ${villeNom}\nCommune : ${communeNom}${quartierNom ? `\nQuartier : ${quartierNom}` : ''}\nCode La Poste CI : ${codeLocalisation}`
         });
     } catch (error: any) {
         console.error('[MOBILE] properties/[id]/geolocalisation error:', error);

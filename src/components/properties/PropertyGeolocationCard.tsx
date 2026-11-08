@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Navigation, CheckCircle2, AlertCircle, RefreshCw, ExternalLink, ShieldCheck } from "lucide-react"
-import { enregistrerPositionGpsBien } from "@/actions/property.actions"
+import { MapPin, Navigation, CheckCircle2, AlertCircle, RefreshCw, ExternalLink, ShieldCheck, Building } from "lucide-react"
+import { enregistrerPositionGpsBien, getReverseGeocodingAction } from "@/actions/property.actions"
 
 interface PropertyGeolocationCardProps {
     propertyId: string
@@ -13,6 +13,8 @@ interface PropertyGeolocationCardProps {
     initialCodeLocalisation?: string | null
     initialW3w?: string | null
     commune: string
+    city?: string | null
+    address?: string | null
     isOwnerOrManager: boolean
 }
 
@@ -25,6 +27,8 @@ export default function PropertyGeolocationCard({
     initialCodeLocalisation,
     initialW3w,
     commune,
+    city,
+    address,
     isOwnerOrManager
 }: PropertyGeolocationCardProps) {
     const [latitude, setLatitude] = useState<number | null>(initialLatitude ?? null)
@@ -33,6 +37,11 @@ export default function PropertyGeolocationCard({
     const [statut, setStatut] = useState<string>(initialStatut || "MANQUANTE")
     const [codeLocalisation, setCodeLocalisation] = useState<string | null>(initialCodeLocalisation ?? null)
     const [w3w, setW3w] = useState<string | null>(initialW3w ?? null)
+
+    // Ville, Commune, Quartier
+    const [ville, setVille] = useState<string>(city || "Abidjan")
+    const [communeName, setCommuneName] = useState<string>(commune || "Cocody")
+    const [quartier, setQuartier] = useState<string>(address || "")
 
     const [isLocating, setIsLocating] = useState(false)
     const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -66,6 +75,14 @@ export default function PropertyGeolocationCard({
                 }
 
                 try {
+                    // Résolution géographique instantanée (Ville, Commune, Quartier)
+                    const geoRes = await getReverseGeocodingAction(lat, lng)
+                    if (geoRes.success) {
+                        if (geoRes.ville) setVille(geoRes.ville)
+                        if (geoRes.commune) setCommuneName(geoRes.commune)
+                        if (geoRes.quartier) setQuartier(geoRes.quartier)
+                    }
+
                     const res = await enregistrerPositionGpsBien({
                         propertyId,
                         lat,
@@ -80,9 +97,14 @@ export default function PropertyGeolocationCard({
                         if (res.statutPosition) setStatut(res.statutPosition)
                         if (res.codeLocalisation) setCodeLocalisation(res.codeLocalisation)
                         if (res.w3w) setW3w(res.w3w)
+
+                        const detailGeo = (geoRes.success && geoRes.quartier)
+                            ? ` (${geoRes.quartier}, ${geoRes.commune || ''}, ${geoRes.ville || ''})`
+                            : ""
+
                         setFeedback({
                             type: 'success',
-                            message: res.message || "Position GPS certifiée avec succès !"
+                            message: `${res.message || "Position GPS certifiée avec succès !"}${detailGeo}`
                         })
                     } else {
                         setFeedback({
@@ -137,7 +159,7 @@ export default function PropertyGeolocationCard({
                             </span>
                         </div>
                         <p className="text-xs text-slate-500">
-                            Coordonnées satellitaires et adresse numérique certifiée conformes aux normes La Poste CI.
+                            Coordonnées satellitaires certifiées avec identification de la Ville, Commune et Quartier.
                         </p>
                     </div>
                 </div>
@@ -163,7 +185,29 @@ export default function PropertyGeolocationCard({
                 </div>
             </div>
 
-            {/* Détails géographiques */}
+            {/* ADRESSAGE SOUVERAIN : VILLE · COMMUNE · QUARTIER */}
+            <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4">
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <Building size={13} className="text-slate-500" />
+                    <span>Découpage Administratif Officiel Résolu</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="bg-white rounded-lg p-3 border border-slate-200">
+                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Ville</span>
+                        <span className="text-sm font-bold text-slate-900 mt-0.5 block">{ville || "Abidjan"}</span>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-slate-200">
+                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Commune</span>
+                        <span className="text-sm font-bold text-emerald-950 mt-0.5 block">{communeName || "Non spécifiée"}</span>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 border border-slate-200">
+                        <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">Quartier & Repère</span>
+                        <span className="text-sm font-bold text-slate-800 mt-0.5 block">{quartier || "Quartier à préciser"}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Détails géographiques & satellitaires */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200">
                     <p className="text-[11px] font-bold uppercase text-slate-500 tracking-wider">Latitude</p>
@@ -233,7 +277,7 @@ export default function PropertyGeolocationCard({
                     <p className="text-xs text-slate-500">
                         {hasGps 
                             ? "Vous pouvez actualiser la position si vous êtes physiquement présent à l'adresse du bien."
-                            : "Appuyez sur le bouton ci-contre pour capturer automatiquement les coordonnées GPS de ce bien."}
+                            : "Appuyez sur le bouton ci-contre pour capturer automatiquement les coordonnées GPS, la ville, commune et quartier de ce bien."}
                     </p>
                     <button
                         type="button"
@@ -244,7 +288,7 @@ export default function PropertyGeolocationCard({
                         {isLocating ? (
                             <>
                                 <RefreshCw size={14} className="animate-spin" />
-                                <span>Acquisition satellite...</span>
+                                <span>Résolution satellite & cadastre...</span>
                             </>
                         ) : (
                             <>
@@ -258,4 +302,5 @@ export default function PropertyGeolocationCard({
         </div>
     )
 }
+
 

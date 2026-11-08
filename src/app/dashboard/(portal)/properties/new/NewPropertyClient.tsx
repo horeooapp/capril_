@@ -27,9 +27,10 @@ import {
     Check,
     Navigation,
     AlertCircle,
-    RefreshCw
+    RefreshCw,
+    Building
 } from "lucide-react"
-import { creerBien, getMyParentStructures, TypeStructure } from "@/actions/property.actions"
+import { creerBien, getMyParentStructures, TypeStructure, getReverseGeocodingAction } from "@/actions/property.actions"
 
 interface CustomUnitItem {
     id: string
@@ -92,6 +93,14 @@ export default function NewPropertyClient() {
     const [isCapturingGps, setIsCapturingGps] = useState(false)
     const [gpsStatusMessage, setGpsStatusMessage] = useState<string | null>(null)
     const [autoGpsAttempted, setAutoGpsAttempted] = useState(false)
+
+    // Ville, Commune et Quartier résolus
+    const [detectedVille, setDetectedVille] = useState<string | null>(null)
+    const [detectedCommune, setDetectedCommune] = useState<string | null>(null)
+    const [detectedQuartier, setDetectedQuartier] = useState<string | null>(null)
+    const [formCommune, setFormCommune] = useState<string>("Cocody")
+    const [formAddress, setFormAddress] = useState<string>("")
+    const [formCity, setFormCity] = useState<string>("Abidjan")
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target
@@ -222,12 +231,40 @@ export default function NewPropertyClient() {
             setAutoGpsAttempted(true)
             setIsCapturingGps(true)
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    setGpsLat(pos.coords.latitude)
-                    setGpsLng(pos.coords.longitude)
-                    setGpsAccuracy(Math.round(pos.coords.accuracy))
-                    setGpsStatusMessage("Position GPS détectée automatiquement avec succès.")
-                    setIsCapturingGps(false)
+                async (pos) => {
+                    const lat = pos.coords.latitude
+                    const lng = pos.coords.longitude
+                    const acc = Math.round(pos.coords.accuracy)
+                    setGpsLat(lat)
+                    setGpsLng(lng)
+                    setGpsAccuracy(acc)
+
+                    // Résolution Ville, Commune, Quartier
+                    try {
+                        const geo = await getReverseGeocodingAction(lat, lng)
+                        if (geo.success) {
+                            if (geo.ville) {
+                                setDetectedVille(geo.ville)
+                                setFormCity(geo.ville)
+                            }
+                            if (geo.commune) {
+                                setDetectedCommune(geo.commune)
+                                setFormCommune(geo.commune)
+                            }
+                            if (geo.quartier) {
+                                setDetectedQuartier(geo.quartier)
+                                setFormAddress((prev) => prev.trim() ? prev : (geo.quartier || ''))
+                            }
+                            const locStr = [geo.quartier, geo.commune, geo.ville].filter(Boolean).join(', ')
+                            setGpsStatusMessage(`Localisation détectée : ${locStr}`)
+                        } else {
+                            setGpsStatusMessage("Position GPS acquise avec succès.")
+                        }
+                    } catch (_geoErr) {
+                        setGpsStatusMessage("Position GPS acquise avec succès.")
+                    } finally {
+                        setIsCapturingGps(false)
+                    }
                 },
                 (_err) => {
                     // Refus ou absence de signal au chargement initial : pas de blocage
@@ -246,12 +283,40 @@ export default function NewPropertyClient() {
         setIsCapturingGps(true)
         setGpsStatusMessage(null)
         navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                setGpsLat(pos.coords.latitude)
-                setGpsLng(pos.coords.longitude)
-                setGpsAccuracy(Math.round(pos.coords.accuracy))
-                setGpsStatusMessage("Position GPS récupérée avec succès.")
-                setIsCapturingGps(false)
+            async (pos) => {
+                const lat = pos.coords.latitude
+                const lng = pos.coords.longitude
+                const acc = Math.round(pos.coords.accuracy)
+                setGpsLat(lat)
+                setGpsLng(lng)
+                setGpsAccuracy(acc)
+
+                // Résolution Ville, Commune, Quartier
+                try {
+                    const geo = await getReverseGeocodingAction(lat, lng)
+                    if (geo.success) {
+                        if (geo.ville) {
+                            setDetectedVille(geo.ville)
+                            setFormCity(geo.ville)
+                        }
+                        if (geo.commune) {
+                            setDetectedCommune(geo.commune)
+                            setFormCommune(geo.commune)
+                        }
+                        if (geo.quartier) {
+                            setDetectedQuartier(geo.quartier)
+                            setFormAddress((prev) => prev.trim() ? prev : (geo.quartier || ''))
+                        }
+                        const locStr = [geo.quartier, geo.commune, geo.ville].filter(Boolean).join(', ')
+                        setGpsStatusMessage(`Localisation certifiée : ${locStr}`)
+                    } else {
+                        setGpsStatusMessage("Position GPS récupérée avec succès.")
+                    }
+                } catch (_geoErr) {
+                    setGpsStatusMessage("Position GPS récupérée avec succès.")
+                } finally {
+                    setIsCapturingGps(false)
+                }
             },
             (err) => {
                 setIsCapturingGps(false)
@@ -779,6 +844,7 @@ export default function NewPropertyClient() {
 
                     {structureCategory !== 'ENFANT' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <input type="hidden" name="city" value={formCity} />
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
                                     Commune ou Ville <span className="text-red-500">*</span>
@@ -786,6 +852,8 @@ export default function NewPropertyClient() {
                                 <select 
                                     required 
                                     name="commune" 
+                                    value={formCommune}
+                                    onChange={(e) => setFormCommune(e.target.value)}
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white outline-none text-sm font-semibold text-slate-800"
                                 >
                                     <optgroup label="District d'Abidjan">
@@ -820,6 +888,8 @@ export default function NewPropertyClient() {
                                 <input 
                                     required 
                                     name="addressLine1" 
+                                    value={formAddress}
+                                    onChange={(e) => setFormAddress(e.target.value)}
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white outline-none text-sm font-medium text-slate-800 placeholder:text-slate-400" 
                                     placeholder="Ex: Angré 8ème Tranche, près de la pharmacie du Soleil" 
                                 />
@@ -894,27 +964,56 @@ export default function NewPropertyClient() {
 
                                 {/* Affichage des coordonnées capturées */}
                                 {gpsLat !== null && gpsLng !== null ? (
-                                    <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                                        <div className="flex items-center gap-2.5 text-emerald-900 font-medium">
-                                            <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0" />
-                                            <div>
-                                                <p className="font-bold text-emerald-950 font-mono">
-                                                    GPS : {gpsLat.toFixed(6)}° N, {gpsLng.toFixed(6)}° W
-                                                </p>
-                                                <p className="text-[11px] text-emerald-700">
-                                                    Précision satellite : ±{gpsAccuracy ?? 15} m {gpsAccuracy && gpsAccuracy <= 20 ? '(Excellente)' : '(Conforme RG-GEO-04)'}
-                                                </p>
+                                    <div className="space-y-3">
+                                        <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                            <div className="flex items-center gap-2.5 text-emerald-900 font-medium">
+                                                <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0" />
+                                                <div>
+                                                    <p className="font-bold text-emerald-950 font-mono">
+                                                        GPS : {gpsLat.toFixed(6)}° N, {gpsLng.toFixed(6)}° W
+                                                    </p>
+                                                    <p className="text-[11px] text-emerald-700">
+                                                        Précision satellite : ±{gpsAccuracy ?? 15} m {gpsAccuracy && gpsAccuracy <= 20 ? '(Excellente)' : '(Conforme RG-GEO-04)'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md self-start sm:self-center">
+                                                Prêt pour certification
+                                            </span>
+                                        </div>
+
+                                        {/* Décomposition Administrative : Ville / Commune / Quartier */}
+                                        <div className="bg-white border border-emerald-200 rounded-xl p-3 shadow-xs">
+                                            <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                                    <MapPin size={12} className="text-[#FF8200]" />
+                                                    Localisation Administrative Résolue
+                                                </span>
+                                                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                                    Synchronisé avec le formulaire
+                                                </span>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                                                <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ville</span>
+                                                    <span className="font-bold text-slate-900 truncate block">{detectedVille || formCity || 'Abidjan'}</span>
+                                                </div>
+                                                <div className="bg-emerald-50/60 rounded-lg p-2 border border-emerald-100">
+                                                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">Commune</span>
+                                                    <span className="font-bold text-emerald-950 truncate block">{detectedCommune || formCommune || 'Cocody'}</span>
+                                                </div>
+                                                <div className="bg-slate-50 rounded-lg p-2 border border-slate-100">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Quartier & Zone</span>
+                                                    <span className="font-bold text-slate-800 truncate block">{detectedQuartier || formAddress || 'Zone détectée par satellite'}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md self-start sm:self-center">
-                                            Prêt pour certification
-                                        </span>
                                     </div>
                                 ) : (
                                     <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex items-start gap-2">
                                         <Info size={15} className="text-amber-600 flex-shrink-0 mt-0.5" />
                                         <span>
-                                            Si vous êtes actuellement sur les lieux du bien, appuyez sur le bouton vert ci-dessus pour enregistrer immédiatement votre position GPS avec précision.
+                                            Si vous êtes actuellement sur les lieux du bien, appuyez sur le bouton vert ci-dessus pour enregistrer immédiatement votre position GPS avec précision. La ville, la commune et le quartier seront automatiquement identifiés.
                                         </span>
                                     </div>
                                 )}

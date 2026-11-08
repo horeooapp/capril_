@@ -106,6 +106,8 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                         initialCodeLocalisation={property.codeLocalisation}
                         initialW3w={property.w3w}
                         commune={property.commune}
+                        city={property.city}
+                        address={property.address || property.addressLine1}
                         isOwnerOrManager={isOwner}
                     />
 
