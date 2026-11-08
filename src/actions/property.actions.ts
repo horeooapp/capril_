@@ -10,6 +10,7 @@ import { ensureAuthenticated, ensurePropertyAccess } from "./auth-helpers";
 import { generatePropertyCode as generatePropertyCodeLegacy } from "@/lib/property";
 import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } from "@/lib/property-utils";
 import { isUserKycSufficient } from "@/lib/kyc-config";
+import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence, confirmerPositionParConcordance } from "@/lib/geo-maposte";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
@@ -141,6 +142,9 @@ export async function creerBien(formData: FormData) {
         nbUnits: parseInt(formData.get("nbUnits") as string) || 0,
         unitRent: parseInt(formData.get("unitRent") as string) || 0,
         leaseType: (formData.get("leaseType") as any) || "residential",
+        gpsLatitude: formData.get("gpsLatitude") ? parseFloat(formData.get("gpsLatitude") as string) : undefined,
+        gpsLongitude: formData.get("gpsLongitude") ? parseFloat(formData.get("gpsLongitude") as string) : undefined,
+        precisionM: formData.get("precisionM") ? Math.round(parseFloat(formData.get("precisionM") as string)) : undefined,
     }
 
     const { typeStructure, unitLabel, parentPropertyId, nbUnits, unitRent } = data;
@@ -183,12 +187,35 @@ export async function creerBien(formData: FormData) {
           leaseType: parent.leaseType,
           managedByUserId: parent.managedByUserId,
           managementMode: parent.managementMode,
+          gpsLatitude: parent.gpsLatitude,
+          gpsLongitude: parent.gpsLongitude,
+          precisionM: parent.precisionM,
+          codeLocalisation: parent.codeLocalisation,
+          w3w: parent.w3w,
+          statutPosition: parent.statutPosition,
         };
       }
 
       // 4. Génération du code
-      const seq = await tx.property.count({ where: { commune: data.commune || inheritedData.commune } });
-      const propertyCode = generatePropertyCode((data.leaseType || inheritedData.leaseType || 'residential') as any, data.commune || inheritedData.commune, seq + 1);
+      const effectiveCommune = data.commune || inheritedData.commune || "Abidjan";
+      const seq = await tx.property.count({ where: { commune: effectiveCommune } });
+      const propertyCode = generatePropertyCode((data.leaseType || inheritedData.leaseType || 'residential') as any, effectiveCommune, seq + 1);
+
+      // 4b. Calcul et dérivation de la géolocalisation certifiée (ADD-28)
+      const hasDirectGps = data.gpsLatitude !== undefined && data.gpsLongitude !== undefined && !isNaN(data.gpsLatitude) && !isNaN(data.gpsLongitude);
+      const effectiveLat = hasDirectGps ? data.gpsLatitude : (inheritedData.gpsLatitude ?? null);
+      const effectiveLng = hasDirectGps ? data.gpsLongitude : (inheritedData.gpsLongitude ?? null);
+      const effectivePrecision = hasDirectGps ? (data.precisionM || 15) : (inheritedData.precisionM ?? null);
+
+      let codeLocalisation: string | null = inheritedData.codeLocalisation || null;
+      let w3w: string | null = inheritedData.w3w || null;
+      let statutPosition = inheritedData.statutPosition || "MANQUANTE";
+
+      if (effectiveLat !== null && effectiveLng !== null) {
+        codeLocalisation = generateLocalisationCode(effectiveCommune, effectiveLat, effectiveLng);
+        w3w = deriveSimulatedW3W(effectiveCommune, effectiveLat, effectiveLng);
+        statutPosition = "DECLAREE";
+      }
 
       // 5. Création
       const bien = await tx.property.create({
@@ -201,7 +228,7 @@ export async function creerBien(formData: FormData) {
           name:             data.name || (parentPropertyId && unitLabel ? `${inheritedData.name || ''} - ${unitLabel}` : data.name),
           unitLabel:        unitLabel ? unitLabel.trim() : undefined,
           parentPropertyId: data.parentPropertyId,
-          commune:          data.commune || inheritedData.commune,
+          commune:          effectiveCommune,
           address:          data.address || inheritedData.address,
           city:             data.city || inheritedData.city || "Abidjan",
           leaseType:        data.leaseType || inheritedData.leaseType || "residential",
@@ -212,9 +239,36 @@ export async function creerBien(formData: FormData) {
           bedrooms:         data.bedrooms,
           referenceCadastre: data.referenceCadastre,
           amenities:        data.amenities || [],
-          status:           "active"
+          status:           "active",
+          // ADD-28 : Géolocalisation
+          gpsLatitude:      effectiveLat,
+          gpsLongitude:     effectiveLng,
+          precisionM:       effectivePrecision,
+          statutPosition,
+          codeLocalisation,
+          w3w,
         }
       });
+
+      // 5a. Consignation de la capture initiale de géolocalisation si fournie directement
+      if (hasDirectGps && effectiveLat !== null && effectiveLng !== null) {
+        try {
+          await tx.capturePosition.create({
+            data: {
+              propertyId: bien.id,
+              userId: session.user.id,
+              role: isPro ? 'AGENCE' : 'BAILLEUR',
+              lat: effectiveLat,
+              lng: effectiveLng,
+              precisionM: effectivePrecision || 15,
+              canal: 'WEB',
+              resultat: 'ACCEPTEE'
+            }
+          });
+        } catch (capErr) {
+          console.warn("[PRP-GEO] Avertissement capture position:", capErr);
+        }
+      }
 
       // 5b. Gestion des images
       let firstUploadedImageUrl: string | null = null;
@@ -642,4 +696,108 @@ export async function getMyParentStructures() {
     },
     orderBy: { createdAt: "desc" }
   });
+}
+
+/**
+ * [ADD-28] Enregistre et certifie la géolocalisation d'un bien par le propriétaire ou l'agent.
+ * Vérifie la cohérence géographique (RG-GEO-04), crée la CapturePosition
+ * et tente la confirmation automatique par concordance (RG-GEO-05).
+ */
+export async function enregistrerPositionGpsBien(params: {
+  propertyId: string;
+  lat: number;
+  lng: number;
+  precisionM?: number;
+}) {
+  try {
+    const session = await ensureAuthenticated();
+    const { propertyId, lat, lng, precisionM } = params;
+
+    if (!propertyId || typeof lat !== 'number' || typeof lng !== 'number') {
+      return { success: false, error: "Identifiant du bien et coordonnées GPS requis." };
+    }
+
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId }
+    });
+    if (!property) return { success: false, error: "Bien introuvable." };
+
+    const isOwner = property.ownerUserId === session.user.id;
+    const isManager = property.managedByUserId === session.user.id;
+    const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(session.user.role as any);
+    if (!isOwner && !isManager && !isAdmin) {
+      return { success: false, error: "Action non autorisée : seuls le propriétaire ou le gestionnaire mandaté peuvent capturer la position GPS." };
+    }
+
+    const effectivePrecision = precisionM ? Math.round(precisionM) : 15;
+
+    // Validation de cohérence (RG-GEO-04)
+    const coherence = validateCaptureCoherence({
+      lat,
+      lng,
+      precisionM: effectivePrecision,
+      commune: property.commune
+    });
+    if (!coherence.valid) {
+      return { success: false, error: coherence.message || "Position GPS non recevable." };
+    }
+
+    const effectiveCommune = property.commune || 'Abidjan';
+    const codeLocalisation = generateLocalisationCode(effectiveCommune, lat, lng);
+    const w3w = deriveSimulatedW3W(effectiveCommune, lat, lng);
+
+    const isAgency = ['AGENCY', 'LANDLORD_PRO', 'AGENCE_AGREE', 'NON_CERTIFIED_AGENT'].includes(session.user.role as any);
+    const role = isAgency ? 'AGENCE' : 'BAILLEUR';
+
+    // 1. Enregistrement de la capture
+    await prisma.capturePosition.create({
+      data: {
+        propertyId,
+        userId: session.user.id,
+        role,
+        lat,
+        lng,
+        precisionM: effectivePrecision,
+        canal: 'WEB',
+        resultat: 'ACCEPTEE'
+      }
+    });
+
+    // 2. Mise à jour du bien
+    const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'DECLAREE';
+    await prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        gpsLatitude: lat,
+        gpsLongitude: lng,
+        precisionM: effectivePrecision,
+        statutPosition: nextStatut,
+        codeLocalisation,
+        w3w,
+      }
+    });
+
+    // 3. Tentative de confirmation par concordance (RG-GEO-05)
+    const concordance = await confirmerPositionParConcordance(propertyId).catch(() => null);
+
+    revalidatePath(`/dashboard/properties/${propertyId}`);
+    revalidatePath("/dashboard/properties");
+
+    return {
+      success: true,
+      propertyId,
+      lat,
+      lng,
+      precisionM: effectivePrecision,
+      codeLocalisation,
+      w3w,
+      statutPosition: concordance?.confirmee ? 'CONFIRMEE' : nextStatut,
+      message: concordance?.confirmee
+        ? concordance.message
+        : `Position GPS (${lat.toFixed(5)}°, ${lng.toFixed(5)}°) enregistrée avec succès. Code : ${codeLocalisation}`
+    };
+  } catch (error: any) {
+    console.error("[PRP-GEO-ERR] Erreur enregistrement GPS bien:", error);
+    return { success: false, error: error.message || "Erreur interne lors de l'enregistrement de la position." };
+  }
 }

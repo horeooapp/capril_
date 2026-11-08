@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { formatUserFriendlyError } from '@/lib/friendly-error';
+import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence } from '@/lib/geo-maposte';
 
 /**
  * GET  /api/mobile/proprietaire/properties
@@ -64,6 +65,12 @@ export async function GET(request: Request) {
                                     ? `${activeLease.tenant.firstName ?? ''} ${activeLease.tenant.lastName ?? ''}`.trim()
                                     : null,
                 currentRent:      activeLease ? Number(activeLease.rentAmount ?? 0) : Number(p.declaredRentFcfa ?? 0),
+                gpsLatitude:      p.gpsLatitude,
+                gpsLongitude:     p.gpsLongitude,
+                precisionM:       p.precisionM,
+                statutPosition:   p.statutPosition,
+                codeLocalisation: p.codeLocalisation,
+                w3w:              p.w3w,
             };
         });
 
@@ -108,7 +115,10 @@ export async function POST(request: Request) {
             titre_numero,
             numero_lot,
             numero_ilot,
-            est_viabilise
+            est_viabilise,
+            gpsLatitude,
+            gpsLongitude,
+            precisionM
         } = body;
 
         if (!address || !commune) {
@@ -166,6 +176,22 @@ export async function POST(request: Request) {
         const parsedSurface = superficieM2 ? parseFloat(String(superficieM2)) : null;
         const parsedPrixVente = prixVenteFcfa ? parseFloat(String(prixVenteFcfa)) : null;
 
+        // ADD-28 : Traitement de la géolocalisation
+        const rawLat = gpsLatitude !== undefined && gpsLatitude !== null ? parseFloat(String(gpsLatitude)) : null;
+        const rawLng = gpsLongitude !== undefined && gpsLongitude !== null ? parseFloat(String(gpsLongitude)) : null;
+        const rawPrecision = precisionM !== undefined && precisionM !== null ? Math.round(Number(precisionM)) : 15;
+        const hasGps = rawLat !== null && rawLng !== null && !isNaN(rawLat) && !isNaN(rawLng);
+
+        let codeLocalisation: string | null = null;
+        let w3w: string | null = null;
+        let statutPosition = 'MANQUANTE';
+
+        if (hasGps) {
+            codeLocalisation = generateLocalisationCode(cleanCommune, rawLat, rawLng);
+            w3w = deriveSimulatedW3W(cleanCommune, rawLat, rawLng);
+            statutPosition = 'DECLAREE';
+        }
+
         const property = await prisma.property.create({
             data: {
                 propertyCode:     finalPropertyCode,
@@ -184,6 +210,13 @@ export async function POST(request: Request) {
                 parentPropertyId: parentPropertyId ?? null,
                 unitLabel:        unitLabel ? String(unitLabel).trim() : null,
                 status:           'ACTIVE',
+                // ADD-28 : Géolocalisation
+                gpsLatitude:      hasGps ? rawLat : null,
+                gpsLongitude:     hasGps ? rawLng : null,
+                precisionM:       hasGps ? rawPrecision : null,
+                statutPosition,
+                codeLocalisation,
+                w3w,
                 // ADD-25 Vente & Terrains (mapping exact Prisma schema)
                 enVente:          Boolean(forSale),
                 prixVenteFcfa:    parsedPrixVente,
@@ -198,6 +231,25 @@ export async function POST(request: Request) {
                 niveauVerifVente:         forSale ? (niveauVerif || 1) : 0,
             },
         });
+
+        if (hasGps && rawLat !== null && rawLng !== null) {
+            try {
+                await prisma.capturePosition.create({
+                    data: {
+                        propertyId: property.id,
+                        userId: dbUser.id,
+                        role: isAgencyUser ? 'AGENCE' : 'BAILLEUR',
+                        lat: rawLat,
+                        lng: rawLng,
+                        precisionM: rawPrecision,
+                        canal: 'APP',
+                        resultat: 'ACCEPTEE'
+                    }
+                });
+            } catch (capErr) {
+                console.warn("[MOBILE] Avertissement capture position:", capErr);
+            }
+        }
 
         return NextResponse.json({
             success:      true,

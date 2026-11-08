@@ -1,5 +1,5 @@
 import { TopNavHeader } from '../components/TopNavHeader';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
 import {
   ChevronLeft,
   Building2,
@@ -22,6 +23,8 @@ import {
   Check,
   ShieldCheck,
   Sparkles,
+  Navigation,
+  RotateCw,
 } from 'lucide-react-native';
 import { fetchWithAuth } from '../lib/api';
 
@@ -87,6 +90,77 @@ export default function CreatePropertyScreen() {
   const [estViabilise, setEstViabilise] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  // ADD-28 : Géolocalisation automatique et manuelle
+  const [gpsLatitude, setGpsLatitude] = useState<number | null>(null);
+  const [gpsLongitude, setGpsLongitude] = useState<number | null>(null);
+  const [precisionM, setPrecisionM] = useState<number | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [gpsMessage, setGpsMessage] = useState<string | null>(null);
+
+  // Tentative de géolocalisation automatique à l'ouverture du formulaire
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          setIsLocating(true);
+          const pos = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          });
+          if (isMounted && pos?.coords) {
+            setGpsLatitude(pos.coords.latitude);
+            setGpsLongitude(pos.coords.longitude);
+            setPrecisionM(Math.round(pos.coords.accuracy || 15));
+            setGpsMessage('Position GPS détectée automatiquement.');
+          }
+        }
+      } catch (_e) {
+        // En cas d'erreur ou GPS inactif, l'utilisateur a le bouton manuel
+      } finally {
+        if (isMounted) setIsLocating(false);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleCaptureGps = async () => {
+    setIsLocating(true);
+    setGpsMessage(null);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission GPS requise',
+          'Veuillez autoriser l\'accès à votre position pour capturer les coordonnées du bien.'
+        );
+        setIsLocating(false);
+        return;
+      }
+
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      if (pos?.coords) {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const acc = Math.round(pos.coords.accuracy || 15);
+        setGpsLatitude(lat);
+        setGpsLongitude(lng);
+        setPrecisionM(acc);
+        setGpsMessage(`Position GPS acquise : ${lat.toFixed(5)}°, ${lng.toFixed(5)}° (±${acc}m)`);
+      }
+    } catch (_err) {
+      Alert.alert(
+        'Erreur GPS',
+        'Impossible de récupérer votre position actuelle. Vérifiez que la localisation GPS est activée dans les paramètres de votre téléphone.'
+      );
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
   const finalCommune = commune === 'Autre' ? customCommune.trim() : commune;
 
   const handleSubmit = async () => {
@@ -149,6 +223,10 @@ export default function CreatePropertyScreen() {
           numero_lot: isForSale && numeroLot.trim() ? numeroLot.trim() : undefined,
           numero_ilot: isForSale && numeroIlot.trim() ? numeroIlot.trim() : undefined,
           est_viabilise: isForSale ? estViabilise : undefined,
+          // ADD-28 : Géolocalisation certifiée
+          gpsLatitude: gpsLatitude ?? undefined,
+          gpsLongitude: gpsLongitude ?? undefined,
+          precisionM: precisionM ?? undefined,
         }),
       });
 
@@ -390,6 +468,67 @@ export default function CreatePropertyScreen() {
               value={unitLabel}
               onChangeText={setUnitLabel}
             />
+
+            {/* ADD-28 : GÉOLOCALISATION CERTIFIÉE DU BIEN */}
+            <View style={styles.geoBox}>
+              <View style={styles.geoHeader}>
+                <View style={styles.geoIconCircle}>
+                  <Navigation color="#1B4D3E" size={16} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={styles.geoTitle}>GÉOLOCALISATION GPS (ADD-28)</Text>
+                    <View style={styles.geoBadge}>
+                      <Text style={styles.geoBadgeText}>La Poste CI</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.geoSubtitle}>
+                    Pour générer l'adresse numérique certifiée du bien
+                  </Text>
+                </View>
+              </View>
+
+              {gpsLatitude !== null && gpsLongitude !== null ? (
+                <View style={styles.geoSuccessCard}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Check color="#1E7E4E" size={16} />
+                    <Text style={styles.geoCoordsText}>
+                      {gpsLatitude.toFixed(5)}° N, {gpsLongitude.toFixed(5)}° W
+                    </Text>
+                  </View>
+                  <Text style={styles.geoAccuracyText}>
+                    Précision satellite : ±{precisionM ?? 15}m {precisionM && precisionM <= 20 ? '(Excellente)' : '(Conforme)'}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.geoHelpText}>
+                  Si vous êtes actuellement sur place, appuyez sur le bouton ci-dessous pour capturer votre position GPS.
+                </Text>
+              )}
+
+              <Pressable
+                style={[styles.geoButton, isLocating && styles.geoButtonDisabled]}
+                onPress={handleCaptureGps}
+                disabled={isLocating}
+              >
+                {isLocating ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Navigation color="#FFFFFF" size={15} />
+                )}
+                <Text style={styles.geoButtonText}>
+                  {isLocating
+                    ? "Acquisition satellite..."
+                    : gpsLatitude !== null
+                    ? "Actualiser ma position GPS"
+                    : "Récupérer ma position GPS actuelle"}
+                </Text>
+              </Pressable>
+
+              {gpsMessage ? (
+                <Text style={styles.geoStatusText}>{gpsMessage}</Text>
+              ) : null}
+            </View>
           </View>
 
           {/* 3. CONDITIONS FINANCIÈRES & CARACTÉRISTIQUES */}
@@ -676,5 +815,97 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+  geoBox: {
+    marginTop: 14,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 14,
+    padding: 14,
+    gap: 10,
+  },
+  geoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  geoIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#E6EFEA',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  geoTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: 0.5,
+  },
+  geoBadge: {
+    backgroundColor: '#E6EFEA',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  geoBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#1B4D3E',
+  },
+  geoSubtitle: {
+    fontSize: 11,
+    color: '#64748B',
+    marginTop: 1,
+  },
+  geoSuccessCard: {
+    backgroundColor: '#EDF7F1',
+    borderWidth: 1,
+    borderColor: '#C6E7D4',
+    borderRadius: 10,
+    padding: 10,
+    gap: 4,
+  },
+  geoCoordsText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1B4D3E',
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+  },
+  geoAccuracyText: {
+    fontSize: 11,
+    color: '#2E7D32',
+    fontWeight: '500',
+  },
+  geoHelpText: {
+    fontSize: 11,
+    color: '#64748B',
+    lineHeight: 16,
+  },
+  geoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1B4D3E',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  geoButtonDisabled: {
+    opacity: 0.6,
+  },
+  geoButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  geoStatusText: {
+    fontSize: 11,
+    color: '#64748B',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 });

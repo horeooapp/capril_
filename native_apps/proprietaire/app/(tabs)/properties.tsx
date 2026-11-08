@@ -11,9 +11,11 @@ import {
   TextInput,
   RefreshControl,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
 import {
   Building2,
   ShieldCheck,
@@ -24,6 +26,8 @@ import {
   User,
   Plus,
   FileSpreadsheet,
+  MapPin,
+  Navigation,
 } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
@@ -35,6 +39,56 @@ export default function PropertiesScreen() {
   const [filter, setFilter] = useState<'all' | 'Loué' | 'Vacant'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'rent_asc' | 'rent_desc' | 'name'>('default');
+  const [capturingPropertyId, setCapturingPropertyId] = useState<string | null>(null);
+
+  const handleCaptureGpsForProperty = async (propertyId: string) => {
+    setCapturingPropertyId(propertyId);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission requise',
+          'Veuillez autoriser l\'accès à la géolocalisation pour enregistrer la position de ce bien.'
+        );
+        setCapturingPropertyId(null);
+        return;
+      }
+
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      if (pos?.coords) {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const accuracy = Math.round(pos.coords.accuracy || 15);
+
+        const response = await fetchWithAuth(`/proprietaire/properties/${propertyId}/geolocalisation`, {
+          method: 'POST',
+          body: JSON.stringify({
+            lat,
+            lng,
+            precisionM: accuracy,
+          }),
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+          Alert.alert(
+            'Position enregistrée !',
+            data.message || `Coordonnées certifiées : ${lat.toFixed(5)}°, ${lng.toFixed(5)}°`
+          );
+          fetchProperties();
+        } else {
+          Alert.alert('Erreur', data.error || 'Impossible d\'enregistrer la position.');
+        }
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur GPS', e.message || 'Impossible d\'obtenir les coordonnées GPS.');
+    } finally {
+      setCapturingPropertyId(null);
+    }
+  };
 
   const fetchProperties = async () => {
     try {
@@ -312,6 +366,35 @@ export default function PropertiesScreen() {
                 </Pressable>
               )}
 
+              {/* BLOC GÉOLOCALISATION GPS (ADD-28) */}
+              <View style={styles.geoRow}>
+                <View style={styles.geoRowLeft}>
+                  <MapPin color={item.gpsLatitude ? '#1E7E4E' : '#94A3B8'} size={13} />
+                  <Text style={styles.geoRowText} numberOfLines={1}>
+                    {item.gpsLatitude 
+                      ? `GPS : ${Number(item.gpsLatitude).toFixed(4)}°, ${Number(item.gpsLongitude).toFixed(4)}° (${item.codeLocalisation || 'Déclaré'})`
+                      : 'Position GPS non renseignée'}
+                  </Text>
+                </View>
+
+                <Pressable
+                  style={[styles.geoCaptureBtn, capturingPropertyId === item.id && { opacity: 0.6 }]}
+                  onPress={() => handleCaptureGpsForProperty(item.id)}
+                  disabled={capturingPropertyId === item.id}
+                >
+                  {capturingPropertyId === item.id ? (
+                    <ActivityIndicator size="small" color="#1B4D3E" />
+                  ) : (
+                    <>
+                      <Navigation color="#1B4D3E" size={11} />
+                      <Text style={styles.geoCaptureBtnText}>
+                        {item.gpsLatitude ? 'Actualiser' : 'Capturer GPS'}
+                      </Text>
+                    </>
+                  )}
+                </Pressable>
+              </View>
+
               <View style={styles.footerRow}>
                 <Text style={styles.rent}>
                   {(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
@@ -541,5 +624,45 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '700',
+  },
+  geoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    gap: 8,
+  },
+  geoRowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
+  },
+  geoRowText: {
+    fontSize: 11,
+    color: '#475569',
+    fontWeight: '500',
+    flex: 1,
+  },
+  geoCaptureBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E6EFEA',
+    borderWidth: 1,
+    borderColor: '#C6E7D4',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  geoCaptureBtnText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#1B4D3E',
   },
 });

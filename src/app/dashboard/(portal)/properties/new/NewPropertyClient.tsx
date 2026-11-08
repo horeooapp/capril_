@@ -24,7 +24,10 @@ import {
     ArrowLeft, 
     Layers,
     FileText,
-    Check
+    Check,
+    Navigation,
+    AlertCircle,
+    RefreshCw
 } from "lucide-react"
 import { creerBien, getMyParentStructures, TypeStructure } from "@/actions/property.actions"
 
@@ -81,6 +84,14 @@ export default function NewPropertyClient() {
     // Image Upload State
     const [images, setImages] = useState<File[]>([])
     const [previews, setPreviews] = useState<string[]>([])
+
+    // ADD-28 : Géolocalisation automatique et manuelle
+    const [gpsLat, setGpsLat] = useState<number | null>(null)
+    const [gpsLng, setGpsLng] = useState<number | null>(null)
+    const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null)
+    const [isCapturingGps, setIsCapturingGps] = useState(false)
+    const [gpsStatusMessage, setGpsStatusMessage] = useState<string | null>(null)
+    const [autoGpsAttempted, setAutoGpsAttempted] = useState(false)
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target
@@ -205,6 +216,57 @@ export default function NewPropertyClient() {
         }
     }, [structureCategory])
 
+    // ADD-28 : Déclenchement automatique de la géolocalisation à l'arrivée sur le formulaire
+    useEffect(() => {
+        if (typeof window !== "undefined" && navigator.geolocation && !autoGpsAttempted) {
+            setAutoGpsAttempted(true)
+            setIsCapturingGps(true)
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    setGpsLat(pos.coords.latitude)
+                    setGpsLng(pos.coords.longitude)
+                    setGpsAccuracy(Math.round(pos.coords.accuracy))
+                    setGpsStatusMessage("Position GPS détectée automatiquement avec succès.")
+                    setIsCapturingGps(false)
+                },
+                (_err) => {
+                    // Refus ou absence de signal au chargement initial : pas de blocage
+                    setIsCapturingGps(false)
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+            )
+        }
+    }, [autoGpsAttempted])
+
+    const handleManualGpsCapture = () => {
+        if (!navigator.geolocation) {
+            setGpsStatusMessage("La géolocalisation n'est pas prise en charge par ce navigateur.")
+            return
+        }
+        setIsCapturingGps(true)
+        setGpsStatusMessage(null)
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setGpsLat(pos.coords.latitude)
+                setGpsLng(pos.coords.longitude)
+                setGpsAccuracy(Math.round(pos.coords.accuracy))
+                setGpsStatusMessage("Position GPS récupérée avec succès.")
+                setIsCapturingGps(false)
+            },
+            (err) => {
+                setIsCapturingGps(false)
+                let msg = "Impossible d'acquérir le signal GPS."
+                if (err.code === err.PERMISSION_DENIED) {
+                    msg = "Permission refusée. Veuillez autoriser l'accès GPS dans votre navigateur."
+                } else if (err.code === err.TIMEOUT) {
+                    msg = "Délai dépassé. Veuillez réessayer dans une zone dégagée."
+                }
+                setGpsStatusMessage(msg)
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        )
+    }
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setError("")
@@ -217,6 +279,15 @@ export default function NewPropertyClient() {
 
         // Équipements cochés
         selectedAmenities.forEach(am => formData.append("amenities", am))
+
+        // ADD-28 : Transmettre les coordonnées GPS capturées
+        if (gpsLat !== null && gpsLng !== null) {
+            formData.set("gpsLatitude", gpsLat.toString())
+            formData.set("gpsLongitude", gpsLng.toString())
+            if (gpsAccuracy !== null) {
+                formData.set("precisionM", gpsAccuracy.toString())
+            }
+        }
 
         // Configuration de la hiérarchie
         if (structureCategory === 'PARENT') {
@@ -773,6 +844,86 @@ export default function NewPropertyClient() {
                                         <strong>Pourquoi cette référence ?</strong> Ce numéro figure sur votre ACD (Arrêté de Concession Définitive), certificat de mutation ou attestation d'attribution. Il permet d'authentifier officiellement votre bien et d'éviter les litiges.
                                     </span>
                                 </div>
+                            </div>
+
+                            {/* ADD-28 : GÉOLOCALISATION AUTOMATIQUE ET MANUELLE DU BIEN */}
+                            <div className="sm:col-span-2 bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                            <Navigation size={16} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                                                <span>Géolocalisation Certifiée (ADD-28)</span>
+                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800">
+                                                    La Poste CI
+                                                </span>
+                                            </h3>
+                                            <p className="text-[11px] text-slate-500">
+                                                Coordonnées satellitaires pour générer l'adresse numérique sécurisée du bien.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Bouton pour récupérer / rafraîchir la position */}
+                                    <button
+                                        type="button"
+                                        onClick={handleManualGpsCapture}
+                                        disabled={isCapturingGps}
+                                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-[#1B4D3E] hover:bg-[#153e32] active:bg-[#0f2d24] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                                    >
+                                        {isCapturingGps ? (
+                                            <>
+                                                <RefreshCw size={14} className="animate-spin" />
+                                                <span>Recherche satellite...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <MapPin size={14} />
+                                                <span>{gpsLat !== null ? "Actualiser ma position" : "Récupérer ma position GPS"}</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+
+                                {/* Inputs cachés transmis dans le formulaire */}
+                                <input type="hidden" name="gpsLatitude" value={gpsLat ?? ''} />
+                                <input type="hidden" name="gpsLongitude" value={gpsLng ?? ''} />
+                                <input type="hidden" name="precisionM" value={gpsAccuracy ?? ''} />
+
+                                {/* Affichage des coordonnées capturées */}
+                                {gpsLat !== null && gpsLng !== null ? (
+                                    <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                        <div className="flex items-center gap-2.5 text-emerald-900 font-medium">
+                                            <CheckCircle2 size={16} className="text-emerald-600 flex-shrink-0" />
+                                            <div>
+                                                <p className="font-bold text-emerald-950 font-mono">
+                                                    GPS : {gpsLat.toFixed(6)}° N, {gpsLng.toFixed(6)}° W
+                                                </p>
+                                                <p className="text-[11px] text-emerald-700">
+                                                    Précision satellite : ±{gpsAccuracy ?? 15} m {gpsAccuracy && gpsAccuracy <= 20 ? '(Excellente)' : '(Conforme RG-GEO-04)'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md self-start sm:self-center">
+                                            Prêt pour certification
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 flex items-start gap-2">
+                                        <Info size={15} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                                        <span>
+                                            Si vous êtes actuellement sur les lieux du bien, appuyez sur le bouton vert ci-dessus pour enregistrer immédiatement votre position GPS avec précision.
+                                        </span>
+                                    </div>
+                                )}
+
+                                {gpsStatusMessage && (
+                                    <p className="text-[11px] text-slate-500 italic">
+                                        {gpsStatusMessage}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     ) : (

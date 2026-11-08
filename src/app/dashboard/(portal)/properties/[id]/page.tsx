@@ -8,6 +8,7 @@ import InviteManagerForm from "@/components/properties/InviteManagerForm"
 import ManagersList from "@/components/properties/ManagersList"
 import PropertyImageGallery from "@/components/properties/PropertyImageGallery"
 import PropertyActionsBar from "@/components/properties/PropertyActionsBar"
+import PropertyGeolocationCard from "@/components/properties/PropertyGeolocationCard"
 
 export default async function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -93,8 +94,21 @@ export default async function PropertyDetailPage({ params }: { params: Promise<{
                     </div>
                 </div>
 
-                {/* Right: Management & Roles */}
+                {/* Right: Management & Roles & Geolocation */}
                 <div className="lg:col-span-2 space-y-8">
+                    {/* ADD-28 : GÉOLOCALISATION CERTIFIÉE & ADRESSE NUMÉRIQUE MAPOSTE */}
+                    <PropertyGeolocationCard
+                        propertyId={id}
+                        initialLatitude={property.gpsLatitude}
+                        initialLongitude={property.gpsLongitude}
+                        initialPrecisionM={property.precisionM}
+                        initialStatut={property.statutPosition}
+                        initialCodeLocalisation={property.codeLocalisation}
+                        initialW3w={property.w3w}
+                        commune={property.commune}
+                        isOwnerOrManager={isOwner}
+                    />
+
                     <section className="glass-panel p-10 rounded-[2.5rem] border-white/40 shadow-2xl">
                         <div className="flex items-center justify-between mb-8">
                             <div>
