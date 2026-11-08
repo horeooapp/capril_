@@ -12,7 +12,16 @@ export async function GET(request: Request) {
         const lngStr = searchParams.get('lng');
 
         if (!latStr || !lngStr) {
-            return NextResponse.json({ error: "Paramètres 'lat' et 'lng' requis." }, { status: 400 });
+            return NextResponse.json({ 
+                error: "Paramètres 'lat' et 'lng' requis.",
+                usage: "GET /api/geo/reverse?lat=<latitude>&lng=<longitude>",
+                exemples: {
+                    cocody_angre: "https://qapril.net/api/geo/reverse?lat=5.3850&lng=-3.9850",
+                    adjame: "https://qapril.net/api/geo/reverse?lat=5.3599&lng=-4.0083",
+                    plateau: "https://qapril.net/api/geo/reverse?lat=5.3236&lng=-4.0177",
+                    yopougon: "https://qapril.net/api/geo/reverse?lat=5.3400&lng=-4.0800"
+                }
+            }, { status: 400 });
         }
 
         const lat = parseFloat(latStr);
@@ -33,3 +42,4 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "Erreur lors de la résolution géographique." }, { status: 500 });
     }
 }
+
