@@ -107,7 +107,9 @@ export const authConfig = {
                 pathname.startsWith("/uploads/") ||
                 pathname.startsWith("/verif") ||
                 pathname.startsWith("/manuel") ||
-                ["/impact", "/expertise", "/a-propos", "/faq", "/manuel", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif"].includes(pathname);
+                pathname.startsWith("/downloads") ||
+                pathname.startsWith("/telecharger") ||
+                ["/impact", "/expertise", "/a-propos", "/faq", "/manuel", "/telecharger", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif"].includes(pathname);
 
             // Redirection intelligente si déjà connecté sur /login générique
             if (isLoggedIn && pathname === "/login") {
