@@ -38,7 +38,7 @@ export default function AddendaOverviewWidget({
             <div className="panel-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                     <h2 className="panel-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        Supervision des Innovations 2026 (ADD-27 · ADD-28 · ADD-29)
+                        Supervision des Avancées Républicaines & Notariales
                         <span style={{ fontSize: "10px", textTransform: "uppercase", fontWeight: 700, padding: "2px 8px", borderRadius: "4px", backgroundColor: "#E3F5EC", color: "#1B4D3E" }}>
                             Déployé en Production
                         </span>
@@ -53,7 +53,7 @@ export default function AddendaOverviewWidget({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                {/* BLOC 1 : PILOTAGE VOCAL (ADD-27) */}
+                {/* BLOC 1 : PILOTAGE VOCAL */}
                 <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
                     <div>
                         <div className="flex items-center justify-between mb-3">
@@ -61,7 +61,7 @@ export default function AddendaOverviewWidget({
                                 <Mic size={18} />
                             </div>
                             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                                ADD-27 Vocal
+                                Cockpit Vocal
                             </span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-900 mb-1">
@@ -81,7 +81,7 @@ export default function AddendaOverviewWidget({
                                 <span className="font-bold text-slate-900">{vocalIntentsCount}</span>
                             </div>
                             <div className="flex justify-between items-center py-1 px-2.5 rounded bg-slate-50 border border-slate-100">
-                                <span className="text-slate-600">Verrou RG-AST-01 :</span>
+                                <span className="text-slate-600">Contrôle contractuel :</span>
                                 <span className="font-bold text-emerald-700">100% Sécurisé (Tactile)</span>
                             </div>
                         </div>
@@ -92,7 +92,7 @@ export default function AddendaOverviewWidget({
                     </div>
                 </div>
 
-                {/* BLOC 2 : GÉOLOCALISATION & ADRESSAGE MAPOSTE (ADD-28) */}
+                {/* BLOC 2 : GÉOLOCALISATION & ADRESSAGE MAPOSTE */}
                 <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
                     <div>
                         <div className="flex items-center justify-between mb-3">
@@ -100,7 +100,7 @@ export default function AddendaOverviewWidget({
                                 <MapPin size={18} />
                             </div>
                             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-800">
-                                ADD-28 La Poste CI
+                                La Poste CI
                             </span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-900 mb-1">
@@ -131,7 +131,7 @@ export default function AddendaOverviewWidget({
                     </div>
                 </div>
 
-                {/* BLOC 3 : OCCUPANTS & ATTESTATIONS (ADD-29) */}
+                {/* BLOC 3 : OCCUPANTS & ATTESTATIONS */}
                 <div className="p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm">
                     <div>
                         <div className="flex items-center justify-between mb-3">
@@ -139,14 +139,14 @@ export default function AddendaOverviewWidget({
                                 <FileCheck2 size={18} />
                             </div>
                             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 text-sky-800">
-                                ADD-29 Opposable
+                                Justificatif Opposable
                             </span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-900 mb-1">
                             Occupants & Attestations de Résidence
                         </h4>
                         <p className="text-xs text-slate-500 mb-4">
-                            Justificatif de domicile certifié à 3 niveaux (A/B/C) avec QR Code public et sceau SHA-256.
+                            Justificatif de domicile certifié à 3 niveaux (A/B/C) avec QR Code public et empreinte numérique certifiée.
                         </p>
 
                         <div className="space-y-2 text-xs font-mono">

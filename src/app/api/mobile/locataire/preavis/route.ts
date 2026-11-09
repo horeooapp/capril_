@@ -103,3 +103,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Erreur lors de l'enregistrement du préavis." }, { status: 500 });
     }
 }
+

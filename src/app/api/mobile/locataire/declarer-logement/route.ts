@@ -92,3 +92,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Erreur lors de l'enregistrement de la déclaration." }, { status: 500 });
     }
 }
+

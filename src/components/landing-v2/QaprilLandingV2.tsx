@@ -312,7 +312,7 @@ export default function QaprilLandingV2({
                     Propriétaires bailleurs
                   </div>
                   <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
-                    Gérez vos biens, encaissez vos loyers et suivez vos quittances.
+                    Gérez vos biens, validez les déclarations locataires en 1 clic et encaissez en toute sérénité.
                   </p>
                 </button>
 
@@ -339,7 +339,7 @@ export default function QaprilLandingV2({
                     Locataires certifiés
                   </div>
                   <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
-                    Payez par Wave/Mobile Money et recevez votre reçu officiel immédiat.
+                    Déclarez votre logement en 30s, payez vos loyers et obtenez vos quittances certifiées immédiates.
                   </p>
                 </button>
 
@@ -572,7 +572,7 @@ export default function QaprilLandingV2({
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            4bis. NOUVELLES NORMES & INNOVATIONS 2026 (ADD-27 · ADD-28 · ADD-29)
+            4bis. NOUVELLES NORMES & INNOVATIONS RÉPUBLICAINES 2026
         ══════════════════════════════════════════════════════════════════ */}
         <section id="innovations" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
           <div className="mb-12 max-w-3xl">
@@ -581,15 +581,53 @@ export default function QaprilLandingV2({
               Réformes 2026 & Décret n° 2019-576
             </div>
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
-              Trois avancées majeures pour la sécurité notariale et le confort de gestion
+              Quatre avancées majeures pour la sécurité locative et le confort de gestion
             </h2>
             <p className="text-base text-slate-600 font-normal mt-3 leading-relaxed">
-              QAPRIL intègre les dernières directives de l'État ivoirien et innove pour simplifier chaque acte locatif, de la recherche d'adresse au justificatif de domicile certifié.
+              QAPRIL intègre les dernières directives de l'État ivoirien et innove pour simplifier chaque acte locatif, de la déclaration spontanée de logement à la quittance officielle instantanée.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* CARTE 1 : PILOTAGE VOCAL (ADD-27) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* CARTE 1 : ADOPTION IMMÉDIATE & PAIEMENT 1-CLIC */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <span className="text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-md">
+                    Adoption Immédiate
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  Déclaration en 30s & Quittance instantanée
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  Le locataire déclare son logement et invite son bailleur par SMS ou WhatsApp. Déclaration de paiements directs (Wave, Orange, MTN, Moov, Espèces) avec émission immédiate de quittance certifiée dès validation bailleur en 1 clic.
+                </p>
+                <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Déclaration locataire & validation propriétaire en 1 clic</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Quittance officielle avec empreinte horodatée immédiate</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span>Règlements Wave, Orange Money, MTN, Moov & Espèces</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+                <span>Validation 1-clic républicaine</span>
+                <ArrowRight className="w-4 h-4" />
+              </div>
+            </div>
+
+            {/* CARTE 2 : PILOTAGE VOCAL */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -597,7 +635,7 @@ export default function QaprilLandingV2({
                     <Mic className="w-5 h-5" />
                   </div>
                   <span className="text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md">
-                    ADD-27 · Pilotage Vocal
+                    Cockpit Vocal
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -613,7 +651,7 @@ export default function QaprilLandingV2({
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>Règle RG-AST-01 : confirmation tactile obligatoire pour tout acte légal</span>
+                    <span>Confirmation tactile obligatoire pour tout acte contractuel</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -627,78 +665,78 @@ export default function QaprilLandingV2({
               </div>
             </div>
 
-            {/* CARTE 2 : GÉOLOCALISATION & MAPOSTE (ADD-28) */}
+            {/* CARTE 3 : GÉOLOCALISATION & MAPOSTE */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
+                  <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700">
                     <MapPin className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-md">
-                    ADD-28 · La Poste CI
+                  <span className="text-xs font-medium text-sky-800 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-md">
+                    GPS & La Poste CI
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  GPS certifié & Adresse MaPoste
+                  GPS certifié & Adressage précis
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
-                  Fin des imprécisions d'adressage à Abidjan et en région. Relevé GPS in situ avec contrôle de concordance (≤ 30 m) et attribution directe de la boîte postale numérique officielle de La Poste de Côte d'Ivoire.
+                  Relevé GPS in situ automatique avec identification immédiate de la Ville, Commune et Quartier. Attribution de la boîte postale numérique officielle de La Poste de Côte d'Ivoire.
                 </p>
                 <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
                   <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <span>Précision GPS ≤ 50 m avec détection anti-usurpation</span>
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <span>Détection GPS automatique & Commune/Quartier résolus</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <span>Génération du Code Localisation National souverain</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
                     <span>Boîte postale numérique MaPoste rattachée au bail</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                    <span>Protection de l'identité bailleur (« Bailleur certifié »)</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-sky-700">
                 <span>Adressage officiel Décret 2019-576</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
 
-            {/* CARTE 3 : ATTESTATION DE RÉSIDENCE (ADD-29) */}
+            {/* CARTE 4 : ATTESTATION DE RÉSIDENCE & CONFORMITÉ CCH */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-700">
                     <FileCheck2 className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-medium text-sky-800 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-md">
-                    ADD-29 · Justificatif Opposable
+                  <span className="text-xs font-medium text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">
+                    Conformité CCH
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  Attestation de résidence officielle
+                  Attestations & Plafonds CCH
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
-                  Remplace les certificats de complaisance. Justificatif de domicile à trois niveaux (A, B, C) avec sceau cryptographique SHA-256 et QR Code public, opposable aux banques, ambassades, concours et services publics.
+                  Attestation de domicile officielle avec empreinte numérique certifiée et QR Code. Plafonds stricts (caution ≤ 2 mois, avance ≤ 2 mois) et générateur de préavis légal de 30 jours.
                 </p>
                 <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
                   <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-                    <span>Niveau A (titulaire bail actif DGI) & Niveau B (résidents vérifiés)</span>
+                    <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <span>Plafonds légaux stricts Art. 415-416 CCH respectés</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-                    <span>Vérification publique instantanée par QR code en temps réel</span>
+                    <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <span>Générateur de préavis avec délai légal de 30 jours (Art. 434)</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-                    <span>Confidentialité totale : identité du bailleur protégée (RG-CONF-01)</span>
+                    <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <span>Attestation de domicile opposable banques & visas</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-sky-700">
-                <span>Conforme Loi 2013-546 & DGI</span>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-700">
+                <span>Code de la Construction & Habitation</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
@@ -785,13 +823,19 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
+                        <strong className="text-slate-900">Validation en 1 clic :</strong> Votre locataire déclare son logement ou ses règlements directs (Wave, MoMo, Espèces) ? Validez en 1 clic pour émettre instantanément la quittance certifiée.
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+                      <div className="text-xs text-slate-700">
                         <strong className="text-slate-900">Versement automatique :</strong> Loyers reçus directement sur votre compte Wave, Mobile Money ou compte bancaire dès que le locataire paie.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Rappels automatiques par SMS & WhatsApp :</strong> QAPRIL rappelle poliment l'échéance au locataire sans gâter vos relations humaines.
+                        <strong className="text-slate-900">Confidentialité & Géocodage :</strong> Masquez votre identité personnelle sous le label républicain « Bailleur certifié » et géolocalisez votre bien en 1 appui (GPS + Commune/Quartier).
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
@@ -853,19 +897,25 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Zéro contestation :</strong> Un vrai reçu officiel avec code QR arrive sur votre téléphone dès que vous payez.
+                        <strong className="text-slate-900">Déclaration de logement & quittance immédiate :</strong> Déclarez votre logement en 30 secondes et notifiez tout paiement (Wave, MoMo, Espèces) pour recevoir immédiatement votre quittance officielle certifiée.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Caution de 2 mois protégée :</strong> Votre caution est mise en sécurité sur un compte séquestre dédié, pas de surprise à la sortie.
+                        <strong className="text-slate-900">Recherche & Passeport Locatif :</strong> Trouvez le bien idéal selon 5 critères et candidatez en toute sécurité avec votre Passeport Locatif consenti et score de ponctualité.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Factures CIE & SODECI claires :</strong> Suivez vos compteurs d'eau et d'électricité en toute transparence sans surfacturation.
+                        <strong className="text-slate-900">Caution de 2 mois protégée (CCH) :</strong> Plafonds stricts respectés (2 mois max de caution et 2 mois d'avance) avec mise en sécurité sur compte séquestre dédié.
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+                      <div className="text-xs text-slate-700">
+                        <strong className="text-slate-900">Préavis légal de départ (Art. 434) :</strong> Générateur de préavis avec respect scrupuleux du délai légal de 30 jours et référence formelle d'opposabilité.
                       </div>
                     </div>
                   </div>

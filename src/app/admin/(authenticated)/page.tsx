@@ -44,6 +44,7 @@ import SyncButton from "@/components/admin/SyncButton"
 import AdminMarketWidget from "@/components/admin/AdminMarketWidget"
 import { getNationalMarketComparison } from "@/actions/observatory-national"
 import AddendaOverviewWidget from "@/components/admin/AddendaOverviewWidget"
+import AdoptionEngineOverviewWidget from "@/components/admin/AdoptionEngineOverviewWidget"
 import GlobalSessionRevokeCard from "@/components/admin/GlobalSessionRevokeCard"
 import { getLastRevocationInfo } from "@/lib/session-revocation"
 
@@ -126,7 +127,20 @@ export default async function AdminDashboardOverview() {
             attestA_Count,
             attestB_Count,
             attestC_Count,
-            lastRevocationInfo
+            lastRevocationInfo,
+            // Métriques Moteur d'Adoption IC-01
+            bdqPendingCount,
+            bdqContestedCount,
+            bdqRentSum,
+            payDecTotal,
+            payDecPending,
+            payDecConfirmed,
+            payDecContested,
+            payDecAmountConfirmed,
+            payDecAmountPending,
+            preavisTotal,
+            preavisPending,
+            geolocatedPropsExact
         ] = await Promise.all([
             prisma.user.count().catch(() => 0),
             prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -208,7 +222,20 @@ export default async function AdminDashboardOverview() {
             ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'A' } }) || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'B' } }) || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'C' } }) || Promise.resolve(0)).catch(() => 0),
-            getLastRevocationInfo().catch(() => null)
+            getLastRevocationInfo().catch(() => null),
+            // IC-01 queries
+            ((prisma as any).bailDeclaratif?.count?.({ where: { statut: "PENDING_LOCATAIRE" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).bailDeclaratif?.count?.({ where: { statut: "CONTESTE" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).bailDeclaratif?.aggregate?.({ _sum: { loyerDeclareMensuel: true } }) || Promise.resolve(null)).catch(() => null),
+            ((prisma as any).declarationPaiement?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).declarationPaiement?.count?.({ where: { statut: "DECLARE" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).declarationPaiement?.count?.({ where: { statut: "CONFIRME" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).declarationPaiement?.count?.({ where: { statut: "CONTESTE" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).declarationPaiement?.aggregate?.({ _sum: { montant: true }, where: { statut: "CONFIRME" } }) || Promise.resolve(null)).catch(() => null),
+            ((prisma as any).declarationPaiement?.aggregate?.({ _sum: { montant: true }, where: { statut: "DECLARE" } }) || Promise.resolve(null)).catch(() => null),
+            ((prisma as any).preavisBail?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).preavisBail?.count?.({ where: { statut: "EMIS" } }) || Promise.resolve(0)).catch(() => 0),
+            prisma.property.count({ where: { latitude: { not: null }, longitude: { not: null } } }).catch(() => 0)
         ]);
         
         // Process trends with safety guards
@@ -359,7 +386,26 @@ export default async function AdminDashboardOverview() {
                     />
                 </div>
 
-                {/* SUPERVISION INNOVATIONS 2026 : ADD-27, ADD-28, ADD-29 */}
+                {/* MOTEUR D'ADOPTION & DÉCLARATIONS SPONTANÉES IC-01 */}
+                <AdoptionEngineOverviewWidget
+                    bdqTotal={safeData.totalBdqs}
+                    bdqPending={bdqPendingCount}
+                    bdqConfirmed={safeData.confirmedBdqs}
+                    bdqContested={bdqContestedCount}
+                    bdqTotalRentDeclared={Number(bdqRentSum?._sum?.loyerDeclareMensuel || 0)}
+                    paymentDeclarationsTotal={payDecTotal}
+                    paymentDeclarationsPending={payDecPending}
+                    paymentDeclarationsConfirmed={payDecConfirmed}
+                    paymentDeclarationsContested={payDecContested}
+                    paymentAmountConfirmed={Number(payDecAmountConfirmed?._sum?.montant || 0)}
+                    paymentAmountPending={Number(payDecAmountPending?._sum?.montant || 0)}
+                    preavisTotal={preavisTotal}
+                    preavisPending={preavisPending}
+                    geolocatedPropertiesCount={geolocatedPropsExact}
+                    totalPropertiesCount={safeData.totalProperties}
+                />
+
+                {/* SUPERVISION DES AVANCÉES RÉPUBLICAINES & NOTARIALES */}
                 <AddendaOverviewWidget
                     vocalSessionsCount={vocalSessionsCount}
                     vocalIntentsCount={vocalIntentsCount}
