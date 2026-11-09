@@ -16,11 +16,8 @@ export default async function TenantRightsPage() {
         getTenantRightsHistory()
     ])
 
-    if (!dashboard.success || !dashboard.hasLease) {
-        redirect("/mon-espace-locataire")
-    }
-
-    const leaseId = dashboard.lease.id
+    const hasLease = dashboard?.success && dashboard?.hasLease
+    const leaseId = hasLease ? dashboard.lease.id : ""
     const history = historyResult.success ? historyResult.data : []
 
     return (
@@ -37,6 +34,16 @@ export default async function TenantRightsPage() {
                     </p>
                 </div>
             </div>
+
+            {!hasLease && (
+                <div className="bg-amber-50 border border-amber-200/80 p-5 rounded-2xl flex items-start gap-3">
+                    <Info className="text-amber-600 shrink-0 mt-0.5" size={20} />
+                    <div className="text-xs text-amber-950 font-medium leading-relaxed">
+                        <span className="font-bold block mb-0.5">Aucun bail validé rattaché :</span>
+                        Pour ouvrir une réclamation ou émettre un acte contradictoire officiel, validez votre code de bail reçu ou déclarez votre logement. Vous pouvez toutefois consulter le cadre légal et les démarches ci-dessous.
+                    </div>
+                </div>
+            )}
 
             {/* Educational Banner */}
             <div className="bg-slate-50 p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm relative overflow-hidden group">
@@ -79,7 +86,7 @@ export default async function TenantRightsPage() {
                                          </p>
                                      </div>
                                  </div>
-                                 <div className="text-[9px] font-black text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-widest">Voir Détails →</div>
+                                 <div className="text-[10px] font-black text-slate-600 group-hover:text-[#97782A] transition-colors uppercase tracking-widest">Voir Détails →</div>
                              </div>
                          ))}
                      </div>

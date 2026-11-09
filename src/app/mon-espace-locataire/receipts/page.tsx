@@ -8,16 +8,19 @@ export const dynamic = "force-dynamic"
 export default async function TenantReceiptsPage() {
     const receipts = await getReceiptsForTenant()
     const dashboard = await getTenantDashboard()
-    
-    if (!dashboard.success || !dashboard.hasLease) {
-        redirect("/mon-espace-locataire")
-    }
 
-    const lease = dashboard.lease as any
+    const lease = (dashboard?.success && dashboard?.lease) 
+        ? dashboard.lease 
+        : { 
+            id: "", 
+            computedStatus: "AUCUN_BAIL", 
+            totalArrears: 0, 
+            rentAmount: 0 
+        }
 
     return (
         <ReceiptsContent 
-            receipts={receipts} 
+            receipts={receipts || []} 
             lease={lease} 
         />
     )

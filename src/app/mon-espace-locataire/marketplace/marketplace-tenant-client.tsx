@@ -242,17 +242,17 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                         <Bell size={20} className="animate-pulse" />
                     </div>
                     <div className="min-w-0">
-                        <h4 className="text-sm font-black text-slate-900 tracking-tight">
+                        <h4 className="text-sm font-black text-white tracking-tight">
                             Notification Automatique de Logement Active
                         </h4>
-                        <p className="text-xs text-slate-600 font-medium mt-0.5">
+                        <p className="text-xs text-slate-300 font-medium mt-0.5">
                             Dès qu'un bien correspondant à vos critères de recherche est publié, vous recevez une notification immédiate.
                         </p>
                     </div>
                 </div>
                 <Link
                     href="/mon-espace-locataire/profil-public"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shrink-0 transition-all hover:scale-105"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shrink-0 transition-all hover:scale-105 shadow-md"
                 >
                     <span>Mes Critères & Alertes</span>
                     <ArrowUpRight size={14} />

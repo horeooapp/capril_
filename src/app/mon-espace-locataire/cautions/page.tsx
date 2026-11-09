@@ -6,8 +6,7 @@ import CautionsLocataireClient from "@/components/locataire/CautionsLocataireCli
 
 export default async function CautionsPage() {
     const session = await auth()
-    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    if (!session?.user || activeRole !== "TENANT") redirect("/mon-espace-locataire/login")
+    if (!session?.user) redirect("/mon-espace-locataire/login")
 
     const dashboardData = await getLocataireDashboardData(session.user.id)
     

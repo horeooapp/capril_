@@ -9,20 +9,18 @@ export const dynamic = "force-dynamic"
 export default async function TenantAbonnementsPage() {
     const session = await auth();
     if (!session?.user) {
-        redirect("/dashboard/login");
+        redirect("/mon-espace-locataire/login");
     }
 
     const dashboard = await getTenantDashboard();
     
-    if (!dashboard.success || !dashboard.hasLease) {
-        redirect("/mon-espace-locataire");
-    }
+    const hasLease = dashboard?.success && dashboard?.hasLease;
 
-    // Fetch real subscriptions from DB
-    const abonnements = await prisma.abonnementOperateur.findMany({
+    // Fetch real subscriptions from DB if lease exists
+    const abonnements = hasLease ? await prisma.abonnementOperateur.findMany({
         where: { leaseId: dashboard.lease.id },
         orderBy: { createdAt: "desc" }
-    });
+    }) : [];
 
-    return <AbonnementsClient lease={dashboard.lease} abonnements={abonnements} />
+    return <AbonnementsClient lease={hasLease ? dashboard.lease : null} abonnements={abonnements} />
 }

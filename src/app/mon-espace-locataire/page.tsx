@@ -250,14 +250,20 @@ export default function LocataireDashboardPage() {
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link 
                                     href="/valider-bail" 
-                                    className="bg-[#D97706] hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
                                 >
                                     <span>Valider un code de bail reçu</span>
                                     <Key size={14} />
                                 </Link>
                                 <Link 
+                                    href="/mon-espace-locataire/marketplace" 
+                                    className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs flex items-center justify-center gap-2"
+                                >
+                                    <span>Trouver un logement</span>
+                                </Link>
+                                <Link 
                                     href="/onboarding/tenant" 
-                                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs"
+                                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs flex items-center justify-center"
                                 >
                                     Compléter mon profil
                                 </Link>

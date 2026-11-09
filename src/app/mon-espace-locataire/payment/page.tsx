@@ -11,16 +11,38 @@ export const dynamic = "force-dynamic"
 export default async function TenantPaymentPage() {
     const session = await auth()
     
-    const activeRole = (session?.user as any)?.chosenRole || session?.user?.role;
-    
-    if (!session?.user || activeRole !== "TENANT") {
+    if (!session?.user) {
         redirect("/mon-espace-locataire/login")
     }
 
     const data = await getTenantDashboard()
     
     if (!data.success || !data.hasLease) {
-        redirect("/mon-espace-locataire")
+        return (
+            <div className="max-w-2xl mx-auto py-12 px-4 text-center space-y-6">
+                <div className="w-16 h-16 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center text-amber-700 mx-auto">
+                    <CheckCircle2 size={32} />
+                </div>
+                <h1 className="text-2xl font-black text-slate-900 tracking-tight">Règlement du Loyer</h1>
+                <p className="text-sm text-slate-600 font-medium max-w-md mx-auto leading-relaxed">
+                    Aucun loyer n'est actuellement en attente. Pour régler votre loyer ou transmettre une preuve de paiement, un bail actif doit être rattaché à votre compte.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                    <Link
+                        href="/valider-bail"
+                        className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow-sm"
+                    >
+                        Valider un code de bail reçu
+                    </Link>
+                    <Link
+                        href="/mon-espace-locataire"
+                        className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-xl text-xs transition-all shadow-sm"
+                    >
+                        Retour au tableau de bord
+                    </Link>
+                </div>
+            </div>
+        )
     }
 
     const lease = data.lease as any

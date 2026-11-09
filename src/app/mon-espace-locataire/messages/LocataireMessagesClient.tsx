@@ -102,13 +102,21 @@ export default function LocataireMessagesClient({
           <p className="text-xs text-slate-500 leading-relaxed font-medium">
             Votre messagerie sécurisée avec votre bailleur ou gérant sera automatiquement activée dès que votre bail sera validé.
           </p>
-          <Link
-            href="/mon-espace-locataire"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
-          >
-            <Home size={14} />
-            <span>Retour au tableau de bord</span>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2.5 justify-center pt-2">
+            <Link
+              href="/valider-bail"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black transition-all shadow-sm"
+            >
+              <span>Valider un code de bail</span>
+            </Link>
+            <Link
+              href="/mon-espace-locataire"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
+            >
+              <Home size={14} />
+              <span>Tableau de bord</span>
+            </Link>
+          </div>
         </div>
       )}
     </div>

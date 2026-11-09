@@ -4,16 +4,13 @@ import { redirect } from "next/navigation"
 
 export default async function CieSodeciPage() {
   const dashboard = await getTenantDashboard()
-  
-  if (!dashboard.success || !dashboard.hasLease) {
-      redirect("/mon-espace-locataire")
-  }
 
-  const lease = dashboard.lease as any
+  const lease = (dashboard?.success && dashboard?.lease) ? dashboard.lease : null
+  const utilities = (dashboard?.success && dashboard?.utilities) ? dashboard.utilities : []
 
   return (
     <div className="max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <EnergyDashboard leaseId={lease.id} utilities={dashboard.utilities} />
+      <EnergyDashboard leaseId={lease?.id || ""} utilities={utilities} />
     </div>
   );
 }

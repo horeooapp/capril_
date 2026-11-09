@@ -16,8 +16,11 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
         }
 
         const userRoles = (session.user as any).eligibleRoles || [session.user.role];
-        const currentRole = (session.user as any).chosenRole || session.user.role;
-        const isTenant = currentRole === Role.TENANT || userRoles.includes(Role.TENANT);
+        const currentRole = (session.user as any)?.chosenRole || (session.user as any)?.capaciteActive || session.user.role || 'TENANT';
+        const isTenant = ['TENANT', 'LOCATAIRE', 'USER'].includes(currentRole) || 
+            userRoles.includes('TENANT') || 
+            userRoles.includes('LOCATAIRE') ||
+            userRoles.includes('USER');
 
         if (!isTenant) {
             return serializeObject({ success: false, error: "Accès refusé. Réservé aux locataires." })
