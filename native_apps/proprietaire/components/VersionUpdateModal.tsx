@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, Linking } from 'react-native';
+import { View, Text, StyleSheet, Modal, Pressable, Linking, ActivityIndicator } from 'react-native';
+import * as Updates from 'expo-updates';
 import { checkBackendVersionAsync, VersionCheckResult, APP_VERSION } from '../lib/version';
 import { Download, X } from 'lucide-react-native';
 
 export function VersionUpdateModal() {
   const [data, setData] = useState<VersionCheckResult | null>(null);
   const [visible, setVisible] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     checkBackendVersionAsync().then((res) => {
@@ -18,7 +20,24 @@ export function VersionUpdateModal() {
 
   if (!visible || !data) return null;
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
+    if (isUpdating) return;
+    try {
+      setIsUpdating(true);
+      if (Updates.isEnabled && !__DEV__) {
+        const check = await Updates.checkForUpdateAsync();
+        if (check.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+          return;
+        }
+      }
+    } catch (e) {
+      // Fallback vers le lien de téléchargement direct
+    } finally {
+      setIsUpdating(false);
+    }
+
     if (data.downloadUrl) {
       Linking.openURL(data.downloadUrl).catch(() => {});
     }
@@ -68,9 +87,15 @@ export function VersionUpdateModal() {
           </View>
 
           <View style={styles.actions}>
-            <Pressable style={styles.primaryBtn} onPress={handleDownload}>
-              <Download color="#FFFFFF" size={16} />
-              <Text style={styles.primaryBtnText}>Télécharger la mise à jour</Text>
+            <Pressable style={styles.primaryBtn} onPress={handleDownload} disabled={isUpdating}>
+              {isUpdating ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Download color="#FFFFFF" size={16} />
+              )}
+              <Text style={styles.primaryBtnText}>
+                {isUpdating ? 'Mise à jour en cours...' : 'Télécharger la mise à jour'}
+              </Text>
             </Pressable>
 
             {!data.isForceUpdate && (
