@@ -32,7 +32,7 @@ export function AppVersionBadge() {
         const updateIdStr = Updates.updateId ? Updates.updateId.substring(0, 8) : 'Base';
         Alert.alert(
           'Application à jour',
-          `${APP_NAME} v${APP_VERSION} (b${BUILD_NUMBER})\nOTA ID: ${updateIdStr} (Canal: ${Updates.channel || 'preview'})\n\nVous utilisez la version la plus récente de QAPRIL.`
+          `${APP_NAME} v${APP_VERSION}\n\nVous disposez de la version certifiée la plus récente de QAPRIL.`
         );
       }
     } catch (e: any) {

@@ -247,8 +247,8 @@ export default function ProfileScreen() {
                   {isCheckingUpdate ? 'Recherche en cours...' : 'Vérifier les mises à jour (OTA)'}
                 </Text>
               </Pressable>
-              <Text style={{ fontSize: 10, color: '#9CA3AF', textAlign: 'center' }}>
-                Canal actif : {Updates.channel || 'production'} · Version : {Updates.updateId ? Updates.updateId.substring(0, 8) : 'Base APK'}
+              <Text style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center' }}>
+                Version 2.0.0 · Infrastructure certifiée QAPRIL CI
               </Text>
             </View>
 

@@ -214,7 +214,7 @@ export default function PropertiesScreen() {
         {/* TITRE + BOUTONS D'ACTION RAPIDE (NOUVEAU BIEN / NOUVEAU BAIL) */}
         <View style={styles.headerTopRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.sub}>Patrimoine & Conformité (Loi 2019-576)</Text>
+            <Text style={styles.sub}>Gestion de votre patrimoine</Text>
             <Text style={styles.title}>Mes Biens ({safeProperties.length})</Text>
           </View>
           <View style={styles.headerActionBtns}>
@@ -422,9 +422,15 @@ export default function PropertiesScreen() {
                   {Number(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
                 </Text>
                 <View style={styles.badgesRight}>
-                  <View style={styles.nivPill}>
-                    <ShieldCheck color="#1E7E4E" size={12} />
-                    <Text style={styles.nivText}>Vérif. niv. {item.niv || 3}</Text>
+                  <View style={[styles.nivPill, !item.isBienVerifie && !(item.gpsLatitude != null) && { backgroundColor: '#F1F5F9' }]}>
+                    <ShieldCheck color={item.isBienVerifie || item.gpsLatitude != null ? "#1E7E4E" : "#64748B"} size={12} />
+                    <Text style={[styles.nivText, !item.isBienVerifie && !(item.gpsLatitude != null) && { color: '#64748B' }]}>
+                      {item.isBienVerifie || (item.niveauVerifVente && item.niveauVerifVente >= 3)
+                        ? 'Titre vérifié (niv. 3)'
+                        : item.gpsLatitude != null
+                        ? 'GPS certifié (niv. 2)'
+                        : 'Déclaré (niv. 1)'}
+                    </Text>
                   </View>
                   {item.masque && (
                     <View style={styles.maskPill}>

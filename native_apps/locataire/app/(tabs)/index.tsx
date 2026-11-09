@@ -365,7 +365,8 @@ export default function LocatairePrototypeScreen() {
     loadDashboard();
   }, []);
 
-  const userName = data?.user ? ((data.user.firstName || "") + " " + (data.user.lastName || "")).trim() || data.user.email || "Locataire" : "Locataire";
+  const fullName = data?.user ? ((data.user.firstName || "") + " " + (data.user.lastName || "")).trim() : "";
+  const userName = fullName || (data?.user?.phone ? `Locataire (${data.user.phone})` : (data?.user?.email ? data.user.email.split('@')[0] : "Locataire"));
 
 
 
@@ -607,9 +608,11 @@ export default function LocatairePrototypeScreen() {
               <View>
                 <View style={styles.drawerBadgeRow}>
                   <Text style={styles.drawerBrand}>QAPRIL</Text>
-                  <View style={styles.certifBadge}>
-                    <ShieldCheck color="#10B981" size={12} />
-                    <Text style={styles.certifBadgeText}>LOCATAIRE CERTIFIÉ</Text>
+                  <View style={[styles.certifBadge, (!data?.user?.isCertified && (data?.user?.kycLevel ?? 0) < 2) && { backgroundColor: '#F1F5F9' }]}>
+                    <ShieldCheck color={data?.user?.isCertified || (data?.user?.kycLevel ?? 0) >= 2 ? "#10B981" : "#64748B"} size={12} />
+                    <Text style={[styles.certifBadgeText, (!data?.user?.isCertified && (data?.user?.kycLevel ?? 0) < 2) && { color: '#64748B' }]}>
+                      {data?.user?.isCertified || (data?.user?.kycLevel ?? 0) >= 2 ? "LOCATAIRE CERTIFIÉ" : "ESPACE LOCATAIRE"}
+                    </Text>
                   </View>
                 </View>
                 <Text style={styles.drawerUser}>{userName}</Text>
@@ -909,12 +912,14 @@ export default function LocatairePrototypeScreen() {
               <Pressable style={styles.cardGrid} onPress={() => setScreen('passeport')}>
                 <ShieldCheck color="#1E7E4E" size={20} />
                 <Text style={styles.cardTitle}>Mon passeport</Text>
-                <Text style={styles.cardSub}>Niveau KYC {data?.user?.kycLevel ?? 1} · vérifié</Text>
+                <Text style={styles.cardSub}>
+                  {data?.user?.kycLevel >= 2 ? 'Identité vérifiée (Niv. 2)' : (data?.user?.kycLevel === 1 ? 'Téléphone vérifié (Niv. 1)' : 'Profil à compléter')}
+                </Text>
               </Pressable>
               <Pressable style={styles.cardGrid} onPress={() => setScreen('recherche')}>
                 <Search color="#2C3E6B" size={20} />
                 <Text style={styles.cardTitle}>Ma recherche</Text>
-                <Text style={styles.cardSub}>{marketList.length} offre(s) vérifiée(s)</Text>
+                <Text style={styles.cardSub}>{marketList.length > 0 ? `${marketList.length} offre(s) vérifiée(s)` : 'Trouver un logement'}</Text>
               </Pressable>
             </View>
           </View>

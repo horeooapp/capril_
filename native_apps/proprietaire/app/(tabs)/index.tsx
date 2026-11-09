@@ -528,9 +528,9 @@ export default function BailleurAndAgencePrototypeScreen() {
               </View>
             </View>
 
-            {/* STATUT DU PROFIL STRICTEMENT CHARGÉ */}
+            {/* STATUT DU PROFIL ACTIF */}
             <View style={styles.drawerModeSection}>
-              <Text style={styles.drawerSectionTitle}>PROFIL STRICTEMENT ACTIF</Text>
+              <Text style={styles.drawerSectionTitle}>PROFIL ACTIF</Text>
               <View
                 style={[
                   styles.activeProfileBadgeBox,
@@ -563,8 +563,8 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </Text>
                   <Text style={styles.activeProfileBadgeDesc}>
                     {isBailleur
-                      ? 'Dashboard patrimoine strictement chargé'
-                      : 'Console gestion d’agence strictement chargée'}
+                      ? 'Gestion directe de votre patrimoine'
+                      : 'Console de gestion de vos mandats'}
                   </Text>
                 </View>
               </View>
@@ -736,12 +736,14 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Espace Propriétaire Bailleur</Text>
                     <Text style={styles.h1}>{userName}</Text>
                   </View>
-                  <Pressable
-                    style={styles.pillGold}
-                    onPress={() => setEurMode(!eurMode)}
-                  >
-                    <Text style={styles.pillGoldText}>{eurMode ? 'Afficher en F' : 'Afficher en €'}</Text>
-                  </Pressable>
+                  {dashData?.user?.diasporaAbonnement && (
+                    <Pressable
+                      style={styles.pillGold}
+                      onPress={() => setEurMode(!eurMode)}
+                    >
+                      <Text style={styles.pillGoldText}>{eurMode ? 'Afficher en F' : 'Afficher en €'}</Text>
+                    </Pressable>
+                  )}
                 </View>
 
                 <View style={[styles.heroCard, { backgroundColor: '#1B4D3E' }]}>
@@ -1111,7 +1113,9 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={styles.sectionGap}>
                 <Text style={styles.h1}>Votre niveau de confiance</Text>
                 <View style={styles.card}>
-                  <Text style={styles.boldText}>Niveau KYC actuel : Niveau {dashData?.user?.kycLevel ?? 1} ({dashData?.user?.kycStatus ?? 'Validé'})</Text>
+                  <Text style={styles.boldText}>
+                    Niveau de confiance : Niveau {dashData?.user?.kycLevel ?? 1} ({dashData?.user?.kycStatus === 'verified' || dashData?.user?.isCertified ? 'Identité vérifiée' : 'Téléphone validé'})
+                  </Text>
                   <Text style={[styles.subMuted, { marginTop: 4 }]}>Patrimoine déclaré : {bBiens.length} bien(s)</Text>
                   <Text style={[styles.subMuted, { marginTop: 2 }]}>Baux en cours : {bBaux.length} bail(aux)</Text>
                 </View>

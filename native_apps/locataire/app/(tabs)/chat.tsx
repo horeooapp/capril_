@@ -177,18 +177,6 @@ export default function ChatScreen() {
                         <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN DIRECT</Text>
                     </View>
                 </View>
-
-                {/* BANDEAU LÉGENDE DES ENCOCHES */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <CheckCheck size={12} color="#9CA3AF" />
-                        <Text style={{ fontSize: 10, color: '#64748B', fontWeight: '600' }}>2 encoches grises : reçu</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <CheckCheck size={12} color="#EF4444" />
-                        <Text style={{ fontSize: 10, color: '#DC2626', fontWeight: '700' }}>2 encoches rouges : lu</Text>
-                    </View>
-                </View>
             </View>
 
             <KeyboardAvoidingView 

@@ -80,16 +80,16 @@ export default function LoginScreen() {
           </Text>
         </View>
 
-        {/* ÉTAPE OBLIGATOIRE : CHOIX STRICT DU PROFIL */}
+        {/* ÉTAPE OBLIGATOIRE : CHOIX DU PROFIL */}
         <View style={styles.selectorSection}>
           <View style={styles.stepHeaderRow}>
             <View style={[styles.stepNumBadge, { backgroundColor: accentColor }]}>
               <Text style={styles.stepNumText}>1</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.selectorLabel}>VOTRE RÔLE POUR CETTE SESSION</Text>
+              <Text style={styles.selectorLabel}>VOTRE ESPACE POUR CETTE SESSION</Text>
               <Text style={styles.selectorSub}>
-                Seul le dashboard du profil choisi sera strictement chargé.
+                Choisissez votre espace de travail dédié.
               </Text>
             </View>
           </View>
@@ -213,8 +213,8 @@ export default function LoginScreen() {
             }
             subtitle={
               isProprietaire
-                ? 'Saisissez votre email pour charger strictement votre tableau de bord bailleur.'
-                : 'Saisissez votre email agréé pour charger strictement la console de gestion d’agence.'
+                ? 'Saisissez votre e-mail ou téléphone pour accéder à votre espace bailleur.'
+                : 'Saisissez votre e-mail agréé pour accéder à votre console d’agence.'
             }
           />
         </View>

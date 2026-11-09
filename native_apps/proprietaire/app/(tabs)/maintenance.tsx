@@ -106,16 +106,15 @@ export default function ProprietaireMaintenanceScreen() {
     <SafeAreaView style={styles.container}>
       <TopNavHeader title="Incidents & Travaux" subtitle="Maintenance en direct" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {/* BANDEAU RÔLE : RÉCEPTION PROPRIÉTAIRE */}
+        {/* BANDEAU : SUIVI DES SIGNALEMENTS */}
         <View style={styles.roleBanner}>
           <View style={styles.roleTag}>
             <Wrench color="#1B4D3E" size={14} />
-            <Text style={styles.roleTagText}>RÉCEPTION BAILLEUR · SIGNALEMENTS LOCATAIRES</Text>
+            <Text style={styles.roleTagText}>SUIVI DES TRAVAUX</Text>
           </View>
-          <Text style={styles.roleTitle}>Signalements & travaux reçus</Text>
+          <Text style={styles.roleTitle}>Signalements & pannes reçus</Text>
           <Text style={styles.roleDesc}>
-            En tant que propriétaire ou agence, vous recevez ici les signalements d’incidents émis par vos locataires
-            pour mandater les artisans et piloter la résolution rapide.
+            Recevez directement les déclarations d'incidents transmises par vos locataires avec photos datées pour organiser les réparations.
           </Text>
         </View>
 
@@ -169,7 +168,7 @@ export default function ProprietaireMaintenanceScreen() {
                 Aucun signalement {filter !== 'all' ? `(${filter})` : ''}
               </Text>
               <Text style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', marginTop: 4, paddingHorizontal: 16 }}>
-                Les déclarations de pannes émises par vos locataires apparaîtront ici avec photos horodatées et valeur légale.
+                Les déclarations de pannes ou réparations transmises par vos locataires apparaîtront ici avec photos datées.
               </Text>
             </View>
           ) : (

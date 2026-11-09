@@ -167,26 +167,14 @@ export default function ProprietaireChatScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Messagerie Bailleur
+                            Messagerie Locataires
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#1B4D3E' }}>
-                            Échanges certifiés avec vos locataires · Horodatage infalsifiable
+                            Vos échanges sont conservés et datés
                         </Text>
                     </View>
                     <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
                         <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN DIRECT</Text>
-                    </View>
-                </View>
-
-                {/* BANDEAU LÉGENDE DES ENCOCHES */}
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <CheckCheck size={12} color="#9CA3AF" />
-                        <Text style={{ fontSize: 10, color: '#64748B', fontWeight: '600' }}>2 encoches grises : reçu</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <CheckCheck size={12} color="#EF4444" />
-                        <Text style={{ fontSize: 10, color: '#DC2626', fontWeight: '700' }}>2 encoches rouges : lu</Text>
                     </View>
                 </View>
             </View>
@@ -209,7 +197,7 @@ export default function ProprietaireChatScreen() {
                                 Aucun message échangé
                             </Text>
                             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 8, lineHeight: 18 }}>
-                                Vos messages avec vos locataires apparaîtront ici en temps réel avec valeur légale.
+                                Vos échanges avec vos locataires apparaîtront ici en temps réel.
                             </Text>
                         </View>
                     }

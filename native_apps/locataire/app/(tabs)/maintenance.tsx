@@ -108,15 +108,14 @@ export default function MaintenanceScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          {/* BANDEAU RÔLE : ÉMISSION LOCATAIRE */}
+          {/* BANDEAU : SIGNALER UN INCIDENT */}
           <View style={styles.roleBanner}>
             <View style={styles.roleTag}>
               <Wrench color="#059669" size={14} />
-              <Text style={styles.roleTagText}>ÉMISSION DU LOCATAIRE → BAILLEUR</Text>
+              <Text style={styles.roleTagText}>SIGNALER UN INCIDENT</Text>
             </View>
             <Text style={styles.roleDesc}>
-              En tant que locataire, vous émettez ici vos déclarations de pannes ou travaux. Votre bailleur reçoit
-              l’alerte en temps réel avec preuve contradictoire horodatée.
+              Déclarez une panne ou une dégradation dans votre logement. Votre bailleur est directement averti avec photo datée pour planifier l’intervention.
             </Text>
             <View style={styles.destinataireCard}>
               <Text style={styles.destinataireLabel}>DESTINATAIRE NOTIFIÉ :</Text>
