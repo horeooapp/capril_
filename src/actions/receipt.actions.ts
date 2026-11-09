@@ -12,6 +12,7 @@ import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers";
 import { writeAuditLog } from "@/lib/audit";
 import { serializeReceipt } from "@/lib/serialize";
 import { LeaseLifecycleService } from "@/lib/lease-lifecycle.service";
+import { normalizePhone } from "@/lib/phone";
 
 const PRIX_QUITTANCE = Number(process.env.QAPRIL_QUITTANCE_PRIX_FCFA ?? 90);
 
@@ -130,8 +131,22 @@ export async function getReceiptById(id: string) {
 export async function getReceiptsForTenant() {
     try {
         const session = await ensureAuthenticated();
+        const user = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { id: true, phone: true, email: true }
+        });
+        const normalized = user?.phone ? normalizePhone(user.phone) : null;
+
         const receipts = await prisma.receipt.findMany({
-            where: { lease: { tenantId: session.user.id } },
+            where: {
+                lease: {
+                    OR: [
+                        { tenantId: session.user.id },
+                        ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                        ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+                    ]
+                }
+            },
             include: { lease: { include: { property: true } } },
             orderBy: { periodMonth: 'desc' }
         });

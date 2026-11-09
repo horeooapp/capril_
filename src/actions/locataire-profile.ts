@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { calculateUserScore } from "@/lib/scoring"
 import { serializeObject } from "@/lib/serialize"
+import { normalizePhone } from "@/lib/phone"
 
 /**
  * M-LOC-DASHBOARD & M-LOC-SCORE (Profil centralisé)
@@ -29,10 +30,20 @@ async function getLocataireDashboardDataRaw(userId: string) {
         })
     }
 
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, phone: true, email: true }
+    });
+    const normalized = user?.phone ? normalizePhone(user.phone) : null;
+
     // Récupérer les baux actifs du locataire
     const bailsList = await (prisma as any).lease.findMany({
         where: {
-            tenantId: userId,
+            OR: [
+                { tenantId: userId },
+                ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+            ],
             status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'DRAFT', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'LOYER_IMPAYE'] }
         },
         include: { 
@@ -48,6 +59,15 @@ async function getLocataireDashboardDataRaw(userId: string) {
             }
         }
     })
+
+    // Rattacher automatiquement les baux non encore liés à userId
+    for (const b of bailsList) {
+        if (b.tenantId !== userId) {
+            try {
+                await (prisma as any).lease.update({ where: { id: b.id }, data: { tenantId: userId } });
+            } catch {}
+        }
+    }
 
     // Récupérer la caution (si 1 seul bail, c'est plus simple)
     const activeBailIds = bailsList.map((b: any) => b.id)

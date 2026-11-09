@@ -60,32 +60,38 @@ export default function LocataireDashboardPage() {
     const [isMounted, setIsMounted] = useState(false)
     const [utilityModalOpen, setUtilityModalOpen] = useState(false)
     const [selectedUtilityCategory, setSelectedUtilityCategory] = useState<any>("EAU")
+    const [selectedLeaseId, setSelectedLeaseId] = useState<string | null>(null)
     const router = useRouter()
 
     useEffect(() => {
         setIsMounted(true)
     }, [])
 
+    const loadData = async (requestedId?: string) => {
+        try {
+            setLoading(true)
+            const targetId = requestedId || selectedLeaseId || undefined
+            const data = await getTenantDashboard(targetId)
+            if (data) {
+                setDashboardData(data)
+                if (data.lease?.id) {
+                    setSelectedLeaseId(data.lease.id)
+                }
+            } else {
+                setDashboardData({ success: false, error: "Erreur de communication avec le serveur." })
+            }
+        } catch (err: any) {
+            console.error("Dashboard Load Error:", err)
+            setDashboardData({ success: false, error: err.message || "Une erreur inattendue est survenue." })
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
         if (status === "unauthenticated") {
             router.replace("/mon-espace-locataire/login")
             return
-        }
-
-        async function loadData() {
-            try {
-                const data = await getTenantDashboard()
-                if (data) {
-                    setDashboardData(data)
-                } else {
-                    setDashboardData({ success: false, error: "Erreur de communication avec le serveur." })
-                }
-            } catch (err: any) {
-                console.error("Dashboard Load Error:", err)
-                setDashboardData({ success: false, error: err.message || "Une erreur inattendue est survenue." })
-            } finally {
-                setLoading(false)
-            }
         }
 
         if (status === "authenticated") {
@@ -345,6 +351,48 @@ export default function LocataireDashboardPage() {
                 </div>
             </header>
 
+            {/* Sélecteur Multi-Logements si plusieurs baux actifs */}
+            {dashboardData.allLeases && dashboardData.allLeases.length > 1 && (
+                <div className="bg-slate-900 text-white p-4 sm:p-5 rounded-3xl border border-slate-800 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 text-lg shrink-0">
+                            🏢
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                                    Multi-Baux ({dashboardData.allLeases.length} actifs)
+                                </span>
+                            </div>
+                            <p className="text-xs text-slate-300 font-medium mt-0.5">
+                                Logement affiché : <span className="font-black text-white">{lease.property?.name || lease.leaseReference}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                        {dashboardData.allLeases.map((l: any) => {
+                            const isCurrent = l.id === lease.id;
+                            return (
+                                <button
+                                    key={l.id}
+                                    onClick={() => loadData(l.id)}
+                                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                                        isCurrent
+                                            ? 'bg-amber-500 text-slate-950 shadow-md font-black scale-102'
+                                            : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                                    }`}
+                                >
+                                    <span>{l.propertyName}</span>
+                                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${isCurrent ? 'bg-black/20 text-slate-950 font-black' : 'bg-slate-900 text-slate-400'}`}>
+                                        {Number(l.rentAmount).toLocaleString('fr-FR')} F
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             {/* Carte Prioritaire : Signature de Bail en Attente */}
             {((dashboardData.pendingSignatureLease && dashboardData.pendingSignatureLease.id !== lease?.id) || ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'DRAFT'].includes(lease?.status)) && (
                 <div className="animate-in fade-in slide-in-from-top-4 duration-500">
@@ -494,7 +542,7 @@ export default function LocataireDashboardPage() {
                             <div className="flex-1 min-w-0">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">Bailleur désigné</p>
                                 <p className="text-xs font-bold text-slate-800 truncate mt-0.5">
-                                    {lease.landlord?.firstName} {lease.landlord?.lastName}
+                                    {lease.landlord?.fullName || [lease.landlord?.firstName, lease.landlord?.lastName].filter(Boolean).join(" ") || "Bailleur désigné"}
                                 </p>
                             </div>
                         </div>
@@ -662,15 +710,15 @@ export default function LocataireDashboardPage() {
                             Discussion avec mon Bailleur
                         </h3>
                         <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                            Échangez en direct avec {lease.landlord ? `${lease.landlord.firstName} ${lease.landlord.lastName}` : "votre bailleur"}. Tous vos messages et signalements sont horodatés et opposables.
+                            Échangez en direct avec {lease.landlord?.fullName || [lease.landlord?.firstName, lease.landlord?.lastName].filter(Boolean).join(" ") || "votre bailleur"}. Tous vos messages et signalements sont horodatés et opposables.
                         </p>
                         <div className="mt-4 p-3 bg-slate-50/80 rounded-xl border border-slate-100 flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-900 text-amber-400 flex items-center justify-center font-black text-xs shrink-0">
-                                {(lease.landlord?.firstName?.[0] || 'B') + (lease.landlord?.lastName?.[0] || '')}
+                                {(lease.landlord?.firstName?.[0] || lease.landlord?.fullName?.[0] || 'B') + (lease.landlord?.lastName?.[0] || '')}
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-slate-800 truncate">
-                                    {lease.landlord ? `${lease.landlord.firstName} ${lease.landlord.lastName}` : "Bailleur désigné"}
+                                    {lease.landlord?.fullName || [lease.landlord?.firstName, lease.landlord?.lastName].filter(Boolean).join(" ") || "Bailleur désigné"}
                                 </p>
                                 <p className="text-[10px] text-slate-400 truncate">
                                     Canal ouvert · Reçus et encoches de lecture

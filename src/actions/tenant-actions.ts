@@ -6,7 +6,7 @@ import { Role, BdqStatut } from "@prisma/client"
 import { serializeLease, serializeObject } from "@/lib/serialize"
 import { normalizePhone } from "@/lib/phone"
 
-export async function getTenantDashboard() {
+export async function getTenantDashboard(requestedLeaseId?: string) {
     try {
         const session = await auth()
         
@@ -35,10 +35,16 @@ export async function getTenantDashboard() {
             return serializeObject({ success: false, error: "Profil utilisateur introuvable." })
         }
 
-        // 3. Trouver le bail actif prioritairement (ACTIVE, ACTIVE_DECLARATIF, LOYER_IMPAYE)
-        let activeLease = await prisma.lease.findFirst({
+        const normalized = user.phone ? normalizePhone(user.phone) : null;
+
+        // 3. Récupérer TOUS les baux actifs du locataire
+        const allActiveLeases = await prisma.lease.findMany({
             where: {
-                tenantId: userId,
+                OR: [
+                    { tenantId: userId },
+                    ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+                    ...(user.email ? [{ tenant: { email: user.email } }] : [])
+                ],
                 status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] }
             },
             orderBy: { createdAt: "desc" },
@@ -66,60 +72,23 @@ export async function getTenantDashboard() {
                 },
                 caution: true
             }
-        })
+        });
 
-        // 3.1 Si aucun bail actif direct, chercher par téléphone ou email du locataire
-        const normalized = user.phone ? normalizePhone(user.phone) : null;
-        if (!activeLease && (normalized || user.email)) {
-            activeLease = await prisma.lease.findFirst({
-                where: {
-                    OR: [
-                        ...(normalized ? [{ tenant: { phone: normalized } }] : []),
-                        ...(user.email ? [{ tenant: { email: user.email } }] : [])
-                    ],
-                    status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] }
-                },
-                orderBy: { createdAt: "desc" },
-                include: {
-                    property: true,
-                    landlord: { 
-                        select: { 
-                            lastName: true, 
-                            firstName: true, 
-                            phone: true,
-                            walletConfig: { select: { landlordCode: true } }
-                        } 
-                    },
-                    receipts: {
-                        orderBy: { createdAt: "desc" },
-                        take: 24
-                    },
-                    arrears: {
-                        where: { status: { in: ["unpaid", "UNPAID"] } }
-                    },
-                    openingState: true,
-                    etatsDesLieux: {
-                        orderBy: { createdAt: "desc" },
-                        take: 2
-                    },
-                    caution: true
-                }
-            });
-
-            // Rattacher le bail au compte connecté si besoin
-            if (activeLease && activeLease.tenantId !== userId) {
+        // Rattacher automatiquement les baux non encore liés à userId
+        for (const l of allActiveLeases) {
+            if (l.tenantId !== userId) {
                 try {
-                    await prisma.lease.update({
-                        where: { id: activeLease.id },
-                        data: { tenantId: userId }
-                    });
-                } catch (linkErr) {
-                    console.warn("[getTenantDashboard] Could not update lease tenantId:", linkErr);
-                }
+                    await prisma.lease.update({ where: { id: l.id }, data: { tenantId: userId } });
+                } catch {}
             }
         }
 
-        // 3.2 Si toujours aucun bail actif, chercher un bail en cours (PENDING_SIGNATURE, PENDING_CONFIRMATION, DRAFT)
+        // Sélectionner le bail actif demandé ou le premier disponible
+        let activeLease = requestedLeaseId 
+            ? allActiveLeases.find(l => l.id === requestedLeaseId) || allActiveLeases[0]
+            : allActiveLeases[0];
+
+        // 3.1 Si aucun bail actif confirmé, chercher un bail en cours (PENDING_SIGNATURE, PENDING_CONFIRMATION, DRAFT)
         if (!activeLease) {
             activeLease = await prisma.lease.findFirst({
                 where: {
@@ -327,6 +296,13 @@ export async function getTenantDashboard() {
                 lastReceiptDate: lastReceipt?.createdAt || null,
                 rentDeadline: rentDeadline.toISOString()
             },
+            allLeases: (allActiveLeases || []).map(l => ({
+                id: l.id,
+                leaseReference: l.leaseReference,
+                rentAmount: Number(l.rentAmount || 0),
+                propertyName: l.property?.name || l.property?.address || "Logement",
+                commune: l.property?.commune || l.property?.city || "Abidjan"
+            })),
             utilities,
             score: locataireProfile?.scoreActuel || 750,
             locataireProfile,

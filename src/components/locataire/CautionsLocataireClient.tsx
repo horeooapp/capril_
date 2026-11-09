@@ -57,10 +57,19 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
 
     if (!bail) {
         return (
-            <div className="glass-panel p-20 rounded-[3rem] text-center border border-white/40">
-                <AlertCircle size={48} className="mx-auto text-gray-200 mb-6" />
-                <h3 className="text-xl font-black text-gray-400 uppercase tracking-tighter">Aucun bail actif trouvé</h3>
-                <p className="text-gray-400 font-medium">Vous devez avoir un bail actif pour gérer votre caution.</p>
+            <div className="bg-white p-12 md:p-16 rounded-3xl text-center border border-slate-200/90 shadow-sm max-w-xl mx-auto space-y-4">
+                <div className="w-16 h-16 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center text-amber-700 mx-auto">
+                    <AlertCircle size={32} />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Aucun bail actif rattaché</h3>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    Vous devez avoir un bail actif validé pour enregistrer et certifier votre dépôt de garantie / caution.
+                </p>
+                <div className="pt-2">
+                    <Link href="/mon-espace-locataire" className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all">
+                        Retour au tableau de bord
+                    </Link>
+                </div>
             </div>
         )
     }

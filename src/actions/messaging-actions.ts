@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { normalizePhone } from "@/lib/phone";
 
 export interface ChatMessage {
   id: string;
@@ -43,13 +44,25 @@ export async function getConversations(): Promise<{ success: boolean; conversati
     }
 
     const userId = session.user.id;
-    const userRole = String((session.user as any)?.chosenRole || session.user.role || "").toUpperCase();
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, phone: true, email: true, role: true }
+    });
+    const userRole = String((session.user as any)?.chosenRole || user?.role || session.user.role || "").toUpperCase();
     const isTenant = userRole === "TENANT" || userRole === "LOCATAIRE";
+    const normalized = user?.phone ? normalizePhone(user.phone) : null;
 
     // 1. Trouver les baux rattachés à cet utilisateur
     let leases = await (prisma as any).lease.findMany({
       where: isTenant
-        ? { tenantId: userId, status: { notIn: ["CANCELLED", "ARCHIVED"] } }
+        ? {
+            OR: [
+              { tenantId: userId },
+              ...(normalized ? [{ tenant: { phone: normalized } }] : []),
+              ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+            ],
+            status: { notIn: ["CANCELLED", "ARCHIVED"] }
+          }
         : { landlordId: userId, status: { notIn: ["CANCELLED", "ARCHIVED"] } },
       include: {
         tenant: { select: { id: true, firstName: true, lastName: true, phone: true } },
@@ -69,6 +82,17 @@ export async function getConversations(): Promise<{ success: boolean; conversati
       },
       orderBy: { updatedAt: "desc" }
     });
+
+    // Rattacher automatiquement les baux non encore liés à userId
+    if (isTenant && leases) {
+      for (const l of leases) {
+        if (l.tenantId !== userId) {
+          try {
+            await (prisma as any).lease.update({ where: { id: l.id }, data: { tenantId: userId } });
+          } catch {}
+        }
+      }
+    }
 
     // 2. Si aucun bail avec le rôle présumé, chercher tous les baux où l'utilisateur est soit locataire soit bailleur
     if (!leases || leases.length === 0) {

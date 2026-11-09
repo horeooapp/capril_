@@ -68,6 +68,8 @@ export const serializeLease = (lease: any) => {
     }
 
     const landlordData = lease.landlord ? {
+        firstName: shouldMask ? null : (lease.landlord.firstName || null),
+        lastName: shouldMask ? null : (lease.landlord.lastName || null),
         fullName: shouldMask 
             ? maskedName 
             : ((lease.landlord.firstName || lease.landlord.lastName) 
