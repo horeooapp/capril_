@@ -12,6 +12,7 @@ import {
   Modal,
   TextInput,
   BackHandler,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';

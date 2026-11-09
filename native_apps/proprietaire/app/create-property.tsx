@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import * as Location from 'expo-location';
 import {
   ChevronLeft,
   Building2,
@@ -27,6 +26,14 @@ import {
   RotateCw,
 } from 'lucide-react-native';
 import { fetchWithAuth } from '../lib/api';
+
+// Chargement sécurisé conditionnel du module de géolocalisation
+let LocationModule: any = null;
+try {
+  LocationModule = require('expo-location');
+} catch {
+  LocationModule = null;
+}
 
 const COMMUNES_ABIDJAN = [
   'Cocody',
@@ -128,20 +135,22 @@ export default function CreatePropertyScreen() {
     } catch (_e) {
       // Fallback natif Expo Location si déconnecté
       try {
-        const results = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
-        if (results && results.length > 0) {
-          const r = results[0];
-          const v = r.city || r.region || 'Abidjan';
-          const c = r.subregion || r.district || r.city || 'Cocody';
-          const q = [r.name, r.street].filter(Boolean).join(', ') || r.district || '';
-          setDetectedVille(v);
-          setDetectedCommune(c);
-          setDetectedQuartier(q);
-          if (COMMUNES_ABIDJAN.includes(c)) {
-            setCommune(c);
-          }
-          if (q) {
-            setAddress(prev => prev.trim().length === 0 ? q : prev);
+        if (LocationModule?.reverseGeocodeAsync) {
+          const results = await LocationModule.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+          if (results && results.length > 0) {
+            const r = results[0];
+            const v = r.city || r.region || 'Abidjan';
+            const c = r.subregion || r.district || r.city || 'Cocody';
+            const q = [r.name, r.street].filter(Boolean).join(', ') || r.district || '';
+            setDetectedVille(v);
+            setDetectedCommune(c);
+            setDetectedQuartier(q);
+            if (COMMUNES_ABIDJAN.includes(c)) {
+              setCommune(c);
+            }
+            if (q) {
+              setAddress(prev => prev.trim().length === 0 ? q : prev);
+            }
           }
         }
       } catch (_err) {}
@@ -152,12 +161,13 @@ export default function CreatePropertyScreen() {
   useEffect(() => {
     let isMounted = true;
     (async () => {
+      if (!LocationModule?.requestForegroundPermissionsAsync) return;
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
+        const { status } = await LocationModule.requestForegroundPermissionsAsync();
         if (status === 'granted') {
           setIsLocating(true);
-          const pos = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
+          const pos = await LocationModule.getCurrentPositionAsync({
+            accuracy: LocationModule.Accuracy?.Balanced ?? 3,
           });
           if (isMounted && pos?.coords) {
             const lat = pos.coords.latitude;
@@ -179,10 +189,17 @@ export default function CreatePropertyScreen() {
   }, []);
 
   const handleCaptureGps = async () => {
+    if (!LocationModule?.requestForegroundPermissionsAsync) {
+      Alert.alert(
+        'Capture GPS',
+        'La capture GPS directe nécessite la dernière mise à jour de l\'application. Vous pouvez saisir directement l\'adresse et la commune de votre bien.'
+      );
+      return;
+    }
     setIsLocating(true);
     setGpsMessage(null);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await LocationModule.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(
           'Permission GPS requise',
@@ -192,8 +209,8 @@ export default function CreatePropertyScreen() {
         return;
       }
 
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+      const pos = await LocationModule.getCurrentPositionAsync({
+        accuracy: LocationModule.Accuracy?.High ?? 4,
       });
 
       if (pos?.coords) {

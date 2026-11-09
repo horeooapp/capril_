@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import * as Location from 'expo-location';
 import {
   Building2,
   ShieldCheck,
@@ -31,6 +30,14 @@ import {
 } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
+// Chargement sécurisé conditionnel du module de géolocalisation
+let LocationModule: any = null;
+try {
+  LocationModule = require('expo-location');
+} catch {
+  LocationModule = null;
+}
+
 export default function PropertiesScreen() {
   const router = useRouter();
   const [properties, setProperties] = useState<any[]>([]);
@@ -42,9 +49,17 @@ export default function PropertiesScreen() {
   const [capturingPropertyId, setCapturingPropertyId] = useState<string | null>(null);
 
   const handleCaptureGpsForProperty = async (propertyId: string) => {
+    if (!LocationModule || !LocationModule.requestForegroundPermissionsAsync) {
+      Alert.alert(
+        'Capture GPS',
+        'La capture GPS directe depuis l\'application nécessite la dernière mise à jour native. Vous pouvez renseigner l\'adresse complète dans le formulaire du bien.'
+      );
+      return;
+    }
+
     setCapturingPropertyId(propertyId);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await LocationModule.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert(
           'Permission requise',
@@ -54,8 +69,8 @@ export default function PropertiesScreen() {
         return;
       }
 
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+      const pos = await LocationModule.getCurrentPositionAsync({
+        accuracy: LocationModule.Accuracy?.High ?? 4,
       });
 
       if (pos?.coords) {
@@ -93,8 +108,11 @@ export default function PropertiesScreen() {
   const fetchProperties = async () => {
     try {
       const response = await fetchWithAuth('/proprietaire/properties');
+      if (!response.ok) {
+        return;
+      }
       const json = await response.json();
-      if (response.ok && json.properties) {
+      if (json && Array.isArray(json.properties)) {
         setProperties(json.properties);
       }
     } catch (e) {
@@ -118,24 +136,26 @@ export default function PropertiesScreen() {
   };
 
   const isRentedProperty = (p: any) => {
-    const s = (p.occupancyStatus || '').toLowerCase();
+    if (!p) return false;
+    const s = String(p.occupancyStatus || '').toLowerCase();
     return (
       s === 'loué' ||
       s === 'loue' ||
       s === 'occupé' ||
       s === 'occupe' ||
       p.isRented === true ||
-      p.status === 'rented' ||
-      p.status === 'RENTED' ||
+      String(p.status || '').toLowerCase() === 'rented' ||
       (typeof p.tenantName === 'string' && p.tenantName.trim().length > 0)
     );
   };
 
-  const rentedCount = properties.filter(isRentedProperty).length;
-  const vacantCount = properties.filter((p) => !isRentedProperty(p)).length;
+  const safeProperties = Array.isArray(properties) ? properties : [];
+  const rentedCount = safeProperties.filter(isRentedProperty).length;
+  const vacantCount = safeProperties.filter((p) => !isRentedProperty(p)).length;
 
-  const filteredList = properties
+  const filteredList = [...safeProperties]
     .filter((p) => {
+      if (!p) return false;
       // 1. Filtre statut (Tous, Loués, Vacants)
       if (filter === 'Loué' && !isRentedProperty(p)) return false;
       if (filter === 'Vacant' && isRentedProperty(p)) return false;
@@ -156,13 +176,13 @@ export default function PropertiesScreen() {
     })
     .sort((a, b) => {
       if (sortMode === 'rent_asc') {
-        const rentA = a.currentRent || a.declaredRentFcfa || 0;
-        const rentB = b.currentRent || b.declaredRentFcfa || 0;
+        const rentA = Number(a.currentRent || a.declaredRentFcfa || 0);
+        const rentB = Number(b.currentRent || b.declaredRentFcfa || 0);
         return rentA - rentB;
       }
       if (sortMode === 'rent_desc') {
-        const rentA = a.currentRent || a.declaredRentFcfa || 0;
-        const rentB = b.currentRent || b.declaredRentFcfa || 0;
+        const rentA = Number(a.currentRent || a.declaredRentFcfa || 0);
+        const rentB = Number(b.currentRent || b.declaredRentFcfa || 0);
         return rentB - rentA;
       }
       if (sortMode === 'name') {
@@ -195,7 +215,7 @@ export default function PropertiesScreen() {
         <View style={styles.headerTopRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.sub}>Patrimoine & Conformité (Loi 2019-576)</Text>
-            <Text style={styles.title}>Mes Biens ({properties.length})</Text>
+            <Text style={styles.title}>Mes Biens ({safeProperties.length})</Text>
           </View>
           <View style={styles.headerActionBtns}>
             <Pressable
@@ -236,7 +256,7 @@ export default function PropertiesScreen() {
         {/* 2. SÉLECTEUR DE STATUT (TOUS, LOUÉS, VACANTS) AVEC COMPTEURS RÉELS */}
         <View style={styles.filterRow}>
           {[
-            { id: 'all', label: `Tous (${properties.length})` },
+            { id: 'all', label: `Tous (${safeProperties.length})` },
             { id: 'Loué', label: `Loués (${rentedCount})` },
             { id: 'Vacant', label: `Vacants (${vacantCount})` },
           ].map((item) => (
@@ -284,7 +304,7 @@ export default function PropertiesScreen() {
 
       <FlatList
         data={filteredList}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => (item?.id ? String(item.id) : String(index))}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1B4D3E']} />}
         ListEmptyComponent={
@@ -314,7 +334,9 @@ export default function PropertiesScreen() {
           </View>
         }
         renderItem={({ item }) => {
+          if (!item) return null;
           const rented = isRentedProperty(item);
+          const hasGps = item.gpsLatitude != null && item.gpsLongitude != null && !isNaN(Number(item.gpsLatitude)) && !isNaN(Number(item.gpsLongitude));
           return (
             <View style={styles.card}>
               <View style={styles.rowBetween}>
@@ -323,7 +345,7 @@ export default function PropertiesScreen() {
                     <Building2 color={rented ? '#1E7E4E' : '#1B4D3E'} size={20} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.propertyName} numberOfLines={1}>{item.name}</Text>
+                    <Text style={styles.propertyName} numberOfLines={1}>{item.name || 'Bien sans nom'}</Text>
                     <Text style={styles.propertyAddress} numberOfLines={1}>
                       {item.address ? `${item.address} · ` : ''}{item.commune || 'Abidjan'}{item.city && item.city !== item.commune ? ` (${item.city})` : ''}
                     </Text>
@@ -366,12 +388,12 @@ export default function PropertiesScreen() {
                 </Pressable>
               )}
 
-              {/* BLOC GÉOLOCALISATION GPS (ADD-28) */}
+              {/* BLOC GÉOLOCALISATION GPS */}
               <View style={styles.geoRow}>
                 <View style={styles.geoRowLeft}>
-                  <MapPin color={item.gpsLatitude ? '#1E7E4E' : '#94A3B8'} size={13} />
+                  <MapPin color={hasGps ? '#1E7E4E' : '#94A3B8'} size={13} />
                   <Text style={styles.geoRowText} numberOfLines={1}>
-                    {item.gpsLatitude 
+                    {hasGps
                       ? `GPS : ${Number(item.gpsLatitude).toFixed(4)}°, ${Number(item.gpsLongitude).toFixed(4)}° (${item.codeLocalisation || 'Déclaré'})`
                       : 'Position GPS non renseignée'}
                   </Text>
@@ -388,7 +410,7 @@ export default function PropertiesScreen() {
                     <>
                       <Navigation color="#1B4D3E" size={11} />
                       <Text style={styles.geoCaptureBtnText}>
-                        {item.gpsLatitude ? 'Actualiser' : 'Capturer GPS'}
+                        {hasGps ? 'Actualiser' : 'Capturer GPS'}
                       </Text>
                     </>
                   )}
@@ -397,7 +419,7 @@ export default function PropertiesScreen() {
 
               <View style={styles.footerRow}>
                 <Text style={styles.rent}>
-                  {(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
+                  {Number(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
                 </Text>
                 <View style={styles.badgesRight}>
                   <View style={styles.nivPill}>

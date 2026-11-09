@@ -235,7 +235,7 @@ export default async function AdminDashboardOverview() {
             ((prisma as any).declarationPaiement?.aggregate?.({ _sum: { montant: true }, where: { statut: "DECLARE" } }) || Promise.resolve(null)).catch(() => null),
             ((prisma as any).preavisBail?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).preavisBail?.count?.({ where: { statut: "EMIS" } }) || Promise.resolve(0)).catch(() => 0),
-            prisma.property.count({ where: { latitude: { not: null }, longitude: { not: null } } }).catch(() => 0)
+            prisma.property.count({ where: { gpsLatitude: { not: null }, gpsLongitude: { not: null } } }).catch(() => 0)
         ]);
         
         // Process trends with safety guards
