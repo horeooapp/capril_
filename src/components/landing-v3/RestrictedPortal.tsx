@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { Lock, ArrowRight, ShieldAlert } from "lucide-react";
+import { Lock, ArrowRight, ShieldAlert, Smartphone } from "lucide-react";
 import { choisirTypeConnexion, type TypeConnexion } from "@/actions/auth.actions";
 
 export default function RestrictedPortal() {
@@ -103,6 +103,17 @@ export default function RestrictedPortal() {
                 </div>
               </div>
             </button>
+
+            {/* Accès Téléchargement Applications Mobiles */}
+            <div className="mt-6 text-center">
+              <Link 
+                href="/telecharger"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-all"
+              >
+                <Smartphone className="w-4 h-4" />
+                <span>Télécharger les applications mobiles QAPRIL (Android APK)</span>
+              </Link>
+            </div>
           </motion.div>
         </motion.div>
       </div>

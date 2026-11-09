@@ -40,6 +40,7 @@ import {
   Mic,
   MapPin,
   FileCheck2,
+  Download,
 } from "lucide-react";
 
 const SLIDES = [
@@ -92,6 +93,8 @@ export default function QaprilLandingV2({
 
   const landingNavLinks = [
     { href: "/", label: "Accueil", icon: <Home size={18} /> },
+    { href: "/telecharger", label: "Applications Mobiles", icon: <Smartphone size={18} /> },
+    { href: "/verifier", label: "Vérifier une Quittance", icon: <ShieldCheck size={18} /> },
     { href: "/piliers", label: "Piliers QAPRIL", icon: <ShieldCheck size={18} /> },
     { href: "/solutions", label: "Nos Solutions", icon: <LayoutDashboard size={18} /> },
     { href: "/services", label: "Services & Garanties", icon: <Building2 size={18} /> },
@@ -175,7 +178,14 @@ export default function QaprilLandingV2({
           </Link>
 
           {/* Navigation Centrale sur Une Seule Ligne */}
-          <nav className={`hidden lg:flex items-center gap-5 xl:gap-7 text-xs xl:text-sm font-semibold whitespace-nowrap shrink-0 transition-colors ${scrolled ? 'text-slate-700' : 'text-slate-200'}`}>
+          <nav className={`hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-sm font-semibold whitespace-nowrap shrink-0 transition-colors ${scrolled ? 'text-slate-700' : 'text-slate-200'}`}>
+            <Link href="/telecharger" className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 font-bold transition-colors">
+              <Smartphone size={14} />
+              <span>Apps Mobiles</span>
+            </Link>
+            <Link href="/verifier" className="hover:text-[#D97706] transition-colors">
+              Vérifier
+            </Link>
             <Link href="/piliers" className="hover:text-[#D97706] transition-colors">
               Piliers
             </Link>
@@ -283,9 +293,35 @@ export default function QaprilLandingV2({
                 Gestion locative certifiée et baux d'habitation conformes en Côte d'Ivoire
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-10 max-w-3xl">
+              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-8 max-w-3xl">
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution en compte séquestre dédié. Tout est clair, rapide et protégé.
               </p>
+
+              {/* BANNIÈRE PROMINENTE APPLICATION MOBILE */}
+              <div className="mb-8 p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-400">Applications Mobiles QAPRIL</span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">v2.0.0 Certifiée</span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-0.5">
+                      Installez les applications officielles Propriétaire & Locataire sur Android pour gérer vos baux partout.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/telecharger"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shrink-0 transition-colors shadow-md"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Télécharger l'App (APK)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
 
               {/* 3 Portails Métiers Directs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
@@ -1484,6 +1520,18 @@ export default function QaprilLandingV2({
               </div>
               <ul className="space-y-2 text-xs text-slate-600">
                 <li>
+                  <Link href="/telecharger" className="text-emerald-700 font-bold hover:text-emerald-900 transition-colors flex items-center gap-1.5">
+                    <Smartphone size={13} />
+                    <span>Applications Mobiles (APK)</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/verifier" className="hover:text-slate-900 transition-colors flex items-center gap-1.5">
+                    <ShieldCheck size={13} />
+                    <span>Vérifier une Quittance</span>
+                  </Link>
+                </li>
+                <li>
                   <Link href="/dashboard" className="hover:text-slate-900 transition-colors">
                     Espace Propriétaire
                   </Link>
@@ -1555,6 +1603,28 @@ export default function QaprilLandingV2({
           </div>
         </div>
       </footer>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          BARRE FLOTTANTE MOBILE : TÉLÉCHARGER L'APPLICATION MOBILE
+      ══════════════════════════════════════════════════════════════════ */}
+      <div className="sm:hidden fixed bottom-3 left-3 right-3 z-40 bg-slate-950/95 border border-emerald-500/50 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl flex items-center justify-between gap-2.5 text-white animate-in slide-in-from-bottom duration-300">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <Smartphone className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] font-black uppercase tracking-wider text-white truncate">App Mobile QAPRIL</div>
+            <div className="text-[10px] text-emerald-400 font-medium truncate">Version 2.0.0 Android</div>
+          </div>
+        </div>
+        <Link
+          href="/telecharger"
+          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5 shrink-0 shadow-md transition-all active:scale-95"
+        >
+          <Download className="w-3.5 h-3.5" />
+          <span>Installer</span>
+        </Link>
+      </div>
     </div>
     </SessionProvider>
   );

@@ -244,7 +244,7 @@ export default function MobileMenu({
                 </div>
 
                 {/* Bouton Accès Rapide : RETOUR VERS L'ACCUEIL */}
-                <div className="p-3 bg-slate-900/40 border-b border-slate-800/80 shrink-0">
+                <div className="p-3 bg-slate-900/40 border-b border-slate-800/80 shrink-0 space-y-2">
                     <Link 
                         href="/" 
                         onClick={() => setIsOpen(false)}
@@ -255,6 +255,21 @@ export default function MobileMenu({
                             <span>Retour à la page d'accueil</span>
                         </span>
                         <ChevronRight size={13} className="text-amber-400" />
+                    </Link>
+
+                    {/* TÉLÉCHARGEMENT DIRECT APPLICATIONS MOBILES APK */}
+                    <Link 
+                        href="/telecharger" 
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/80 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all active:scale-95 shadow-sm"
+                    >
+                        <span className="flex items-center gap-2">
+                            <Download size={15} className="text-emerald-400" />
+                            <span>Télécharger l'App Android (APK)</span>
+                        </span>
+                        <span className="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded font-black border border-emerald-500/30">
+                            v2.0.0
+                        </span>
                     </Link>
                 </div>
 
