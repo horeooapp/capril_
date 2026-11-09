@@ -185,6 +185,29 @@ export default function LocatairePrototypeScreen() {
   const [marketCommune, setMarketCommune] = useState<string>('TOUTES');
   const [marketType, setMarketType] = useState<string>('TOUS');
 
+  // Nouveaux états IC-01 (Ma dette, Mes droits, État des lieux, Invité, Consultations, Négociation & Visites)
+  const [debtModal, setDebtModal] = useState(false);
+  const [partialAmt, setPartialAmt] = useState('100000');
+  const [planMonths, setPlanMonths] = useState(3);
+  const [rightsModal, setRightsModal] = useState(false);
+  const [edlModal, setEdlModal] = useState(false);
+  const [guestModal, setGuestModal] = useState(false);
+  const [guestNom, setGuestNom] = useState('');
+  const [guestLien, setGuestLien] = useState('Famille');
+  const [guestDays, setGuestDays] = useState<15 | 30 | 60 | 90>(30);
+  const [whoViewedModal, setWhoViewedModal] = useState(false);
+  const [shareTranche, setShareTranche] = useState(true);
+  const [shareFoyer, setShareFoyer] = useState(true);
+  const [shareDuree, setShareDuree] = useState(true);
+  const [proposeRentModal, setProposeRentModal] = useState(false);
+  const [proposedRentAmt, setProposedRentAmt] = useState('');
+  const [visiteModal, setVisiteModal] = useState(false);
+  const [visiteSlot, setVisiteSlot] = useState('Samedi · 10h00');
+  const [mesCandModal, setMesCandModal] = useState(false);
+  const [myCandidatures, setMyCandidatures] = useState<any[]>([
+    { id: 'c1', titre: '3 pièces · Cocody Angré 8e Tranche', loyer: 180000, statut: 'Visite proposée', date: 'Hier' },
+  ]);
+
   const availableCommunes = React.useMemo(() => {
     const set = new Set<string>();
     marketList.forEach((off: any) => {
@@ -539,28 +562,15 @@ export default function LocatairePrototypeScreen() {
     <SafeAreaView style={styles.container}>
       {/* HEADER NOUVELLE GÉNÉRATION AVEC BOUTON MENU MOBILE */}
       <View style={styles.mobileHeader}>
-        {/* BOUTONS RETOUR & ACCUEIL */}
-        <Pressable
-          style={styles.headerNavIconBtn}
-          onPress={() => {
-            if (screen !== 'accueil') {
-              setScreen('accueil');
-            } else {
-              confirmExitApp();
-            }
-          }}
-          accessibilityLabel="Retour en arrière"
-        >
-          <ArrowLeft color="#FFFFFF" size={18} />
-        </Pressable>
-
-        <Pressable
-          style={styles.headerNavIconBtn}
-          onPress={() => setScreen('accueil')}
-          accessibilityLabel="Accueil"
-        >
-          <Home color="#FFFFFF" size={18} />
-        </Pressable>
+        {screen !== 'accueil' && (
+          <Pressable
+            style={[styles.menuBurgerBtn, { marginRight: 6 }]}
+            onPress={() => setScreen('accueil')}
+            accessibilityLabel="Retour à l'accueil"
+          >
+            <ArrowLeft color="#1A1D26" size={20} />
+          </Pressable>
+        )}
         <Pressable
           style={styles.menuBurgerBtn}
           onPress={() => setMenuOpen(true)}
@@ -1178,21 +1188,36 @@ export default function LocatairePrototypeScreen() {
             </Text>
 
             <View style={styles.card}>
-              <Text style={styles.label}>PÉRIODE À RÉGLER (PLAFOND LÉGAL 2 MOIS D’AVANCE · ART. 416 CCH)</Text>
+              <Text style={styles.label}>COMBIEN DE MOIS RÉGLER ? (VOTRE CHOIX VOLONTAIRE)</Text>
               <View style={styles.segRow}>
-                {[
-                  [1, '1 mois (Déc.)'],
-                  [2, '2 mois (Déc. + Janv.)'],
-                ].map(([m, lbl]) => (
+                {[1, 2, 3, 4, 5, 6].map((m) => (
                   <Pressable
                     key={m}
-                    onPress={() => setPayPeriod(Number(m))}
+                    onPress={() => setPayPeriod(m)}
                     style={[styles.segBtn, payPeriod === m && styles.segBtnOn]}
                   >
-                    <Text style={[styles.segText, payPeriod === m && styles.segTextOn]}>{lbl}</Text>
+                    <Text style={[styles.segText, payPeriod === m && styles.segTextOn]}>
+                      {m} mois
+                    </Text>
                   </Pressable>
                 ))}
               </View>
+
+              {payPeriod === 2 && (
+                <View style={{ backgroundColor: '#EFF6FF', borderRadius: 10, padding: 10, marginTop: 8, borderWidth: 1, borderColor: '#BFDBFE' }}>
+                  <Text style={{ fontSize: 12, color: '#1E40AF', lineHeight: 17 }}>
+                    Le bailleur ne peut jamais exiger plus de 2 mois d’avance à l’entrée. Vous choisissez librement de régler 2 mois.
+                  </Text>
+                </View>
+              )}
+
+              {payPeriod > 2 && (
+                <View style={{ backgroundColor: '#FFFBEB', borderRadius: 10, padding: 10, marginTop: 8, borderWidth: 1, borderColor: '#FDE68A' }}>
+                  <Text style={{ fontSize: 12, color: '#92400E', lineHeight: 17 }}>
+                    Au-delà de 2 mois d’avance, le total figure sur la déclaration fiscale (article 415). Votre bailleur ne peut jamais l’exiger : c’est votre choix.
+                  </Text>
+                </View>
+              )}
 
               <Text style={[styles.label, { marginTop: 14 }]}>OPÉRATEUR MOBILE MONEY</Text>
               <View style={styles.segRow}>
@@ -1227,7 +1252,7 @@ export default function LocatairePrototypeScreen() {
                 onPress={() =>
                   Alert.alert(
                     'Paiement initié',
-                    `Redirection vers ${payOp} pour ${fmt(loyer * payPeriod)}. Votre quittance officielle sera émise instantanément.`
+                    `Redirection vers ${payOp} pour ${fmt(loyer * payPeriod)}. Votre quittance officielle sera émise dès validation.`
                   )
                 }
               >
@@ -1237,7 +1262,17 @@ export default function LocatairePrototypeScreen() {
 
               <Pressable style={styles.btnGhost} onPress={() => setProcheModal(true)}>
                 <Share2 color="#2C3E6B" size={16} />
-                <Text style={styles.btnGhostText}>Faire payer par un proche (lien de paiement tiers)</Text>
+                <Text style={styles.btnGhostText}>Faire payer par un proche (lien WhatsApp)</Text>
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setPayAutrementModal(true)}>
+                <CheckCircle2 color="#1E7E4E" size={16} />
+                <Text style={[styles.btnGhostText, { color: '#1E7E4E' }]}>J’ai payé autrement (espèces, virement, direct)</Text>
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setDebtModal(true)}>
+                <FileText color="#B45309" size={16} />
+                <Text style={[styles.btnGhostText, { color: '#B45309' }]}>Régler une partie / Proposer un échéancier</Text>
               </Pressable>
             </View>
           </View>
@@ -1257,7 +1292,7 @@ export default function LocatairePrototypeScreen() {
               <View style={styles.rowBetween}>
                 <Text style={styles.boldText}>{receiptsList.length} quittance(s) enregistrée(s)</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>Conforme Loi 2019-576</Text>
+                  <Text style={styles.pillOkText}>Quittances officielles</Text>
                 </View>
               </View>
             </View>
@@ -1298,21 +1333,21 @@ export default function LocatairePrototypeScreen() {
           <View style={styles.sectionGap}>
             <Text style={styles.h1}>Ma caution</Text>
             <Text style={styles.subMuted}>
-              Plafonnée à 2 mois de loyer (art. 415 CCH) · protégée par l’état des lieux contradictoire
+              Plafonnée à 2 mois de loyer · protégée par l’état des lieux d’entrée et de sortie
             </Text>
 
             <View style={styles.heroBlue}>
               <Text style={styles.heroSub}>DÉPÔT DE GARANTIE CONSIGNÉ</Text>
               <Text style={styles.heroBig}>{fmt(depositAmount)}</Text>
               <Text style={styles.heroSub}>
-                {data?.hasLease ? 'Restitution légale sous 30 jours maximum après remise des clés (art. 416 CCH)' : 'Aucun dépôt consigné actuellement'}
+                {data?.hasLease ? 'Restitution sous 30 jours maximum après remise des clés' : 'Aucun dépôt consigné actuellement'}
               </Text>
             </View>
 
             <View style={styles.card}>
               <Text style={styles.boldText}>Règles de protection de votre caution</Text>
               <Text style={[styles.subMuted, { marginTop: 6 }]}>
-                • Aucune retenue ne peut être effectuée sans comparaison entre l’état des lieux d’entrée et de sortie signé des deux parties (M-EDL).{'\n'}
+                • Aucune retenue ne peut être effectuée sans comparaison entre l’état des lieux d’entrée et de sortie signé des deux parties.{'\n'}
                 • L’usure normale du logement n’est jamais imputable au locataire.
               </Text>
             </View>
@@ -1345,11 +1380,11 @@ export default function LocatairePrototypeScreen() {
           <View style={styles.sectionGap}>
             <Text style={styles.h1}>Mon bail · {bailRef}</Text>
             <Text style={styles.subMuted}>
-              Enregistré à la DGI (art. 414 CCH) · Principe des Deux Horloges actif
+              Contrat de location d’habitation conforme à la loi ivoirienne
             </Text>
 
             <View style={styles.card}>
-              <Text style={styles.label}>INFORMATIONS CONTRACTUELLES</Text>
+              <Text style={styles.label}>INFORMATIONS DU BAIL</Text>
               <View style={[styles.rowBetween, { marginTop: 8 }]}>
                 <Text style={styles.subMuted}>Période du contrat</Text>
                 <Text style={styles.boldText}>
@@ -1357,7 +1392,7 @@ export default function LocatairePrototypeScreen() {
                 </Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
-                <Text style={styles.subMuted}>Loyer mensuel contractuel</Text>
+                <Text style={styles.subMuted}>Loyer mensuel</Text>
                 <Text style={styles.boldText}>{fmt(loyer)}</Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
@@ -1365,36 +1400,65 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.boldText}>Le {data?.lease?.paymentDay || 5} du mois</Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
-                <Text style={styles.subMuted}>Dépôt de garantie consigné</Text>
+                <Text style={styles.subMuted}>Dépôt de garantie (max. 2 mois)</Text>
                 <Text style={styles.boldText}>{fmt(depositAmount)}</Text>
               </View>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.boldText}>Droits légaux garantis par QAPRIL</Text>
-              <Text style={[styles.subMuted, { marginTop: 6 }]}>
-                • Révision de loyer interdite avant 3 ans et préavis de 3 mois.{'\n'}
-                • Toute clause contraire au Code de la Construction et de l’Habitat est réputée non écrite (art. 420 CCH).
-              </Text>
-            </View>
+            {/* ACTIONS DU BAIL COMME DANS LA MAQUETTE IC-01 (V.bail) */}
+            <Pressable style={styles.cardRow} onPress={() => setRightsModal(true)}>
+              <ShieldCheck color="#2C3E6B" size={20} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boldText}>Mes droits sur ce bail</Text>
+                <Text style={styles.subMuted}>Dépôt ≤ 2 mois, avances ≤ 2 mois, préavis 3 mois, révision encadrée</Text>
+              </View>
+              <ChevronRight color="#6B7280" size={18} />
+            </Pressable>
+
+            <Pressable style={styles.cardRow} onPress={() => setEdlModal(true)}>
+              <FileSpreadsheet color="#1E7E4E" size={20} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boldText}>État des lieux</Text>
+                <Text style={styles.subMuted}>Pièces, équipements, relevés compteurs CIE / SODECI et photos</Text>
+              </View>
+              <ChevronRight color="#6B7280" size={18} />
+            </Pressable>
+
+            <Pressable style={styles.cardRow} onPress={() => { loadOccupants(); setOccupantsModal(true); }}>
+              <Users color="#2C3E6B" size={20} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boldText}>Occupants de mon foyer</Text>
+                <Text style={styles.subMuted}>Conjoint, enfants majeurs ou proches résidant avec vous</Text>
+              </View>
+              <ChevronRight color="#6B7280" size={18} />
+            </Pressable>
+
+            <Pressable style={styles.cardRow} onPress={() => setGuestModal(true)}>
+              <UserCheck color="#D97706" size={20} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boldText}>Héberger un invité</Text>
+                <Text style={styles.subMuted}>Attestation d’hébergement temporaire (15, 30, 60 ou 90 jours)</Text>
+              </View>
+              <ChevronRight color="#6B7280" size={18} />
+            </Pressable>
 
             {/* P1-08: DONNER CONGÉ (PRÉAVIS DE DÉPART) */}
             <View style={[styles.card, { borderColor: '#CBD5E1', backgroundColor: '#F8FAFC' }]}>
               <View style={styles.rowBetween}>
-                <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>Fin de bail & Déménagement</Text>
+                <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>Donner mon préavis de départ</Text>
                 <View style={{ backgroundColor: '#E2E8F0', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>Art. 434 CCH</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>Préavis 3 mois</Text>
                 </View>
               </View>
               <Text style={[styles.subMuted, { marginTop: 4, lineHeight: 18 }]}>
-                Vous souhaitez quitter votre logement ? Générez votre notification formelle de préavis de départ conforme à la loi (délai légal de 30 jours minimum).
+                Vous souhaitez quitter votre logement ? Envoyez votre préavis officiel à votre bailleur avec calcul automatique de la date de sortie et du rendez-vous d’état des lieux.
               </Text>
               <Pressable
                 style={[styles.btnSecondary, { marginTop: 12, borderColor: '#2C3E6B' }]}
                 onPress={() => setCongeModal(true)}
               >
                 <FileText color="#2C3E6B" size={16} />
-                <Text style={[styles.btnSecondaryText, { color: '#2C3E6B' }]}>Donner congé (Préavis officiel)</Text>
+                <Text style={[styles.btnSecondaryText, { color: '#2C3E6B' }]}>Donner mon préavis</Text>
               </Pressable>
             </View>
           </View>
@@ -1483,28 +1547,53 @@ export default function LocatairePrototypeScreen() {
 
             <View style={styles.heroBlue}>
               <View style={styles.rowBetween}>
-                <Text style={styles.heroSub}>INDICE DE CONFIANCE LOCATIVE</Text>
+                <Text style={styles.heroSub}>MA TRANCHE DE CONFIANCE</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>Tranche A · Excellente</Text>
+                  <Text style={styles.pillOkText}>
+                    {(data?.paidReceiptsCount ?? 0) >= 3 || (data?.user?.kycLevel ?? 0) >= 2
+                      ? 'Tranche A · Excellente'
+                      : (data?.paidReceiptsCount ?? 0) >= 1
+                        ? 'Tranche B · Bonne'
+                        : 'En construction'}
+                  </Text>
                 </View>
               </View>
-              <Text style={styles.heroBig}>{data?.paidReceiptsCount ?? 0} loyer(s) à l’heure</Text>
+              <Text style={styles.heroBig}>{data?.paidReceiptsCount ?? 0} loyer(s) payé(s) à l’heure</Text>
               <Text style={styles.heroSub}>
-                Votre score chiffré exact vous appartient : un bailleur ne voit que votre tranche (A, B ou C)
+                Votre score chiffré exact vous appartient : un bailleur ne voit que votre tranche et les badges que vous activez.
               </Text>
-              <Pressable
-                style={[styles.btnWhite, { marginTop: 12 }]}
-                onPress={() => setVueBailleurModal(true)}
-              >
-                <Text style={styles.btnWhiteText}>Aperçu : « Voir ce que voit un bailleur »</Text>
-              </Pressable>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                <Pressable
+                  style={styles.btnWhite}
+                  onPress={() => setVueBailleurModal(true)}
+                >
+                  <Text style={styles.btnWhiteText}>Voir comme un bailleur</Text>
+                </Pressable>
+                <Pressable
+                  style={styles.btnOutlineWhite}
+                  onPress={() => setWhoViewedModal(true)}
+                >
+                  <Text style={styles.btnOutlineWhiteText}>Qui a consulté mon profil</Text>
+                </Pressable>
+              </View>
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.label}>CE QUE JE PARTAGE LORS D’UNE CANDIDATURE</Text>
+              <Text style={styles.label}>CE QUE J’AUTORISE À VOIR LORS D’UNE CANDIDATURE</Text>
+
+              <Pressable style={styles.toggleRow} onPress={() => setShareTranche(!shareTranche)}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.boldText}>Ma tranche de confiance (A, B ou C)</Text>
+                  <Text style={styles.subMuted}>Jamais le détail du calcul</Text>
+                </View>
+                <Text style={[styles.boldText, { color: shareTranche ? '#1E7E4E' : '#6B7280' }]}>
+                  {shareTranche ? 'Partagé' : 'Masqué'}
+                </Text>
+              </Pressable>
+
               <Pressable style={styles.toggleRow} onPress={() => setShareRev(!shareRev)}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>Badge « Revenus ≥ 3 × loyer »</Text>
+                  <Text style={styles.boldText}>Mes badges (Ponctuel, Revenus ≥ 3× loyer, Garant)</Text>
                   <Text style={styles.subMuted}>Sans jamais révéler le montant de votre salaire</Text>
                 </View>
                 <Text style={[styles.boldText, { color: shareRev ? '#1E7E4E' : '#6B7280' }]}>
@@ -1512,23 +1601,23 @@ export default function LocatairePrototypeScreen() {
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareGarant(!shareGarant)}>
+              <Pressable style={styles.toggleRow} onPress={() => setShareFoyer(!shareFoyer)}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>Badge « Garant engagé »</Text>
-                  <Text style={styles.subMuted}>Indique la présence d’une caution solidaire vérifiée</Text>
+                  <Text style={styles.boldText}>Composition de mon foyer</Text>
+                  <Text style={styles.subMuted}>Nombre d’occupants prévus dans le logement</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareGarant ? '#1E7E4E' : '#6B7280' }]}>
-                  {shareGarant ? 'Partagé' : 'Masqué'}
+                <Text style={[styles.boldText, { color: shareFoyer ? '#1E7E4E' : '#6B7280' }]}>
+                  {shareFoyer ? 'Partagé' : 'Masqué'}
                 </Text>
               </Pressable>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareScore(!shareScore)}>
+              <Pressable style={styles.toggleRow} onPress={() => setShareDuree(!shareDuree)}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>Score chiffré détaillé & pièces CNI</Text>
-                  <Text style={styles.subMuted}>Protégés par défaut</Text>
+                  <Text style={styles.boldText}>Durée de mon bail actuel</Text>
+                  <Text style={styles.subMuted}>Ancienneté dans votre logement actuel</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareScore ? '#D4912A' : '#1E7E4E' }]}>
-                  {shareScore ? 'Ouvert' : 'Protégé'}
+                <Text style={[styles.boldText, { color: shareDuree ? '#1E7E4E' : '#6B7280' }]}>
+                  {shareDuree ? 'Partagé' : 'Masqué'}
                 </Text>
               </Pressable>
             </View>
@@ -1562,7 +1651,7 @@ export default function LocatairePrototypeScreen() {
             </View>
 
             {/* 3 SOUS-ONGLETS RECHERCHE (IC-01 Section 6) */}
-            <View style={{ flexDirection: 'row', gap: 6, marginVertical: 6 }}>
+            <View style={{ flexDirection: 'row', gap: 6, marginVertical: 6, flexWrap: 'wrap' }}>
               {[
                 { id: 'offres', label: 'Offres vérifiées' },
                 { id: 'besoin', label: 'Mon besoin (5 critères)' },
@@ -1586,6 +1675,14 @@ export default function LocatairePrototypeScreen() {
                   </Text>
                 </Pressable>
               ))}
+              <Pressable
+                style={[styles.filterChip, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}
+                onPress={() => setMesCandModal(true)}
+              >
+                <Text style={[styles.filterChipText, { color: '#2C3E6B', fontWeight: '700' }]}>
+                  Mes candidatures ({myCandidatures.length})
+                </Text>
+              </Pressable>
             </View>
 
             {searchSubTab === 'besoin' && (
@@ -1913,8 +2010,30 @@ export default function LocatairePrototypeScreen() {
                         setCandidatureModal(true);
                       }}
                     >
-                      <Text style={styles.btnPrimaryText}>Candidater avec mon Passeport</Text>
+                      <Text style={styles.btnPrimaryText}>Candidater en 1 clic</Text>
                     </Pressable>
+
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                      <Pressable
+                        style={[styles.btnGhost, { flex: 1 }]}
+                        onPress={() => {
+                          setSelectedOfferForCandidature(off);
+                          setProposedRentAmt(String(Math.round(rent * 0.9)));
+                          setProposeRentModal(true);
+                        }}
+                      >
+                        <Text style={styles.btnGhostText}>Proposer un loyer</Text>
+                      </Pressable>
+                      <Pressable
+                        style={[styles.btnGhost, { flex: 1 }]}
+                        onPress={() => {
+                          setSelectedOfferForCandidature(off);
+                          setVisiteModal(true);
+                        }}
+                      >
+                        <Text style={styles.btnGhostText}>Demander une visite</Text>
+                      </Pressable>
+                    </View>
                   </View>
                 );
               })
@@ -2653,16 +2772,353 @@ export default function LocatairePrototypeScreen() {
           <View style={styles.modalSheet}>
             <Text style={styles.h2}>Ce que voit un futur bailleur</Text>
             <Text style={[styles.subMuted, { marginTop: 4 }]}>
-              Ni votre score chiffré, ni votre salaire exact, ni votre CNI ne sont affichés.
+              Ni votre score chiffré, ni votre salaire exact, ni votre pièce d’identité ne sont affichés.
             </Text>
             <View style={styles.recapBox}>
-              <Text style={styles.boldText}>{userName} · Tranche ICL {data?.user?.kycLevel >= 2 ? 'A' : 'B'}</Text>
-              <Text style={styles.subMuted}>• Régularité : 12/12 loyers payés à l’heure</Text>
-              <Text style={styles.subMuted}>• Revenus ≥ 3 × loyer : {shareRev ? 'Oui (vérifié)' : 'Non partagé'}</Text>
-              <Text style={styles.subMuted}>• Garant : {shareGarant ? 'Oui (engagé)' : 'Non partagé'}</Text>
+              <Text style={styles.boldText}>
+                {userName} · {shareTranche ? ((data?.paidReceiptsCount ?? 0) >= 3 || (data?.user?.kycLevel ?? 0) >= 2 ? 'Tranche A' : 'Tranche B') : 'Tranche masquée'}
+              </Text>
+              <Text style={styles.subMuted}>• Régularité : {data?.paidReceiptsCount ?? 0} loyer(s) payé(s) à l’heure</Text>
+              <Text style={styles.subMuted}>• Badges : {shareRev ? 'Ponctuel · Revenus ≥ 3× loyer' : 'Masqués'}</Text>
+              <Text style={styles.subMuted}>• Composition du foyer : {shareFoyer ? 'Partagée' : 'Masquée'}</Text>
+              <Text style={styles.subMuted}>• Durée du bail actuel : {shareDuree ? 'Partagée' : 'Masquée'}</Text>
             </View>
             <Pressable style={styles.btnPrimary} onPress={() => setVueBailleurModal(false)}>
               <Text style={styles.btnPrimaryText}>Compris</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : QUI A CONSULTÉ MON PROFIL (IC-01 V.who) */}
+      <Modal visible={whoViewedModal} transparent animationType="slide" onRequestClose={() => setWhoViewedModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Qui a consulté mon profil</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Seuls les bailleurs ou agences auprès desquels vous avez candidaté peuvent voir votre passeport. Vous pouvez révoquer l’accès à tout moment.
+            </Text>
+            <View style={styles.recapBox}>
+              <View style={styles.rowBetween}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.boldText}>Agence Riviera Habitat</Text>
+                  <Text style={styles.subMuted}>Consulté suite à votre candidature · Il y a 2 jours</Text>
+                </View>
+                <Pressable
+                  style={{ backgroundColor: '#FEF2F2', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                  onPress={() => Alert.alert('Accès révoqué', 'Cet interlocuteur ne peut plus consulter votre passeport locatif.')}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#DC2626' }}>Révoquer</Text>
+                </Pressable>
+              </View>
+            </View>
+            <Pressable style={styles.btnPrimary} onPress={() => setWhoViewedModal(false)}>
+              <Text style={styles.btnPrimaryText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : MA DETTE / PAIEMENT PARTIEL & PLAN D'APUREMENT (IC-01 V.debt) */}
+      <Modal visible={debtModal} transparent animationType="slide" onRequestClose={() => setDebtModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Régler une partie / Proposer un échéancier</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Proposez un versement partiel à votre bailleur. Les mois les plus anciens sont soldés en premier.
+            </Text>
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 10 }}>
+              <View>
+                <Text style={styles.label}>MONTANT QUE JE PEUX VERSER MAINTENANT (FCFA)</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  keyboardType="numeric"
+                  value={partialAmt}
+                  onChangeText={setPartialAmt}
+                  placeholder="Ex : 100000"
+                />
+              </View>
+
+              {(() => {
+                const baseRent = loyer || 150000;
+                const amt = Math.max(0, parseInt(partialAmt.replace(/\s/g, ''), 10) || 0);
+                const fullMonths = Math.floor(amt / baseRent);
+                const remainder = amt % baseRent;
+                const remainingToPay = Math.max(0, baseRent - remainder);
+                const monthlyInstallment = Math.ceil(remainingToPay / planMonths);
+                return (
+                  <View style={styles.recapBox}>
+                    <Text style={styles.label}>APERÇU DE L’IMPUTATION</Text>
+                    <Text style={styles.subMuted}>
+                      • Mois complets soldés : <Text style={styles.boldText}>{fullMonths} quittance(s) émise(s)</Text>
+                    </Text>
+                    <Text style={styles.subMuted}>
+                      • Acompte sur le mois en cours : <Text style={styles.boldText}>{fmt(remainder)} (reçu d’acompte)</Text>
+                    </Text>
+                    <Text style={styles.subMuted}>
+                      • Solde restant à étaler : <Text style={styles.boldText}>{fmt(remainingToPay)}</Text> ({fmt(monthlyInstallment)} / mois sur {planMonths} mois)
+                    </Text>
+                  </View>
+                );
+              })()}
+
+              <Text style={styles.label}>ÉTALER LE SOLDE RESTANT SUR :</Text>
+              <View style={styles.segRow}>
+                {[1, 2, 3, 4, 6].map((m) => (
+                  <Pressable
+                    key={m}
+                    onPress={() => setPlanMonths(m)}
+                    style={[styles.segBtn, planMonths === m && styles.segBtnOn]}
+                  >
+                    <Text style={[styles.segText, planMonths === m && styles.segTextOn]}>{m} mois</Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { marginTop: 8 }]}
+                onPress={() => {
+                  setDebtModal(false);
+                  Alert.alert(
+                    'Proposition envoyée',
+                    `Votre proposition de versement de ${fmt(parseInt(partialAmt, 10) || 0)} avec plan sur ${planMonths} mois a été transmise à votre bailleur.`
+                  );
+                }}
+              >
+                <Text style={styles.btnPrimaryText}>Envoyer la proposition au bailleur</Text>
+              </Pressable>
+              <Pressable style={styles.btnGhost} onPress={() => setDebtModal(false)}>
+                <Text style={styles.btnGhostText}>Annuler</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : MES DROITS SUR CE BAIL (IC-01 V.rights) */}
+      <Modal visible={rightsModal} transparent animationType="slide" onRequestClose={() => setRightsModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Mes droits sur ce bail</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Les règles essentielles qui protègent votre location en Côte d’Ivoire :
+            </Text>
+            <View style={styles.recapBox}>
+              <Text style={styles.boldText}>1. Dépôt de garantie plafonné à 2 mois</Text>
+              <Text style={styles.subMuted}>Votre caution ne peut jamais dépasser 2 mois de loyer et doit être restituée sous 30 jours après la remise des clés.</Text>
+              <Text style={[styles.boldText, { marginTop: 6 }]}>2. Avance de loyer plafonnée à 2 mois</Text>
+              <Text style={styles.subMuted}>Aucun bailleur ne peut exiger plus de 2 mois d’avance à l’entrée. Au-delà, c’est uniquement votre choix volontaire.</Text>
+              <Text style={[styles.boldText, { marginTop: 6 }]}>3. Préavis de départ de 3 mois</Text>
+              <Text style={styles.subMuted}>Vous pouvez quitter le logement à tout moment en respectant le préavis légal.</Text>
+              <Text style={[styles.boldText, { marginTop: 6 }]}>4. Révision du loyer encadrée</Text>
+              <Text style={styles.subMuted}>Le loyer ne peut être révisé qu’à l’issue d’une période de 3 ans et avec un préavis de 3 mois.</Text>
+              <Text style={[styles.boldText, { marginTop: 6 }]}>5. Grosses réparations</Text>
+              <Text style={styles.subMuted}>La structure, la toiture et la plomberie principale sont à la charge du propriétaire.</Text>
+            </View>
+            <Pressable style={styles.btnPrimary} onPress={() => setRightsModal(false)}>
+              <Text style={styles.btnPrimaryText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : ÉTAT DES LIEUX (IC-01 V.edl) */}
+      <Modal visible={edlModal} transparent animationType="slide" onRequestClose={() => setEdlModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>État des lieux contradictoire</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Protège votre caution : seules les dégradations constatées entre l’entrée et la sortie peuvent faire l’objet d’une retenue.
+            </Text>
+            <View style={styles.recapBox}>
+              <Text style={styles.boldText}>Pièces & équipements contrôlés</Text>
+              <Text style={styles.subMuted}>• Salon & séjour : Bon état général</Text>
+              <Text style={styles.subMuted}>• Cuisine : Évier, robinetterie et plan de travail vérifiés</Text>
+              <Text style={styles.subMuted}>• Chambres & salles d’eau : Peintures et ouvrants conformes</Text>
+              <Text style={[styles.boldText, { marginTop: 6 }]}>Relevés des compteurs à l’entrée</Text>
+              <Text style={styles.subMuted}>• Électricité (CIE) & Eau (SODECI) horodatés avec photos</Text>
+            </View>
+            <Pressable style={styles.btnPrimary} onPress={() => setEdlModal(false)}>
+              <Text style={styles.btnPrimaryText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : HÉBERGER UN INVITÉ (IC-01 V.guest) */}
+      <Modal visible={guestModal} transparent animationType="slide" onRequestClose={() => setGuestModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Héberger un invité</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Générez une attestation d’hébergement temporaire (jusqu’à 5 invités simultanés, valable 15 à 90 jours).
+            </Text>
+            <TextInput
+              style={[styles.input, { marginTop: 8 }]}
+              placeholder="Nom et prénoms de l’invité"
+              value={guestNom}
+              onChangeText={setGuestNom}
+            />
+            <Text style={[styles.label, { marginTop: 8 }]}>DURÉE DE L’HÉBERGEMENT</Text>
+            <View style={styles.segRow}>
+              {([15, 30, 60, 90] as const).map((d) => (
+                <Pressable
+                  key={d}
+                  onPress={() => setGuestDays(d)}
+                  style={[styles.segBtn, guestDays === d && styles.segBtnOn]}
+                >
+                  <Text style={[styles.segText, guestDays === d && styles.segTextOn]}>{d} jours</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Pressable
+              style={[styles.btnPrimary, { marginTop: 10 }]}
+              onPress={() => {
+                if (!guestNom.trim()) {
+                  Alert.alert('Nom requis', 'Veuillez indiquer le nom et le prénom de votre invité.');
+                  return;
+                }
+                setGuestModal(false);
+                Alert.alert(
+                  'Attestation générée',
+                  `L’attestation d’hébergement temporaire (${guestDays} jours) pour ${guestNom.trim()} a été générée avec son QR code de vérification.`
+                );
+                setGuestNom('');
+              }}
+            >
+              <Text style={styles.btnPrimaryText}>Générer l’attestation d’hébergement</Text>
+            </Pressable>
+            <Pressable style={styles.btnGhost} onPress={() => setGuestModal(false)}>
+              <Text style={styles.btnGhostText}>Annuler</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : PROPOSER UN LOYER (80-100% · IC-01 V.propose) */}
+      <Modal visible={proposeRentModal} transparent animationType="slide" onRequestClose={() => setProposeRentModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Proposer un loyer</Text>
+            {(() => {
+              const asked = selectedOfferForCandidature?.loyerDemande || selectedOfferForCandidature?.declaredRentFcfa || selectedOfferForCandidature?.price || 200000;
+              const minAllowed = Math.round(asked * 0.8);
+              const val = parseInt(proposedRentAmt.replace(/\s/g, ''), 10) || 0;
+              const isValid = val >= minAllowed && val <= asked;
+              return (
+                <>
+                  <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                    Loyer affiché : {fmt(asked)} · Vous pouvez proposer un montant compris entre {fmt(minAllowed)} (80 %) et {fmt(asked)}.
+                  </Text>
+                  <TextInput
+                    style={[styles.input, { marginTop: 8 }]}
+                    keyboardType="numeric"
+                    value={proposedRentAmt}
+                    onChangeText={setProposedRentAmt}
+                    placeholder={String(minAllowed)}
+                  />
+                  {!isValid && val > 0 && (
+                    <Text style={{ fontSize: 12, color: '#DC2626', fontWeight: '600', marginTop: 4 }}>
+                      La proposition doit être comprise entre {fmt(minAllowed)} et {fmt(asked)}.
+                    </Text>
+                  )}
+                  <Pressable
+                    style={[styles.btnPrimary, { marginTop: 10, opacity: isValid ? 1 : 0.5 }]}
+                    disabled={!isValid}
+                    onPress={() => {
+                      setProposeRentModal(false);
+                      setMyCandidatures((prev) => [
+                        {
+                          id: 'c-' + Date.now(),
+                          titre: selectedOfferForCandidature?.titre || selectedOfferForCandidature?.logement?.name || 'Logement vérifié',
+                          loyer: val,
+                          statut: 'Proposition envoyée',
+                          date: 'À l’instant',
+                        },
+                        ...prev,
+                      ]);
+                      Alert.alert('Proposition envoyée', `Votre offre à ${fmt(val)} / mois a été transmise au bailleur.`);
+                    }}
+                  >
+                    <Text style={styles.btnPrimaryText}>Envoyer ma proposition ({fmt(val)})</Text>
+                  </Pressable>
+                </>
+              );
+            })()}
+            <Pressable style={styles.btnGhost} onPress={() => setProposeRentModal(false)}>
+              <Text style={styles.btnGhostText}>Annuler</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : DEMANDER UNE VISITE (IC-01 V.visite) */}
+      <Modal visible={visiteModal} transparent animationType="slide" onRequestClose={() => setVisiteModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Demander une visite</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Choisissez le créneau qui vous convient pour visiter ce logement :
+            </Text>
+            <View style={{ gap: 8, marginVertical: 10 }}>
+              {['Mercredi · 16h00', 'Vendredi · 15h00', 'Samedi · 10h00', 'Samedi · 15h30'].map((slot) => (
+                <Pressable
+                  key={slot}
+                  onPress={() => setVisiteSlot(slot)}
+                  style={[styles.cardRow, visiteSlot === slot && { borderColor: '#2C3E6B', backgroundColor: '#EFF6FF' }]}
+                >
+                  <Text style={[styles.boldText, { flex: 1 }]}>{slot}</Text>
+                  {visiteSlot === slot && <Check color="#2C3E6B" size={18} />}
+                </Pressable>
+              ))}
+            </View>
+            <Pressable
+              style={styles.btnPrimary}
+              onPress={() => {
+                setVisiteModal(false);
+                setMyCandidatures((prev) => [
+                  {
+                    id: 'v-' + Date.now(),
+                    titre: selectedOfferForCandidature?.titre || selectedOfferForCandidature?.logement?.name || 'Logement vérifié',
+                    loyer: selectedOfferForCandidature?.loyerDemande || selectedOfferForCandidature?.declaredRentFcfa || 180000,
+                    statut: `Visite demandée (${visiteSlot})`,
+                    date: 'À l’instant',
+                  },
+                  ...prev,
+                ]);
+                Alert.alert('Demande envoyée', `Votre demande de visite pour ${visiteSlot} a été envoyée.`);
+              }}
+            >
+              <Text style={styles.btnPrimaryText}>Confirmer le créneau ({visiteSlot})</Text>
+            </Pressable>
+            <Pressable style={styles.btnGhost} onPress={() => setVisiteModal(false)}>
+              <Text style={styles.btnGhostText}>Annuler</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : MES CANDIDATURES (IC-01 V.mescand) */}
+      <Modal visible={mesCandModal} transparent animationType="slide" onRequestClose={() => setMesCandModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Mes candidatures</Text>
+            <Text style={[styles.subMuted, { marginTop: 4 }]}>
+              Suivi de vos candidatures : Envoyée → Vue → Visite proposée → Retenue
+            </Text>
+            <View style={{ gap: 8, marginVertical: 10 }}>
+              {myCandidatures.map((c) => (
+                <View key={c.id} style={styles.card}>
+                  <Text style={styles.boldText}>{c.titre}</Text>
+                  <Text style={styles.subMuted}>{fmt(c.loyer)} / mois · {c.date}</Text>
+                  <View style={[styles.pillOk, { alignSelf: 'flex-start', marginTop: 4 }]}>
+                    <Text style={styles.pillOkText}>{c.statut}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+            <Pressable style={styles.btnPrimary} onPress={() => setMesCandModal(false)}>
+              <Text style={styles.btnPrimaryText}>Fermer</Text>
             </Pressable>
           </View>
         </View>

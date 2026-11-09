@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { sendSMS } from '@/lib/sms';
 
 export async function POST(request: Request) {
     try {
@@ -18,7 +19,11 @@ export async function POST(request: Request) {
                 tenantId: user.userId,
                 status: 'ACTIVE'
             },
-            include: { property: true }
+            include: {
+                property: { include: { owner: true } },
+                landlord: true,
+                tenant: true
+            }
         });
 
         if (!lease) {
@@ -63,6 +68,16 @@ export async function POST(request: Request) {
                 preuveUrl: preuveUrl || null,
             }
         });
+
+        // Notification SMS au bailleur (non-bloquante)
+        const landlordPhone = lease.landlord?.phone || lease.property?.owner?.phone;
+        const tenantName = [lease.tenant?.firstName, lease.tenant?.lastName].filter(Boolean).join(' ').trim() || 'Votre locataire';
+        if (landlordPhone) {
+            await sendSMS(
+                landlordPhone,
+                `QAPRIL : ${tenantName} a déclaré un paiement de ${amountNum.toLocaleString('fr-FR')} FCFA (${moyen || 'Mobile Money'}) pour ${currentMonthStr}. Confirmez dans QAPRIL Propriétaire pour émettre la quittance.`
+            ).catch(() => null);
+        }
 
         return NextResponse.json({
             success: true,

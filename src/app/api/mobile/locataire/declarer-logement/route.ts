@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { normalizePhone } from '@/lib/phone';
+import { sendSMS } from '@/lib/sms';
 
 export async function POST(request: Request) {
     try {
@@ -79,6 +80,14 @@ export async function POST(request: Request) {
                 hashDeclaration: `DECL_TENANT_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
             }
         });
+
+        // Notification SMS au bailleur (non-bloquante)
+        if (normalizedLandlordPhone) {
+            await sendSMS(
+                normalizedLandlordPhone,
+                `QAPRIL : ${tenantFullName} déclare occuper votre logement (${housingDesc.trim()}) pour ${rentNum.toLocaleString('fr-FR')} FCFA/mois. Confirmez sur votre espace QAPRIL Propriétaire (qapril.net/telecharger).`
+            ).catch(() => null);
+        }
 
         return NextResponse.json({
             success: true,

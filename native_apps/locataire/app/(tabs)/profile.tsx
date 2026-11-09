@@ -26,10 +26,13 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Modification email
+  // Modification email & À propos
   const [editEmailVisible, setEditEmailVisible] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [isSavingEmail, setIsSavingEmail] = useState(false);
+  const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [maposteCode, setMaposteCode] = useState('CI-ABJ-COC-04821');
+  const [editMaposteVisible, setEditMaposteVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -159,21 +162,70 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#2C3E6B', marginTop: 2 }}>
+                  {user?.phone || '+225 · Numéro vérifié'}
+                </Text>
                 
                 <Pressable 
                   onPress={() => { setNewEmail(user?.email || ''); setEditEmailVisible(true); }}
                   style={styles.emailRow}
                 >
                   <Mail color="#6B7280" size={13} />
-                  <Text style={styles.email} numberOfLines={1}>{user?.email || 'Définir un e-mail'}</Text>
+                  <Text style={styles.email} numberOfLines={1}>{user?.email || 'Ajouter un e-mail (optionnel)'}</Text>
                   <Edit2 color="#2C3E6B" size={12} style={{ marginLeft: 2 }} />
                 </Pressable>
 
                 <View style={styles.pillOk}>
                   <Text style={styles.pillOkText}>
-                    {user?.isCertified ? 'Identité certifiée · Dossier Validé' : 'Compte actif · Espace Locataire'}
+                    {user?.isCertified ? 'Niveau 2 · Identité vérifiée' : 'Niveau 1 · Téléphone vérifié'}
                   </Text>
                 </View>
+              </View>
+            </View>
+
+            {/* Niveaux de confiance locataire (IC-01) */}
+            <View style={styles.card}>
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#6B7280', marginBottom: 8 }}>
+                MON NIVEAU DE CONFIANCE
+              </Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#1E7E4E', marginBottom: 6 }}>
+                ✓ Niveau 1 · Téléphone vérifié par code SMS
+              </Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: user?.isCertified ? '#1E7E4E' : '#6B7280' }}>
+                {user?.isCertified
+                  ? '✓ Niveau 2 · Identité vérifiée (pièce d’identité contrôlée)'
+                  : '○ Niveau 2 · Identité vérifiée (pièce d’identité + Mobile Money au même nom)'}
+              </Text>
+              {!user?.isCertified && (
+                <Pressable
+                  style={[styles.btnSecondary, { marginTop: 10, paddingVertical: 10 }]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Vérifier mon identité (Niveau 2)',
+                      'La vérification associe votre pièce d’identité (CNI ou passeport) à votre compte Mobile Money au même nom pour renforcer votre passeport locatif.'
+                    )
+                  }
+                >
+                  <Text style={styles.btnSecondaryText}>Ajouter ma pièce d’identité</Text>
+                </Pressable>
+              )}
+            </View>
+
+            {/* Ma boîte MaPoste */}
+            <View style={styles.card}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.cardTitle}>Ma boîte MaPoste</Text>
+                  <Text style={styles.cardSub}>
+                    Code postal numérique : {maposteCode} · Utilisé pour la réception de vos courriers officiels.
+                  </Text>
+                </View>
+                <Pressable
+                  style={{ backgroundColor: '#F4F5F9', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                  onPress={() => setEditMaposteVisible(true)}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#2C3E6B' }}>Modifier</Text>
+                </Pressable>
               </View>
             </View>
 
@@ -181,9 +233,9 @@ export default function ProfileScreen() {
               <View style={styles.row}>
                 <ShieldCheck color="#2C3E6B" size={20} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>Vos données vous appartiennent</Text>
+                  <Text style={styles.cardTitle}>Confidentialité & Passeport locatif</Text>
                   <Text style={styles.cardSub}>
-                    Aucun bailleur ne voit votre tranche de confiance ni vos pièces sans votre accord explicite.
+                    Vos données vous appartiennent. Aucun bailleur ne voit votre tranche de confiance ni vos pièces sans votre accord explicite.
                   </Text>
                 </View>
               </View>
@@ -196,7 +248,7 @@ export default function ProfileScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardTitle}>Manuel d'Utilisation Officiel</Text>
                   <Text style={styles.cardSub}>
-                    Consultez le guide officiel complet de l'application (version 2.0 certifiée).
+                    Consultez le guide officiel complet de l'application (version 2.0).
                   </Text>
                 </View>
               </View>
@@ -213,28 +265,15 @@ export default function ProfileScreen() {
                   onPress={() => Linking.openURL('https://qapril.net/api/manual/download')}
                 >
                   <Download color="#2C3E6B" size={14} />
-                  <Text style={[styles.btnSecondaryText, { color: '#2C3E6B', fontSize: 12 }]}>Télécharger DOCX</Text>
+                  <Text style={[styles.btnSecondaryText, { color: '#2C3E6B', fontSize: 12 }]}>Télécharger</Text>
                 </Pressable>
               </View>
             </View>
 
-            <View style={{ gap: 6 }}>
-              {updateAvailable === true && (
-                <View style={{ backgroundColor: '#059669', padding: 12, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>✓ MISE À JOUR DISPONIBLE</Text>
-                  <Text style={{ color: '#A7F3D0', fontSize: 11 }}>Appuyez ci-dessous</Text>
-                </View>
-              )}
-              <Pressable style={styles.btnSecondary} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
-                <RefreshCw color="#2C3E6B" size={16} />
-                <Text style={styles.btnSecondaryText}>
-                  {isCheckingUpdate ? 'Recherche en cours...' : 'Vérifier les mises à jour (OTA)'}
-                </Text>
-              </Pressable>
-              <Text style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center' }}>
-                Version 2.0.0 · Infrastructure certifiée QAPRIL CI
-              </Text>
-            </View>
+            <Pressable style={styles.btnSecondary} onPress={() => setAboutModalVisible(true)}>
+              <RefreshCw color="#2C3E6B" size={16} />
+              <Text style={styles.btnSecondaryText}>À propos de QAPRIL · Version 2.0.0</Text>
+            </Pressable>
 
             <Pressable style={styles.btnDanger} onPress={handleLogout}>
               <LogOut color="#C0392B" size={16} />
@@ -284,6 +323,59 @@ export default function ProfileScreen() {
                 )}
               </Pressable>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal MaPoste */}
+      <Modal visible={editMaposteVisible} transparent animationType="fade" onRequestClose={() => setEditMaposteVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Ma boîte MaPoste</Text>
+            <Text style={styles.modalSubtitle}>Renseignez votre code postal numérique MaPoste pour vos notifications officielles.</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={maposteCode}
+              onChangeText={setMaposteCode}
+              placeholder="CI-ABJ-COC-04821"
+              autoCapitalize="characters"
+            />
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} onPress={() => setEditMaposteVisible(false)}>
+                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalBtn, { backgroundColor: '#2C3E6B' }]}
+                onPress={() => {
+                  setEditMaposteVisible(false);
+                  Alert.alert('MaPoste enregistrée', `Votre code postal numérique ${maposteCode} est bien lié à votre compte.`);
+                }}
+              >
+                <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal À propos */}
+      <Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>QAPRIL Locataire</Text>
+            <Text style={styles.modalSubtitle}>
+              Version 2.0.0 · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Conçue conformément au Code de la Construction et de l’Habitat et à la protection des données personnelles.
+            </Text>
+            <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
+              <RefreshCw color="#2C3E6B" size={16} />
+              <Text style={styles.btnSecondaryText}>
+                {isCheckingUpdate ? 'Recherche en cours...' : 'Rechercher une mise à jour'}
+              </Text>
+            </Pressable>
+            <Pressable style={[styles.modalBtn, { backgroundColor: '#2C3E6B', flex: 0 }]} onPress={() => setAboutModalVisible(false)}>
+              <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Fermer</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>

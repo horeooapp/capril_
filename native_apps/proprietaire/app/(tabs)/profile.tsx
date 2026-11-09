@@ -27,10 +27,14 @@ export default function ProfileScreen() {
   const [diaspora, setDiaspora] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Modification email
+  // Modification email, Diaspora & À propos
   const [editEmailVisible, setEditEmailVisible] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [isSavingEmail, setIsSavingEmail] = useState(false);
+  const [diasporaModalVisible, setDiasporaModalVisible] = useState(false);
+  const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [maposteCode, setMaposteCode] = useState('CI-ABJ-COC-01180');
+  const [editMaposteVisible, setEditMaposteVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -160,50 +164,83 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#1B4D3E', marginTop: 2 }}>
+                  {user?.phone || '+225 · Numéro vérifié'}
+                </Text>
                 
                 <Pressable 
                   onPress={() => { setNewEmail(user?.email || ''); setEditEmailVisible(true); }}
                   style={styles.emailRow}
                 >
                   <Mail color="#6E6E73" size={13} />
-                  <Text style={styles.email} numberOfLines={1}>{user?.email || 'Définir un e-mail'}</Text>
+                  <Text style={styles.email} numberOfLines={1}>{user?.email || 'Ajouter un e-mail (optionnel)'}</Text>
                   <Edit2 color="#1B4D3E" size={12} style={{ marginLeft: 2 }} />
                 </Pressable>
 
                 <View style={styles.pillOk}>
                   <Text style={styles.pillOkText}>
-                    {user?.isCertified ? 'Bailleur certifié · Identité validée' : 'Compte actif · Espace Bailleur'}
+                    {user?.isCertified ? 'Niveau 2 · Identité vérifiée' : 'Niveau 1 · Téléphone vérifié'}
                   </Text>
                 </View>
               </View>
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.label}>VOTRE NIVEAU DE CONFIANCE</Text>
-              <Text style={styles.item}>✓ Niveau 1 · Téléphone vérifié</Text>
-              <Text style={[styles.item, !user?.isCertified && { color: '#6E6E73' }]}>
-                {user?.isCertified ? '✓ Niveau 2 · Identité validée (Pièce + Rapprochement)' : '○ Niveau 2 · Ajouter ma pièce d’identité pour valider'}
+              <Text style={styles.label}>NIVEAUX DE CONFIANCE BAILLEUR</Text>
+              <Text style={[styles.item, { color: '#1E7E4E' }]}>✓ Niveau 1 · Téléphone vérifié par code SMS</Text>
+              <Text style={[styles.item, { color: user?.isCertified ? '#1E7E4E' : '#6E6E73' }]}>
+                {user?.isCertified
+                  ? '✓ Niveau 2 · Identité vérifiée (pièce + compte Mobile Money au même nom)'
+                  : '○ Niveau 2 · Identité vérifiée (pièce d’identité + Mobile Money au même nom)'}
+              </Text>
+              {!user?.isCertified && (
+                <Pressable
+                  style={[styles.btnSecondary, { marginVertical: 6, paddingVertical: 10 }]}
+                  onPress={() =>
+                    Alert.alert(
+                      'Vérifier mon identité (Niveau 2)',
+                      'La vérification associe votre pièce d’identité (CNI ou passeport) à votre compte Mobile Money au même nom pour certifier votre statut de bailleur.'
+                    )
+                  }
+                >
+                  <Text style={styles.btnSecondaryText}>Ajouter ma pièce d’identité</Text>
+                </Pressable>
+              )}
+              <Text style={[styles.item, { color: '#6E6E73' }]}>
+                ○ Niveau 3 · Titre de propriété contrôlé (par bien dans Mes biens)
               </Text>
               <Text style={[styles.item, { color: '#6E6E73' }]}>
-                ○ Niveau 3 · Titre de propriété contrôlé (enregistré par bien)
-              </Text>
-              <Text style={[styles.item, { color: '#6E6E73' }]}>
-                ○ Niveau 4 · Visite certifiée par agence agréée (par bien)
+                ○ Niveau 4 · Visite certifiée par une agence agréée (par bien)
               </Text>
             </View>
 
-            <Pressable style={styles.cardRow} onPress={() => setDiaspora(!diaspora)}>
+            <Pressable style={styles.cardRow} onPress={() => setDiasporaModalVisible(true)}>
               <Globe color="#1B4D3E" size={20} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Je gère depuis l’étranger — 7 € par mois</Text>
                 <Text style={styles.cardSub}>
-                  Affichage en FCFA et € au taux officiel · rapports de gestion mensuels
+                  Affichage en FCFA et € au taux officiel · rapports mensuels PDF · visite certifiée
                 </Text>
               </View>
               <Text style={[styles.statusText, { color: diaspora ? '#1E7E4E' : '#6E6E73' }]}>
-                {diaspora ? 'Actif' : 'Inactif'}
+                {diaspora ? 'Actif' : 'Découvrir'}
               </Text>
             </Pressable>
+
+            <View style={styles.cardRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardTitle}>Ma boîte MaPoste</Text>
+                <Text style={styles.cardSub}>
+                  Code postal numérique : {maposteCode} · Utilisé pour vos courriers officiels.
+                </Text>
+              </View>
+              <Pressable
+                style={{ backgroundColor: '#F5F2EC', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
+                onPress={() => setEditMaposteVisible(true)}
+              >
+                <Text style={{ fontSize: 12, fontWeight: '600', color: '#1B4D3E' }}>Modifier</Text>
+              </Pressable>
+            </View>
 
             {/* Manuel d'Utilisation Officiel QAPRIL v2.0 */}
             <View style={styles.card}>
@@ -212,7 +249,7 @@ export default function ProfileScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardTitle}>Manuel d'Utilisation Officiel</Text>
                   <Text style={styles.cardSub}>
-                    Guide officiel complet certifié v2.0 (espace bailleur, baux légaux et adoption).
+                    Guide officiel complet v2.0 (espace bailleur, baux et adoption).
                   </Text>
                 </View>
               </View>
@@ -229,28 +266,15 @@ export default function ProfileScreen() {
                   onPress={() => Linking.openURL('https://qapril.net/api/manual/download')}
                 >
                   <Download color="#1B4D3E" size={14} />
-                  <Text style={[styles.btnSecondaryText, { color: '#1B4D3E', fontSize: 12 }]}>Télécharger DOCX</Text>
+                  <Text style={[styles.btnSecondaryText, { color: '#1B4D3E', fontSize: 12 }]}>Télécharger</Text>
                 </Pressable>
               </View>
             </View>
 
-            <View style={{ gap: 6 }}>
-              {updateAvailable === true && (
-                <View style={{ backgroundColor: '#059669', padding: 12, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>✓ MISE À JOUR DISPONIBLE</Text>
-                  <Text style={{ color: '#A7F3D0', fontSize: 11 }}>Appuyez ci-dessous</Text>
-                </View>
-              )}
-              <Pressable style={styles.btnSecondary} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
-                <RefreshCw color="#1B4D3E" size={16} />
-                <Text style={styles.btnSecondaryText}>
-                  {isCheckingUpdate ? 'Recherche en cours...' : 'Vérifier les mises à jour (OTA)'}
-                </Text>
-              </Pressable>
-              <Text style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center' }}>
-                Version 2.0.0 · Infrastructure certifiée QAPRIL CI
-              </Text>
-            </View>
+            <Pressable style={styles.btnSecondary} onPress={() => setAboutModalVisible(true)}>
+              <RefreshCw color="#1B4D3E" size={16} />
+              <Text style={styles.btnSecondaryText}>À propos de QAPRIL · Version 2.0.0</Text>
+            </Pressable>
 
             <Pressable style={styles.btnDanger} onPress={handleLogout}>
               <LogOut color="#C0392B" size={16} />
@@ -300,6 +324,109 @@ export default function ProfileScreen() {
                 )}
               </Pressable>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal Option Diaspora (IC-01 V.diaspora) */}
+      <Modal visible={diasporaModalVisible} transparent animationType="fade" onRequestClose={() => setDiasporaModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Je gère depuis l’étranger</Text>
+            <Text style={styles.modalSubtitle}>Option à 7 € par mois · Résiliable à tout moment</Text>
+            <View style={{ backgroundColor: '#F5F2EC', borderRadius: 12, padding: 14, gap: 8, marginBottom: 14 }}>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#1C1C1E' }}>
+                ✓ Montants en FCFA et en € au taux officiel (1 € = 655,957 F)
+              </Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#1C1C1E' }}>
+                ✓ Rapports mensuels PDF par bien et global
+              </Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#1C1C1E' }}>
+                ✓ Alertes e-mail et WhatsApp sur chaque événement
+              </Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#1C1C1E' }}>
+                ✓ Visite certifiée par une agence partenaire (niveau 4) incluse
+              </Text>
+              <Text style={{ fontSize: 11, color: '#6E6E73', marginTop: 4 }}>
+                QAPRIL n’encaisse jamais vos loyers : ils vont directement sur vos comptes en Côte d’Ivoire.
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} onPress={() => setDiasporaModalVisible(false)}>
+                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Fermer</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]}
+                onPress={() => {
+                  const next = !diaspora;
+                  setDiaspora(next);
+                  setDiasporaModalVisible(false);
+                  Alert.alert(
+                    next ? 'Option activée' : 'Option désactivée',
+                    next
+                      ? 'L’affichage en € et les rapports mensuels sont activés sur votre espace.'
+                      : 'L’affichage est revenu uniquement en FCFA.'
+                  );
+                }}
+              >
+                <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>
+                  {diaspora ? 'Désactiver' : 'Activer — 7 € / mois'}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal MaPoste */}
+      <Modal visible={editMaposteVisible} transparent animationType="fade" onRequestClose={() => setEditMaposteVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Ma boîte MaPoste</Text>
+            <Text style={styles.modalSubtitle}>Renseignez votre code postal numérique MaPoste pour vos notifications officielles.</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={maposteCode}
+              onChangeText={setMaposteCode}
+              placeholder="CI-ABJ-COC-01180"
+              autoCapitalize="characters"
+            />
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+              <Pressable style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} onPress={() => setEditMaposteVisible(false)}>
+                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]}
+                onPress={() => {
+                  setEditMaposteVisible(false);
+                  Alert.alert('MaPoste enregistrée', `Votre code postal numérique ${maposteCode} est bien lié à votre compte.`);
+                }}
+              >
+                <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal À propos */}
+      <Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>QAPRIL Bailleur</Text>
+            <Text style={styles.modalSubtitle}>
+              Version 2.0.0 · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Gestion locative conforme à la réglementation en vigueur (Code de la Construction et de l’Habitat).
+            </Text>
+            <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
+              <RefreshCw color="#1B4D3E" size={16} />
+              <Text style={styles.btnSecondaryText}>
+                {isCheckingUpdate ? 'Recherche en cours...' : 'Rechercher une mise à jour'}
+              </Text>
+            </Pressable>
+            <Pressable style={[styles.modalBtn, { backgroundColor: '#1B4D3E', flex: 0 }]} onPress={() => setAboutModalVisible(false)}>
+              <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Fermer</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>

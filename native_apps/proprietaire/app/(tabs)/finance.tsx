@@ -57,12 +57,9 @@ export default function FinanceScreen() {
       <TopNavHeader title="Flux & Rapports" subtitle="Comptabilité & Reversements" />
       <View style={styles.header}>
         <View>
-          <Text style={styles.sub}>Réconciliation webhooks HMAC-SHA256</Text>
-          <Text style={styles.title}>Flux & Rapports</Text>
+          <Text style={styles.sub}>Vos loyers arrivent directement sur vos comptes</Text>
+          <Text style={styles.title}>Mes encaissements</Text>
         </View>
-        <Pressable style={styles.eurBtn} onPress={() => setEur(!eur)}>
-          <Text style={styles.eurBtnText}>{eur ? 'Afficher en F' : 'Afficher en € (BCE)'}</Text>
-        </Pressable>
       </View>
 
       <View style={styles.heroCard}>

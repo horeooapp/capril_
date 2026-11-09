@@ -69,6 +69,7 @@ const BAILLEUR_MENU_ITEMS = [
   { id: 'flux', label: 'Flux financiers (FCFA/€)', desc: 'Reversements Wave, Orange et virements diaspora', icon: Wallet },
   { id: 'mandats', label: 'Mandats de gestion', desc: 'Agences agréées et intermédiaires', icon: Briefcase },
   { id: 'cand', label: 'Vivier de candidats', desc: 'Demandes de location et dossiers vérifiés', icon: Users },
+  { id: 'params', label: 'Paramètres de gestion', desc: 'Relances J+3/J+7/J+15, paiements partiels et Diaspora', icon: Wrench },
   { id: 'profil', label: 'Profil & Conformité Niv. 1–4', desc: 'Identité bailleur et labels légaux', icon: ShieldCheck },
   { id: 'manuel', label: 'Manuel d’utilisation', desc: 'Guide officiel complet v2.0 certifié', icon: BookOpen },
 ];
@@ -95,13 +96,25 @@ export default function BailleurAndAgencePrototypeScreen() {
 
   // --- ÉTATS PROTOTYPE BAILLEUR ---
   const [bTab, setBTab] = useState<
-    'home' | 'biens' | 'baux' | 'newbail' | 'quit' | 'flux' | 'mandats' | 'cand' | 'profil'
+    'home' | 'biens' | 'baux' | 'newbail' | 'quit' | 'flux' | 'mandats' | 'cand' | 'params' | 'profil'
   >('home');
   const [eurMode, setEurMode] = useState(false);
+  const [diasporaSubscribed, setDiasporaSubscribed] = useState(false);
   const [cashModal, setCashModal] = useState(false);
   const [dgiModalRef, setDgiModalRef] = useState<string | null>(null);
   const [mandatModal, setMandatModal] = useState(false);
   const [mType, setMType] = useState<'agree' | 'nonagree' | 'inter'>('agree');
+
+  // Nouveaux états IC-01 Bailleur (Position du bien, Publier une offre, Paiement partiel, Paramètres)
+  const [positionModalBien, setPositionModalBien] = useState<any>(null);
+  const [offreModalBien, setOffreModalBien] = useState<any>(null);
+  const [offreLoyer, setOffreLoyer] = useState('180000');
+  const [offreNegociable, setOffreNegociable] = useState(true);
+  const [partialModal, setPartialModal] = useState(false);
+  const [relanceJ3, setRelanceJ3] = useState(true);
+  const [relanceJ7, setRelanceJ7] = useState(true);
+  const [relanceJ15, setRelanceJ15] = useState(true);
+  const [partialPolicy, setPartialPolicy] = useState<'plan' | 'accepter' | 'refuser'>('plan');
 
   const [bBiens, setBBiens] = useState<any[]>([]);
   const [bBaux, setBBaux] = useState<any[]>([]);
@@ -321,10 +334,12 @@ export default function BailleurAndAgencePrototypeScreen() {
               type: p.propertyType || 'Bien',
               name: p.name,
               loyer: p.currentRent || p.declaredRentFcfa || 0,
-              loc: p.tenantName || 'Aucun locataire',
+              loc: p.tenantName || '',
               icl: 'A',
               statut: (p.occupancyStatus === 'Occupé' || p.occupancyStatus === 'Loué') ? 'loue' : 'vacant',
-              niv: 3,
+              niv: p.isBienVerifie ? 3 : p.gpsLatitude ? 2 : 1,
+              gpsStatut: p.gpsLatitude ? 'Confirmée' : 'Provisoire',
+              offrePubliee: false,
               masque: false,
               mandat: null
             })));
@@ -401,33 +416,18 @@ export default function BailleurAndAgencePrototypeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
       {/* HEADER MOBILE NOUVELLE GÉNÉRATION */}
       <View style={[styles.mobileHeader, { backgroundColor: primaryColor }]}>
-        {/* BOUTONS RETOUR & ACCUEIL */}
-        <Pressable
-          style={styles.headerNavIconBtn}
-          onPress={() => {
-            if (isBailleur && bTab !== 'home') {
-              setBTab('home');
-            } else if (!isBailleur && aTab !== 'home') {
-              setATab('home');
-            } else {
-              confirmExitApp();
-            }
-          }}
-          accessibilityLabel="Retour en arrière"
-        >
-          <ArrowLeft color="#FFFFFF" size={18} />
-        </Pressable>
-
-        <Pressable
-          style={styles.headerNavIconBtn}
-          onPress={() => {
-            if (isBailleur) setBTab('home');
-            else setATab('home');
-          }}
-          accessibilityLabel="Accueil"
-        >
-          <Home color="#FFFFFF" size={18} />
-        </Pressable>
+        {((isBailleur && bTab !== 'home') || (!isBailleur && aTab !== 'home')) && (
+          <Pressable
+            style={styles.headerNavIconBtn}
+            onPress={() => {
+              if (isBailleur) setBTab('home');
+              else setATab('home');
+            }}
+            accessibilityLabel="Retour à l'accueil"
+          >
+            <ArrowLeft color="#FFFFFF" size={18} />
+          </Pressable>
+        )}
         <Pressable
           style={styles.menuBurgerBtn}
           onPress={() => setMenuOpen(true)}
@@ -454,7 +454,7 @@ export default function BailleurAndAgencePrototypeScreen() {
         </Pressable>
 
         <View style={styles.headerActionsRight}>
-          {isBailleur && (
+          {isBailleur && (dashData?.user?.diasporaAbonnement || diasporaSubscribed) && (
             <Pressable
               style={styles.headerCurrencyPill}
               onPress={() => setEurMode(!eurMode)}
@@ -469,14 +469,6 @@ export default function BailleurAndAgencePrototypeScreen() {
           >
             <User color="#FFFFFF" size={18} />
           </Pressable>
-          <Pressable
-            style={styles.headerExitBtn}
-            onPress={confirmExitApp}
-            accessibilityLabel="Quitter l'application"
-          >
-            <LogOut color="#FCA5A5" size={17} />
-          </Pressable>
-
         </View>
       </View>
 
@@ -518,11 +510,15 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <View style={[styles.certifBadge, { backgroundColor: isBailleur ? '#FEF3C7' : '#EFF6FF' }]}>
                     <ShieldCheck color={isBailleur ? '#D97706' : '#2563EB'} size={12} />
                     <Text style={[styles.certifBadgeText, { color: isBailleur ? '#92400E' : '#1D4ED8' }]}>
-                      {isBailleur ? 'BAILLEUR CERTIFIÉ' : 'AGENCE AGRÉÉE CPRAIMA'}
+                      {isBailleur
+                        ? dashData?.user?.isCertified || (dashData?.user?.kycLevel ?? 1) >= 2
+                          ? 'NIVEAU 2 · VÉRIFIÉ'
+                          : 'NIVEAU 1 · NUMÉRO VÉRIFIÉ'
+                        : 'AGENCE AGRÉÉE'}
                     </Text>
                   </View>
                   <Text style={styles.drawerUserSub}>
-                    {isBailleur ? `${bBiens.length} bien(s) · ${bBaux.length} bail(aux)` : 'AGR-2021-0133'}
+                    {isBailleur ? `${bBiens.length} bien(s) · ${bBaux.length} bail(aux)` : agencyOfficialRef}
                   </Text>
                 </View>
               </View>
@@ -646,7 +642,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               <View style={styles.drawerDivider} />
 
               <Text style={styles.drawerSectionTitle}>RÉGLAGES & COMPTE</Text>
-              {isBailleur && (
+              {isBailleur && (dashData?.user?.diasporaAbonnement || diasporaSubscribed) && (
                 <Pressable
                   style={styles.drawerItem}
                   onPress={() => setEurMode(!eurMode)}
@@ -656,7 +652,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.drawerItemLabel}>Affichage devise : {eurMode ? 'Euros (€)' : 'FCFA (F)'}</Text>
-                    <Text style={styles.drawerItemDesc}>Bascule instantanée des montants</Text>
+                    <Text style={styles.drawerItemDesc}>Option Diaspora active (1 € = 655,957 F)</Text>
                   </View>
                   <Text style={{ fontSize: 13, fontWeight: '600', color: primaryColor }}>
                     {eurMode ? '€' : 'F'}
@@ -736,7 +732,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Espace Propriétaire Bailleur</Text>
                     <Text style={styles.h1}>{userName}</Text>
                   </View>
-                  {dashData?.user?.diasporaAbonnement && (
+                  { (dashData?.user?.diasporaAbonnement || diasporaSubscribed) && (
                     <Pressable
                       style={styles.pillGold}
                       onPress={() => setEurMode(!eurMode)}
@@ -913,6 +909,16 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.boldText}>Vivier qualifié</Text>
                     <Text style={styles.subMuted}>Dossiers locataires</Text>
                   </Pressable>
+                  <Pressable style={styles.cardGrid} onPress={() => setBTab('params')}>
+                    <Wrench color="#1B4D3E" size={20} />
+                    <Text style={styles.boldText}>Paramètres</Text>
+                    <Text style={styles.subMuted}>Relances & paiements partiels</Text>
+                  </Pressable>
+                  <Pressable style={styles.cardGrid} onPress={() => setPartialModal(true)}>
+                    <Wallet color="#9A6500" size={20} />
+                    <Text style={styles.boldText}>Paiement partiel</Text>
+                    <Text style={styles.subMuted}>Gérer un acompte / plan</Text>
+                  </Pressable>
                 </View>
               </View>
             )}
@@ -947,12 +953,30 @@ export default function BailleurAndAgencePrototypeScreen() {
                     </View>
                     <Text style={styles.subMuted}>{b.struct}</Text>
                     <Text style={styles.subMuted}>
-                      {b.loc ? `Locataire : ${b.loc}` : 'Offre publiée dans le vivier · 4 candidats'} · Vérif. niv. {b.niv}
+                      {b.loc ? `Locataire : ${b.loc}` : b.offrePubliee ? 'Offre publiée dans le vivier' : 'Aucun locataire actif'} · Niveau {b.niv} · Position : {b.gpsStatut || 'Provisoire'}
                     </Text>
-                    <View style={[styles.rowBetween, { marginTop: 6 }]}>
-                      <Text style={styles.subMuted}>
-                        Identité bailleur : {b.masque ? 'Masquée (protégée)' : 'Visible'}
-                      </Text>
+                    <View style={[styles.rowBetween, { marginTop: 6, flexWrap: 'wrap', gap: 6 }]}>
+                      <Pressable
+                        style={styles.pillGold}
+                        onPress={() => setPositionModalBien(b)}
+                      >
+                        <Text style={styles.pillGoldText}>Position GPS ({b.gpsStatut || 'Provisoire'})</Text>
+                      </Pressable>
+
+                      {b.statut === 'vacant' && (
+                        <Pressable
+                          style={[styles.pillGold, { backgroundColor: '#E3F5EC' }]}
+                          onPress={() => {
+                            setOffreModalBien(b);
+                            setOffreLoyer(String(b.loyer || 180000));
+                          }}
+                        >
+                          <Text style={[styles.pillGoldText, { color: '#1E7E4E' }]}>
+                            {b.offrePubliee ? 'Modifier l’offre' : 'Publier une offre'}
+                          </Text>
+                        </Pressable>
+                      )}
+
                       <Pressable
                         style={styles.pillGold}
                         onPress={() => {
@@ -966,7 +990,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         }}
                       >
                         <Text style={styles.pillGoldText}>
-                          {b.masque ? 'Lever masquage' : 'Masquer mon nom'}
+                          {b.masque ? 'Nom masqué (Lever)' : 'Masquer mon nom'}
                         </Text>
                       </Pressable>
                     </View>
@@ -1045,7 +1069,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(r.totalAmount || r.rentAmount || 0)}</Text>
                       </View>
                       <Text style={styles.subMuted}>Locataire : {r.lease?.tenant ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim() : 'Locataire'}</Text>
-                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Conforme Loi 2019-576</Text>
+                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Quittance officielle</Text>
                     </View>
                   ))
                 )}
@@ -1055,18 +1079,20 @@ export default function BailleurAndAgencePrototypeScreen() {
             {bTab === 'flux' && (
               <View style={styles.sectionGap}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.h1}>Tableau des flux</Text>
-                  <Pressable style={styles.pillGold} onPress={() => setEurMode(!eurMode)}>
-                    <Text style={styles.pillGoldText}>
-                      {eurMode ? 'En FCFA' : 'En € (BCE 655,957)'}
-                    </Text>
-                  </Pressable>
+                  <Text style={styles.h1}>Mes encaissements</Text>
+                  {(dashData?.user?.diasporaAbonnement || diasporaSubscribed) && (
+                    <Pressable style={styles.pillGold} onPress={() => setEurMode(!eurMode)}>
+                      <Text style={styles.pillGoldText}>
+                        {eurMode ? 'En FCFA' : 'En € (1 € = 655,957 F)'}
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
                 <View style={styles.card}>
-                  <Text style={styles.subMuted}>ENCAISSÉ CE MOIS (FRAIS DE SERVICE : 0 F)</Text>
+                  <Text style={styles.subMuted}>ENCAISSÉ CE MOIS (FRAIS QAPRIL : 0 F)</Text>
                   <Text style={styles.h1}>{fmt(dashData?.collectedRevenue || 0)}</Text>
                   <Text style={styles.subMuted}>
-                    Vos loyers confirmés sont automatiquement réconciliés et disponibles sans commission cachée.
+                    Vos loyers arrivent directement sur vos comptes Wave, Orange Money, MTN ou bancaire.
                   </Text>
                 </View>
               </View>
@@ -1105,6 +1131,100 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4, paddingHorizontal: 12 }]}>
                     Dès qu’un candidat postule à l’un de vos biens avec son Passeport Locatif, son dossier apparaîtra ici.
                   </Text>
+                </View>
+              </View>
+            )}
+
+            {bTab === 'params' && (
+              <View style={styles.sectionGap}>
+                <Text style={styles.h1}>Paramètres de gestion</Text>
+                <Text style={styles.subMuted}>
+                  Configurez vos relances automatiques et votre politique de paiements partiels
+                </Text>
+
+                <View style={styles.card}>
+                  <Text style={styles.label}>RELANCES AUTOMATIQUES EN CAS D’IMPAYÉ</Text>
+                  <Pressable style={styles.rowBetween} onPress={() => setRelanceJ3(!relanceJ3)}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.boldText}>J+3 · Rappel courtois par SMS / WhatsApp</Text>
+                      <Text style={styles.subMuted}>Rappel automatique après la date d’échéance</Text>
+                    </View>
+                    <Text style={{ fontWeight: '700', color: relanceJ3 ? '#1E7E4E' : '#6E6E73' }}>
+                      {relanceJ3 ? 'Actif' : 'Désactivé'}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable style={[styles.rowBetween, { marginTop: 8 }]} onPress={() => setRelanceJ7(!relanceJ7)}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.boldText}>J+7 · Relance formelle horodatée</Text>
+                      <Text style={styles.subMuted}>Invitation à régulariser ou proposer un échéancier</Text>
+                    </View>
+                    <Text style={{ fontWeight: '700', color: relanceJ7 ? '#1E7E4E' : '#6E6E73' }}>
+                      {relanceJ7 ? 'Actif' : 'Désactivé'}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable style={[styles.rowBetween, { marginTop: 8 }]} onPress={() => setRelanceJ15(!relanceJ15)}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.boldText}>J+15 · Préparation du dossier de mise en demeure</Text>
+                      <Text style={styles.subMuted}>Alerte envoyée au bailleur avant envoi</Text>
+                    </View>
+                    <Text style={{ fontWeight: '700', color: relanceJ15 ? '#1E7E4E' : '#6E6E73' }}>
+                      {relanceJ15 ? 'Actif' : 'Désactivé'}
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={styles.label}>POLITIQUE SUR LES PAIEMENTS PARTIELS</Text>
+                  {[
+                    ['plan', 'Accepter avec plan d’apurement seulement (recommandé)'],
+                    ['accepter', 'Accepter librement (reçu d’acompte émis)'],
+                    ['refuser', 'Refuser les paiements partiels'],
+                  ].map(([k, lbl]) => (
+                    <Pressable
+                      key={k}
+                      onPress={() => setPartialPolicy(k as any)}
+                      style={[styles.chip, partialPolicy === k && { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' }]}
+                    >
+                      <Text style={[styles.chipText, partialPolicy === k && { color: '#fff' }]}>{lbl}</Text>
+                    </Pressable>
+                  ))}
+                  <Pressable
+                    style={[styles.btnSecondary, { marginTop: 8 }]}
+                    onPress={() => setPartialModal(true)}
+                  >
+                    <Text style={styles.btnSecondaryText}>Examiner une proposition de paiement partiel</Text>
+                  </Pressable>
+                </View>
+
+                <View style={styles.card}>
+                  <View style={styles.rowBetween}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.boldText}>Je gère depuis l’étranger — 7 € par mois</Text>
+                      <Text style={styles.subMuted}>
+                        Active l’affichage double FCFA / € au taux officiel (1 € = 655,957 F) et les rapports mensuels PDF.
+                      </Text>
+                    </View>
+                    <Pressable
+                      style={[styles.pillGold, diasporaSubscribed && { backgroundColor: '#E3F5EC' }]}
+                      onPress={() => {
+                        const next = !diasporaSubscribed;
+                        setDiasporaSubscribed(next);
+                        if (!next) setEurMode(false);
+                        Alert.alert(
+                          next ? 'Option Diaspora activée' : 'Option désactivée',
+                          next
+                            ? 'Vous pouvez désormais basculer tous vos montants en Euros (€) depuis l’en-tête.'
+                            : 'L’affichage est revenu uniquement en FCFA.'
+                        );
+                      }}
+                    >
+                      <Text style={[styles.pillGoldText, diasporaSubscribed && { color: '#1E7E4E' }]}>
+                        {diasporaSubscribed ? 'Actif (7 €/mois)' : 'Activer'}
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
               </View>
             )}
@@ -1269,6 +1389,73 @@ export default function BailleurAndAgencePrototypeScreen() {
                     );
                   })
                 )}
+              </View>
+            )}
+
+            {aTab === 'baux' && (
+              <View style={[styles.sectionGap, { marginTop: 12 }]}>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.h1}>Baux sous gestion ({bBaux.length})</Text>
+                  <Pressable
+                    style={styles.btnSmallGreen}
+                    onPress={() => router.push('/create-lease')}
+                  >
+                    <Plus size={14} color="#fff" />
+                    <Text style={styles.btnSmallGreenText}>+ Bail</Text>
+                  </Pressable>
+                </View>
+                {bBaux.length === 0 ? (
+                  <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
+                    <FileSpreadsheet color="#9CA3AF" size={36} />
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#64748B', marginTop: 8 }}>
+                      Aucun bail sous gestion
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#94A3B8', textAlign: 'center', marginTop: 4 }}>
+                      Les baux du portefeuille agence apparaîtront ici.
+                    </Text>
+                  </View>
+                ) : (
+                  bBaux.map((b) => (
+                    <View key={b.ref} style={styles.card}>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.boldText}>{b.bien} · {b.loc}</Text>
+                        <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{b.ref}</Text>
+                      </View>
+                      <Text style={styles.subMuted}>{Number(b.loyer || 0).toLocaleString('fr-FR')} F / mois · Durée {b.duree} mois</Text>
+                    </View>
+                  ))
+                )}
+              </View>
+            )}
+
+            {aTab === 'team' && (
+              <View style={[styles.sectionGap, { marginTop: 12 }]}>
+                <Text style={styles.h1}>Équipe & Collaborateurs</Text>
+                <Text style={styles.subMuted}>
+                  Les gestionnaires affectés aux biens masqués ne voient que le code séquentiel BAI-NNN du bailleur mandant.
+                </Text>
+                <View style={styles.card}>
+                  <View style={styles.rowBetween}>
+                    <View>
+                      <Text style={styles.boldText}>{userName}</Text>
+                      <Text style={styles.subMuted}>Chef d’agence · Accès complet (identité bailleurs visible)</Text>
+                    </View>
+                    <View style={styles.pillGold}>
+                      <Text style={styles.pillGoldText}>Admin</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.card}>
+                  <View style={styles.rowBetween}>
+                    <View>
+                      <Text style={styles.boldText}>Collaborateur Gestionnaire</Text>
+                      <Text style={styles.subMuted}>Gestionnaire · Identité bailleurs masquée (codes BAI-NNN)</Text>
+                    </View>
+                    <View style={[styles.pillGold, { backgroundColor: '#E7ECF6' }]}>
+                      <Text style={[styles.pillGoldText, { color: '#1F2A44' }]}>Protégé</Text>
+                    </View>
+                  </View>
+                </View>
               </View>
             )}
 
@@ -1543,6 +1730,143 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <Text style={styles.btnGhostText}>Annuler</Text>
               </Pressable>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : POSITION DU BIEN (IC-01 V.position) */}
+      <Modal visible={!!positionModalBien} transparent animationType="slide" onRequestClose={() => setPositionModalBien(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Position du bien · {positionModalBien?.name}</Text>
+            <Text style={styles.subMuted}>
+              Statut actuel : {positionModalBien?.gpsStatut || 'Provisoire'} (Provisoire → Confirmée sur place → Gelée une fois le bail actif).
+            </Text>
+            <View style={styles.recapBox}>
+              <Text style={styles.boldText}>Comment confirmer la position ?</Text>
+              <Text style={styles.subMuted}>
+                Rendez-vous dans le logement et enregistrez la position GPS exacte depuis l’onglet « Biens ». Une fois le bail signé, la position est gelée pour garantir la sécurité du locataire et du propriétaire.
+              </Text>
+            </View>
+            <Pressable
+              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+              onPress={() => {
+                setBBiens((prev) =>
+                  prev.map((x) => (x.id === positionModalBien?.id ? { ...x, gpsStatut: 'Confirmée', niv: Math.max(x.niv, 2) } : x))
+                );
+                setPositionModalBien(null);
+                Alert.alert('Position confirmée', 'La position GPS du logement a été marquée comme confirmée.');
+              }}
+            >
+              <Text style={styles.btnPrimaryText}>Enregistrer ma position actuelle (sur place)</Text>
+            </Pressable>
+            <Pressable style={styles.btnGhost} onPress={() => setPositionModalBien(null)}>
+              <Text style={styles.btnGhostText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : PUBLIER UNE OFFRE (IC-01 V.offre) */}
+      <Modal visible={!!offreModalBien} transparent animationType="slide" onRequestClose={() => setOffreModalBien(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Publier une offre · {offreModalBien?.name}</Text>
+            <Text style={styles.subMuted}>
+              Rendez ce bien vacant visible dans le vivier QAPRIL pour recevoir des candidatures qualifiées.
+            </Text>
+            <Text style={[styles.label, { marginTop: 8 }]}>LOYER MENSUEL DEMANDÉ (FCFA)</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={offreLoyer}
+              onChangeText={setOffreLoyer}
+            />
+            <Pressable
+              style={[styles.rowBetween, { marginVertical: 8 }]}
+              onPress={() => setOffreNegociable(!offreNegociable)}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={styles.boldText}>Autoriser les propositions de loyer (80 % à 100 %)</Text>
+                <Text style={styles.subMuted}>Les candidats pourront proposer jusqu’à -20 % maximum</Text>
+              </View>
+              <Text style={{ fontWeight: '700', color: offreNegociable ? '#1E7E4E' : '#6E6E73' }}>
+                {offreNegociable ? 'Oui' : 'Non'}
+              </Text>
+            </Pressable>
+            <View style={styles.recapBox}>
+              <Text style={styles.subMuted}>• Dépôt de garantie légal : max. 2 mois ({fmt((Number(offreLoyer) || 0) * 2)})</Text>
+              <Text style={styles.subMuted}>• Avance de loyer exigible : max. 2 mois ({fmt((Number(offreLoyer) || 0) * 2)})</Text>
+            </View>
+            <Pressable
+              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+              onPress={() => {
+                setBBiens((prev) =>
+                  prev.map((x) =>
+                    x.id === offreModalBien?.id
+                      ? { ...x, loyer: Number(offreLoyer) || x.loyer, offrePubliee: true }
+                      : x
+                  )
+                );
+                setOffreModalBien(null);
+                Alert.alert('Offre publiée !', 'Votre logement est désormais visible par les candidats vérifiés du vivier QAPRIL.');
+              }}
+            >
+              <Text style={styles.btnPrimaryText}>Publier l’offre dans le vivier</Text>
+            </Pressable>
+            <Pressable style={styles.btnGhost} onPress={() => setOffreModalBien(null)}>
+              <Text style={styles.btnGhostText}>Annuler</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : PAIEMENT PARTIEL & PLAN D'APUREMENT CÔTÉ BAILLEUR (IC-01 V.partial) */}
+      <Modal visible={partialModal} transparent animationType="slide" onRequestClose={() => setPartialModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Proposition de paiement partiel</Text>
+            <Text style={styles.subMuted}>
+              Lorsqu’un locataire propose un règlement partiel, QAPRIL impute d’abord les échéances les plus anciennes :
+            </Text>
+            <View style={styles.recapBox}>
+              <Text style={styles.boldText}>Règle d’imputation automatique</Text>
+              <Text style={styles.subMuted}>• Mois complets couverts → Quittances officielles émises</Text>
+              <Text style={styles.subMuted}>• Reliquat partiel → Reçu d’acompte émis (jamais une quittance complète)</Text>
+              <Text style={styles.subMuted}>• Solde restant → Étalé selon le plan d’apurement accepté</Text>
+            </View>
+            <View style={{ gap: 8 }}>
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1E7E4E' }]}
+                onPress={() => {
+                  setPartialModal(false);
+                  Alert.alert('Accepté avec plan', 'Le reçu d’acompte et l’échéancier d’apurement ont été envoyés au locataire.');
+                }}
+              >
+                <Text style={styles.btnPrimaryText}>Accepter avec plan d’apurement</Text>
+              </Pressable>
+              <Pressable
+                style={styles.btnSecondary}
+                onPress={() => {
+                  setPartialModal(false);
+                  Alert.alert('Accepté sans plan', 'Le reçu d’acompte a été émis. Le solde reste exigible.');
+                }}
+              >
+                <Text style={styles.btnSecondaryText}>Accepter sans plan (reçu d’acompte)</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.btnSecondary, { borderColor: '#DC2626' }]}
+                onPress={() => {
+                  setPartialModal(false);
+                  Alert.alert('Proposition refusée', 'Le locataire a été notifié du refus du paiement partiel.');
+                }}
+              >
+                <Text style={[styles.btnSecondaryText, { color: '#DC2626' }]}>Refuser le paiement partiel</Text>
+              </Pressable>
+            </View>
+            <Pressable style={styles.btnGhost} onPress={() => setPartialModal(false)}>
+              <Text style={styles.btnGhostText}>Fermer</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>

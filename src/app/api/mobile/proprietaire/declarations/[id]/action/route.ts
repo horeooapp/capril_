@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { sendSMS } from '@/lib/sms';
 
 export async function POST(
     request: Request,
@@ -88,6 +89,13 @@ export async function POST(
                     confirmationAt: new Date(),
                 }
             });
+
+            if (bdq.telephoneLocataire) {
+                await sendSMS(
+                    bdq.telephoneLocataire,
+                    `QAPRIL : Votre bailleur a confirmé votre logement (${bdq.descriptionLogement}) ! Votre bail réf. ${leaseRef} est désormais actif dans votre application QAPRIL Locataire.`
+                ).catch(() => null);
+            }
 
             return NextResponse.json({
                 success: true,

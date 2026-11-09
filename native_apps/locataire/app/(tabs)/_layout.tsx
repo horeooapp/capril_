@@ -16,7 +16,12 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarHideOnKeyboard: true,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '600',
+          marginTop: 2,
+        },
         tabBarStyle: {
           backgroundColor: 'rgba(255, 255, 255, 0.98)',
           borderTopWidth: 1,
@@ -26,9 +31,9 @@ export default function TabLayout() {
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.04,
           shadowRadius: 4,
-          height: 54 + Math.max(insets.bottom, 14),
+          height: 58 + Math.max(insets.bottom, 14),
           paddingBottom: Math.max(insets.bottom, 14),
-          paddingTop: 8,
+          paddingTop: 6,
         },
         tabBarItemStyle: {
           justifyContent: 'center',
@@ -41,36 +46,41 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Accueil',
           tabBarAccessibilityLabel: 'Accueil',
-          tabBarIcon: ({ color, focused }) => <Home color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
+          tabBarIcon: ({ color, focused }) => <Home color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="receipts"
         options={{
+          title: 'Quittances',
           tabBarAccessibilityLabel: 'Quittances',
-          tabBarIcon: ({ color, focused }) => <FileText color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
+          tabBarIcon: ({ color, focused }) => <FileText color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="maintenance"
         options={{
+          title: 'Travaux',
           tabBarAccessibilityLabel: 'Signalements',
-          tabBarIcon: ({ color, focused }) => <Wrench color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
+          tabBarIcon: ({ color, focused }) => <Wrench color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
+          title: 'Messages',
           tabBarAccessibilityLabel: 'Messages',
-          tabBarIcon: ({ color, focused }) => <MessageCircle color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
+          tabBarIcon: ({ color, focused }) => <MessageCircle color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
+          title: 'Profil',
           tabBarAccessibilityLabel: 'Profil',
-          tabBarIcon: ({ color, focused }) => <User color={color} size={focused ? 24 : 22} strokeWidth={focused ? 2.4 : 1.8} />,
+          tabBarIcon: ({ color, focused }) => <User color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
     </Tabs>

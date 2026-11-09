@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { createHash, randomUUID } from 'crypto';
+import { sendSMS } from '@/lib/sms';
 
 export async function POST(
     request: Request,
@@ -83,6 +84,14 @@ export async function POST(
                     quittanceId: receipt.id
                 }
             });
+
+            const tenantPhone = declaration.locataire?.phone || declaration.bail?.tenant?.phone;
+            if (tenantPhone) {
+                await sendSMS(
+                    tenantPhone,
+                    `QAPRIL : Votre paiement de ${total.toLocaleString('fr-FR')} FCFA (${periodMonth}) est confirmé ! Quittance officielle réf. ${ref} disponible dans votre application.`
+                ).catch(() => null);
+            }
 
             return NextResponse.json({
                 success: true,
