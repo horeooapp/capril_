@@ -79,7 +79,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
                     <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase mb-2">Ma Caution.</h1>
-                    <p className="text-gray-500 font-medium tracking-wide">Certification numérique et traçabilité SHA-256 de vos dépôts.</p>
+                    <p className="text-gray-500 font-medium tracking-wide">Vos quittances et dépôts certifiés conformes.</p>
                 </div>
                 {caution && (
                     <div className="flex items-center gap-3 px-4 py-2 bg-[#375623]/10 rounded-2xl border border-[#375623]/20">
@@ -195,7 +195,7 @@ export default function CautionsLocataireClient({ caution: initialCaution, bail,
                                 <Hash size={18} />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Empreinte Numérique (SHA-256)</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Code d'intégrité numérique</p>
                                 <p className="text-[11px] font-mono text-gray-500 break-all leading-tight">{caution.hashSha256}</p>
                             </div>
                         </div>

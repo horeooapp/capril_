@@ -170,7 +170,7 @@ export default function ChatScreen() {
                             Messagerie Sécurisée
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#0D2B6E' }}>
-                            Échanges certifiés bailleur & locataire · Horodatage SHA-256
+                            Vos échanges sont conservés et datés
                         </Text>
                     </View>
                     <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>

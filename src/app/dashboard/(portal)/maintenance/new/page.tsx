@@ -22,7 +22,7 @@ export default async function NewMaintenanceTicketPage() {
 
                 <div className="space-y-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1 rounded-md">
-                        Règle de gestion QAPRIL · RG-MAI-01
+                        Gestion des incidents & réparations
                     </span>
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight">
                         Émission réservée aux locataires
@@ -35,11 +35,11 @@ export default async function NewMaintenanceTicketPage() {
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3 text-xs text-slate-700 leading-relaxed">
                     <p className="font-bold text-slate-900 flex items-center gap-2">
                         <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-                        Principe de la preuve contradictoire horodatée (ADD-11) :
+                        Photo datée qui fait preuve :
                     </p>
                     <p>
                         Seul le locataire en titre peut déclarer une panne, fuite ou dégradation depuis son <strong>Espace Locataire QAPRIL</strong>. 
-                        Cette déclaration génère une preuve horodatée avec empreinte cryptographique SHA-256 qui vous est transmise instantanément.
+                        Cette déclaration génère une preuve horodatée avec certificat numérique qui vous est transmise instantanément.
                     </p>
                     <p>
                         Si votre locataire vous a contacté hors plateforme (appel, WhatsApp), demandez-lui d’émettre son signalement depuis son application mobile ou son espace web afin de garantir la traçabilité des travaux.

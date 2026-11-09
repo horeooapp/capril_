@@ -180,9 +180,9 @@ export default function ProfileScreen() {
               <View style={styles.row}>
                 <ShieldCheck color="#2C3E6B" size={20} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>Protection des données (Loi 2013-450 CI)</Text>
+                  <Text style={styles.cardTitle}>Vos données vous appartiennent</Text>
                   <Text style={styles.cardSub}>
-                    Aucun bailleur ne peut consulter votre score chiffré ni vos pièces d’identité sans votre autorisation explicite (ADD-21).
+                    Aucun bailleur ne voit votre tranche de confiance ni vos pièces sans votre accord explicite.
                   </Text>
                 </View>
               </View>

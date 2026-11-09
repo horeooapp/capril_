@@ -174,9 +174,9 @@ export default function MaintenanceScreen() {
               onPress={() => {
                 setHasPhoto(!hasPhoto);
                 Alert.alert(
-                  !hasPhoto ? 'Photo horodatée ajoutée' : 'Photo retirée',
+                  !hasPhoto ? 'Photo datée ajoutée' : 'Photo retirée',
                   !hasPhoto
-                    ? '1 photo avec signature cryptographique SHA-256 attachée au dossier.'
+                    ? '1 photo datée faisant foi attachée au dossier.'
                     : 'La photo a été détachée.'
                 );
               }}
@@ -185,13 +185,13 @@ export default function MaintenanceScreen() {
                 <>
                   <CheckCircle2 color="#059669" size={18} />
                   <Text style={[styles.photoBtnText, { color: '#059669' }]}>
-                    1 photo horodatée SHA-256 attachée
+                    1 photo datée attachée
                   </Text>
                 </>
               ) : (
                 <>
                   <Camera color="#2C3E6B" size={18} />
-                  <Text style={styles.photoBtnText}>Joindre une photo horodatée (Preuve ADD-11)</Text>
+                  <Text style={styles.photoBtnText}>Photo datée qui fait preuve</Text>
                 </>
               )}
             </Pressable>
@@ -206,7 +206,7 @@ export default function MaintenanceScreen() {
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
                 <View style={styles.submitBtnInner}>
-                  <Text style={styles.submitText}>ÉMETTRE LE SIGNALEMENT AU BAILLEUR</Text>
+                  <Text style={styles.submitText}>Envoyer à mon bailleur</Text>
                   <ArrowRight color="#FFFFFF" size={16} />
                 </View>
               )}

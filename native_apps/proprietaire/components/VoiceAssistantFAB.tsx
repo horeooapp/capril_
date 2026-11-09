@@ -162,7 +162,7 @@ export function VoiceAssistantFAB({
             <View style={styles.legalBanner}>
               <ShieldCheck color="#1B4D3E" size={16} />
               <Text style={styles.legalBannerText}>
-                RG-AST-01 : Tout acte juridique exige votre validation tactile manuelle.
+                Sécurité : Tout acte juridique exige votre confirmation tactile manuelle.
               </Text>
             </View>
 

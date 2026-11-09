@@ -115,7 +115,7 @@ export default function ProprietaireMaintenanceScreen() {
           <Text style={styles.roleTitle}>Signalements & travaux reçus</Text>
           <Text style={styles.roleDesc}>
             En tant que propriétaire ou agence, vous recevez ici les signalements d’incidents émis par vos locataires
-            pour mandater les artisans et piloter la résolution contradictoire (ADD-11).
+            pour mandater les artisans et piloter la résolution rapide.
           </Text>
         </View>
 
@@ -261,7 +261,7 @@ export default function ProprietaireMaintenanceScreen() {
                 <View style={styles.photoAlert}>
                   <Camera color="#1B4D3E" size={16} />
                   <Text style={styles.photoAlertText}>
-                    {selectedIncident?.photosCount} photos horodatées avec hash SHA-256 (ADD-11)
+                    {selectedIncident?.photosCount} photos datées faisant foi
                   </Text>
                 </View>
               </View>

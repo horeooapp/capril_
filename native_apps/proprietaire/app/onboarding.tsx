@@ -37,12 +37,12 @@ const ONBOARDING_SLIDES = [
     badge: 'GESTION DE PATRIMOINE',
     title: 'Zéro impayé, quittances certifiées',
     description:
-      'Chaque paiement Mobile Money ou virement déclenche l’émission d’une quittance officielle scellée SHA-256 avec QR Code de contrôle vérifiable.',
+      'Chaque paiement Mobile Money ou virement déclenche l’émission d’une quittance officielle vérifiable par QR Code, acceptée par les banques.',
     icon: CreditCard,
   },
   {
     id: '3',
-    badge: 'CANAL CONVERSATIONNEL (ADD-26)',
+    badge: 'CANAL CONVERSATIONNEL SÉCURISÉ',
     title: 'Accessible sans application, 24h/24',
     description:
       'Vos locataires peuvent déclarer, confirmer leurs paiements et recevoir leurs quittances par simple SMS ou WhatsApp, sans obligation d’installer l’application.',

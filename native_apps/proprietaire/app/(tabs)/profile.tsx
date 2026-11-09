@@ -23,7 +23,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [diaspora, setDiaspora] = useState(true);
+  const [diaspora, setDiaspora] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Modification email
@@ -178,19 +178,25 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.label}>NIVEAUX DE VÉRIFICATION BAILLEUR (ADD-22)</Text>
-              <Text style={styles.item}>✓ Niveau 1 · Déclaré (OTP téléphone validé)</Text>
-              <Text style={styles.item}>✓ Niveau 2 · Identité CNI + Mobile Money rapprochés</Text>
-              <Text style={styles.item}>✓ Niveau 3 · Titre de propriété contrôlé (ACD / TF / CPF)</Text>
-              <Text style={styles.item}>✓ Niveau 4 · Visite par agence agréée CPRAIMA-CI</Text>
+              <Text style={styles.label}>VOTRE NIVEAU DE CONFIANCE</Text>
+              <Text style={styles.item}>✓ Niveau 1 · Téléphone vérifié</Text>
+              <Text style={[styles.item, !user?.isCertified && { color: '#6E6E73' }]}>
+                {user?.isCertified ? '✓ Niveau 2 · Identité validée (Pièce + Rapprochement)' : '○ Niveau 2 · Ajouter ma pièce d’identité pour valider'}
+              </Text>
+              <Text style={[styles.item, { color: '#6E6E73' }]}>
+                ○ Niveau 3 · Titre de propriété contrôlé (enregistré par bien)
+              </Text>
+              <Text style={[styles.item, { color: '#6E6E73' }]}>
+                ○ Niveau 4 · Visite certifiée par agence agréée (par bien)
+              </Text>
             </View>
 
             <Pressable style={styles.cardRow} onPress={() => setDiaspora(!diaspora)}>
               <Globe color="#1B4D3E" size={20} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>Package Diaspora · 7 € / mois (ADD-16)</Text>
+                <Text style={styles.cardTitle}>Je gère depuis l’étranger — 7 € par mois</Text>
                 <Text style={styles.cardSub}>
-                  Double affichage FCFA / € au taux BCE horodaté · rapports mensuels en €
+                  Affichage en FCFA et € au taux officiel · rapports de gestion mensuels
                 </Text>
               </View>
               <Text style={[styles.statusText, { color: diaspora ? '#1E7E4E' : '#6E6E73' }]}>

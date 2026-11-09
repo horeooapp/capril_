@@ -82,12 +82,12 @@ const MENU_ITEMS = [
   { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes', icon: Home },
   { id: 'factures' as LocScreen, label: 'Régler mes factures', desc: 'Eau (SODECI), Élec (CIE), Téléphone, Internet', icon: Zap },
   { id: 'payer' as LocScreen, label: 'Payer mon loyer', desc: 'Wave, Orange, MTN, Moov et Carte bancaire', icon: CreditCard },
-  { id: 'quittances' as LocScreen, label: 'Mes quittances', desc: 'Historique certifié et téléchargement PDF', icon: FileText },
-  { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Séquestre du dépôt de garantie et conformité légale', icon: ShieldCheck },
+  { id: 'quittances' as LocScreen, label: 'Mes quittances', desc: 'La preuve officielle de vos paiements', icon: FileText },
+  { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Ma caution, bloquée jusqu’aux clés', icon: ShieldCheck },
   { id: 'bail' as LocScreen, label: 'Mon contrat de bail', desc: 'Clauses, reconduction et état des lieux', icon: FileSpreadsheet },
   { id: 'documents' as LocScreen, label: 'Mes documents', desc: 'Attestations, pièces et quittances', icon: Folder },
-  { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Score de solvabilité et ponctualité', icon: UserCheck },
-  { id: 'recherche' as LocScreen, label: 'Trouver un logement', desc: 'Biens certifiés QAPRIL et conformes', icon: Search },
+  { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Tranche de confiance et ponctualité', icon: UserCheck },
+  { id: 'recherche' as LocScreen, label: 'Trouver un logement', desc: 'Offres vérifiées et compatibles', icon: Search },
 ];
 
 export default function LocatairePrototypeScreen() {
@@ -123,6 +123,17 @@ export default function LocatairePrototypeScreen() {
 
   // Recherche, tri et filtres pour "Trouver un logement"
   const [marketSearchQuery, setMarketSearchQuery] = useState('');
+
+  // États Déclaration de logement & Invitation bailleur (IC-01 P0-02)
+  const [declareModal, setDeclareModal] = useState(false);
+  const [inviteModal, setInviteModal] = useState(false);
+  const [decBailleurNom, setDecBailleurNom] = useState('');
+  const [decBailleurTel, setDecBailleurTel] = useState('');
+  const [decLogementDesc, setDecLogementDesc] = useState('');
+  const [decLoyer, setDecLoyer] = useState('');
+  const [decJour, setDecJour] = useState('5');
+  const [pendingDeclaration, setPendingDeclaration] = useState<any>(null);
+  const [submittingDeclaration, setSubmittingDeclaration] = useState(false);
 
   // États pour Attestation & Occupants Déclarés (ADD-29)
   const [generatingAttestation, setGeneratingAttestation] = useState(false);
@@ -657,85 +668,121 @@ export default function LocatairePrototypeScreen() {
               </Pressable>
             </View>
 
-            {/* HERO LOYER */}
-            <View style={styles.heroBlue}>
-              <View style={styles.rowBetween}>
-                <Text style={styles.heroSub}>LOYER DU MOIS EN COURS</Text>
-                <View style={data?.rentStatus === 'PAID' ? styles.pillOk : [styles.pillOk, { backgroundColor: '#FEF3C7' }]}>
-                  <Text style={[styles.pillOkText, data?.rentStatus !== 'PAID' && { color: '#B45309' }]}>
-                    {data?.rentStatus === 'PAID' ? 'À jour · Loyer réglé' : 'À régler'}
-                  </Text>
+            {/* HERO LOYER OU ÉTAT SANS BAIL (P0-02) */}
+            {data?.hasLease && loyer > 0 ? (
+              <View style={styles.heroBlue}>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.heroSub}>LOYER DU MOIS EN COURS</Text>
+                  <View style={data?.rentStatus === 'PAID' ? styles.pillOk : [styles.pillOk, { backgroundColor: '#FEF3C7' }]}>
+                    <Text style={[styles.pillOkText, data?.rentStatus !== 'PAID' && { color: '#B45309' }]}>
+                      {data?.rentStatus === 'PAID' ? 'À jour · Loyer réglé' : 'À régler'}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.heroBig}>{fmt(loyer)}</Text>
+                <Text style={styles.heroSub}>
+                  Bail {bailRef} · Prochaine échéance le {data?.lease?.paymentDay || 5} du mois · Frais : 0 F
+                </Text>
+                <View style={styles.heroActions}>
+                  <Pressable style={styles.btnWhite} onPress={() => setScreen('payer')}>
+                    <Text style={styles.btnWhiteText}>Payer maintenant</Text>
+                  </Pressable>
+                  <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
+                    <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
+                  </Pressable>
                 </View>
               </View>
-              <Text style={styles.heroBig}>{fmt(loyer)}</Text>
-              <Text style={styles.heroSub}>
-                {data?.hasLease ? `Bail ${bailRef} · Prochaine échéance le ${data?.lease?.paymentDay || 5} du mois · Frais : 0 F` : 'Aucun contrat de bail actif'}
-              </Text>
-              <View style={styles.heroActions}>
-                <Pressable style={styles.btnWhite} onPress={() => setScreen('payer')}>
-                  <Text style={styles.btnWhiteText}>Payer maintenant</Text>
-                </Pressable>
-                <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
-                  <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
-                </Pressable>
-              </View>
-            </View>
-
-            
-            {/* HERO FACTURES & FLUIDES (Eau, Électricité, Téléphone, Internet) */}
-            <View style={[styles.card, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', borderWidth: 1.5 }]}>
-              <View style={styles.rowBetween}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Zap color="#E67E22" size={16} />
-                  <Text style={[styles.label, { marginBottom: 0 }]}>RÈGLEMENT FACTURES & FLUIDES</Text>
+            ) : pendingDeclaration ? (
+              <View style={[styles.card, { borderColor: '#FCD34D', backgroundColor: '#FFFDF5', padding: 20 }]}>
+                <View style={styles.rowBetween}>
+                  <Text style={[styles.label, { color: '#92400E', fontWeight: '800' }]}>DÉCLARATION EN COURS</Text>
+                  <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#B45309' }}>En attente du bailleur</Text>
+                  </View>
                 </View>
-                <Pressable onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}>
-                  <Text style={[styles.cardSub, { color: '#2C3E6B', fontWeight: '700' }]}>Tout régler ›</Text>
+                <Text style={[styles.h2, { color: '#1A1D26', marginTop: 6 }]}>
+                  {pendingDeclaration.logementDesc || 'Logement déclaré'}
+                </Text>
+                <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                  Bailleur : {pendingDeclaration.bailleurNom} ({pendingDeclaration.bailleurTel}) · Loyer : {fmt(Number(pendingDeclaration.loyer) || 0)}
+                </Text>
+                <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 8, lineHeight: 17 }}>
+                  Votre déclaration a été enregistrée. Dès que votre propriétaire ou agence valide son compte, votre bail sera activé et vos quittances débloquées.
+                </Text>
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#1E7E4E', marginTop: 12 }]}
+                  onPress={() => setInviteModal(true)}
+                >
+                  <Share2 color="#fff" size={16} />
+                  <Text style={styles.btnPrimaryText}>Relancer l'invitation au bailleur</Text>
                 </Pressable>
               </View>
-
-              <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
-                Réglez vos factures d'eau, d'électricité, recharges mobiles et box fibre.
-              </Text>
-
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Pressable
-                  style={[styles.factureQuickBtn, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}
-                  onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}
-                >
-                  <Droplets color="#0284C7" size={20} />
-                  <Text style={[styles.factureQuickLabel, { color: '#0369A1' }]}>Eau</Text>
-                  <Text style={styles.factureQuickSub}>SODECI</Text>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.factureQuickBtn, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}
-                  onPress={() => { setFactureCat('ELEC'); setScreen('factures'); }}
-                >
-                  <Zap color="#D97706" size={20} />
-                  <Text style={[styles.factureQuickLabel, { color: '#B45309' }]}>Élec</Text>
-                  <Text style={styles.factureQuickSub}>CIE / Carte</Text>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.factureQuickBtn, { backgroundColor: '#DCFCE7', borderColor: '#BBF7D0' }]}
-                  onPress={() => { setFactureCat('TEL'); setScreen('factures'); }}
-                >
-                  <Smartphone color="#16A34A" size={20} />
-                  <Text style={[styles.factureQuickLabel, { color: '#15803D' }]}>Mobile</Text>
-                  <Text style={styles.factureQuickSub}>Crédit/Pass</Text>
-                </Pressable>
-
-                <Pressable
-                  style={[styles.factureQuickBtn, { backgroundColor: '#EEF2FF', borderColor: '#E0E7FF' }]}
-                  onPress={() => { setFactureCat('NET'); setScreen('factures'); }}
-                >
-                  <Wifi color="#4F46E5" size={20} />
-                  <Text style={[styles.factureQuickLabel, { color: '#4338CA' }]}>Internet</Text>
-                  <Text style={styles.factureQuickSub}>Fibre / 4G</Text>
-                </Pressable>
+            ) : (
+              <View style={[styles.card, { borderColor: '#CBD5E1', backgroundColor: '#FFFFFF', padding: 22, alignItems: 'center' }]}>
+                <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                  <Home color="#2C3E6B" size={28} />
+                </View>
+                <Text style={[styles.h1, { fontSize: 20, textAlign: 'center', color: '#1A1D26' }]}>
+                  Aucun logement déclaré
+                </Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 6, marginBottom: 16, maxWidth: 300 }]}>
+                  Déclarez votre logement pour inviter votre bailleur, activer votre bail officiel et recevoir vos quittances numériques.
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 10, width: '100%', flexWrap: 'wrap' }}>
+                  <Pressable
+                    style={[styles.btnPrimary, { flex: 1, minWidth: 140, backgroundColor: '#2C3E6B' }]}
+                    onPress={() => setDeclareModal(true)}
+                  >
+                    <Text style={styles.btnPrimaryText}>Déclarer mon logement</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.btnSecondary, { flex: 1, minWidth: 140 }]}
+                    onPress={() => setInviteModal(true)}
+                  >
+                    <Text style={styles.btnSecondaryText}>Inviter mon bailleur</Text>
+                  </Pressable>
+                </View>
               </View>
-            </View>
+            )}
+
+            {/* HERO FACTURES & FLUIDES (Eau, Électricité) — Réservé aux baux actifs */}
+            {data?.hasLease && (
+              <View style={[styles.card, { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', borderWidth: 1.5 }]}>
+                <View style={styles.rowBetween}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Zap color="#E67E22" size={16} />
+                    <Text style={[styles.label, { marginBottom: 0 }]}>RÈGLEMENT FACTURES & FLUIDES</Text>
+                  </View>
+                  <Pressable onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}>
+                    <Text style={[styles.cardSub, { color: '#2C3E6B', fontWeight: '700' }]}>Tout régler ›</Text>
+                  </Pressable>
+                </View>
+
+                <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+                  Réglez vos charges et factures de compteurs individuels (SODECI, CIE).
+                </Text>
+
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    style={[styles.factureQuickBtn, { backgroundColor: '#E0F2FE', borderColor: '#BAE6FD' }]}
+                    onPress={() => { setFactureCat('EAU'); setScreen('factures'); }}
+                  >
+                    <Droplets color="#0284C7" size={20} />
+                    <Text style={[styles.factureQuickLabel, { color: '#0369A1' }]}>Eau</Text>
+                    <Text style={styles.factureQuickSub}>SODECI</Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[styles.factureQuickBtn, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}
+                    onPress={() => { setFactureCat('ELEC'); setScreen('factures'); }}
+                  >
+                    <Zap color="#D97706" size={20} />
+                    <Text style={[styles.factureQuickLabel, { color: '#B45309' }]}>Électricité</Text>
+                    <Text style={styles.factureQuickSub}>CIE</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
 
             {/* GRILLE DE NAVIGATION RAPIDE VERS LES 8 ÉCRANS */}
             <Text style={styles.label}>MON DOSSIER LOCATIF</Text>
@@ -1023,7 +1070,7 @@ export default function LocatairePrototypeScreen() {
             </Pressable>
             <Text style={styles.h1}>Payer mon loyer</Text>
             <Text style={styles.subMuted}>
-              Quittance officielle SHA-256 émise automatiquement dès confirmation (RG-QUI-04)
+              Quittance officielle émise automatiquement dès confirmation du règlement
             </Text>
 
             <View style={styles.card}>
@@ -1076,7 +1123,7 @@ export default function LocatairePrototypeScreen() {
                 onPress={() =>
                   Alert.alert(
                     'Paiement initié',
-                    `Redirection vers ${payOp} pour ${fmt(loyer * payPeriod)}. Votre quittance SHA-256 sera émise instantanément.`
+                    `Redirection vers ${payOp} pour ${fmt(loyer * payPeriod)}. Votre quittance officielle sera émise instantanément.`
                   )
                 }
               >
@@ -1099,7 +1146,7 @@ export default function LocatairePrototypeScreen() {
           <View style={styles.sectionGap}>
             <Text style={styles.h1}>Mes quittances</Text>
             <Text style={styles.subMuted}>
-              Historique infalsifiable SHA-256 · opposable aux tiers et aux banques
+              Mes quittances — la preuve de vos paiements, acceptée par les banques et les administrations
             </Text>
 
             <View style={styles.card}>
@@ -1116,7 +1163,7 @@ export default function LocatairePrototypeScreen() {
                 <FileText color="#9CA3AF" size={36} />
                 <Text style={[styles.boldText, { marginTop: 10, color: '#64748B' }]}>Aucune quittance émise</Text>
                 <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
-                  Vos quittances infalsifiables avec signature SHA-256 apparaîtront ici dès le règlement validé.
+                  Vos quittances apparaîtront ici dès le règlement validé.
                 </Text>
               </View>
             ) : (
@@ -1125,7 +1172,7 @@ export default function LocatairePrototypeScreen() {
                   <View style={{ flex: 1 }}>
                     <Text style={styles.boldText}>{q.period || q.periodMonth} · {fmt(q.amount)}</Text>
                     <Text style={styles.subMuted}>
-                      {q.date ? `Payé le ${q.date}` : ''} {q.paymentMethod ? `via ${q.paymentMethod}` : ''} {q.receiptHash ? `· SHA-256 ${q.receiptHash.substring(0, 8)}...` : ''}
+                      {q.date ? `Payé le ${q.date}` : ''} {q.paymentMethod ? `via ${q.paymentMethod}` : ''} {q.receiptRef ? `· Réf. ${q.receiptRef}` : ''}
                     </Text>
                   </View>
                   <Pressable
@@ -1248,7 +1295,7 @@ export default function LocatairePrototypeScreen() {
                 Générer mon attestation de résidence QR
               </Text>
               <Text style={styles.heroSub}>
-                Générée en 10 s · signée SHA-256 · acceptée pour banque, école, consulat, CIE/SODECI
+                Générée en 10 s · acceptée pour banque, école, consulat et administrations
               </Text>
             </Pressable>
 
@@ -1265,7 +1312,7 @@ export default function LocatairePrototypeScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.boldText, { color: '#0F172A' }]}>Occupants déclarés du logement</Text>
-                  <Text style={styles.subMuted}>Déclarer conjoint, enfants majeurs ou co-résidents (ADD-29)</Text>
+                  <Text style={styles.subMuted}>Déclarer conjoint, enfants majeurs ou co-résidents</Text>
                 </View>
                 <ChevronRight color="#64748B" size={18} />
               </Pressable>
@@ -1273,7 +1320,7 @@ export default function LocatairePrototypeScreen() {
 
             {data?.hasLease ? (
               [
-                { t: `Contrat de bail certifié (${bailRef})`, s: `${propName} · Enregistré · SHA-256` },
+                { t: `Contrat de bail certifié (${bailRef})`, s: `${propName} · Enregistré et certifié` },
                 { t: 'Attestation de dépôt de garantie', s: `${fmt(depositAmount)} séquestrés conformes` },
               ].map((doc, i) => (
                 <Pressable
@@ -1301,13 +1348,13 @@ export default function LocatairePrototypeScreen() {
         )}
 
         {/* =========================================================
-            ÉCRAN 7 · MON PASSEPORT LOCATIF (ADD-21)
+            ÉCRAN 7 · MON PASSEPORT LOCATIF
            ========================================================= */}
         {screen === 'passeport' && (
           <View style={styles.sectionGap}>
             <Text style={styles.h1}>Mon Passeport Locatif</Text>
             <Text style={styles.subMuted}>
-              Vous contrôlez exactement ce qu’un futur bailleur peut voir (ADD-21)
+              Vous contrôlez exactement ce qu’un futur bailleur peut voir
             </Text>
 
             <View style={styles.heroBlue}>
@@ -1354,7 +1401,7 @@ export default function LocatairePrototypeScreen() {
               <Pressable style={styles.toggleRow} onPress={() => setShareScore(!shareScore)}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.boldText}>Score chiffré détaillé & pièces CNI</Text>
-                  <Text style={styles.subMuted}>Réservés par défaut (ADD-21)</Text>
+                  <Text style={styles.subMuted}>Protégés par défaut</Text>
                 </View>
                 <Text style={[styles.boldText, { color: shareScore ? '#D4912A' : '#1E7E4E' }]}>
                   {shareScore ? 'Ouvert' : 'Protégé'}
@@ -1595,7 +1642,7 @@ export default function LocatairePrototypeScreen() {
           <View style={styles.modalSheet}>
             <Text style={styles.h2}>Faire payer par un proche</Text>
             <Text style={[styles.subMuted, { marginTop: 6 }]}>
-              Partagez ce lien sécurisé sur WhatsApp : votre proche règle via Wave, Orange Money, MTN ou carte, et la quittance SHA-256 est émise directement à votre nom.
+              Partagez ce lien sécurisé sur WhatsApp : votre proche règle via Wave, Orange Money, MTN ou carte, et la quittance officielle est émise directement à votre nom.
             </Text>
             <View style={styles.recapBox}>
               <Text style={styles.boldText}>https://pay.qapril.ci/p/{bailRef}</Text>
@@ -1611,6 +1658,139 @@ export default function LocatairePrototypeScreen() {
               <Text style={styles.btnPrimaryText}>Partager sur WhatsApp</Text>
             </Pressable>
             <Pressable style={styles.btnGhost} onPress={() => setProcheModal(false)}>
+              <Text style={styles.btnGhostText}>Fermer</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : DÉCLARER MON LOGEMENT (IC-01 P0-02) */}
+      <Modal visible={declareModal} transparent animationType="slide" onRequestClose={() => setDeclareModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Déclarer mon logement</Text>
+            <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+              Renseignez les 4 informations clés pour inviter votre bailleur et activer votre bail officiel.
+            </Text>
+
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 10 }}>
+              <View>
+                <Text style={styles.label}>NOM DU BAILLEUR OU DE L'AGENCE *</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder="Ex : M. Koffi Konan ou Agence Riviera"
+                  value={decBailleurNom}
+                  onChangeText={setDecBailleurNom}
+                />
+              </View>
+
+              <View>
+                <Text style={styles.label}>NUMÉRO DU BAILLEUR (WHATSAPP / SMS) *</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder="Ex : 0707070707"
+                  keyboardType="phone-pad"
+                  value={decBailleurTel}
+                  onChangeText={setDecBailleurTel}
+                />
+              </View>
+
+              <View>
+                <Text style={styles.label}>ADRESSE DU LOGEMENT & COMMUNE *</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder="Ex : 3 pièces, Cocody Angré 8e Tranche"
+                  value={decLogementDesc}
+                  onChangeText={setDecLogementDesc}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={{ flex: 2 }}>
+                  <Text style={styles.label}>LOYER MENSUEL (FCFA) *</Text>
+                  <TextInput
+                    style={[styles.input, { marginTop: 4 }]}
+                    placeholder="Ex : 150000"
+                    keyboardType="numeric"
+                    value={decLoyer}
+                    onChangeText={setDecLoyer}
+                  />
+                </View>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.label}>JOUR ÉCHÉANCE</Text>
+                  <TextInput
+                    style={[styles.input, { marginTop: 4 }]}
+                    placeholder="5"
+                    keyboardType="numeric"
+                    value={decJour}
+                    onChangeText={setDecJour}
+                  />
+                </View>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 10 }]}
+                disabled={submittingDeclaration}
+                onPress={() => {
+                  if (!decBailleurNom.trim() || !decBailleurTel.trim() || !decLogementDesc.trim() || !decLoyer.trim()) {
+                    Alert.alert('Champs obligatoires', 'Veuillez renseigner le nom, le téléphone du bailleur, le logement et le loyer.');
+                    return;
+                  }
+                  setPendingDeclaration({
+                    bailleurNom: decBailleurNom.trim(),
+                    bailleurTel: decBailleurTel.trim(),
+                    logementDesc: decLogementDesc.trim(),
+                    loyer: decLoyer.trim(),
+                    jour: decJour.trim() || '5',
+                    status: 'EN_ATTENTE',
+                  });
+                  setDeclareModal(false);
+                  setInviteModal(true);
+                }}
+              >
+                <Text style={styles.btnPrimaryText}>Enregistrer et inviter mon bailleur</Text>
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setDeclareModal(false)}>
+                <Text style={styles.btnGhostText}>Annuler</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : INVITER MON BAILLEUR (IC-01 P0-02) */}
+      <Modal visible={inviteModal} transparent animationType="slide" onRequestClose={() => setInviteModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <Text style={styles.h2}>Inviter mon bailleur</Text>
+            <Text style={[styles.subMuted, { marginTop: 6 }]}>
+              Un message pré-rempli va être préparé pour votre bailleur. Dès qu'il confirme en répondant 1, votre bail devient actif.
+            </Text>
+
+            <View style={[styles.recapBox, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
+              <Text style={[styles.boldText, { color: '#166534' }]}>Message officiel QAPRIL :</Text>
+              <Text style={[styles.subMuted, { color: '#14532D', marginTop: 4, lineHeight: 18 }]}>
+                « Bonjour {decBailleurNom || 'Propriétaire'}, votre locataire {userName} a déclaré votre logement ({decLogementDesc || 'logement'}) sur QAPRIL pour un loyer de {fmt(Number(decLoyer) || loyer)}. Répondez 1 pour confirmer ou connectez-vous sur https://qapril.net/b »
+              </Text>
+            </View>
+
+            <Pressable
+              style={[styles.btnPrimary, { backgroundColor: '#1E7E4E' }]}
+              onPress={() => {
+                setInviteModal(false);
+                Alert.alert(
+                  'Invitation transmise',
+                  `L'invitation a été envoyée au ${decBailleurTel || 'bailleur'}. Vous serez notifié dès sa confirmation.`
+                );
+              }}
+            >
+              <Share2 color="#fff" size={16} />
+              <Text style={styles.btnPrimaryText}>Envoyer l'invitation (WhatsApp / SMS)</Text>
+            </Pressable>
+
+            <Pressable style={styles.btnGhost} onPress={() => setInviteModal(false)}>
               <Text style={styles.btnGhostText}>Fermer</Text>
             </Pressable>
           </View>
@@ -1641,7 +1821,7 @@ export default function LocatairePrototypeScreen() {
                 </View>
               )}
               <Text style={[styles.subMuted, { marginTop: 6, fontWeight: '700', color: '#1E7E4E' }]}>
-                ✓ Sceau cryptographique SHA-256 · QR Code vérifiable
+                ✓ Document officiel certifié · QR Code de vérification
               </Text>
             </View>
 
@@ -1854,7 +2034,7 @@ export default function LocatairePrototypeScreen() {
       <Modal visible={vueBailleurModal} transparent animationType="slide" onRequestClose={() => setVueBailleurModal(false)}>
         <View style={styles.modalBackdrop}>
           <View style={styles.modalSheet}>
-            <Text style={styles.h2}>Ce que voit un bailleur (ADD-21)</Text>
+            <Text style={styles.h2}>Ce que voit un futur bailleur</Text>
             <Text style={[styles.subMuted, { marginTop: 4 }]}>
               Ni votre score chiffré, ni votre salaire exact, ni votre CNI ne sont affichés.
             </Text>
@@ -2186,6 +2366,28 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  btnSecondary: {
+    backgroundColor: '#F1F5F9',
+    borderRadius: 14,
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+  },
+  btnSecondaryText: { color: '#0F172A', fontSize: 13, fontWeight: '700' },
+  input: {
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 13,
+    color: '#0F172A',
+  },
   btnGhost: {
     backgroundColor: '#F4F5F9',
     borderRadius: 14,

@@ -115,13 +115,13 @@ export default function MaintenanceDashboardClient({ initialIncidents }: { initi
                 <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-[10px] font-black uppercase tracking-widest mb-2">
                         <ShieldCheck size={12} className="text-emerald-600" />
-                        RÉCEPTION BAILLEUR · SIGNALEMENTS DES LOCATAIRES (RG-MAI-01)
+                        RÉCEPTION BAILLEUR · SIGNALEMENTS DES LOCATAIRES
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tighter flex items-center gap-3">
                         <Wrench className="text-amber-500" size={30} /> Signalements reçus
                     </h1>
                     <p className="text-[13px] font-medium text-slate-500 mt-1 max-w-2xl leading-relaxed">
-                        Conformément aux règles de gestion QAPRIL, les signalements d’incidents sont émis exclusivement par les locataires. Vous recevez ici leurs déclarations horodatées (ADD-11) pour mandater des artisans, échanger directement par messagerie et piloter la résolution contradictoire.
+                        Les signalements d’incidents sont émis par vos locataires. Vous recevez ici leurs déclarations horodatées avec photos pour mandater des artisans, échanger directement par messagerie et piloter la résolution.
                     </p>
                 </div>
 

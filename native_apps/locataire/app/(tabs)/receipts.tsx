@@ -44,16 +44,16 @@ export default function ReceiptsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavHeader title="Mes Quittances" subtitle="Quittances certifiées SHA-256" />
+      <TopNavHeader title="Mes Quittances" subtitle="La preuve officielle de vos paiements" />
       <View style={styles.header}>
-        <Text style={styles.sub}>Historique infalsifiable SHA-256 (RG-QUI-04)</Text>
+        <Text style={styles.sub}>Mes quittances — la preuve de vos paiements</Text>
         <Text style={styles.title}>Mes quittances</Text>
       </View>
 
       <View style={styles.banner}>
         <View style={{ flex: 1 }}>
           <Text style={styles.bannerTitle}>{receipts.length} quittance{receipts.length > 1 ? 's' : ''} émise{receipts.length > 1 ? 's' : ''}</Text>
-          <Text style={styles.bannerSub}>Opposable aux tiers, banques et consulats (SHA-256)</Text>
+          <Text style={styles.bannerSub}>Acceptée par les banques et les administrations</Text>
         </View>
         {receipts.length > 0 && (
           <Pressable
@@ -78,7 +78,7 @@ export default function ReceiptsScreen() {
               Aucune quittance émise pour le moment
             </Text>
             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
-              Vos quittances infalsifiables avec signature SHA-256 apparaîtront ici dès la validation de vos règlements de loyer.
+              Vos quittances apparaîtront ici dès la validation de vos règlements de loyer.
             </Text>
           </View>
         }

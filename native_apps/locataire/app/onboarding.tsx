@@ -36,7 +36,7 @@ const ONBOARDING_SLIDES = [
     badge: 'PAIEMENTS & PREUVES OFFICIELLES',
     title: 'Quittances certifiées avec QR Code',
     description:
-      'Chaque paiement de loyer génère immédiatement une quittance officielle vérifiable par QR Code et scellée avec une empreinte numérique SHA-256.',
+      'Chaque paiement de loyer génère immédiatement une quittance officielle vérifiable par QR Code, acceptée par les banques et les administrations.',
     icon: Receipt,
   },
   {

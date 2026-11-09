@@ -16,7 +16,7 @@ export const RightsActionManager = ({ leaseId }: { leaseId: string }) => {
             id: "INTERVENTION",
             type: "MAINTENANCE",
             title: "Demande d'Intervention (Travaux)",
-            description: "Plomberie, électricité, étanchéité. Signalez un sinistre à votre propriétaire via la règle d'assistance sécurisée (RCL-05).",
+            description: "Plomberie, électricité, étanchéité. Signalez un sinistre à votre propriétaire pour une prise en charge rapide.",
             icon: <MessageSquareWarning size={20} className="text-amber-600" />,
             badge: "Délai 144h Max",
             bgColor: "bg-orange-50",

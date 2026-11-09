@@ -36,10 +36,10 @@ export default function ReceiptsContent({ receipts, lease }: any) {
                 <div className="relative z-10">
                     <h1 className="text-2xl sm:text-4xl font-black text-qnavy-dark uppercase tracking-tighter flex items-center gap-3">
                         Quittances
-                        <span className="hidden sm:inline-block bg-qgreen/10 text-qgreen text-[10px] px-3 py-1 rounded-full tracking-widest font-black uppercase border border-qgreen/20">SHA-256</span>
+                        <span className="hidden sm:inline-block bg-qgreen/10 text-qgreen text-[10px] px-3 py-1 rounded-full tracking-widest font-black uppercase border border-qgreen/20">Officiel</span>
                     </h1>
                     <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-qtext-light mt-2">
-                        Historique certifié QAPRIL
+                        Mes quittances — la preuve de vos paiements
                     </p>
                 </div>
 
@@ -70,7 +70,7 @@ export default function ReceiptsContent({ receipts, lease }: any) {
                     </div>
                     <h2 className="text-lg font-black text-qnavy-dark uppercase tracking-widest">Aucune quittance</h2>
                     <p className="text-sm text-qtext-mid max-w-sm mx-auto mt-2 font-medium">
-                        Vos quittances apparaîtront ici certifiées (SHA-256).
+                        Vos quittances apparaîtront ici dès vos règlements validés.
                     </p>
                 </motion.div>
             ) : (

@@ -59,7 +59,7 @@ function calcDroitsDgi(loyer: number, duree: number, pages = PAGES_STD) {
 const BAILLEUR_MENU_ITEMS = [
   { id: 'home', label: 'Accueil & Synthèse', desc: 'Encaissements, loyers perçus et alertes', icon: Home },
   { id: 'biens', label: 'Mes biens & Lots', desc: 'Gestion du patrimoine et taux d’occupation', icon: Building2 },
-  { id: 'baux', label: 'Mes baux & DGI', desc: 'Enregistrement fiscal, SHA-256 et contrats', icon: FileSpreadsheet },
+  { id: 'baux', label: 'Mes baux & DGI', desc: 'Enregistrement fiscal et contrats certifiés', icon: FileSpreadsheet },
   { id: 'quit', label: 'Quittances certifiées', desc: 'Émission et historique mensuel', icon: FileText },
   { id: 'flux', label: 'Flux financiers (FCFA/€)', desc: 'Reversements Wave, Orange et virements diaspora', icon: Wallet },
   { id: 'mandats', label: 'Mandats de gestion', desc: 'Agences agréées et intermédiaires', icon: Briefcase },
@@ -604,7 +604,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     {fmt(dashData?.collectedRevenue || 0)} <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {fmt(dashData?.monthlyRevenue || 0)}</Text>
                   </Text>
                   <Text style={styles.heroSub}>
-                    {bBiens.filter((x) => x.statut === 'loue').length} bien(s) loué(s) sur {bBiens.length} · Frais de gestion : 0 F
+                    {bBiens.filter((x) => x.statut === 'loue').length} bien(s) loué(s) sur {bBiens.length}
                   </Text>
                 </View>
 
@@ -635,7 +635,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   >
                     <Building2 color="#166534" size={20} />
                     <Text style={[styles.boldText, { color: '#166534' }]}>+ Nouveau Bien</Text>
-                    <Text style={styles.subMuted}>Immatriculation QAPRIL</Text>
+                    <Text style={styles.subMuted}>Ajouter un bien</Text>
                   </Pressable>
                   <Pressable
                     style={[styles.cardGrid, { backgroundColor: '#FEF3C7', borderColor: '#FCD34D' }]}
@@ -643,7 +643,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   >
                     <FileSpreadsheet color="#92400E" size={20} />
                     <Text style={[styles.boldText, { color: '#92400E' }]}>+ Nouveau Bail</Text>
-                    <Text style={styles.subMuted}>Loi 2019-576 & SMS OTP</Text>
+                    <Text style={styles.subMuted}>Bail conforme à la loi, signé par code SMS</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('baux')}>
                     <FileText color="#1B4D3E" size={20} />
@@ -653,7 +653,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Pressable style={styles.cardGrid} onPress={() => setCashModal(true)}>
                     <Camera color="#9A6500" size={20} />
                     <Text style={styles.boldText}>Encaisser espèces</Text>
-                    <Text style={styles.subMuted}>Photo reçu + SHA-256</Text>
+                    <Text style={styles.subMuted}>Avec photo du reçu</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setMandatModal(true)}>
                     <Users color="#1B4D3E" size={20} />
@@ -703,7 +703,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     </Text>
                     <View style={[styles.rowBetween, { marginTop: 6 }]}>
                       <Text style={styles.subMuted}>
-                        Identité bailleur : {b.masque ? 'Masquée (RG-CONF-01)' : 'Visible'}
+                        Identité bailleur : {b.masque ? 'Masquée (protégée)' : 'Visible'}
                       </Text>
                       <Pressable
                         style={styles.pillGold}
@@ -756,7 +756,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                       </Text>
                     </View>
                     <Text style={styles.subMuted}>
-                      {b.ref} · {fmt(b.loyer)} / mois · SHA-256 {b.sha}
+                      {b.ref} · {fmt(b.loyer)} / mois · Certifié
                     </Text>
                     {!b.dgi && (
                       <Pressable
@@ -786,7 +786,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <FileText color="#9CA3AF" size={36} />
                     <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucune quittance émise</Text>
                     <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
-                      Les quittances certifiées SHA-256 générées pour vos locataires apparaîtront ici.
+                      Vos quittances — la preuve de vos paiements, acceptée par les banques et les administrations.
                     </Text>
                   </View>
                 ) : (
@@ -847,7 +847,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {bTab === 'cand' && (
               <View style={styles.sectionGap}>
-                <Text style={styles.h1}>Vivier & Candidatures (ADD-21)</Text>
+                <Text style={styles.h1}>Vivier & Candidatures</Text>
                 <Text style={styles.subMuted}>
                   Vous voyez la tranche ICL et les badges, jamais le score chiffré ni les pièces réservées.
                 </Text>
@@ -863,7 +863,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {bTab === 'profil' && (
               <View style={styles.sectionGap}>
-                <Text style={styles.h1}>Vérification Bailleur (ADD-22)</Text>
+                <Text style={styles.h1}>Votre niveau de confiance</Text>
                 <View style={styles.card}>
                   <Text style={styles.boldText}>Niveau KYC actuel : Niveau {dashData?.user?.kycLevel ?? 1} ({dashData?.user?.kycStatus ?? 'Validé'})</Text>
                   <Text style={[styles.subMuted, { marginTop: 4 }]}>Patrimoine déclaré : {bBiens.length} bien(s)</Text>
@@ -1087,7 +1087,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                             setMandants((prev) =>
                               prev.map((x) => (x.id === m.id ? { ...x, rev: 'fait' } : x))
                             );
-                            Alert.alert('Reversement exécuté', 'Relevé PDF SHA-256 envoyé au bailleur.');
+                            Alert.alert('Reversement exécuté', 'Relevé certifié envoyé au bailleur.');
                           }}
                         >
                           <Text style={styles.btnPrimaryText}>
@@ -1107,9 +1107,9 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {aTab === 'verif' && (
               <View style={[styles.sectionGap, { marginTop: 12 }]}>
-                <Text style={styles.h1}>Visites de vérification Niveau 4 (ADD-22)</Text>
+                <Text style={styles.h1}>Visites de vérification certifiée</Text>
                 <Text style={styles.subMuted}>
-                  Réseau CPRAIMA-CI · Honoraires agence : 15 000 F / visite
+                  Réseau d’agences agréées · Honoraires agence : 15 000 F / visite
                 </Text>
                 {verifs.map((v, i) => (
                   <View key={i} style={styles.card}>
@@ -1147,13 +1147,13 @@ export default function BailleurAndAgencePrototypeScreen() {
           <View style={styles.modalSheet}>
             <Text style={styles.h2}>Encaisser en espèces</Text>
             <Text style={styles.subMuted}>
-              Photo obligatoire du reçu manuscrit · émission immédiate de la quittance SHA-256
+              Photo obligatoire du reçu manuscrit · émission immédiate de la quittance officielle
             </Text>
             <Pressable
               style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 10 }]}
               onPress={() => {
                 setCashModal(false);
-                Alert.alert('Encaissement enregistré', 'Quittance SHA-256 émise et envoyée par SMS.');
+                Alert.alert('Encaissement enregistré', 'Quittance officielle émise et envoyée par SMS.');
               }}
             >
               <Text style={styles.btnPrimaryText}>Photographier le reçu et émettre la quittance</Text>
@@ -1199,9 +1199,9 @@ export default function BailleurAndAgencePrototypeScreen() {
             <Text style={styles.h2}>Confier un bien</Text>
             <View style={{ gap: 8, marginVertical: 8 }}>
               {[
-                ['agree', 'Agence immobilière agréée (Substitution totale · RG-MAN-01)'],
-                ['nonagree', 'Agence non agréée (Délégation partielle · RG-DEL-01)'],
-                ['inter', 'Intermédiaire de gestion (Délégation partielle · RG-DEL-01)'],
+                ['agree', 'Agence immobilière agréée (Substitution totale)'],
+                ['nonagree', 'Agence non agréée (Délégation partielle)'],
+                ['inter', 'Intermédiaire de gestion (Délégation partielle)'],
               ].map(([t, lbl]) => (
                 <Pressable
                   key={t}
