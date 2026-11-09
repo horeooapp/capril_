@@ -4,15 +4,15 @@ import { authenticateMobileRequest } from '@/lib/mobile-auth';
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: bdqId } = await params;
         const user = await authenticateMobileRequest(request);
         if (!user) {
             return NextResponse.json({ error: "Non autorisé. Jeton manquant ou invalide." }, { status: 401 });
         }
 
-        const bdqId = params.id;
         const body = await request.json().catch(() => ({}));
         const { action, newRent, reason } = body;
 

@@ -5,15 +5,15 @@ import { createHash, randomUUID } from 'crypto';
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: declarationId } = await params;
         const user = await authenticateMobileRequest(request);
         if (!user) {
             return NextResponse.json({ error: "Non autorisé. Jeton manquant ou invalide." }, { status: 401 });
         }
 
-        const declarationId = params.id;
         const body = await request.json().catch(() => ({}));
         const { action, reason } = body;
 
