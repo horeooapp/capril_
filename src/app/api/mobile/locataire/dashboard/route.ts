@@ -38,23 +38,33 @@ export async function GET(request: Request) {
         // Fetch pending lease (BailDeclaratif) for the tenant
         const pendingLease = await prisma.bailDeclaratif.findFirst({
             where: {
-                locataireId: user.userId,
+                OR: [
+                    { locataireId: user.userId },
+                    ...(userRecord?.phone ? [{ telephoneLocataire: userRecord.phone }] : [])
+                ],
                 statut: 'PENDING_LOCATAIRE'
             },
             include: {
-                property: true
-            }
+                property: true,
+                bailleur: {
+                    select: { firstName: true, lastName: true, phone: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
         });
 
         if (!lease) {
             return NextResponse.json({
                 hasLease: false,
                 user: userRecord,
-                pendingLease: pendingLease ? {
+                pendingDeclaration: pendingLease ? {
                     id: pendingLease.id,
-                    propertyName: pendingLease.property?.name || 'Logement',
-                    rentAmount: pendingLease.montantLoyer,
-                    status: pendingLease.statut
+                    landlordName: `${pendingLease.bailleur?.firstName || ''} ${pendingLease.bailleur?.lastName || ''}`.trim() || 'Bailleur',
+                    landlordPhone: pendingLease.bailleur?.phone || '',
+                    housingDesc: pendingLease.descriptionLogement,
+                    rentAmount: pendingLease.loyerDeclareMensuel,
+                    status: pendingLease.statut,
+                    sourceCreation: pendingLease.sourceCreation
                 } : null,
                 message: "Aucun bail actif trouvé."
             });
@@ -91,10 +101,22 @@ export async function GET(request: Request) {
                 periodMonth: currentMonthStr
             }
         });
+
+        // Check if there is a pending payment declaration (P0-04)
+        const pendingPayment = await prisma.declarationPaiement.findFirst({
+            where: {
+                bailId: lease.id,
+                mois: currentMonthStr,
+                statut: 'DECLARE'
+            },
+            orderBy: { createdAt: 'desc' }
+        });
         
         let rentStatus = 'PENDING';
-        if (currentReceipt) {
-            rentStatus = currentReceipt.status === 'paid' || currentReceipt.status === 'PAID' ? 'PAID' : 'PENDING';
+        if (currentReceipt && (currentReceipt.status === 'paid' || currentReceipt.status === 'PAID')) {
+            rentStatus = 'PAID';
+        } else if (pendingPayment) {
+            rentStatus = 'DECLARED_PENDING';
         }
 
         // Fetch recent receipts & punctuality stats
@@ -174,6 +196,14 @@ export async function GET(request: Request) {
             recentReceipts: mappedReceipts,
             openMaintenanceCount,
             nextPaymentDate: nextPaymentDate.toISOString(),
+            pendingPayment: pendingPayment ? {
+                id: pendingPayment.id,
+                amount: pendingPayment.montant,
+                paymentMethod: pendingPayment.moyen,
+                date: pendingPayment.datePaiement,
+                month: pendingPayment.mois,
+                status: pendingPayment.statut,
+            } : null,
         });
 
     } catch (error: any) {

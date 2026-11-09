@@ -275,6 +275,7 @@ export async function POST(request: Request) {
                 durationMonths: parsedDuration,
                 leaseType: property.leaseType || 'residential',
                 status: 'ACTIVE',
+                bailleurMasque: Boolean(body.bailleurMasque),
                 qrCodeUrl: fullPublicPdfUrl,
                 modeCreation: 'NUMERIQUE'
             }

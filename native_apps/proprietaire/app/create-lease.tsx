@@ -56,6 +56,7 @@ export default function CreateLeaseScreen() {
   const [depositAmount, setDepositAmount] = useState('');
   const [advanceAmount, setAdvanceAmount] = useState('');
   const [durationMonths, setDurationMonths] = useState('12');
+  const [maskIdentity, setMaskIdentity] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Charger les biens du propriétaire
@@ -153,6 +154,7 @@ export default function CreateLeaseScreen() {
           depositAmount: depositAmount.trim() || String(maxLegalCaution),
           avanceLoyer: advanceAmount.trim() || String(maxLegalCaution),
           durationMonths: durationMonths,
+          bailleurMasque: maskIdentity,
         }),
       });
 
@@ -161,7 +163,7 @@ export default function CreateLeaseScreen() {
       if (res.ok && data.success) {
         Alert.alert(
           'Bail Créé & Envoyé !',
-          `Le contrat de bail officiel a été généré en PDF et scellé numériquement.\n\nUne notification SMS a été transmise au locataire pour sa signature par code OTP.\n\nRéf : ${data.lease?.leaseReference || 'Enregistré'}`,
+          `Le contrat de bail officiel a été généré en PDF et scellé numériquement.\n\nUne notification SMS a été transmise au locataire pour sa signature par code SMS.\n\nRéf : ${data.lease?.leaseReference || 'Enregistré'}`,
           [
             {
               text: 'OK',
@@ -284,7 +286,7 @@ export default function CreateLeaseScreen() {
               onChangeText={setTenantName}
             />
 
-            <Text style={styles.fieldLabel}>Numéro de Téléphone (pour signature SMS OTP) *</Text>
+            <Text style={styles.fieldLabel}>Numéro de Téléphone (pour signature par code SMS) *</Text>
             <TextInput
               style={styles.input}
               placeholder="Ex: 0701020304"
@@ -435,6 +437,48 @@ export default function CreateLeaseScreen() {
                 );
               })}
             </View>
+          </View>
+
+          {/* 4. CONFIDENTIALITÉ DU BAILLEUR (IC-01 P1-01 / P1-02) */}
+          <View style={styles.formSection}>
+            <Text style={styles.sectionTitle}>4. PROTECTION DE VOTRE IDENTITÉ</Text>
+            <Pressable
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: 12,
+                backgroundColor: maskIdentity ? '#F0FDF4' : '#FFFFFF',
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: maskIdentity ? '#86EFAC' : '#E5E7EB',
+                marginTop: 6,
+              }}
+              onPress={() => setMaskIdentity(!maskIdentity)}
+            >
+              <View style={{ flex: 1, marginRight: 12 }}>
+                <Text style={{ fontWeight: '700', color: '#1A1D26', fontSize: 14 }}>
+                  Masquer mon identité à ce locataire
+                </Text>
+                <Text style={{ fontSize: 12, color: '#6B7280', marginTop: 2, lineHeight: 16 }}>
+                  {maskIdentity
+                    ? "✓ Activé : Le locataire verra 'Bailleur certifié' au lieu de votre nom et contact direct."
+                    : "Désactivé : Vos nom et coordonnées apparaîtront sur l'espace locataire."}
+                </Text>
+              </View>
+              <View
+                style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  backgroundColor: maskIdentity ? '#1E7E4E' : '#D1D5DB',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {maskIdentity && <CheckCircle2 color="#fff" size={16} />}
+              </View>
+            </Pressable>
           </View>
 
           {/* BOUTON D'ACTION PRINCIPAL */}

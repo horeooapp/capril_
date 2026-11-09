@@ -45,6 +45,8 @@ import {
   User,
   Bell,
   Wrench,
+  Check,
+  Edit3,
 } from 'lucide-react-native';
 
 const EUR_RATE = 655.957;
@@ -112,6 +114,143 @@ export default function BailleurAndAgencePrototypeScreen() {
 
   const [exLoyer, setExLoyer] = useState('180000');
   const [exDuree, setExDuree] = useState('24');
+
+  // --- ÉTATS DÉCLARATIONS & ACTIONS IC-01 (P0-03 & P0-05) ---
+  const [updateRentModal, setUpdateRentModal] = useState(false);
+  const [selectedDeclId, setSelectedDeclId] = useState('');
+  const [newRentAmount, setNewRentAmount] = useState('');
+  const [submittingDeclAction, setSubmittingDeclAction] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const reloadData = () => setRefreshTrigger((prev) => prev + 1);
+
+  const handleConfirmTenantDeclaration = (id: string) => {
+    Alert.alert(
+      'Confirmer le locataire',
+      'Confirmez-vous que cette personne est votre locataire ? Le bail officiel sera validé et activé.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Oui, confirmer',
+          onPress: async () => {
+            try {
+              const res = await fetchWithAuth(`/proprietaire/declarations/${id}/action`, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'CONFIRM' }),
+              });
+              const d = await res.json();
+              if (res.ok && d.success) {
+                Alert.alert('Bail Validé !', d.message || 'Le bail a été créé et activé.');
+                reloadData();
+              } else {
+                Alert.alert('Erreur', d.error || 'Impossible de confirmer.');
+              }
+            } catch (e) {
+              Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handlePromptUpdateRent = (id: string, currentRent: number) => {
+    setSelectedDeclId(id);
+    setNewRentAmount(String(currentRent || ''));
+    setUpdateRentModal(true);
+  };
+
+  const handleRejectTenantDeclaration = (id: string) => {
+    Alert.alert(
+      'Rejeter la déclaration',
+      'Confirmez-vous que vous ne connaissez pas cette personne ? La déclaration sera définitivement rejetée.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Je ne connais pas',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const res = await fetchWithAuth(`/proprietaire/declarations/${id}/action`, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'REJECT' }),
+              });
+              const d = await res.json();
+              if (res.ok && d.success) {
+                Alert.alert('Déclaration rejetée', d.message);
+                reloadData();
+              } else {
+                Alert.alert('Erreur', d.error || 'Impossible de rejeter.');
+              }
+            } catch (e) {
+              Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleConfirmPayment = (id: string) => {
+    Alert.alert(
+      'Confirmer la réception',
+      'Confirmez-vous avoir reçu ce règlement ? La quittance officielle sera immédiatement émise et remise au locataire.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Oui, émettre la quittance',
+          onPress: async () => {
+            try {
+              const res = await fetchWithAuth(`/proprietaire/declarations-paiement/${id}/action`, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'CONFIRM' }),
+              });
+              const d = await res.json();
+              if (res.ok && d.success) {
+                Alert.alert('Quittance Officielle Émise !', d.message || 'La quittance a été transmise au locataire.');
+                reloadData();
+              } else {
+                Alert.alert('Erreur', d.error || 'Impossible de valider.');
+              }
+            } catch (e) {
+              Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleRejectPayment = (id: string) => {
+    Alert.alert(
+      'Rejeter le paiement',
+      'Confirmez-vous ne pas avoir reçu ce paiement ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Non, pas reçu',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const res = await fetchWithAuth(`/proprietaire/declarations-paiement/${id}/action`, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'REJECT' }),
+              });
+              const d = await res.json();
+              if (res.ok && d.success) {
+                Alert.alert('Paiement rejeté', d.message);
+                reloadData();
+              } else {
+                Alert.alert('Erreur', d.error || 'Impossible de rejeter.');
+              }
+            } catch (e) {
+              Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
 
   // Gestion du retour physique Android et confirmation de sortie
@@ -626,6 +765,103 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Vacantes</Text>
                   </View>
                 </View>
+
+                {/* P0-03: DÉCLARATIONS LOCATAIRES À CONFIRMER */}
+                {dashData?.pendingTenantDeclarations && dashData.pendingTenantDeclarations.length > 0 && (
+                  <View style={{ marginTop: 12, marginBottom: 8 }}>
+                    <Text style={[styles.label, { color: '#B45309', fontWeight: '800' }]}>
+                      À CONFIRMER · DÉCLARATION LOCATAIRE ({dashData.pendingTenantDeclarations.length})
+                    </Text>
+                    {dashData.pendingTenantDeclarations.map((decl: any) => (
+                      <View key={decl.id} style={[styles.card, { borderColor: '#FCD34D', backgroundColor: '#FFFDF5', padding: 16, marginBottom: 10 }]}>
+                        <View style={styles.rowBetween}>
+                          <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>{decl.tenantName}</Text>
+                          <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: '#B45309' }}>Nouveau locataire</Text>
+                          </View>
+                        </View>
+                        <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                          Contact : {decl.tenantPhone || 'Numéro fourni'}
+                        </Text>
+                        <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                          Logement déclaré : {decl.housingDesc}
+                        </Text>
+                        <Text style={[styles.boldText, { marginTop: 6, color: '#1B4D3E', fontSize: 15 }]}>
+                          Loyer mensuel : {fmt(decl.rentAmount)}
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                          <Pressable
+                            style={[styles.btnPrimary, { flex: 1, minWidth: 120, backgroundColor: '#1E7E4E', paddingVertical: 10 }]}
+                            onPress={() => handleConfirmTenantDeclaration(decl.id)}
+                          >
+                            <Check color="#fff" size={15} />
+                            <Text style={[styles.btnPrimaryText, { fontSize: 12 }]}>C’est mon locataire</Text>
+                          </Pressable>
+                          <Pressable
+                            style={[styles.btnSecondary, { flex: 1, minWidth: 110, paddingVertical: 10, borderColor: '#D97706' }]}
+                            onPress={() => handlePromptUpdateRent(decl.id, decl.rentAmount)}
+                          >
+                            <Edit3 color="#D97706" size={15} />
+                            <Text style={[styles.btnSecondaryText, { color: '#D97706', fontSize: 12 }]}>Corriger le loyer</Text>
+                          </Pressable>
+                          <Pressable
+                            style={[styles.btnSecondary, { flex: 1, minWidth: 110, paddingVertical: 10, borderColor: '#EF4444' }]}
+                            onPress={() => handleRejectTenantDeclaration(decl.id)}
+                          >
+                            <X color="#EF4444" size={15} />
+                            <Text style={[styles.btnSecondaryText, { color: '#EF4444', fontSize: 12 }]}>Je ne connais pas</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* P0-05: PAIEMENTS À CONFIRMER */}
+                {dashData?.pendingPaymentDeclarations && dashData.pendingPaymentDeclarations.length > 0 && (
+                  <View style={{ marginTop: 12, marginBottom: 8 }}>
+                    <Text style={[styles.label, { color: '#1E7E4E', fontWeight: '800' }]}>
+                      PAIEMENTS À CONFIRMER ({dashData.pendingPaymentDeclarations.length})
+                    </Text>
+                    {dashData.pendingPaymentDeclarations.map((pay: any) => (
+                      <View key={pay.id} style={[styles.card, { borderColor: '#86EFAC', backgroundColor: '#F0FDF4', padding: 16, marginBottom: 10 }]}>
+                        <View style={styles.rowBetween}>
+                          <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>{pay.tenantName}</Text>
+                          <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                            <Text style={{ fontSize: 11, fontWeight: '700', color: '#166534' }}>{pay.paymentMethod}</Text>
+                          </View>
+                        </View>
+                        <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                          Bien : {pay.propertyName} · Période : {pay.month}
+                        </Text>
+                        <Text style={[styles.boldText, { marginTop: 4, color: '#166534', fontSize: 16 }]}>
+                          Montant reçu : {fmt(pay.amount)}
+                        </Text>
+                        <Text style={[styles.subMuted, { fontSize: 11, marginTop: 2 }]}>
+                          Déclaré le {new Date(pay.date).toLocaleDateString('fr-FR')}
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
+                          <Pressable
+                            style={[styles.btnPrimary, { flex: 2, backgroundColor: '#1E7E4E', paddingVertical: 10 }]}
+                            onPress={() => handleConfirmPayment(pay.id)}
+                          >
+                            <Check color="#fff" size={16} />
+                            <Text style={[styles.btnPrimaryText, { fontSize: 13 }]}>Oui, j'ai reçu</Text>
+                          </Pressable>
+                          <Pressable
+                            style={[styles.btnSecondary, { flex: 1, paddingVertical: 10, borderColor: '#EF4444' }]}
+                            onPress={() => handleRejectPayment(pay.id)}
+                          >
+                            <X color="#EF4444" size={16} />
+                            <Text style={[styles.btnSecondaryText, { color: '#EF4444', fontSize: 13 }]}>Non</Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
 
                 <Text style={styles.label}>ACTIONS RAPIDES</Text>
                 <View style={styles.grid2}>
@@ -1233,6 +1469,70 @@ export default function BailleurAndAgencePrototypeScreen() {
         </View>
       </Modal>
 
+      {/* MODALE : CORRIGER LE LOYER DÉCLARÉ (IC-01 P0-03) */}
+      <Modal visible={updateRentModal} transparent animationType="slide" onRequestClose={() => setUpdateRentModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Corriger le loyer</Text>
+            <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+              Ajustez le montant du loyer mensuel si le locataire a fait une erreur dans sa déclaration.
+            </Text>
+
+            <View style={{ width: '100%', gap: 10 }}>
+              <Text style={styles.label}>NOUVEAU MONTANT DU LOYER (FCFA) *</Text>
+              <TextInput
+                style={[styles.input, { marginTop: 4 }]}
+                placeholder="Ex : 160000"
+                keyboardType="numeric"
+                value={newRentAmount}
+                onChangeText={setNewRentAmount}
+              />
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1E7E4E', marginTop: 10 }]}
+                disabled={submittingDeclAction}
+                onPress={async () => {
+                  const val = parseFloat(newRentAmount.replace(/\s/g, '')) || 0;
+                  if (val <= 0) {
+                    Alert.alert('Montant invalide', 'Veuillez saisir un loyer supérieur à 0.');
+                    return;
+                  }
+                  setSubmittingDeclAction(true);
+                  try {
+                    const res = await fetchWithAuth(`/proprietaire/declarations/${selectedDeclId}/action`, {
+                      method: 'POST',
+                      body: JSON.stringify({ action: 'UPDATE_RENT', newRent: val }),
+                    });
+                    const d = await res.json();
+                    if (res.ok && d.success) {
+                      Alert.alert('Loyer Corrigé !', d.message);
+                      setUpdateRentModal(false);
+                      reloadData();
+                    } else {
+                      Alert.alert('Erreur', d.error || 'Impossible de mettre à jour le loyer.');
+                    }
+                  } catch (e) {
+                    Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+                  } finally {
+                    setSubmittingDeclAction(false);
+                  }
+                }}
+              >
+                {submittingDeclAction ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Valider le montant corrigé</Text>
+                )}
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setUpdateRentModal(false)}>
+                <Text style={styles.btnGhostText}>Annuler</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Assistant Vocal QAPRIL (ADD-27) */}
       <VoiceAssistantFAB moduleName={isBailleur ? 'BAILLEUR' : 'AGENCE'} primaryColor={primaryColor} />
     </SafeAreaView>
@@ -1670,6 +1970,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   btnPrimaryText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
+  btnSecondary: {
+    borderRadius: 14,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    gap: 6,
+  },
+  btnSecondaryText: { color: '#334155', fontSize: 13, fontWeight: '700' },
   btnGhost: {
     borderRadius: 14,
     height: 42,

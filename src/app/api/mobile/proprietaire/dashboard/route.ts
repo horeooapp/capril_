@@ -100,6 +100,74 @@ export async function GET(request: Request) {
             }
         });
 
+        // Déclarations locataires à confirmer (P0-03)
+        const pendingTenantDeclarationsRaw = await prisma.bailDeclaratif.findMany({
+            where: {
+                OR: [
+                    { bailleurId: user.userId },
+                    ...(userRecord?.phone ? [{ telephoneLocataire: { not: userRecord.phone }, bailleur: { phone: userRecord.phone } }] : [])
+                ],
+                sourceCreation: 'TENANT_DECLARATION',
+                statut: 'PENDING_LOCATAIRE'
+            },
+            include: {
+                locataire: {
+                    select: { firstName: true, lastName: true, phone: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const pendingTenantDeclarations = pendingTenantDeclarationsRaw.map(d => ({
+            id: d.id,
+            tenantName: d.nomLocataireDeclare || `${d.locataire?.firstName || ''} ${d.locataire?.lastName || ''}`.trim() || 'Locataire',
+            tenantPhone: d.telephoneLocataire || d.locataire?.phone || '',
+            housingDesc: d.descriptionLogement,
+            rentAmount: d.loyerDeclareMensuel,
+            createdAt: d.createdAt
+        }));
+
+        // Déclarations de paiements à confirmer (P0-05)
+        const pendingPaymentsRaw = await prisma.declarationPaiement.findMany({
+            where: {
+                bail: {
+                    OR: [
+                        { landlordId: user.userId },
+                        { property: { ownerUserId: user.userId } },
+                        { property: { managedByUserId: user.userId } }
+                    ]
+                },
+                statut: 'DECLARE'
+            },
+            include: {
+                locataire: {
+                    select: { firstName: true, lastName: true, phone: true }
+                },
+                bail: {
+                    include: {
+                        property: {
+                            select: { name: true, address: true, commune: true }
+                        }
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const pendingPaymentDeclarations = pendingPaymentsRaw.map(p => ({
+            id: p.id,
+            tenantName: `${p.locataire?.firstName || ''} ${p.locataire?.lastName || ''}`.trim() || 'Locataire',
+            tenantPhone: p.locataire?.phone || '',
+            propertyName: p.bail?.property?.name || p.bail?.property?.address || 'Logement',
+            amount: p.montant,
+            paymentMethod: p.moyen,
+            date: p.datePaiement,
+            month: p.mois,
+            preuveUrl: p.preuveUrl,
+            leaseId: p.bailId,
+            createdAt: p.createdAt
+        }));
+
         return NextResponse.json({
             user: userRecord,
             totalProperties,
@@ -110,6 +178,8 @@ export async function GET(request: Request) {
             vacantProperties,
             pendingLeasesCount,
             incidentsCount,
+            pendingTenantDeclarations,
+            pendingPaymentDeclarations,
             currency: 'XOF'
         });
 

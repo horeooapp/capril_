@@ -135,7 +135,34 @@ export default function LocatairePrototypeScreen() {
   const [pendingDeclaration, setPendingDeclaration] = useState<any>(null);
   const [submittingDeclaration, setSubmittingDeclaration] = useState(false);
 
-  // États pour Attestation & Occupants Déclarés (ADD-29)
+  // États Déclaration de paiement alternatif (IC-01 P0-04)
+  const [payAutrementModal, setPayAutrementModal] = useState(false);
+  const [autreMoyen, setAutreMoyen] = useState('WAVE');
+  const [autreMontant, setAutreMontant] = useState('');
+  const [autreDate, setAutreDate] = useState('');
+  const [submittingPayAutrement, setSubmittingPayAutrement] = useState(false);
+
+  // État Préavis / Donner congé (P1-08)
+  const [congeModal, setCongeModal] = useState(false);
+  const [congeDate, setCongeDate] = useState('');
+  const [congeMotif, setCongeMotif] = useState('');
+  const [submittingConge, setSubmittingConge] = useState(false);
+  const [activePreavis, setActivePreavis] = useState<any>(null);
+
+  // État Refonte Recherche en 5 blocs & Compatibilité (IC-01 Section 6)
+  const [searchSubTab, setSearchSubTab] = useState<'offres' | 'besoin' | 'recues'>('offres');
+  const [besoinCommune, setBesoinCommune] = useState('Cocody');
+  const [besoinType, setBesoinType] = useState('Appartement');
+  const [besoinBudget, setBesoinBudget] = useState('250000');
+  const [besoinDate, setBesoinDate] = useState('1er du mois prochain');
+  const [besoinSituation, setBesoinSituation] = useState('Salarié');
+  const [candidatureModal, setCandidatureModal] = useState(false);
+  const [selectedOfferForCandidature, setSelectedOfferForCandidature] = useState<any>(null);
+  const [shareTrustLevel, setShareTrustLevel] = useState(true);
+  const [sharePunctuality, setSharePunctuality] = useState(true);
+  const [shareIncome, setShareIncome] = useState(false);
+
+  // États pour Attestation & Occupants Déclarés
   const [generatingAttestation, setGeneratingAttestation] = useState(false);
   const [attestationResult, setAttestationResult] = useState<any>(null);
   const [occupantsModal, setOccupantsModal] = useState(false);
@@ -228,6 +255,27 @@ export default function LocatairePrototypeScreen() {
       });
   }, [marketList, marketSearchQuery, marketCommune, marketType, marketSortPrice]);
 
+  const getOfferCompatibility = (offer: any) => {
+    let score = 50;
+    const offCommune = (offer.logement?.commune || offer.commune || '').toLowerCase();
+    const targetCommune = besoinCommune.toLowerCase();
+    if (offCommune && targetCommune && (offCommune.includes(targetCommune) || targetCommune.includes(offCommune))) {
+      score += 25;
+    }
+    const offRent = offer.loyerDemande || offer.declaredRentFcfa || offer.price || 0;
+    const maxBudget = parseFloat(besoinBudget.replace(/\s/g, '')) || 300000;
+    if (offRent > 0 && offRent <= maxBudget) {
+      score += 15;
+    } else if (offRent > 0 && offRent <= maxBudget * 1.15) {
+      score += 5;
+    }
+    const offType = (offer.logement?.propertyType || offer.propertyType || '').toLowerCase();
+    if (offType && offType.includes(besoinType.toLowerCase())) {
+      score += 10;
+    }
+    return Math.min(score, 98);
+  };
+
   const hasActiveFilters =
     Boolean(marketSearchQuery.trim()) ||
     marketSortPrice !== 'none' ||
@@ -275,6 +323,16 @@ export default function LocatairePrototypeScreen() {
         if (dashRes.ok) {
           const json = await dashRes.json();
           setData(json);
+          if (json.pendingDeclaration) {
+            setPendingDeclaration({
+              id: json.pendingDeclaration.id,
+              bailleurNom: json.pendingDeclaration.landlordName,
+              bailleurTel: json.pendingDeclaration.landlordPhone,
+              logementDesc: json.pendingDeclaration.housingDesc,
+              loyer: json.pendingDeclaration.rentAmount,
+              status: json.pendingDeclaration.status,
+            });
+          }
         }
         if (receiptsRes.ok) {
           const recJson = await receiptsRes.json();
@@ -668,14 +726,28 @@ export default function LocatairePrototypeScreen() {
               </Pressable>
             </View>
 
-            {/* HERO LOYER OU ÉTAT SANS BAIL (P0-02) */}
+            {/* HERO LOYER OU ÉTAT SANS BAIL (P0-02 & P0-04) */}
             {data?.hasLease && loyer > 0 ? (
               <View style={styles.heroBlue}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.heroSub}>LOYER DU MOIS EN COURS</Text>
-                  <View style={data?.rentStatus === 'PAID' ? styles.pillOk : [styles.pillOk, { backgroundColor: '#FEF3C7' }]}>
-                    <Text style={[styles.pillOkText, data?.rentStatus !== 'PAID' && { color: '#B45309' }]}>
-                      {data?.rentStatus === 'PAID' ? 'À jour · Loyer réglé' : 'À régler'}
+                  <View style={
+                    data?.rentStatus === 'PAID'
+                      ? styles.pillOk
+                      : data?.rentStatus === 'DECLARED_PENDING'
+                      ? [styles.pillOk, { backgroundColor: '#FEF3C7' }]
+                      : [styles.pillOk, { backgroundColor: '#FEE2E2' }]
+                  }>
+                    <Text style={[
+                      styles.pillOkText,
+                      data?.rentStatus === 'DECLARED_PENDING' && { color: '#B45309' },
+                      data?.rentStatus !== 'PAID' && data?.rentStatus !== 'DECLARED_PENDING' && { color: '#B91C1C' },
+                    ]}>
+                      {data?.rentStatus === 'PAID'
+                        ? 'À jour · Loyer réglé'
+                        : data?.rentStatus === 'DECLARED_PENDING'
+                        ? 'En attente de confirmation'
+                        : 'À régler'}
                     </Text>
                   </View>
                 </View>
@@ -683,14 +755,32 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.heroSub}>
                   Bail {bailRef} · Prochaine échéance le {data?.lease?.paymentDay || 5} du mois · Frais : 0 F
                 </Text>
-                <View style={styles.heroActions}>
-                  <Pressable style={styles.btnWhite} onPress={() => setScreen('payer')}>
-                    <Text style={styles.btnWhiteText}>Payer maintenant</Text>
-                  </Pressable>
-                  <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
-                    <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
-                  </Pressable>
-                </View>
+
+                {data?.rentStatus === 'DECLARED_PENDING' ? (
+                  <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', padding: 12, borderRadius: 10, marginTop: 10 }}>
+                    <Text style={{ color: '#fff', fontSize: 13, lineHeight: 18 }}>
+                      Paiement de {fmt(data?.pendingPayment?.amount || loyer)} déclaré via {data?.pendingPayment?.paymentMethod || 'autre moyen'}. En attente de confirmation par votre bailleur pour l'émission de la quittance officielle.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={[styles.heroActions, { flexWrap: 'wrap', gap: 8 }]}>
+                    <Pressable style={styles.btnWhite} onPress={() => setScreen('payer')}>
+                      <Text style={styles.btnWhiteText}>Payer maintenant</Text>
+                    </Pressable>
+                    <Pressable
+                      style={styles.btnOutlineWhite}
+                      onPress={() => {
+                        setAutreMontant(String(loyer));
+                        setPayAutrementModal(true);
+                      }}
+                    >
+                      <Text style={styles.btnOutlineWhiteText}>J’ai payé autrement</Text>
+                    </Pressable>
+                    <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
+                      <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
+                    </Pressable>
+                  </View>
+                )}
               </View>
             ) : pendingDeclaration ? (
               <View style={[styles.card, { borderColor: '#FCD34D', backgroundColor: '#FFFDF5', padding: 20 }]}>
@@ -1273,6 +1363,26 @@ export default function LocatairePrototypeScreen() {
                 • Toute clause contraire au Code de la Construction et de l’Habitat est réputée non écrite (art. 420 CCH).
               </Text>
             </View>
+
+            {/* P1-08: DONNER CONGÉ (PRÉAVIS DE DÉPART) */}
+            <View style={[styles.card, { borderColor: '#CBD5E1', backgroundColor: '#F8FAFC' }]}>
+              <View style={styles.rowBetween}>
+                <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>Fin de bail & Déménagement</Text>
+                <View style={{ backgroundColor: '#E2E8F0', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>Art. 434 CCH</Text>
+                </View>
+              </View>
+              <Text style={[styles.subMuted, { marginTop: 4, lineHeight: 18 }]}>
+                Vous souhaitez quitter votre logement ? Générez votre notification formelle de préavis de départ conforme à la loi (délai légal de 30 jours minimum).
+              </Text>
+              <Pressable
+                style={[styles.btnSecondary, { marginTop: 12, borderColor: '#2C3E6B' }]}
+                onPress={() => setCongeModal(true)}
+              >
+                <FileText color="#2C3E6B" size={16} />
+                <Text style={[styles.btnSecondaryText, { color: '#2C3E6B' }]}>Donner congé (Préavis officiel)</Text>
+              </Pressable>
+            </View>
           </View>
         )}
 
@@ -1437,6 +1547,163 @@ export default function LocatairePrototypeScreen() {
               </Pressable>
             </View>
 
+            {/* 3 SOUS-ONGLETS RECHERCHE (IC-01 Section 6) */}
+            <View style={{ flexDirection: 'row', gap: 6, marginVertical: 6 }}>
+              {[
+                { id: 'offres', label: 'Offres vérifiées' },
+                { id: 'besoin', label: 'Mon besoin (5 critères)' },
+                { id: 'recues', label: 'Offres reçues' },
+              ].map((tab) => (
+                <Pressable
+                  key={tab.id}
+                  style={[
+                    styles.filterChip,
+                    searchSubTab === tab.id && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                  ]}
+                  onPress={() => setSearchSubTab(tab.id as any)}
+                >
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      searchSubTab === tab.id && { color: '#FFFFFF', fontWeight: '700' },
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {searchSubTab === 'besoin' && (
+              <View style={{ gap: 12 }}>
+                <View style={styles.card}>
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>1. Où souhaitez-vous habiter ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Sélectionnez votre commune ou quartier prioritaire</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {['Cocody', 'Marcory', 'Riviera', 'Plateau', 'Bingerville', 'Yopougon'].map((c) => (
+                      <Pressable
+                        key={c}
+                        style={[
+                          styles.filterChip,
+                          besoinCommune === c && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                        ]}
+                        onPress={() => setBesoinCommune(c)}
+                      >
+                        <Text style={[styles.filterChipText, besoinCommune === c && { color: '#fff', fontWeight: '700' }]}>
+                          {c}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>2. Quel type de logement ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Typologie recherchée</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {['Studio', 'Appartement', 'Villa', 'Duplex'].map((t) => (
+                      <Pressable
+                        key={t}
+                        style={[
+                          styles.filterChip,
+                          besoinType === t && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                        ]}
+                        onPress={() => setBesoinType(t)}
+                      >
+                        <Text style={[styles.filterChipText, besoinType === t && { color: '#fff', fontWeight: '700' }]}>
+                          {t}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>3. Combien (Budget mensuel max) ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 6 }]}>Montant loyer max en FCFA</Text>
+                  <TextInput
+                    style={[styles.input, { marginTop: 4 }]}
+                    placeholder="Ex : 250000"
+                    keyboardType="numeric"
+                    value={besoinBudget}
+                    onChangeText={setBesoinBudget}
+                  />
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>4. Quand souhaitez-vous emménager ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Date d'entrée souhaitée</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {['Immédiat', '1er du mois prochain', 'Dans 2 mois'].map((d) => (
+                      <Pressable
+                        key={d}
+                        style={[
+                          styles.filterChip,
+                          besoinDate === d && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                        ]}
+                        onPress={() => setBesoinDate(d)}
+                      >
+                        <Text style={[styles.filterChipText, besoinDate === d && { color: '#fff', fontWeight: '700' }]}>
+                          {d}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={styles.card}>
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>5. Qui va occuper le logement ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Votre profil locataire</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {['Salarié', 'Fonctionnaire', 'Profession libérale', 'Couple', 'Famille'].map((s) => (
+                      <Pressable
+                        key={s}
+                        style={[
+                          styles.filterChip,
+                          besoinSituation === s && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                        ]}
+                        onPress={() => setBesoinSituation(s)}
+                      >
+                        <Text style={[styles.filterChipText, besoinSituation === s && { color: '#fff', fontWeight: '700' }]}>
+                          {s}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#1E7E4E', marginTop: 8 }]}
+                  onPress={() => {
+                    setSearchSubTab('offres');
+                    Alert.alert(
+                      'Besoin enregistré !',
+                      'Vos 5 critères ont été enregistrés. Le taux de compatibilité de toutes les offres a été mis à jour.'
+                    );
+                  }}
+                >
+                  <Check color="#fff" size={16} />
+                  <Text style={styles.btnPrimaryText}>Enregistrer & voir les offres compatibles</Text>
+                </Pressable>
+              </View>
+            )}
+
+            {searchSubTab === 'recues' && (
+              <View style={[styles.card, { padding: 24, alignItems: 'center', borderColor: '#CBD5E1' }]}>
+                <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                  <Bell color="#2C3E6B" size={26} />
+                </View>
+                <Text style={[styles.h2, { textAlign: 'center', color: '#1A1D26' }]}>
+                  Offres directes reçues
+                </Text>
+                <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 6, lineHeight: 18 }]}>
+                  Dès qu'un bailleur ou une agence certifiée repère votre Passeport Locatif compatible avec son bien, ses invitations directes s'afficheront ici.
+                </Text>
+              </View>
+            )}
+
+            {searchSubTab === 'offres' && (
+              <>
             {/* 1. BARRE DE RECHERCHE */}
             <View style={styles.searchBarContainer}>
               <Search color="#64748B" size={18} style={{ marginLeft: 12 }} />
@@ -1584,6 +1851,9 @@ export default function LocatairePrototypeScreen() {
                 const address = off.logement?.address || off.address || '';
                 const rawImg = off.photosUrls?.[0] || off.logement?.images?.[0]?.s3Key || null;
                 const imgUri = formatImageUrl(rawImg);
+                const compat = getOfferCompatibility(off);
+                const compatColor = compat >= 80 ? '#1E7E4E' : compat >= 65 ? '#2C3E6B' : '#B45309';
+                const compatBg = compat >= 80 ? '#F0FDF4' : compat >= 65 ? '#EFF6FF' : '#FFFDF5';
 
                 return (
                   <View key={off.id || i} style={styles.card}>
@@ -1604,8 +1874,13 @@ export default function LocatairePrototypeScreen() {
                       <Text style={[styles.boldText, { fontSize: 16, flex: 1, marginRight: 8 }]}>
                         {title}
                       </Text>
-                      <View style={styles.pillTint}>
-                        <Text style={styles.pillTintText}>{commune}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <View style={{ backgroundColor: compatBg, paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6, borderWidth: 1, borderColor: compatColor + '40' }}>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: compatColor }}>{compat}% compatible</Text>
+                        </View>
+                        <View style={styles.pillTint}>
+                          <Text style={styles.pillTintText}>{commune}</Text>
+                        </View>
                       </View>
                     </View>
 
@@ -1619,18 +1894,18 @@ export default function LocatairePrototypeScreen() {
 
                     <Pressable
                       style={[styles.btnPrimary, { marginTop: 12 }]}
-                      onPress={() =>
-                        Alert.alert(
-                          'Candidature envoyée',
-                          `Votre Passeport Locatif a été transmis pour "${title}" au bailleur en toute sécurité.`
-                        )
-                      }
+                      onPress={() => {
+                        setSelectedOfferForCandidature(off);
+                        setCandidatureModal(true);
+                      }}
                     >
                       <Text style={styles.btnPrimaryText}>Candidater avec mon Passeport</Text>
                     </Pressable>
                   </View>
                 );
               })
+            )}
+            </>
             )}
           </View>
         )}
@@ -1732,24 +2007,50 @@ export default function LocatairePrototypeScreen() {
               <Pressable
                 style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 10 }]}
                 disabled={submittingDeclaration}
-                onPress={() => {
+                onPress={async () => {
                   if (!decBailleurNom.trim() || !decBailleurTel.trim() || !decLogementDesc.trim() || !decLoyer.trim()) {
                     Alert.alert('Champs obligatoires', 'Veuillez renseigner le nom, le téléphone du bailleur, le logement et le loyer.');
                     return;
                   }
-                  setPendingDeclaration({
-                    bailleurNom: decBailleurNom.trim(),
-                    bailleurTel: decBailleurTel.trim(),
-                    logementDesc: decLogementDesc.trim(),
-                    loyer: decLoyer.trim(),
-                    jour: decJour.trim() || '5',
-                    status: 'EN_ATTENTE',
-                  });
-                  setDeclareModal(false);
-                  setInviteModal(true);
+                  setSubmittingDeclaration(true);
+                  try {
+                    const res = await fetchWithAuth('/locataire/declarer-logement', {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        landlordName: decBailleurNom.trim(),
+                        landlordPhone: decBailleurTel.trim(),
+                        housingDesc: decLogementDesc.trim(),
+                        rent: decLoyer.trim(),
+                      }),
+                    });
+                    const result = await res.json();
+                    if (res.ok && result.success) {
+                      setPendingDeclaration({
+                        id: result.declarationId,
+                        bailleurNom: decBailleurNom.trim(),
+                        bailleurTel: decBailleurTel.trim(),
+                        logementDesc: decLogementDesc.trim(),
+                        loyer: decLoyer.trim(),
+                        jour: decJour.trim() || '5',
+                        status: 'EN_ATTENTE',
+                      });
+                      setDeclareModal(false);
+                      setInviteModal(true);
+                    } else {
+                      Alert.alert('Erreur', result.error || 'Impossible d\'enregistrer la déclaration.');
+                    }
+                  } catch (err) {
+                    Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+                  } finally {
+                    setSubmittingDeclaration(false);
+                  }
                 }}
               >
-                <Text style={styles.btnPrimaryText}>Enregistrer et inviter mon bailleur</Text>
+                {submittingDeclaration ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Enregistrer et inviter mon bailleur</Text>
+                )}
               </Pressable>
 
               <Pressable style={styles.btnGhost} onPress={() => setDeclareModal(false)}>
@@ -1793,6 +2094,308 @@ export default function LocatairePrototypeScreen() {
             <Pressable style={styles.btnGhost} onPress={() => setInviteModal(false)}>
               <Text style={styles.btnGhostText}>Fermer</Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : J'AI PAYÉ AUTREMENT (IC-01 P0-04) */}
+      <Modal visible={payAutrementModal} transparent animationType="slide" onRequestClose={() => setPayAutrementModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>J’ai payé autrement</Text>
+            <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+              Déclarez votre règlement direct (Wave, Orange, MTN, Espèces, Virement) pour que votre bailleur confirme et émette votre quittance officielle.
+            </Text>
+
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 10 }}>
+              <Text style={styles.label}>MOYEN DE RÈGLEMENT *</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {[
+                  { id: 'WAVE', label: 'Wave' },
+                  { id: 'ORANGE_MONEY', label: 'Orange Money' },
+                  { id: 'MTN', label: 'MTN MoMo' },
+                  { id: 'MOOV', label: 'Moov Money' },
+                  { id: 'ESPECES', label: 'Espèces' },
+                  { id: 'VIREMENT', label: 'Virement bancaire' },
+                ].map((m) => (
+                  <Pressable
+                    key={m.id}
+                    style={[
+                      styles.btnSecondary,
+                      { paddingHorizontal: 12, paddingVertical: 8 },
+                      autreMoyen === m.id && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                    ]}
+                    onPress={() => setAutreMoyen(m.id)}
+                  >
+                    <Text
+                      style={[
+                        styles.btnSecondaryText,
+                        { fontSize: 12 },
+                        autreMoyen === m.id && { color: '#fff', fontWeight: '700' },
+                      ]}
+                    >
+                      {m.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.label}>MONTANT RÉGLÉ (FCFA) *</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder={String(loyer || 150000)}
+                  keyboardType="numeric"
+                  value={autreMontant}
+                  onChangeText={setAutreMontant}
+                />
+              </View>
+
+              <View style={{ marginTop: 8 }}>
+                <Text style={styles.label}>DATE DU PAIEMENT (JJ/MM/AAAA)</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder={new Date().toLocaleDateString('fr-FR')}
+                  value={autreDate}
+                  onChangeText={setAutreDate}
+                />
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1E7E4E', marginTop: 12 }]}
+                disabled={submittingPayAutrement}
+                onPress={async () => {
+                  const finalMontant = autreMontant.trim() || String(loyer);
+                  if (!finalMontant || Number(finalMontant) <= 0) {
+                    Alert.alert('Montant requis', 'Veuillez préciser le montant réglé.');
+                    return;
+                  }
+                  setSubmittingPayAutrement(true);
+                  try {
+                    const res = await fetchWithAuth('/locataire/declarer-paiement', {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        moyen: autreMoyen,
+                        montant: finalMontant,
+                        datePaiement: new Date().toISOString(),
+                      }),
+                    });
+                    const json = await res.json();
+                    if (res.ok && json.success) {
+                      Alert.alert(
+                        'Paiement Déclaré !',
+                        json.message || 'Votre déclaration a été enregistrée. Votre bailleur a été notifié pour confirmation.'
+                      );
+                      setPayAutrementModal(false);
+                      setData((prev: any) => ({
+                        ...prev,
+                        rentStatus: 'DECLARED_PENDING',
+                        pendingPayment: {
+                          amount: Number(finalMontant),
+                          paymentMethod: autreMoyen,
+                          date: new Date().toISOString(),
+                          status: 'DECLARE',
+                        },
+                      }));
+                    } else {
+                      Alert.alert('Erreur', json.error || 'Impossible d\'enregistrer le paiement.');
+                    }
+                  } catch (e) {
+                    Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+                  } finally {
+                    setSubmittingPayAutrement(false);
+                  }
+                }}
+              >
+                {submittingPayAutrement ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Confirmer ma déclaration de paiement</Text>
+                )}
+              </Pressable>
+
+              <Pressable
+                style={[styles.btnSecondary, { marginTop: 6 }]}
+                onPress={() => setPayAutrementModal(false)}
+              >
+                <Text style={styles.btnSecondaryText}>Fermer</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : DONNER CONGÉ (PRÉAVIS DE DÉPART - P1-08) */}
+      <Modal visible={congeModal} transparent animationType="slide" onRequestClose={() => setCongeModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Donner congé (Préavis officiel)</Text>
+            <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+              Notification formelle conforme à l’art. 434 du Code de la Construction et de l’Habitat.
+            </Text>
+
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 10 }}>
+              <View style={[styles.recapBox, { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1' }]}>
+                <Text style={[styles.boldText, { color: '#1E293B' }]}>Délai légal obligatoire : 30 jours</Text>
+                <Text style={[styles.subMuted, { marginTop: 4, lineHeight: 18 }]}>
+                  En validant cette notification, votre bailleur recevra officiellement votre date de libération des lieux pour planifier l’état des lieux de sortie et la restitution de caution.
+                </Text>
+              </View>
+
+              <View style={{ marginTop: 4 }}>
+                <Text style={styles.label}>DATE DE DÉPART SOUHAITÉE (JJ/MM/AAAA) *</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder={(() => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + 30);
+                    return d.toLocaleDateString('fr-FR');
+                  })()}
+                  value={congeDate}
+                  onChangeText={setCongeDate}
+                />
+              </View>
+
+              <View style={{ marginTop: 4 }}>
+                <Text style={styles.label}>MOTIF DU DÉPART (OPTIONNEL)</Text>
+                <TextInput
+                  style={[styles.input, { marginTop: 4 }]}
+                  placeholder="Ex : Déménagement, mutation professionnelle, acquisition..."
+                  value={congeMotif}
+                  onChangeText={setCongeMotif}
+                />
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 12 }]}
+                disabled={submittingConge}
+                onPress={async () => {
+                  setSubmittingConge(true);
+                  try {
+                    let targetDate: Date;
+                    if (congeDate.trim()) {
+                      const parts = congeDate.trim().split(/[\/\-]/);
+                      if (parts.length === 3) {
+                        targetDate = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+                      } else {
+                        targetDate = new Date(congeDate.trim());
+                      }
+                    } else {
+                      targetDate = new Date();
+                      targetDate.setDate(targetDate.getDate() + 30);
+                    }
+
+                    const res = await fetchWithAuth('/locataire/preavis', {
+                      method: 'POST',
+                      body: JSON.stringify({
+                        dateDepartPrevue: targetDate.toISOString(),
+                        motif: congeMotif.trim() || undefined,
+                      }),
+                    });
+                    const json = await res.json();
+                    if (res.ok && json.success) {
+                      Alert.alert(
+                        'Préavis Transmis !',
+                        json.message || 'Votre préavis a été notifié à votre bailleur.'
+                      );
+                      setCongeModal(false);
+                      setActivePreavis(json.preavis);
+                    } else {
+                      Alert.alert('Erreur', json.error || 'Impossible d\'enregistrer le préavis.');
+                    }
+                  } catch (e) {
+                    Alert.alert('Erreur réseau', 'Vérifiez votre connexion internet.');
+                  } finally {
+                    setSubmittingConge(false);
+                  }
+                }}
+              >
+                {submittingConge ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.btnPrimaryText}>Transmettre mon préavis officiel</Text>
+                )}
+              </Pressable>
+
+              <Pressable style={styles.btnSecondary} onPress={() => setCongeModal(false)}>
+                <Text style={styles.btnSecondaryText}>Annuler</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : CANDIDATER AVEC CONSENTEMENT (IC-01 Section 6) */}
+      <Modal visible={candidatureModal} transparent animationType="slide" onRequestClose={() => setCandidatureModal(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            <Text style={styles.h2}>Candidater au logement</Text>
+            <Text style={[styles.subMuted, { marginTop: 4, marginBottom: 12 }]}>
+              {selectedOfferForCandidature?.titre || selectedOfferForCandidature?.logement?.name || 'Logement certifié QAPRIL'}
+            </Text>
+
+            <ScrollView style={{ width: '100%' }} contentContainerStyle={{ gap: 10 }}>
+              <Text style={styles.label}>CONSENTEMENT DE PARTAGE SÉCURISÉ</Text>
+              <Text style={[styles.subMuted, { fontSize: 12, lineHeight: 17 }]}>
+                Vous choisissez exactement ce que le bailleur pourra consulter. Aucune pièce confidentielle n'est transmise sans votre accord.
+              </Text>
+
+              <Pressable
+                style={[styles.recapBox, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: shareTrustLevel ? '#F0FDF4' : '#FFFFFF' }]}
+                onPress={() => setShareTrustLevel(!shareTrustLevel)}
+              >
+                <View style={{ flex: 1, marginRight: 10 }}>
+                  <Text style={styles.boldText}>Tranche de confiance certifiée</Text>
+                  <Text style={[styles.subMuted, { fontSize: 11 }]}>Option recommandée (Tranche ponctuelle)</Text>
+                </View>
+                <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: shareTrustLevel ? '#1E7E4E' : '#D1D5DB', alignItems: 'center', justifyContent: 'center' }}>
+                  {shareTrustLevel && <Check color="#fff" size={14} />}
+                </View>
+              </Pressable>
+
+              <Pressable
+                style={[styles.recapBox, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: sharePunctuality ? '#F0FDF4' : '#FFFFFF' }]}
+                onPress={() => setSharePunctuality(!sharePunctuality)}
+              >
+                <View style={{ flex: 1, marginRight: 10 }}>
+                  <Text style={styles.boldText}>Historique de quittances régulières</Text>
+                  <Text style={[styles.subMuted, { fontSize: 11 }]}>Atteste de vos règlements à bonne date</Text>
+                </View>
+                <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: sharePunctuality ? '#1E7E4E' : '#D1D5DB', alignItems: 'center', justifyContent: 'center' }}>
+                  {sharePunctuality && <Check color="#fff" size={14} />}
+                </View>
+              </Pressable>
+
+              <Pressable
+                style={[styles.recapBox, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: shareIncome ? '#F0FDF4' : '#FFFFFF' }]}
+                onPress={() => setShareIncome(!shareIncome)}
+              >
+                <View style={{ flex: 1, marginRight: 10 }}>
+                  <Text style={styles.boldText}>Attestation de revenus / CDI</Text>
+                  <Text style={[styles.subMuted, { fontSize: 11 }]}>Optionnel : pour accélérer l’accord</Text>
+                </View>
+                <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: shareIncome ? '#1E7E4E' : '#D1D5DB', alignItems: 'center', justifyContent: 'center' }}>
+                  {shareIncome && <Check color="#fff" size={14} />}
+                </View>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1E7E4E', marginTop: 10 }]}
+                onPress={() => {
+                  setCandidatureModal(false);
+                  Alert.alert(
+                    'Candidature transmise !',
+                    'Votre candidature certifiée avec vos choix de consentement a été transmise au bailleur. Vous recevrez une alerte dès son retour.'
+                  );
+                }}
+              >
+                <Text style={styles.btnPrimaryText}>Confirmer ma candidature</Text>
+              </Pressable>
+
+              <Pressable style={styles.btnSecondary} onPress={() => setCandidatureModal(false)}>
+                <Text style={styles.btnSecondaryText}>Annuler</Text>
+              </Pressable>
+            </ScrollView>
           </View>
         </View>
       </Modal>
