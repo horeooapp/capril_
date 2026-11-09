@@ -170,7 +170,7 @@ export default function ProprietaireChatScreen() {
                             Messagerie Bailleur
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#1B4D3E' }}>
-                            Échanges certifiés avec vos locataires · Horodatage SHA-256
+                            Échanges certifiés avec vos locataires · Horodatage infalsifiable
                         </Text>
                     </View>
                     <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>

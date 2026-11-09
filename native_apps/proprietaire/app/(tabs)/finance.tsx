@@ -79,7 +79,7 @@ export default function FinanceScreen() {
         <Pressable
           style={styles.reportBtn}
           onPress={() =>
-            Alert.alert('Rapport mensuel PDF', 'Rapport PDF M-RAPPORT certifié SHA-256 téléchargé.')
+            Alert.alert('Rapport mensuel PDF', 'Rapport PDF mensuel certifié et infalsifiable téléchargé.')
           }
         >
           <FileText color="#1B4D3E" size={16} />

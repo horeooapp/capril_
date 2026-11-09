@@ -76,7 +76,7 @@ export default function LoginScreen() {
               : 'ESPACE AGENCE IMMOBILIÈRE AGRÉÉE'}
           </Text>
           <Text style={styles.subTitle}>
-            Plateforme certifiée de gestion immobilière · DGI & SHA-256
+            Plateforme certifiée de gestion immobilière · DGI & Horodatage certifié
           </Text>
         </View>
 
@@ -127,7 +127,7 @@ export default function LoginScreen() {
               <View style={styles.roleFeaturesList}>
                 <Text style={styles.roleFeatureItem}>• Mes biens & lots propres</Text>
                 <Text style={styles.roleFeatureItem}>• Baux, quittances & loyers</Text>
-                <Text style={styles.roleFeatureItem}>• Signalements locataires (RG-MAI-01)</Text>
+                <Text style={styles.roleFeatureItem}>• Signalements & entretiens locataires</Text>
               </View>
 
               <View
@@ -178,7 +178,7 @@ export default function LoginScreen() {
 
               <View style={styles.roleFeaturesList}>
                 <Text style={styles.roleFeatureItem}>• Portefeuille multi-mandants</Text>
-                <Text style={styles.roleFeatureItem}>• Substitution RG-MAN-01</Text>
+                <Text style={styles.roleFeatureItem}>• Mandats et gestion déléguée</Text>
                 <Text style={styles.roleFeatureItem}>• Rétrocessions & Honoraires (8%)</Text>
               </View>
 

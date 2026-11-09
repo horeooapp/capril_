@@ -83,7 +83,7 @@ export default function MaintenanceScreen() {
       if (res.ok) {
         Alert.alert(
           'Signalement émis avec succès',
-          `Votre signalement a été transmis à ${landlordName} avec horodatage certifié SHA-256 (ADD-11).`
+          `Votre signalement a été transmis à ${landlordName} avec horodatage certifié et preuve contradictoire.`
         );
         setTitle('');
         setDescription('');
@@ -116,7 +116,7 @@ export default function MaintenanceScreen() {
             </View>
             <Text style={styles.roleDesc}>
               En tant que locataire, vous émettez ici vos déclarations de pannes ou travaux. Votre bailleur reçoit
-              l’alerte en temps réel avec preuve contradictoire horodatée (ADD-11).
+              l’alerte en temps réel avec preuve contradictoire horodatée.
             </Text>
             <View style={styles.destinataireCard}>
               <Text style={styles.destinataireLabel}>DESTINATAIRE NOTIFIÉ :</Text>

@@ -58,6 +58,8 @@ import {
   Users,
   UserPlus,
   ExternalLink,
+  BookOpen,
+  Download,
 } from 'lucide-react-native';
 
 const formatImageUrl = (uri?: string | null) => {
@@ -76,7 +78,8 @@ type LocScreen =
   | 'bail'
   | 'documents'
   | 'passeport'
-  | 'recherche';
+  | 'recherche'
+  | 'manuel';
 
 const MENU_ITEMS = [
   { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes', icon: Home },
@@ -88,6 +91,7 @@ const MENU_ITEMS = [
   { id: 'documents' as LocScreen, label: 'Mes documents', desc: 'Attestations, pièces et quittances', icon: Folder },
   { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Tranche de confiance et ponctualité', icon: UserCheck },
   { id: 'recherche' as LocScreen, label: 'Trouver un logement', desc: 'Offres vérifiées et compatibles', icon: Search },
+  { id: 'manuel' as LocScreen, label: 'Manuel d\'utilisation', desc: 'Guide officiel complet v2.0 certifié', icon: BookOpen },
 ];
 
 export default function LocatairePrototypeScreen() {
@@ -631,6 +635,11 @@ export default function LocatairePrototypeScreen() {
                     key={item.id}
                     style={[styles.drawerItem, active && styles.drawerItemActive]}
                     onPress={() => {
+                      if (item.id === 'manuel') {
+                        setMenuOpen(false);
+                        Linking.openURL('https://qapril.net/manuel');
+                        return;
+                      }
                       setScreen(item.id);
                       setMenuOpen(false);
                     }}

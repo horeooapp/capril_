@@ -20,7 +20,7 @@ export default function AgenceLoginScreen() {
         <Text style={styles.badge}>QAPRIL AGENCE AGRÉÉE · CPRAIMA-CI</Text>
         <Text style={styles.title}>Portail Agence Immobilière</Text>
         <Text style={styles.sub}>
-          Substitution totale et exclusive (RG-MAN-01) · Masquage BAI-NNN (RG-CONF-02 à 05) · Enregistrement DGI (ADD-23) · Visites Niveau 4 (ADD-22)
+          Gestion sous mandat certifié · Protection souveraine du portefeuille · Enregistrement officiel DGI · Visites de conformité
         </Text>
         <Pressable
           style={styles.btn}

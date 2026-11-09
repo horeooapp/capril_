@@ -8,12 +8,14 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Upload, ShieldCheck, Users, Building2, Wallet, Plus, Home } from 'lucide-react-native';
+import { Upload, ShieldCheck, Users, Building2, Wallet, Plus, Home, BookOpen, ExternalLink, Download } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { TopNavHeader } from '../../components/TopNavHeader';
+import { AppVersionBadge } from '../../components/AppVersionBadge';
 
 const HON = 0.08;
 const FRAIS_QAPRIL = 2000;
@@ -86,10 +88,10 @@ export default function AgencePrototypeHomeScreen() {
               ['home', 'Accueil'],
               ['biens', `Biens sous mandat (${properties.length})`],
               ['mandants', 'Bailleurs mandants'],
-              ['ext', 'Bail externe → DGI (ADD-23)'],
+              ['ext', 'Bail externe → Enregistrement DGI'],
               ['flux', 'Reversements (− 8 %)'],
-              ['verif', 'Visites Niv. 4 (15 000 F)'],
-              ['team', 'Équipe & Masquage'],
+              ['verif', 'Visites de conformité (15 000 F)'],
+              ['team', 'Équipe & Confidentialité'],
             ] as [typeof aTab, string][]
           ).map(([id, label]) => (
             <Pressable
@@ -116,7 +118,7 @@ export default function AgencePrototypeHomeScreen() {
               const next = roleView === 'chef' ? 'collab' : 'chef';
               setRoleView(next);
               Alert.alert(
-                next === 'collab' ? 'Vue collaborateur (RG-CONF-04)' : 'Vue chef d’agence',
+                next === 'collab' ? 'Vue collaborateur (Protection portefeuille)' : 'Vue chef d’agence',
                 next === 'collab'
                   ? 'Les bailleurs masqués apparaissent uniquement sous leur code séquentiel BAI-NNN.'
                   : 'Tous les noms réels des bailleurs mandants sont visibles.'
@@ -167,6 +169,39 @@ export default function AgencePrototypeHomeScreen() {
                 <Text style={{ fontSize: 10, color: '#64748B', fontWeight: '600', marginTop: 2 }}>Génération certifiée</Text>
               </View>
             </View>
+
+            {/* Manuel d'Utilisation Officiel QAPRIL v2.0 */}
+            <View style={styles.card}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <BookOpen color="#D97706" size={20} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.boldText}>Manuel d'Utilisation Officiel</Text>
+                  <Text style={styles.subMuted}>
+                    Guide complet v2.0 certifié pour les agences agréées, la gestion des mandats et le barème notarial.
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <Pressable
+                  style={[styles.btnPrimary, { flex: 1, backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A', marginTop: 0 }]}
+                  onPress={() => Linking.openURL('https://qapril.net/manuel')}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <ExternalLink color="#B45309" size={14} />
+                    <Text style={{ color: '#B45309', fontSize: 12, fontWeight: '700' }}>Consulter en ligne</Text>
+                  </View>
+                </Pressable>
+                <Pressable
+                  style={[styles.btnPrimary, { flex: 1, backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', marginTop: 0 }]}
+                  onPress={() => Linking.openURL('https://qapril.net/api/manual/download')}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Download color="#1F2A44" size={14} />
+                    <Text style={{ color: '#1F2A44', fontSize: 12, fontWeight: '700' }}>Télécharger DOCX</Text>
+                  </View>
+                </Pressable>
+              </View>
+            </View>
           </View>
         )}
 
@@ -194,7 +229,7 @@ export default function AgencePrototypeHomeScreen() {
                   {p.commune} · {p.propertyType} · {Number(p.currentRent || p.declaredRentFcfa || 0).toLocaleString('fr-FR')} XOF
                 </Text>
                 <Text style={[styles.subMuted, { marginTop: 4 }]}>
-                  Locataire : {roleView === 'collab' ? 'Locataire Masqué (RG-CONF-04)' : (p.tenantName || 'Aucun')}
+                  Locataire : {roleView === 'collab' ? 'Locataire Masqué (Protection agence)' : (p.tenantName || 'Aucun')}
                 </Text>
               </View>
             ))}
@@ -205,7 +240,7 @@ export default function AgencePrototypeHomeScreen() {
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.h1}>Transactions & Ventes (ADD-25)</Text>
+                <Text style={styles.h1}>Transactions & Ventes Immobilières</Text>
                 <Text style={styles.subMuted}>Terrains nus, bâtis, ACD et droits de mutation DGI 4%.</Text>
               </View>
               <Pressable 
@@ -217,10 +252,10 @@ export default function AgencePrototypeHomeScreen() {
               </Pressable>
             </View>
 
-            {/* Avertissement RG-VTE-16 */}
+            {/* Avertissement Séquestre Notarial Obligatoire */}
             <View style={[styles.card, { backgroundColor: '#F8FAFC', borderColor: '#CBD5E1', borderLeftWidth: 4, borderLeftColor: '#0F172A' }]}>
               <Text style={{ fontSize: 11, fontWeight: '800', color: '#0F172A', textTransform: 'uppercase' }}>
-                Règle Absolue RG-VTE-16 (Séquestre Notarial)
+                Séquestre Notarial Obligatoire
               </Text>
               <Text style={{ fontSize: 11, color: '#334155', marginTop: 4, lineHeight: 16 }}>
                 QAPRIL ne détient, n'achemine ni ne séquestre aucun acompte, prix ou arrhes. Tous les paiements de vente transitent obligatoirement par le compte séquestre de l'étude notariale désignée.
@@ -291,7 +326,7 @@ export default function AgencePrototypeHomeScreen() {
                     Aucun terrain ou bien en vente actif
                   </Text>
                   <Text style={{ fontSize: 11, color: '#94A3B8', marginTop: 4, textAlign: 'center' }}>
-                    Créez un bien en sélectionnant « Vente / Transaction (ADD-25) ».
+                    Créez un bien en sélectionnant « Vente / Transaction ».
                   </Text>
                 </View>
               ) : (
@@ -350,7 +385,7 @@ export default function AgencePrototypeHomeScreen() {
 
         {!loading && aTab === 'ext' && (
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
-            <Text style={styles.h1}>Bail externe → DGI (ADD-23)</Text>
+            <Text style={styles.h1}>Bail externe → Enregistrement DGI</Text>
             <View style={styles.card}>
               <Text style={styles.label}>LOYER MENSUEL (FCFA)</Text>
               <TextInput value={exLoyer} onChangeText={setExLoyer} keyboardType="numeric" style={styles.input} />
@@ -395,7 +430,7 @@ export default function AgencePrototypeHomeScreen() {
 
         {!loading && aTab === 'verif' && (
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
-            <Text style={styles.h1}>Visites de vérification Niveau 4 (ADD-22)</Text>
+            <Text style={styles.h1}>Visites de vérification physique Niveau 4</Text>
             <View style={styles.card}>
               <Text style={styles.subMuted}>
                 Réseau CPRAIMA-CI · Honoraires d'intervention certifiée : 15 000 FCFA / visite
@@ -414,13 +449,14 @@ export default function AgencePrototypeHomeScreen() {
           <View style={[styles.sectionGap, { marginTop: 12 }]}>
             <Text style={styles.h1}>Équipe & Habilitations</Text>
             <View style={styles.card}>
-              <Text style={styles.boldText}>Règles de masquage RG-CONF-04</Text>
+              <Text style={styles.boldText}>Protection du portefeuille agence</Text>
               <Text style={[styles.subMuted, { marginTop: 4 }]}>
                 En mode collaborateur, les coordonnées réelles des bailleurs sont masquées pour protéger le portefeuille de l'agence.
               </Text>
             </View>
           </View>
         )}
+        <AppVersionBadge />
       </ScrollView>
     </SafeAreaView>
   );

@@ -47,6 +47,8 @@ import {
   Wrench,
   Check,
   Edit3,
+  BookOpen,
+  Download,
 } from 'lucide-react-native';
 
 const EUR_RATE = 655.957;
@@ -67,6 +69,7 @@ const BAILLEUR_MENU_ITEMS = [
   { id: 'mandats', label: 'Mandats de gestion', desc: 'Agences agréées et intermédiaires', icon: Briefcase },
   { id: 'cand', label: 'Vivier de candidats', desc: 'Demandes de location et dossiers vérifiés', icon: Users },
   { id: 'profil', label: 'Profil & Conformité Niv. 1–4', desc: 'Identité bailleur et labels légaux', icon: ShieldCheck },
+  { id: 'manuel', label: 'Manuel d’utilisation', desc: 'Guide officiel complet v2.0 certifié', icon: BookOpen },
 ];
 
 const AGENCE_MENU_ITEMS = [
@@ -78,6 +81,7 @@ const AGENCE_MENU_ITEMS = [
   { id: 'flux', label: 'Rétrocessions & Honoraires', desc: 'Commissions agence et règlements bailleurs', icon: Wallet },
   { id: 'verif', label: 'Vérifications & Constats', desc: 'Inspections, états des lieux et rapports', icon: CheckCircle2 },
   { id: 'team', label: 'Équipe & Collaborateurs', desc: 'Rôles chef d’agence et gestionnaires', icon: ShieldCheck },
+  { id: 'manuel', label: 'Manuel d’utilisation', desc: 'Guide officiel complet v2.0 certifié', icon: BookOpen },
 ];
 
 export default function BailleurAndAgencePrototypeScreen() {
@@ -579,6 +583,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                     key={item.id}
                     style={[styles.drawerItem, active && (isBailleur ? styles.drawerItemActiveBailleur : styles.drawerItemActiveAgence)]}
                     onPress={() => {
+                      if (item.id === 'manuel') {
+                        setMenuOpen(false);
+                        Linking.openURL('https://qapril.net/manuel');
+                        return;
+                      }
                       if (isBailleur) {
                         setBTab(item.id as any);
                       } else {
@@ -1115,7 +1124,7 @@ export default function BailleurAndAgencePrototypeScreen() {
            =================================================================== */
         <>
           <ScrollView contentContainerStyle={styles.scroll}>
-            {/* BASCULE VUE CHEF / VUE COLLABORATEUR (RG-CONF-02 à 05) */}
+            {/* BASCULE VUE CHEF / VUE COLLABORATEUR (Confidentialité) */}
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.subMuted}>{agencyOfficialName} · {agencyOfficialRef}</Text>
@@ -1128,7 +1137,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   const next = roleView === 'chef' ? 'collab' : 'chef';
                   setRoleView(next);
                   Alert.alert(
-                    next === 'collab' ? 'Vue collaborateur (RG-CONF-04)' : 'Vue chef d’agence',
+                    next === 'collab' ? 'Vue collaborateur (Données protégées)' : 'Vue chef d’agence',
                     next === 'collab'
                       ? 'Sur les biens masqués, le bailleur apparaît uniquement sous son code séquentiel BAI-NNN.'
                       : 'Vous voyez tous les noms réels des bailleurs mandants.'
@@ -1164,7 +1173,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Pressable style={styles.cardGrid} onPress={() => setATab('ext')}>
                     <Upload color="#F0774B" size={20} />
                     <Text style={styles.boldText}>Bail externe → DGI</Text>
-                    <Text style={styles.subMuted}>Contrat papier (ADD-23)</Text>
+                    <Text style={styles.subMuted}>Enregistrement officiel du bail</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setATab('verif')}>
                     <ShieldCheck color="#1E7E4E" size={20} />
@@ -1216,7 +1225,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         {b.struct} · {b.type} · Loyer : {Number(b.loyer || 0).toLocaleString('fr-FR')} XOF
                       </Text>
                       <Text style={[styles.subMuted, { marginTop: 4 }]}>
-                        Locataire : {roleView === 'collab' && b.masque ? 'Locataire Masqué (RG-CONF-04)' : b.loc}
+                        Locataire : {roleView === 'collab' && b.masque ? 'Locataire Masqué (Identité protégée)' : b.loc}
                       </Text>
                     </View>
                   ))
@@ -1249,7 +1258,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                           <Text style={styles.subMuted}>Mandat ACTIF</Text>
                         </View>
                         <Text style={styles.subMuted}>
-                          {roleView === 'collab' ? 'Identité protégée (RG-CONF-04)' : `Code collaborateur : ${baiCode}`} · Bien : {b.name}
+                          {roleView === 'collab' ? 'Identité protégée (Confidentialité)' : `Code collaborateur : ${baiCode}`} · Bien : {b.name}
                         </Text>
                       </View>
                     );
@@ -1260,7 +1269,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
             {aTab === 'ext' && (
               <View style={[styles.sectionGap, { marginTop: 12 }]}>
-                <Text style={styles.h1}>Enregistrer un bail externe à la DGI (ADD-23)</Text>
+                <Text style={styles.h1}>Enregistrer un bail externe auprès de la DGI</Text>
                 <Text style={styles.subMuted}>
                   Importez un bail papier non généré par QAPRIL pour calculer et régler les droits DGI (2,5 % × loyer × durée + 500 F × pages + 2 000 F).
                 </Text>

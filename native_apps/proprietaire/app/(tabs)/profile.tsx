@@ -12,11 +12,12 @@ import {
   ScrollView,
   Modal,
   TextInput,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
-import { ShieldCheck, Globe, LogOut, RefreshCw, Mail, Edit2 } from 'lucide-react-native';
+import { ShieldCheck, Globe, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download } from 'lucide-react-native';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 
 export default function ProfileScreen() {
@@ -203,6 +204,35 @@ export default function ProfileScreen() {
                 {diaspora ? 'Actif' : 'Inactif'}
               </Text>
             </Pressable>
+
+            {/* Manuel d'Utilisation Officiel QAPRIL v2.0 */}
+            <View style={styles.card}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <BookOpen color="#D97706" size={20} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.cardTitle}>Manuel d'Utilisation Officiel</Text>
+                  <Text style={styles.cardSub}>
+                    Guide officiel complet certifié v2.0 (espace bailleur, baux légaux et adoption).
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <Pressable
+                  style={[styles.btnSecondary, { flex: 1, backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }]}
+                  onPress={() => Linking.openURL('https://qapril.net/manuel')}
+                >
+                  <ExternalLink color="#B45309" size={14} />
+                  <Text style={[styles.btnSecondaryText, { color: '#B45309', fontSize: 12 }]}>Consulter en ligne</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.btnSecondary, { flex: 1, backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
+                  onPress={() => Linking.openURL('https://qapril.net/api/manual/download')}
+                >
+                  <Download color="#1B4D3E" size={14} />
+                  <Text style={[styles.btnSecondaryText, { color: '#1B4D3E', fontSize: 12 }]}>Télécharger DOCX</Text>
+                </Pressable>
+              </View>
+            </View>
 
             <View style={{ gap: 6 }}>
               {updateAvailable === true && (

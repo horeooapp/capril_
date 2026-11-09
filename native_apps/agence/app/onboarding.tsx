@@ -28,12 +28,12 @@ const ONBOARDING_SLIDES = [
     badge: 'MANDATS & GESTION AGRÉÉE',
     title: 'Substitution totale & légale',
     description:
-      'Gérez vos biens sous mandat certifié (RG-MAN-01). Représentez vos bailleurs, émettez les actes en leur nom et appliquez le masquage souverain de leur identité.',
+      'Gérez vos biens sous mandat certifié. Représentez vos bailleurs, émettez les actes en leur nom et appliquez le masquage souverain de leur identité.',
     icon: Building,
   },
   {
     id: '2',
-    badge: 'CONFORMITÉ FISCALE ADD-23',
+    badge: 'CONFORMITÉ FISCALE & DGI',
     title: 'Enregistrement DGI automatisé',
     description:
       'Téléversement et télédéclaration fiscale directe auprès de la Direction Générale des Impôts. Calcul automatique des droits et reçus scellés.',
@@ -96,7 +96,7 @@ export default function AgenceOnboardingScreen() {
             <View style={styles.separator} />
 
             <Text style={styles.consentBody}>
-              QAPRIL Agence outille les professionnels de l'immobilier conformément à la réglementation ivoirienne (Code de la Construction, Loi sur les professions immobilières, et RG-MAN-01 à RG-MAN-06).
+              QAPRIL Agence outille les professionnels de l'immobilier conformément à la réglementation ivoirienne (Code de la Construction, Loi sur les professions immobilières et mandats de gestion certifiés).
               {'\n\n'}
               Accédez au pilotage de votre portefeuille sous mandat, à la conciliation instantanée des loyers et aux télédéclarations DGI sécurisées.
               {'\n\n'}

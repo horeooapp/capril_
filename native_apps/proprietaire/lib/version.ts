@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL Propriétaire';
 export const APP_KEY = 'proprietaire';
-export const APP_VERSION = '1.1.6';
-export const BUILD_NUMBER = 6;
+export const APP_VERSION = '2.0.0';
+export const BUILD_NUMBER = 7;
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;

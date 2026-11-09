@@ -48,8 +48,8 @@ const COMMUNES_ABIDJAN = [
 const PROPERTY_TYPES = [
   { id: 'APARTMENT', label: 'Appartement' },
   { id: 'VILLA', label: 'Villa / Maison' },
-  { id: 'TERRAIN_URBAIN_NU', label: 'Terrain urbain nu (ADD-25)' },
-  { id: 'TERRAIN_RURAL', label: 'Terrain rural (ADD-25)' },
+  { id: 'TERRAIN_URBAIN_NU', label: 'Terrain urbain nu' },
+  { id: 'TERRAIN_RURAL', label: 'Terrain rural' },
   { id: 'STUDIO', label: 'Studio' },
   { id: 'COMMERCIAL', label: 'Commerce / Local' },
   { id: 'BUILDING', label: 'Immeuble entier' },
@@ -378,7 +378,7 @@ export default function CreatePropertyScreen() {
                 style={[styles.chip, isForSale && styles.chipActive]}
               >
                 <Text style={[styles.chipText, isForSale && styles.chipTextActive]}>
-                  Vente / Transaction (ADD-25)
+                  Vente / Transaction
                 </Text>
               </Pressable>
             </View>
@@ -421,7 +421,7 @@ export default function CreatePropertyScreen() {
 
             {isForSale && (
               <View style={{ marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: '#E2E8F0' }}>
-                <Text style={styles.fieldLabel}>Nature du titre juridique (RG-VTE-03) *</Text>
+                <Text style={styles.fieldLabel}>Nature du titre juridique *</Text>
                 <View style={styles.chipsWrap}>
                   {NATURES_TITRES.map((t) => {
                     const active = natureTitre === t.id;
@@ -439,7 +439,7 @@ export default function CreatePropertyScreen() {
                   })}
                 </View>
 
-                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>N° du titre foncier / ACD (RG-VTE-05) *</Text>
+                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>N° du titre foncier / ACD *</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Ex : ACD-2023-9821 ou TF-12435"
@@ -533,7 +533,7 @@ export default function CreatePropertyScreen() {
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Text style={styles.geoTitle}>GÉOLOCALISATION GPS (ADD-28)</Text>
+                    <Text style={styles.geoTitle}>GÉOLOCALISATION GPS DU BIEN</Text>
                     <View style={styles.geoBadge}>
                       <Text style={styles.geoBadgeText}>La Poste CI</Text>
                     </View>

@@ -1,23 +1,23 @@
 {
-  "version": "1.1.6",
-  "buildNumber": 6,
-  "releaseDate": "2026-11-07",
+  "version": "2.0.0",
+  "buildNumber": 7,
+  "releaseDate": "2026-11-09",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
   "apps": {
     "locataire": {
       "name": "QAPRIL Locataire",
-      "version": "1.1.6",
-      "versionCode": 6,
+      "version": "2.0.0",
+      "versionCode": 7,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Connexion Google et Facebook et mise à jour OTA automatique"
+      "releaseNotes": "Version 2.0.0 : Manuel d'Utilisation Officiel v2.0, déclarations de paiement alternatif, déclaration de logement et fiabilisation des flux"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
-      "version": "1.1.6",
-      "versionCode": 6,
+      "version": "2.0.0",
+      "versionCode": 7,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Connexion Google et Facebook et mise à jour OTA automatique"
+      "releaseNotes": "Version 2.0.0 : Manuel d'Utilisation Officiel v2.0, confirmation des déclarations locataire, validation des paiements alternatifs et conformité lexique"
     }
   }
 }

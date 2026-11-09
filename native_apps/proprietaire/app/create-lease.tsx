@@ -203,7 +203,7 @@ export default function CreateLeaseScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Sécurisation Intégrale & Signature SMS</Text>
               <Text style={styles.legalNoticeDesc}>
-                Le bail est scellé avec empreinte SHA-256. Vos deux parties signent par code OTP SMS légal, et la quittance QR code est immédiatement activée.
+                Le bail est scellé avec un certificat numérique infalsifiable. Les deux parties signent par code SMS certifié, et les quittances à code de vérification sont immédiatement activées.
               </Text>
             </View>
           </View>
