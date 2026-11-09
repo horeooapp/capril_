@@ -774,6 +774,22 @@ export default function NewPropertyClient() {
                                             />
                                         </div>
 
+                                        {/* Nombre de pièces */}
+                                        <div className="w-full md:w-24">
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                                Pièces
+                                            </label>
+                                            <input 
+                                                type="number" 
+                                                min="1"
+                                                step="1"
+                                                value={unit.rooms || ""}
+                                                onChange={(e) => handleUpdateUnit(unit.id, 'rooms', parseInt(e.target.value) || undefined)}
+                                                placeholder="Ex: 3"
+                                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 focus:bg-white focus:ring-1 focus:ring-sky-500 outline-none"
+                                            />
+                                        </div>
+
                                         {/* Superficie (m²) */}
                                         <div className="w-full md:w-28">
                                             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">

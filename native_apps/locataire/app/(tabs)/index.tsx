@@ -155,8 +155,13 @@ export default function LocatairePrototypeScreen() {
 
   // État Refonte Recherche en 5 blocs & Compatibilité (IC-01 Section 6)
   const [searchSubTab, setSearchSubTab] = useState<'offres' | 'besoin' | 'recues'>('offres');
+  const [dbLocalities, setDbLocalities] = useState<string[]>([]);
   const [besoinCommune, setBesoinCommune] = useState('Cocody');
+  const [besoinLocaliteInput, setBesoinLocaliteInput] = useState('');
   const [besoinType, setBesoinType] = useState('Appartement');
+  const [besoinPieces, setBesoinPieces] = useState('3');
+  const [besoinSurfaceMin, setBesoinSurfaceMin] = useState('50');
+  const [besoinBudgetMin, setBesoinBudgetMin] = useState('50000');
   const [besoinBudget, setBesoinBudget] = useState('250000');
   const [besoinDate, setBesoinDate] = useState('1er du mois prochain');
   const [besoinSituation, setBesoinSituation] = useState('Salarié');
@@ -208,16 +213,61 @@ export default function LocatairePrototypeScreen() {
     { id: 'c1', titre: '3 pièces · Cocody Angré 8e Tranche', loyer: 180000, statut: 'Visite proposée', date: 'Hier' },
   ]);
 
+  // Toutes les localités issues des biens disponibles dans la base de données
+  const allAvailableLocalities = React.useMemo(() => {
+    const map = new Map<string, string>();
+    const addLoc = (val: any) => {
+      if (val && typeof val === 'string') {
+        const cleaned = val.trim();
+        if (cleaned.length >= 2) {
+          const key = cleaned.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, cleaned);
+          }
+        }
+      }
+    };
+
+    dbLocalities.forEach(addLoc);
+    marketList.forEach((off: any) => {
+      addLoc(off.logement?.commune || off.commune);
+      addLoc(off.logement?.city || off.city);
+      const addr = off.logement?.address || off.address;
+      if (addr && typeof addr === 'string') {
+        addr.split(/[,;-]/).forEach((seg: string) => {
+          const s = seg.trim();
+          if (s.length >= 3 && s.length <= 35) addLoc(s);
+        });
+      }
+    });
+
+    if (map.size === 0) {
+      ['Cocody', 'Marcory', 'Riviera', 'Plateau', 'Bingerville', 'Yopougon', 'Abobo', 'Koumassi', 'Port-Bouët', 'Treichville', 'Adjamé', 'Grand-Bassam'].forEach(addLoc);
+    }
+
+    return Array.from(map.values()).sort((a, b) => a.localeCompare(b, 'fr'));
+  }, [dbLocalities, marketList]);
+
+  // Suggestions automatiques dès 3 lettres saisies manuellement
+  const matchingLocalities = React.useMemo(() => {
+    const q = besoinLocaliteInput.trim().toLowerCase();
+    if (q.length < 3) return [];
+    return allAvailableLocalities.filter((loc) => loc.toLowerCase().includes(q));
+  }, [besoinLocaliteInput, allAvailableLocalities]);
+
   const availableCommunes = React.useMemo(() => {
     const set = new Set<string>();
+    dbLocalities.forEach((c) => {
+      if (c && typeof c === 'string' && c.trim()) set.add(c.trim());
+    });
     marketList.forEach((off: any) => {
       const c = off.logement?.commune || off.commune;
       if (c && typeof c === 'string' && c.trim()) {
         set.add(c.trim());
       }
     });
-    return ['TOUTES', ...Array.from(set).sort((a, b) => a.localeCompare(b))];
-  }, [marketList]);
+    return ['TOUTES', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'fr'))];
+  }, [marketList, dbLocalities]);
 
   const availableTypes = [
     { id: 'TOUS', label: 'Tous types' },
@@ -283,23 +333,55 @@ export default function LocatairePrototypeScreen() {
   }, [marketList, marketSearchQuery, marketCommune, marketType, marketSortPrice]);
 
   const getOfferCompatibility = (offer: any) => {
-    let score = 50;
+    let score = 45;
     const offCommune = (offer.logement?.commune || offer.commune || '').toLowerCase();
-    const targetCommune = besoinCommune.toLowerCase();
-    if (offCommune && targetCommune && (offCommune.includes(targetCommune) || targetCommune.includes(offCommune))) {
-      score += 25;
+    const offAddress = (offer.logement?.address || offer.address || '').toLowerCase();
+    const offCity = (offer.logement?.city || offer.city || '').toLowerCase();
+    const targetCommune = besoinCommune.trim().toLowerCase();
+    if (
+      targetCommune &&
+      (offCommune.includes(targetCommune) ||
+        targetCommune.includes(offCommune && offCommune.length >= 3 ? offCommune : '___') ||
+        offAddress.includes(targetCommune) ||
+        offCity.includes(targetCommune))
+    ) {
+      score += 20;
     }
+
     const offRent = offer.loyerDemande || offer.declaredRentFcfa || offer.price || 0;
-    const maxBudget = parseFloat(besoinBudget.replace(/\s/g, '')) || 300000;
-    if (offRent > 0 && offRent <= maxBudget) {
+    const minBudget = parseFloat((besoinBudgetMin || '0').replace(/\s/g, '')) || 0;
+    const maxBudget = parseFloat((besoinBudget || '300000').replace(/\s/g, '')) || 300000;
+    if (offRent > 0 && offRent >= minBudget && offRent <= maxBudget) {
       score += 15;
     } else if (offRent > 0 && offRent <= maxBudget * 1.15) {
       score += 5;
     }
+
     const offType = (offer.logement?.propertyType || offer.propertyType || '').toLowerCase();
     if (offType && offType.includes(besoinType.toLowerCase())) {
       score += 10;
     }
+
+    const offRooms = Number(offer.rooms || offer.logement?.rooms || 0);
+    const targetRooms = parseInt(besoinPieces, 10);
+    if (!isNaN(targetRooms) && targetRooms > 0 && offRooms > 0) {
+      if (offRooms === targetRooms || (besoinPieces === '5+' && offRooms >= 5)) {
+        score += 5;
+      }
+    } else {
+      score += 4;
+    }
+
+    const offSurface = Number(offer.superficieM2 || offer.logement?.superficieM2 || 0);
+    const minSurf = parseFloat(besoinSurfaceMin) || 0;
+    if (minSurf > 0 && offSurface > 0) {
+      if (offSurface >= minSurf) {
+        score += 5;
+      }
+    } else {
+      score += 4;
+    }
+
     return Math.min(score, 98);
   };
 
@@ -371,6 +453,9 @@ export default function LocatairePrototypeScreen() {
           const mJson = await marketRes.json();
           if (mJson.annonces && Array.isArray(mJson.annonces)) {
             setMarketList(mJson.annonces);
+          }
+          if (mJson.localities && Array.isArray(mJson.localities)) {
+            setDbLocalities(mJson.localities);
           }
         }
         if (utilRes && utilRes.ok) {
@@ -1688,38 +1773,138 @@ export default function LocatairePrototypeScreen() {
             {searchSubTab === 'besoin' && (
               <View style={{ gap: 12 }}>
                 <View style={styles.card}>
-                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>1. Où souhaitez-vous habiter ?</Text>
-                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Sélectionnez votre commune ou quartier prioritaire</Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                    {['Cocody', 'Marcory', 'Riviera', 'Plateau', 'Bingerville', 'Yopougon'].map((c) => (
+                  <View style={styles.rowBetween}>
+                    <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>1. Où souhaitez-vous habiter ?</Text>
+                    <View style={[styles.pillTint, { backgroundColor: '#EFF6FF' }]}>
+                      <Text style={[styles.pillTintText, { color: '#2C3E6B' }]}>Choix : {besoinCommune}</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>
+                    Saisissez une localité (propositions automatiques dès 3 lettres) ou choisissez parmi les zones des biens disponibles
+                  </Text>
+
+                  {/* Saisie manuelle avec autocomplétion dès 3 lettres */}
+                  <View style={[styles.searchBarContainer, { marginBottom: 8 }]}>
+                    <MapPin color="#2C3E6B" size={17} style={{ marginLeft: 12 }} />
+                    <TextInput
+                      style={styles.searchBarInput}
+                      placeholder="Saisir une localité, commune ou quartier (3 lettres min.)..."
+                      placeholderTextColor="#94A3B8"
+                      value={besoinLocaliteInput}
+                      onChangeText={(txt) => {
+                        setBesoinLocaliteInput(txt);
+                        if (txt.trim().length > 0) {
+                          setBesoinCommune(txt.trim());
+                        }
+                      }}
+                    />
+                    {besoinLocaliteInput.length > 0 && (
                       <Pressable
-                        key={c}
-                        style={[
-                          styles.filterChip,
-                          besoinCommune === c && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
-                        ]}
-                        onPress={() => setBesoinCommune(c)}
+                        onPress={() => setBesoinLocaliteInput('')}
+                        style={{ padding: 8, marginRight: 4 }}
                       >
-                        <Text style={[styles.filterChipText, besoinCommune === c && { color: '#fff', fontWeight: '700' }]}>
-                          {c}
-                        </Text>
+                        <X color="#64748B" size={16} />
                       </Pressable>
-                    ))}
+                    )}
+                  </View>
+
+                  {/* Suggestions après 3 lettres si la localité existe en base */}
+                  {besoinLocaliteInput.trim().length >= 3 && (
+                    <View
+                      style={{
+                        backgroundColor: '#F0FDF4',
+                        borderColor: '#86EFAC',
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        padding: 10,
+                        marginBottom: 10,
+                      }}
+                    >
+                      {matchingLocalities.length > 0 ? (
+                        <>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#166534', marginBottom: 6 }}>
+                            LOCALITÉS EXISTANTES PROPOSÉES ({matchingLocalities.length}) :
+                          </Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                            {matchingLocalities.map((loc) => (
+                              <Pressable
+                                key={`sug-${loc}`}
+                                style={[
+                                  styles.filterChip,
+                                  { borderColor: '#16A34A', backgroundColor: '#FFFFFF' },
+                                  besoinCommune.toLowerCase() === loc.toLowerCase() && {
+                                    backgroundColor: '#1E7E4E',
+                                    borderColor: '#1E7E4E',
+                                  },
+                                ]}
+                                onPress={() => {
+                                  setBesoinCommune(loc);
+                                  setBesoinLocaliteInput(loc);
+                                }}
+                              >
+                                <Text
+                                  style={[
+                                    styles.filterChipText,
+                                    { color: '#166534', fontWeight: '700' },
+                                    besoinCommune.toLowerCase() === loc.toLowerCase() && { color: '#FFFFFF' },
+                                  ]}
+                                >
+                                  ✓ {loc}
+                                </Text>
+                              </Pressable>
+                            ))}
+                          </View>
+                        </>
+                      ) : (
+                        <Text style={{ fontSize: 12, color: '#166534', fontWeight: '600' }}>
+                          Localité personnalisée retenue : « {besoinLocaliteInput.trim()} » (vous serez alerté dès qu’un bien y est publié).
+                        </Text>
+                      )}
+                    </View>
+                  )}
+
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748B', marginBottom: 6 }}>
+                    TOUTES LES LOCALITÉS DES BIENS EN BASE ({allAvailableLocalities.length}) :
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {allAvailableLocalities.map((c) => {
+                      const isSel = besoinCommune.toLowerCase() === c.toLowerCase();
+                      return (
+                        <Pressable
+                          key={c}
+                          style={[
+                            styles.filterChip,
+                            isSel && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                          ]}
+                          onPress={() => {
+                            setBesoinCommune(c);
+                            setBesoinLocaliteInput(c);
+                          }}
+                        >
+                          <Text style={[styles.filterChipText, isSel && { color: '#fff', fontWeight: '700' }]}>
+                            {c}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                   </View>
                 </View>
 
                 <View style={styles.card}>
                   <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>2. Quel type de logement ?</Text>
-                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Typologie recherchée</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>Typologie, nombre de pièces et surface souhaitée</Text>
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                    {['Studio', 'Appartement', 'Villa', 'Duplex'].map((t) => (
+                    {['Studio', 'Appartement', 'Villa', 'Duplex', 'Chambre', 'Commerce'].map((t) => (
                       <Pressable
                         key={t}
                         style={[
                           styles.filterChip,
                           besoinType === t && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
                         ]}
-                        onPress={() => setBesoinType(t)}
+                        onPress={() => {
+                          setBesoinType(t);
+                          if (t === 'Studio') setBesoinPieces('1');
+                        }}
                       >
                         <Text style={[styles.filterChipText, besoinType === t && { color: '#fff', fontWeight: '700' }]}>
                           {t}
@@ -1727,18 +1912,117 @@ export default function LocatairePrototypeScreen() {
                       </Pressable>
                     ))}
                   </View>
+
+                  {/* Nombre de pièces */}
+                  <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E2E8F0' }}>
+                    <Text style={[styles.boldText, { fontSize: 13, color: '#1E293B', marginBottom: 6 }]}>
+                      Nombre de pièces souhaité
+                    </Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                      {[
+                        { val: 'Toutes', label: 'Peu importe' },
+                        { val: '1', label: '1 pièce' },
+                        { val: '2', label: '2 pièces' },
+                        { val: '3', label: '3 pièces' },
+                        { val: '4', label: '4 pièces' },
+                        { val: '5+', label: '5+ pièces' },
+                      ].map((p) => (
+                        <Pressable
+                          key={p.val}
+                          style={[
+                            styles.filterChip,
+                            besoinPieces === p.val && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                          ]}
+                          onPress={() => setBesoinPieces(p.val)}
+                        >
+                          <Text style={[styles.filterChipText, besoinPieces === p.val && { color: '#fff', fontWeight: '700' }]}>
+                            {p.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                    <TextInput
+                      style={[styles.input, { marginTop: 2 }]}
+                      placeholder="Ou saisir le nombre exact de pièces (ex: 3)"
+                      keyboardType="numeric"
+                      value={besoinPieces === 'Toutes' ? '' : besoinPieces}
+                      onChangeText={(txt) => setBesoinPieces(txt.trim() || 'Toutes')}
+                    />
+                  </View>
+
+                  {/* Surface minimale en m² */}
+                  <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#E2E8F0' }}>
+                    <Text style={[styles.boldText, { fontSize: 13, color: '#1E293B', marginBottom: 6 }]}>
+                      Surface minimale souhaitée (m²)
+                    </Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                      {[
+                        { val: '', label: 'Peu importe' },
+                        { val: '25', label: '25 m²' },
+                        { val: '40', label: '40 m²' },
+                        { val: '60', label: '60 m²' },
+                        { val: '80', label: '80 m²' },
+                        { val: '120', label: '120 m²' },
+                        { val: '200', label: '200 m²' },
+                      ].map((s) => (
+                        <Pressable
+                          key={s.label}
+                          style={[
+                            styles.filterChip,
+                            besoinSurfaceMin === s.val && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
+                          ]}
+                          onPress={() => setBesoinSurfaceMin(s.val)}
+                        >
+                          <Text style={[styles.filterChipText, besoinSurfaceMin === s.val && { color: '#fff', fontWeight: '700' }]}>
+                            {s.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                    <TextInput
+                      style={[styles.input, { marginTop: 2 }]}
+                      placeholder="Surface minimale en m² (ex : 65)"
+                      keyboardType="numeric"
+                      value={besoinSurfaceMin}
+                      onChangeText={setBesoinSurfaceMin}
+                    />
+                  </View>
                 </View>
 
                 <View style={styles.card}>
-                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>3. Combien (Budget mensuel max) ?</Text>
-                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 6 }]}>Montant loyer max en FCFA</Text>
-                  <TextInput
-                    style={[styles.input, { marginTop: 4 }]}
-                    placeholder="Ex : 250000"
-                    keyboardType="numeric"
-                    value={besoinBudget}
-                    onChangeText={setBesoinBudget}
-                  />
+                  <Text style={[styles.boldText, { fontSize: 16, color: '#1A1D26' }]}>3. Combien (Budget mensuel) ?</Text>
+                  <Text style={[styles.subMuted, { marginTop: 2, marginBottom: 8 }]}>
+                    Définissez votre fourchette de loyer mensuel en FCFA (Budget minimal et maximal)
+                  </Text>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginBottom: 4 }}>
+                        BUDGET MINIMAL (FCFA)
+                      </Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Ex : 50000"
+                        keyboardType="numeric"
+                        value={besoinBudgetMin}
+                        onChangeText={setBesoinBudgetMin}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginBottom: 4 }}>
+                        BUDGET MAXIMAL (FCFA)
+                      </Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Ex : 250000"
+                        keyboardType="numeric"
+                        value={besoinBudget}
+                        onChangeText={setBesoinBudget}
+                      />
+                    </View>
+                  </View>
+                  <Text style={[styles.subMuted, { marginTop: 8, color: '#1E7E4E', fontWeight: '600' }]}>
+                    Fourchette : de {fmt(Number((besoinBudgetMin || '0').replace(/\s/g, '')) || 0)} à {fmt(Number((besoinBudget || '0').replace(/\s/g, '')) || 0)} / mois
+                  </Text>
                 </View>
 
                 <View style={styles.card}>
@@ -1960,6 +2244,8 @@ export default function LocatairePrototypeScreen() {
                 const rent = off.loyerDemande || off.declaredRentFcfa || off.price || 0;
                 const typeStr = off.logement?.propertyType || off.propertyType || 'Résidentiel';
                 const address = off.logement?.address || off.address || '';
+                const offRooms = off.rooms || off.logement?.rooms || off.nombrePieces || null;
+                const offSurface = off.superficieM2 || off.logement?.superficieM2 || null;
                 const rawImg = off.photosUrls?.[0] || off.logement?.images?.[0]?.s3Key || null;
                 const imgUri = formatImageUrl(rawImg);
                 const compat = getOfferCompatibility(off);
@@ -2000,7 +2286,11 @@ export default function LocatairePrototypeScreen() {
                     </Text>
 
                     <Text style={[styles.subMuted, { marginTop: 2 }]}>
-                      {typeStr} · {address ? address + ' · ' : ''}{commune}
+                      {typeStr}
+                      {offRooms ? ` · ${offRooms} pièce${offRooms > 1 ? 's' : ''}` : ''}
+                      {offSurface ? ` · ${offSurface} m²` : ''}
+                      {' · '}
+                      {address ? address + ' · ' : ''}{commune}
                     </Text>
 
                     <Pressable

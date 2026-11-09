@@ -333,6 +333,8 @@ export default function BailleurAndAgencePrototypeScreen() {
               struct: p.commune || p.address || 'Abidjan',
               type: p.propertyType || 'Bien',
               name: p.name,
+              rooms: p.rooms || null,
+              superficieM2: p.superficieM2 || null,
               loyer: p.currentRent || p.declaredRentFcfa || 0,
               loc: p.tenantName || '',
               icl: 'A',
@@ -951,7 +953,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                         {b.statut === 'vacant' ? 'Vacant' : fmt(b.loyer)}
                       </Text>
                     </View>
-                    <Text style={styles.subMuted}>{b.struct}</Text>
+                    <Text style={styles.subMuted}>
+                      {b.struct}
+                      {b.rooms ? ` · ${b.rooms} pièce${b.rooms > 1 ? 's' : ''}` : ''}
+                      {b.superficieM2 ? ` · ${b.superficieM2} m²` : ''}
+                    </Text>
                     <Text style={styles.subMuted}>
                       {b.loc ? `Locataire : ${b.loc}` : b.offrePubliee ? 'Offre publiée dans le vivier' : 'Aucun locataire actif'} · Niveau {b.niv} · Position : {b.gpsStatut || 'Provisoire'}
                     </Text>

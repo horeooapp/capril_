@@ -59,6 +59,8 @@ export async function GET(request: Request) {
                 status:           p.status,
                 declaredRentFcfa: Number(p.declaredRentFcfa ?? 0),
                 superficieM2:     p.superficieM2 ? Number(p.superficieM2) : null,
+                rooms:            p.rooms ? Number(p.rooms) : null,
+                bedrooms:         p.bedrooms ? Number(p.bedrooms) : null,
                 imageUrl:         p.images[0]?.s3Key ?? null,
                 occupancyStatus:  isRented ? 'Loué' : 'Vacant',
                 isRented:         isRented,
@@ -107,6 +109,8 @@ export async function POST(request: Request) {
             leaseType, 
             declaredRentFcfa, 
             superficieM2, 
+            rooms,
+            bedrooms,
             typeStructure, 
             parentPropertyId, 
             unitLabel,
@@ -176,6 +180,8 @@ export async function POST(request: Request) {
 
         const parsedRent = declaredRentFcfa ? Math.round(Number(declaredRentFcfa)) : 0;
         const parsedSurface = superficieM2 ? parseFloat(String(superficieM2)) : null;
+        const parsedRooms = rooms ? parseInt(String(rooms), 10) : null;
+        const parsedBedrooms = bedrooms ? parseInt(String(bedrooms), 10) : null;
         const parsedPrixVente = prixVenteFcfa ? parseFloat(String(prixVenteFcfa)) : null;
 
         // ADD-28 : Traitement de la géolocalisation
@@ -209,6 +215,8 @@ export async function POST(request: Request) {
                 leaseType:        leaseType ?? 'residential',
                 declaredRentFcfa: parsedRent,
                 superficieM2:     parsedSurface,
+                rooms:            parsedRooms && !isNaN(parsedRooms) ? parsedRooms : null,
+                bedrooms:         parsedBedrooms && !isNaN(parsedBedrooms) ? parsedBedrooms : null,
                 parentPropertyId: parentPropertyId ?? null,
                 unitLabel:        unitLabel ? String(unitLabel).trim() : null,
                 status:           'ACTIVE',

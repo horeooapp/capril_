@@ -88,6 +88,7 @@ export default function CreatePropertyScreen() {
   const [address, setAddress] = useState('');
   const [rent, setRent] = useState('');
   const [surface, setSurface] = useState('');
+  const [rooms, setRooms] = useState('3');
   const [unitLabel, setUnitLabel] = useState('');
   const [isForSale, setIsForSale] = useState(false);
   const [natureTitre, setNatureTitre] = useState('ACD');
@@ -286,6 +287,7 @@ export default function CreatePropertyScreen() {
           leaseType,
           declaredRentFcfa: !isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : 0,
           superficieM2: surface ? parseFloat(surface.replace(/\s/g, '')) : undefined,
+          rooms: rooms ? parseInt(rooms.replace(/\s/g, ''), 10) : undefined,
           unitLabel: unitLabel.trim() || undefined,
           // Extensions ADD-25
           forSale: isForSale,
@@ -407,7 +409,10 @@ export default function CreatePropertyScreen() {
                 return (
                   <Pressable
                     key={t.id}
-                    onPress={() => setPropertyType(t.id)}
+                    onPress={() => {
+                      setPropertyType(t.id);
+                      if (t.id === 'STUDIO') setRooms('1');
+                    }}
                     style={[styles.chip, active && styles.chipActive]}
                   >
                     <Text style={[styles.chipText, active && styles.chipTextActive]}>
@@ -417,6 +422,36 @@ export default function CreatePropertyScreen() {
                 );
               })}
             </View>
+
+            {propertyType !== 'TERRAIN_URBAIN_NU' && propertyType !== 'TERRAIN_RURAL' && (
+              <>
+                <Text style={styles.fieldLabel}>Nombre de pièces *</Text>
+                <View style={styles.chipsWrap}>
+                  {['1', '2', '3', '4', '5', '6'].map((nb) => {
+                    const active = rooms === nb;
+                    return (
+                      <Pressable
+                        key={nb}
+                        onPress={() => setRooms(nb)}
+                        style={[styles.chipSmall, active && styles.chipActive]}
+                      >
+                        <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                          {nb === '1' ? '1 pièce (Studio)' : `${nb} pièces`}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                <TextInput
+                  style={[styles.input, { marginTop: 8 }]}
+                  placeholder="Nombre exact de pièces (ex: 3)"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  value={rooms}
+                  onChangeText={setRooms}
+                />
+              </>
+            )}
 
             <Text style={styles.fieldLabel}>Usage du bail *</Text>
             <View style={styles.chipsWrap}>
@@ -662,7 +697,23 @@ export default function CreatePropertyScreen() {
               </View>
             )}
 
-            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Superficie en m² (optionnel)</Text>
+            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Superficie en m²</Text>
+            <View style={[styles.chipsWrap, { marginBottom: 8 }]}>
+              {['30', '50', '75', '100', '150', '250'].map((s) => {
+                const active = surface === s;
+                return (
+                  <Pressable
+                    key={s}
+                    onPress={() => setSurface(s)}
+                    style={[styles.chipSmall, active && styles.chipActive]}
+                  >
+                    <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                      {s} m²
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
             <View style={styles.inputWithSuffixContainer}>
               <TextInput
                 style={[styles.input, styles.inputFlex]}
