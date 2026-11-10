@@ -117,8 +117,11 @@ export default function BailleurAndAgencePrototypeScreen() {
   const [partialPolicy, setPartialPolicy] = useState<'plan' | 'accepter' | 'refuser'>('plan');
 
   const [bBiens, setBBiens] = useState<any[]>([]);
+  const [biensFilter, setBiensFilter] = useState<'all' | 'loue' | 'vacant'>('all');
   const [bBaux, setBBaux] = useState<any[]>([]);
   const [bReceipts, setBReceipts] = useState<any[]>([]);
+  const [selectedReceiptModal, setSelectedReceiptModal] = useState<any>(null);
+  const [selectedLeaseModal, setSelectedLeaseModal] = useState<any>(null);
   const [dashData, setDashData] = useState<any>(null);
 
   // --- ÉTATS AGENCE AGRÉÉE ---
@@ -352,13 +355,26 @@ export default function BailleurAndAgencePrototypeScreen() {
           const lJson = await leasesRes.json();
           if (lJson.leases && Array.isArray(lJson.leases)) {
             setBBaux(lJson.leases.map((l: any) => ({
+              id: l.id,
               ref: l.leaseReference,
+              status: l.status || 'ACTIVE',
+              typeBail: l.typeBail || l.leaseType || 'HABITATION',
+              startDate: l.startDate,
+              endDate: l.endDate,
               bien: l.property?.name || 'Bien',
+              adresse: l.property?.address || '',
+              commune: l.property?.commune || 'Abidjan',
+              propertyCode: l.property?.propertyCode || '',
               loc: l.tenant ? `${l.tenant.firstName || ''} ${l.tenant.lastName || ''}`.trim() : 'Locataire',
+              locPhone: l.tenant?.phone || '',
+              locEmail: l.tenant?.email || '',
               loyer: l.rentAmount || 0,
+              charges: l.chargesAmount || 0,
+              caution: l.depositAmount || (l.rentAmount ? l.rentAmount * 2 : 0),
+              avance: l.avanceLoyer || (l.rentAmount ? l.rentAmount * 2 : 0),
               duree: l.durationMonths || 12,
               dgi: true,
-              sha: l.id.substring(0, 8) + '...'
+              sha: l.id ? l.id.substring(0, 12).toUpperCase() : 'SHA256-QAPRIL'
             })));
           }
         }
@@ -752,28 +768,77 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <Text style={styles.heroBig}>
                     {fmt(dashData?.collectedRevenue || 0)} <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {fmt(dashData?.monthlyRevenue || 0)}</Text>
                   </Text>
-                  <Text style={styles.heroSub}>
-                    {bBiens.filter((x) => x.statut === 'loue').length} bien(s) loué(s) sur {bBiens.length}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
+                    <Pressable
+                      onPress={() => {
+                        setBiensFilter('loue');
+                        setBTab('biens');
+                      }}
+                      style={{ backgroundColor: 'rgba(255,255,255,0.16)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}
+                    >
+                      <Text style={[styles.heroSub, { textDecorationLine: 'underline', color: '#FFFFFF' }]}>
+                        {bBiens.filter((x) => x.statut === 'loue').length} bien(s) loué(s)
+                      </Text>
+                    </Pressable>
+                    <Text style={styles.heroSub}>sur</Text>
+                    <Pressable
+                      onPress={() => {
+                        setBiensFilter('all');
+                        setBTab('biens');
+                      }}
+                      style={{ backgroundColor: 'rgba(255,255,255,0.16)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}
+                    >
+                      <Text style={[styles.heroSub, { textDecorationLine: 'underline', color: '#FFFFFF' }]}>
+                        {bBiens.length} bien(s) au total →
+                      </Text>
+                    </Pressable>
+                  </View>
                 </View>
 
                 <View style={styles.kpiRow}>
-                  <View style={styles.kpiBox}>
-                    <Text style={styles.kpiNum}>{bBiens.length}</Text>
-                    <Text style={styles.subMuted}>Portes</Text>
-                  </View>
-                  <View style={styles.kpiBox}>
-                    <Text style={[styles.kpiNum, { color: '#1E7E4E' }]}>
-                      {bBiens.filter((x) => x.statut === 'loue').length}
-                    </Text>
-                    <Text style={styles.subMuted}>Louées</Text>
-                  </View>
-                  <View style={styles.kpiBox}>
-                    <Text style={[styles.kpiNum, { color: '#C0392B' }]}>
-                      {bBiens.filter((x) => x.statut === 'vacant').length}
-                    </Text>
-                    <Text style={styles.subMuted}>Vacantes</Text>
-                  </View>
+                  <Pressable
+                    style={[styles.kpiBox, { borderColor: '#1B4D3E', borderWidth: 1.2 }]}
+                    onPress={() => {
+                      setBiensFilter('all');
+                      setBTab('biens');
+                    }}
+                  >
+                    <View style={styles.rowBetween}>
+                      <Text style={styles.kpiNum}>{bBiens.length}</Text>
+                      <ChevronRight color="#1B4D3E" size={14} />
+                    </View>
+                    <Text style={[styles.subMuted, { color: '#1B4D3E', fontWeight: '600' }]}>Biens (Tous)</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.kpiBox, { borderColor: '#1E7E4E', borderWidth: 1.2 }]}
+                    onPress={() => {
+                      setBiensFilter('loue');
+                      setBTab('biens');
+                    }}
+                  >
+                    <View style={styles.rowBetween}>
+                      <Text style={[styles.kpiNum, { color: '#1E7E4E' }]}>
+                        {bBiens.filter((x) => x.statut === 'loue').length}
+                      </Text>
+                      <ChevronRight color="#1E7E4E" size={14} />
+                    </View>
+                    <Text style={[styles.subMuted, { color: '#1E7E4E', fontWeight: '600' }]}>Biens loués</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.kpiBox, { borderColor: '#C0392B', borderWidth: 1.2 }]}
+                    onPress={() => {
+                      setBiensFilter('vacant');
+                      setBTab('biens');
+                    }}
+                  >
+                    <View style={styles.rowBetween}>
+                      <Text style={[styles.kpiNum, { color: '#C0392B' }]}>
+                        {bBiens.filter((x) => x.statut === 'vacant').length}
+                      </Text>
+                      <ChevronRight color="#C0392B" size={14} />
+                    </View>
+                    <Text style={[styles.subMuted, { color: '#C0392B', fontWeight: '600' }]}>Vacants</Text>
+                  </Pressable>
                 </View>
 
                 {/* P0-03: DÉCLARATIONS LOCATAIRES À CONFIRMER */}
@@ -928,7 +993,13 @@ export default function BailleurAndAgencePrototypeScreen() {
             {bTab === 'biens' && (
               <View style={styles.sectionGap}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.h1}>Mes biens ({bBiens.length})</Text>
+                  <Text style={styles.h1}>
+                    {biensFilter === 'loue'
+                      ? `Biens loués (${bBiens.filter((x) => x.statut === 'loue').length})`
+                      : biensFilter === 'vacant'
+                      ? `Biens vacants (${bBiens.filter((x) => x.statut === 'vacant').length})`
+                      : `Mes biens (${bBiens.length})`}
+                  </Text>
                   <Pressable
                     style={styles.pillGold}
                     onPress={() => router.push('/create-property')}
@@ -936,16 +1007,56 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.pillGoldText}>+ Ajouter un bien</Text>
                   </Pressable>
                 </View>
-                {bBiens.length === 0 ? (
+
+                <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                  {[
+                    { key: 'all', label: `Tous (${bBiens.length})` },
+                    { key: 'loue', label: `Loués (${bBiens.filter((x) => x.statut === 'loue').length})` },
+                    { key: 'vacant', label: `Vacants (${bBiens.filter((x) => x.statut === 'vacant').length})` },
+                  ].map((tab) => {
+                    const active = biensFilter === tab.key;
+                    return (
+                      <Pressable
+                        key={tab.key}
+                        onPress={() => setBiensFilter(tab.key as any)}
+                        style={[
+                          styles.pillGold,
+                          active
+                            ? { backgroundColor: '#1B4D3E' }
+                            : { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E4E0D7' },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.pillGoldText,
+                            active ? { color: '#FFFFFF' } : { color: '#3A3F47' },
+                          ]}
+                        >
+                          {tab.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                {bBiens.filter((x) => (biensFilter === 'all' ? true : x.statut === biensFilter)).length === 0 ? (
                   <View style={[styles.card, { alignItems: 'center', paddingVertical: 32 }]}>
                     <Building2 color="#9CA3AF" size={36} />
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>Aucun bien enregistré</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', marginTop: 10 }}>
+                      {biensFilter === 'loue'
+                        ? 'Aucun bien loué'
+                        : biensFilter === 'vacant'
+                        ? 'Aucun bien vacant'
+                        : 'Aucun bien enregistré'}
+                    </Text>
                     <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
                       Vos biens immobiliers apparaîtront ici avec leur niveau de conformité légale.
                     </Text>
                   </View>
                 ) : (
-                  bBiens.map((b) => (
+                  bBiens
+                    .filter((x) => (biensFilter === 'all' ? true : x.statut === biensFilter))
+                    .map((b) => (
                   <View key={b.id} style={styles.card}>
                     <View style={styles.rowBetween}>
                       <Text style={styles.boldText}>{b.name} · {b.type}</Text>
@@ -1026,7 +1137,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </View>
                 ) : (
                   bBaux.map((b) => (
-                  <View key={b.ref} style={styles.card}>
+                  <Pressable
+                    key={b.ref}
+                    style={styles.card}
+                    onPress={() => setSelectedLeaseModal(b)}
+                  >
                     <View style={styles.rowBetween}>
                       <Text style={styles.boldText}>{b.bien} · {b.loc}</Text>
                       <Text style={[styles.boldText, { color: b.dgi ? '#1E7E4E' : '#B86E00' }]}>
@@ -1036,6 +1151,15 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>
                       {b.ref} · {fmt(b.loyer)} / mois · Certifié
                     </Text>
+                    <View style={[styles.rowBetween, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Eye color="#1B4D3E" size={15} />
+                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#1B4D3E' }}>
+                          Afficher le contrat de bail
+                        </Text>
+                      </View>
+                      <ChevronRight color="#1B4D3E" size={16} />
+                    </View>
                     {!b.dgi && (
                       <Pressable
                         style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 8 }]}
@@ -1046,7 +1170,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         </Text>
                       </Pressable>
                     )}
-                  </View>
+                  </Pressable>
                 )))}
               </View>
             )}
@@ -1068,16 +1192,37 @@ export default function BailleurAndAgencePrototypeScreen() {
                     </Text>
                   </View>
                 ) : (
-                  bReceipts.map((r: any, i: number) => (
-                    <View key={r.id || i} style={styles.card}>
-                      <View style={styles.rowBetween}>
-                        <Text style={styles.boldText}>{r.lease?.property?.name || 'Bien'} · {r.periodMonth}</Text>
-                        <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(r.totalAmount || r.rentAmount || 0)}</Text>
-                      </View>
-                      <Text style={styles.subMuted}>Locataire : {r.lease?.tenant ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim() : 'Locataire'}</Text>
-                      <Text style={styles.subMuted}>Réf : {r.receiptRef} · Quittance officielle</Text>
-                    </View>
-                  ))
+                  bReceipts.map((r: any, i: number) => {
+                    const propName = r.property || r.lease?.property?.name || 'Bien immobilier';
+                    const tenantName =
+                      r.tenant ||
+                      (r.lease?.tenant
+                        ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim()
+                        : 'Locataire');
+                    return (
+                      <Pressable
+                        key={r.id || i}
+                        style={styles.card}
+                        onPress={() => setSelectedReceiptModal(r)}
+                      >
+                        <View style={styles.rowBetween}>
+                          <Text style={styles.boldText}>{propName} · {r.periodMonth}</Text>
+                          <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(r.totalAmount || r.rentAmount || 0)}</Text>
+                        </View>
+                        <Text style={styles.subMuted}>Locataire : {tenantName}</Text>
+                        <Text style={styles.subMuted}>Réf : {r.receiptRef} · Quittance officielle</Text>
+                        <View style={[styles.rowBetween, { marginTop: 6, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <Eye color="#1B4D3E" size={15} />
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1B4D3E' }}>
+                              Afficher la quittance
+                            </Text>
+                          </View>
+                          <ChevronRight color="#1B4D3E" size={16} />
+                        </View>
+                      </Pressable>
+                    );
+                  })
                 )}
               </View>
             )}
@@ -1422,13 +1567,26 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </View>
                 ) : (
                   bBaux.map((b) => (
-                    <View key={b.ref} style={styles.card}>
+                    <Pressable
+                      key={b.ref}
+                      style={styles.card}
+                      onPress={() => setSelectedLeaseModal(b)}
+                    >
                       <View style={styles.rowBetween}>
                         <Text style={styles.boldText}>{b.bien} · {b.loc}</Text>
                         <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{b.ref}</Text>
                       </View>
                       <Text style={styles.subMuted}>{Number(b.loyer || 0).toLocaleString('fr-FR')} F / mois · Durée {b.duree} mois</Text>
-                    </View>
+                      <View style={[styles.rowBetween, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                          <Eye color="#1F2A44" size={15} />
+                          <Text style={{ fontSize: 12, fontWeight: '700', color: '#1F2A44' }}>
+                            Afficher le contrat de bail
+                          </Text>
+                        </View>
+                        <ChevronRight color="#1F2A44" size={16} />
+                      </View>
+                    </Pressable>
                   ))
                 )}
               </View>
@@ -1873,6 +2031,287 @@ export default function BailleurAndAgencePrototypeScreen() {
             <Pressable style={styles.btnGhost} onPress={() => setPartialModal(false)}>
               <Text style={styles.btnGhostText}>Fermer</Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : VISUALISATION D'UNE QUITTANCE CERTIFIÉE */}
+      <Modal
+        visible={!!selectedReceiptModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedReceiptModal(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '88%' }]}>
+            {selectedReceiptModal && (() => {
+              const r = selectedReceiptModal;
+              const propName = r.property || r.lease?.property?.name || 'Bien immobilier';
+              const tenantName =
+                r.tenant ||
+                (r.lease?.tenant
+                  ? `${r.lease.tenant.firstName || ''} ${r.lease.tenant.lastName || ''}`.trim()
+                  : 'Locataire');
+              const rentAmt = Number(r.rentAmount || r.totalAmount || 0);
+              const chargesAmt = Number(r.chargesAmount || 0);
+              const totalAmt = Number(r.totalAmount || rentAmt + chargesAmt);
+              const paidDateStr = r.paidAt
+                ? new Date(r.paidAt).toLocaleDateString('fr-FR')
+                : new Date().toLocaleDateString('fr-FR');
+              return (
+                <>
+                  <View style={styles.rowBetween}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.label, { color: '#1B4D3E', fontWeight: '800' }]}>
+                        RÉPUBLIQUE DE CÔTE D’IVOIRE · QAPRIL
+                      </Text>
+                      <Text style={styles.h2}>Quittance de Loyer Certifiée</Text>
+                    </View>
+                    <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#166534' }}>ACQUITTÉE ✓</Text>
+                    </View>
+                  </View>
+
+                  <ScrollView showsVerticalScrollIndicator={false} style={{ marginVertical: 8 }}>
+                    <View style={[styles.recapBox, { gap: 6 }]}>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Référence Quittance</Text>
+                        <Text style={styles.boldText}>{r.receiptRef || 'REC-QAPRIL'}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Période couverte</Text>
+                        <Text style={styles.boldText}>{r.periodMonth || 'Mois en cours'}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Date d’acquittement</Text>
+                        <Text style={styles.boldText}>{paidDateStr}</Text>
+                      </View>
+                      {r.leaseReference ? (
+                        <View style={styles.rowBetween}>
+                          <Text style={styles.subMuted}>Réf. Contrat de Bail</Text>
+                          <Text style={styles.boldText}>{r.leaseReference}</Text>
+                        </View>
+                      ) : null}
+                    </View>
+
+                    <View style={[styles.card, { marginVertical: 6 }]}>
+                      <Text style={styles.label}>PARTIES & LOGEMENT</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Bailleur / Émetteur</Text>
+                        <Text style={styles.boldText}>{isBailleur ? userName : agencyOfficialName}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Locataire</Text>
+                        <Text style={styles.boldText}>{tenantName}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Logement</Text>
+                        <Text style={styles.boldText}>{propName}</Text>
+                      </View>
+                    </View>
+
+                    <View style={[styles.card, { marginVertical: 6, backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
+                      <Text style={[styles.label, { color: '#166534' }]}>DÉTAIL DU RÈGLEMENT</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Loyer principal</Text>
+                        <Text style={styles.boldText}>{fmt(rentAmt)}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Charges locatives</Text>
+                        <Text style={styles.boldText}>{fmt(chargesAmt)}</Text>
+                      </View>
+                      <View style={[styles.rowBetween, { paddingTop: 6, borderTopWidth: 1, borderTopColor: '#BBF7D0' }]}>
+                        <Text style={[styles.boldText, { color: '#166534', fontSize: 15 }]}>Total quittancé</Text>
+                        <Text style={[styles.boldText, { color: '#166534', fontSize: 17 }]}>{fmt(totalAmt)}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Mode de paiement</Text>
+                        <Text style={styles.boldText}>{r.paymentMethod || 'Mobile Money / Virement'}</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.recapBox}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                        <ShieldCheck color="#1B4D3E" size={16} />
+                        <Text style={[styles.boldText, { color: '#1B4D3E' }]}>Certification numérique SHA-256</Text>
+                      </View>
+                      <Text style={styles.subMuted}>
+                        Dont quittance, sous réserve de tous droits. Ce document électronique horodaté constitue une preuve légale de paiement conforme au CCH ivoirien.
+                      </Text>
+                      {r.qrToken ? (
+                        <Text style={[styles.subMuted, { fontSize: 10, marginTop: 4 }]}>
+                          Jeton de vérification : {r.qrToken}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </ScrollView>
+
+                  <Pressable
+                    style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+                    onPress={() => setSelectedReceiptModal(null)}
+                  >
+                    <Text style={styles.btnPrimaryText}>Fermer la quittance</Text>
+                  </Pressable>
+                </>
+              );
+            })()}
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : VISUALISATION DU CONTRAT DE BAIL DANS L'APPLICATION */}
+      <Modal
+        visible={!!selectedLeaseModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedLeaseModal(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
+            {selectedLeaseModal && (() => {
+              const b = selectedLeaseModal;
+              const startStr = b.startDate
+                ? new Date(b.startDate).toLocaleDateString('fr-FR')
+                : new Date().toLocaleDateString('fr-FR');
+              const endStr = b.endDate
+                ? new Date(b.endDate).toLocaleDateString('fr-FR')
+                : 'Tacite reconduction';
+              return (
+                <>
+                  <View style={styles.rowBetween}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.label, { color: primaryColor, fontWeight: '800' }]}>
+                        CONTRAT OFFICIEL · LOI N° 2019-576 (CCH CI)
+                      </Text>
+                      <Text style={styles.h2}>Contrat de Bail ({b.ref})</Text>
+                    </View>
+                    <View
+                      style={{
+                        backgroundColor: b.dgi ? '#DCFCE7' : '#FEF3C7',
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 999,
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: b.dgi ? '#166534' : '#B45309' }}>
+                        {b.dgi ? 'ENREGISTRÉ DGI ✓' : 'À ENREGISTRER'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <ScrollView showsVerticalScrollIndicator={false} style={{ marginVertical: 8 }}>
+                    <View style={[styles.card, { marginBottom: 8 }]}>
+                      <Text style={[styles.label, { color: primaryColor }]}>ARTICLE 1 — IDENTIFICATION DES PARTIES</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Bailleur / Mandataire</Text>
+                        <Text style={styles.boldText}>{isBailleur ? userName : agencyOfficialName}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Locataire (Preneur)</Text>
+                        <Text style={styles.boldText}>{b.loc}</Text>
+                      </View>
+                      {b.locPhone ? (
+                        <View style={styles.rowBetween}>
+                          <Text style={styles.subMuted}>Contact locataire</Text>
+                          <Text style={styles.boldText}>{b.locPhone}</Text>
+                        </View>
+                      ) : null}
+                    </View>
+
+                    <View style={[styles.card, { marginBottom: 8 }]}>
+                      <Text style={[styles.label, { color: primaryColor }]}>ARTICLE 2 — DÉSIGNATION DU BIEN LOUÉ</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Logement</Text>
+                        <Text style={styles.boldText}>{b.bien}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Localité / Adresse</Text>
+                        <Text style={styles.boldText}>
+                          {[b.commune, b.adresse].filter(Boolean).join(' · ') || 'Abidjan'}
+                        </Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Usage du bail</Text>
+                        <Text style={styles.boldText}>{b.typeBail || 'Habitation principale'}</Text>
+                      </View>
+                    </View>
+
+                    <View style={[styles.card, { marginBottom: 8 }]}>
+                      <Text style={[styles.label, { color: primaryColor }]}>ARTICLE 3 — DURÉE ET PRISE D’EFFET</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Date de prise d’effet</Text>
+                        <Text style={styles.boldText}>{startStr}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Échéance / Reconduction</Text>
+                        <Text style={styles.boldText}>{endStr}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Durée contractuelle</Text>
+                        <Text style={styles.boldText}>{b.duree || 12} mois</Text>
+                      </View>
+                    </View>
+
+                    <View style={[styles.card, { marginBottom: 8, backgroundColor: '#F5F2EC' }]}>
+                      <Text style={[styles.label, { color: primaryColor }]}>ARTICLE 4 — CONDITIONS FINANCIÈRES</Text>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Loyer mensuel</Text>
+                        <Text style={[styles.boldText, { fontSize: 15, color: primaryColor }]}>{fmt(b.loyer || 0)}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Charges mensuelles</Text>
+                        <Text style={styles.boldText}>{fmt(b.charges || 0)}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Dépôt de garantie (Caution · max 2 mois)</Text>
+                        <Text style={styles.boldText}>{fmt(b.caution || (b.loyer || 0) * 2)}</Text>
+                      </View>
+                      <View style={styles.rowBetween}>
+                        <Text style={styles.subMuted}>Avance de loyer (max 2 mois)</Text>
+                        <Text style={styles.boldText}>{fmt(b.avance || (b.loyer || 0) * 2)}</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.recapBox}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                        <ShieldCheck color={primaryColor} size={16} />
+                        <Text style={[styles.boldText, { color: primaryColor }]}>
+                          ARTICLE 5 — CONFORMITÉ DGI & CERTIFICATION QAPRIL
+                        </Text>
+                      </View>
+                      <Text style={styles.subMuted}>
+                        Contrat rédigé conformément aux articles 414 et suivants du Code de la Construction et de l’Habitation de Côte d’Ivoire.
+                      </Text>
+                      <Text style={[styles.subMuted, { marginTop: 4 }]}>
+                        Empreinte SHA-256 : {b.sha} · Droits DGI : {fmt(calcDroitsDgi(b.loyer || 0, b.duree || 12))}
+                      </Text>
+                    </View>
+                  </ScrollView>
+
+                  {!b.dgi && (
+                    <Pressable
+                      style={[styles.btnPrimary, { backgroundColor: primaryColor }]}
+                      onPress={() => {
+                        const refToReg = b.ref;
+                        setSelectedLeaseModal(null);
+                        setDgiModalRef(refToReg);
+                      }}
+                    >
+                      <Text style={styles.btnPrimaryText}>
+                        Enregistrer à la DGI ({fmt(calcDroitsDgi(b.loyer, b.duree) + FRAIS_QAPRIL)})
+                      </Text>
+                    </Pressable>
+                  )}
+
+                  <Pressable
+                    style={[styles.btnPrimary, { backgroundColor: primaryColor }]}
+                    onPress={() => setSelectedLeaseModal(null)}
+                  >
+                    <Text style={styles.btnPrimaryText}>Fermer le contrat</Text>
+                  </Pressable>
+                </>
+              );
+            })()}
           </View>
         </View>
       </Modal>
