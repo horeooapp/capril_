@@ -65,6 +65,23 @@ export default function LoginScreen() {
         >
         {/* LOGO & TITRE */}
         <View style={styles.header}>
+          <Pressable
+            onPress={() => router.replace('/onboarding' as any)}
+            style={{
+              alignSelf: 'flex-start',
+              marginBottom: 10,
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: 999,
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.16)',
+            }}
+          >
+            <Text style={{ color: '#E2E8F0', fontSize: 11, fontWeight: '700' }}>
+              ← Voir la présentation
+            </Text>
+          </Pressable>
           <Image
             source={{ uri: 'https://www.qapril.net/logo.png' }}
             style={styles.logo}

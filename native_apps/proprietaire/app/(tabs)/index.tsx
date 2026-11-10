@@ -312,7 +312,7 @@ export default function BailleurAndAgencePrototypeScreen() {
         } else if (activeProfile === 'proprietaire' || activeProfile === 'bailleur') {
           setAppMode('bailleur');
         } else {
-          router.replace('/');
+          router.replace('/onboarding' as any);
           return;
         }
 

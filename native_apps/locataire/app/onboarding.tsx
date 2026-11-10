@@ -79,9 +79,9 @@ export default function LocataireOnboardingScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       {/* 1. MODALE DE CONSENTEMENT ET CADRE LÉGAL RÉPUBLICAIN */}
-      <Modal visible={showLegalConsent} transparent={false} animationType="fade">
+      <Modal visible={showLegalConsent} transparent={true} animationType="fade">
         <SafeAreaView style={styles.modalBackdrop}>
-          <StatusBar barStyle="dark-content" backgroundColor="#F1F5F9" />
+          <StatusBar barStyle="dark-content" backgroundColor="rgba(15, 23, 42, 0.45)" />
           <View style={styles.consentCard}>
             <View style={styles.consentBadge}>
               <ShieldCheck color="#1E40AF" size={15} />
@@ -100,21 +100,21 @@ export default function LocataireOnboardingScreen() {
               {'\n\n'}
               Accédez à vos quittances certifiées, suivez vos versements de loyer et recevez vos alertes de signature de bail par code OTP sécurisé.
               {'\n\n'}
-              En appuyant sur <Text style={{ fontWeight: '700' }}>Accepter et continuer</Text>, vous acceptez nos Conditions Générales et notre Politique de Confidentialité.
+              En appuyant sur <Text style={{ fontWeight: '700' }}>Accepter</Text>, vous acceptez nos Conditions Générales et notre Politique de Confidentialité.
             </Text>
 
             <View style={styles.consentButtonsRow}>
               <Pressable
                 style={styles.btnSecondary}
-                onPress={finishOnboarding}
+                onPress={() => setShowLegalConsent(false)}
               >
-                <Text style={styles.btnSecondaryText}>Passer</Text>
+                <Text style={styles.btnSecondaryText}>Annuler</Text>
               </Pressable>
               <Pressable
                 style={styles.btnPrimaryConsent}
                 onPress={() => setShowLegalConsent(false)}
               >
-                <Text style={styles.btnPrimaryText}>Accepter et continuer</Text>
+                <Text style={styles.btnPrimaryText}>Accepter</Text>
               </Pressable>
             </View>
           </View>
@@ -164,27 +164,36 @@ export default function LocataireOnboardingScreen() {
         }}
       />
 
-      {/* 4. PIED DE PAGE : PAGINATION + BOUTON D'ACTION */}
+      {/* 4. PIED DE PAGE : BOUTON D'ACTION + POINTS DE PAGINATION */}
       <View style={styles.footer}>
-        <View style={styles.paginationRow}>
-          {ONBOARDING_SLIDES.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dot,
-                currentSlideIndex === i ? styles.dotActive : styles.dotInactive,
-              ]}
-            />
-          ))}
-        </View>
-
         <Pressable style={styles.actionBtn} onPress={handleNext}>
           <Text style={styles.actionBtnText}>
             {currentSlideIndex === ONBOARDING_SLIDES.length - 1
-              ? 'Commencer maintenant'
+              ? 'Utiliser maintenant'
               : 'Continuer'}
           </Text>
         </Pressable>
+
+        {/* Points de pagination sous le bouton */}
+        <View style={styles.paginationRow}>
+          {ONBOARDING_SLIDES.map((_, i) => (
+            <Pressable
+              key={i}
+              onPress={() => {
+                flatListRef.current?.scrollToIndex({ index: i, animated: true });
+                setCurrentSlideIndex(i);
+              }}
+              hitSlop={8}
+            >
+              <View
+                style={[
+                  styles.dot,
+                  currentSlideIndex === i ? styles.dotActive : styles.dotInactive,
+                ]}
+              />
+            </Pressable>
+          ))}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -193,7 +202,7 @@ export default function LocataireOnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   topBar: {
     flexDirection: 'row',
@@ -202,7 +211,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#F1F5F9',
     backgroundColor: '#FFFFFF',
   },
   logoRow: {
@@ -228,10 +237,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   visualContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#FFFFFF',
+    width: 156,
+    height: 156,
+    borderRadius: 78,
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
     borderColor: '#E2E8F0',
     alignItems: 'center',
@@ -239,9 +248,9 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   iconCircle: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: 104,
+    height: 104,
+    borderRadius: 52,
     backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -262,12 +271,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   slideTitle: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
     color: '#0F172A',
     textAlign: 'center',
     marginBottom: 12,
-    lineHeight: 28,
+    lineHeight: 30,
   },
   slideDescription: {
     fontSize: 14,
@@ -277,35 +286,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   footer: {
-    paddingHorizontal: 24,
-    paddingBottom: 28,
+    paddingHorizontal: 32,
+    paddingBottom: 30,
     backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-    paddingTop: 16,
+    paddingTop: 12,
   },
   paginationRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 20,
+    gap: 10,
+    marginTop: 18,
   },
   dot: {
-    height: 6,
-    borderRadius: 3,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   dotActive: {
-    width: 24,
-    backgroundColor: '#1E3A8A', // Aplat solide bleu nuit
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#2563EB',
   },
   dotInactive: {
-    width: 6,
-    backgroundColor: '#CBD5E1',
+    backgroundColor: '#E2E8F0',
   },
   actionBtn: {
-    backgroundColor: '#1E3A8A',
-    borderRadius: 12,
+    backgroundColor: '#2563EB',
+    borderRadius: 999,
     paddingVertical: 15,
     alignItems: 'center',
     justifyContent: 'center',
@@ -316,19 +325,25 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Modale de consentement solide
+  // Modale de consentement flottante laissant apparaître l'illustration en haut
   modalBackdrop: {
     flex: 1,
-    backgroundColor: '#F1F5F9',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
+    backgroundColor: 'rgba(15, 23, 42, 0.35)',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 16,
+    paddingBottom: 28,
   },
   consentCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: '#E2E8F0',
     padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 10,
   },
   consentBadge: {
     flexDirection: 'row',

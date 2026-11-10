@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getStoredToken, getHasSeenOnboarding } from '../lib/api';
+import { getStoredToken } from '../lib/api';
 
 export default function AuthGateIndex() {
   const router = useRouter();
@@ -11,17 +11,14 @@ export default function AuthGateIndex() {
     const checkAuth = async () => {
       try {
         const token = await getStoredToken();
-        const hasSeenIntro = await getHasSeenOnboarding();
         if (!active) return;
         if (token) {
           router.replace('/(tabs)');
-        } else if (!hasSeenIntro) {
-          router.replace('/onboarding' as any);
         } else {
-          router.replace('/login');
+          router.replace('/onboarding' as any);
         }
       } catch {
-        if (active) router.replace('/login');
+        if (active) router.replace('/onboarding' as any);
       }
     };
     checkAuth();

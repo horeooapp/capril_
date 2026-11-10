@@ -167,14 +167,14 @@ export async function logoutAndRedirect(router: any): Promise<void> {
         console.warn('Erreur clearAppSessionAndCache:', err);
     }
     if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location) {
-        window.location.href = '/login';
+        window.location.href = '/onboarding';
     } else {
         try {
             if (router.canDismiss && router.canDismiss()) {
                 router.dismissAll();
             }
         } catch {}
-        router.replace('/login');
+        router.replace('/onboarding');
     }
 }
 

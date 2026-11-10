@@ -9,7 +9,8 @@ import {
     KeyboardAvoidingView, 
     Platform,
     TouchableWithoutFeedback,
-    Keyboard
+    Keyboard,
+    Pressable
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -32,6 +33,23 @@ export default function LoginScreen() {
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={styles.content}>
                             <View style={styles.header}>
+                                <Pressable
+                                    onPress={() => router.replace('/onboarding' as any)}
+                                    style={{
+                                        alignSelf: 'flex-start',
+                                        marginBottom: 12,
+                                        paddingHorizontal: 10,
+                                        paddingVertical: 5,
+                                        borderRadius: 999,
+                                        backgroundColor: 'rgba(255,255,255,0.12)',
+                                        borderWidth: 1,
+                                        borderColor: 'rgba(255,255,255,0.22)',
+                                    }}
+                                >
+                                    <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '700' }}>
+                                        ← Voir la présentation
+                                    </Text>
+                                </Pressable>
                                 <Image 
                                     source={{ uri: 'https://www.qapril.net/logo.png' }} 
                                     style={styles.logo}
