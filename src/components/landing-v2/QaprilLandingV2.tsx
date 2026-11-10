@@ -297,32 +297,6 @@ export default function QaprilLandingV2({
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution en compte séquestre dédié. Tout est clair, rapide et protégé.
               </p>
 
-              {/* BANNIÈRE PROMINENTE APPLICATION MOBILE */}
-              <div className="mb-8 p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
-                    <Smartphone className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-black uppercase tracking-wider text-emerald-400">Applications Mobiles QAPRIL</span>
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">v2.0.0 Certifiée</span>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-0.5">
-                      Installez les applications officielles Propriétaire & Locataire sur Android pour gérer vos baux partout.
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  href="/telecharger"
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shrink-0 transition-colors shadow-md"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Télécharger l'App (APK)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
               {/* 3 Portails Métiers Directs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <button
