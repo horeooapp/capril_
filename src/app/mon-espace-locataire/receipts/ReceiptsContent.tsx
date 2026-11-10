@@ -127,7 +127,7 @@ export default function ReceiptsContent({ receipts, lease }: any) {
             )}
 
             {/* Note d'Information */}
-            <motion.div variants={itemVariants} className="bg-slate-50 p-6 sm:p-8 rounded-[2rem] shadow-xl text-white flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mt-12 overflow-hidden">
+            <motion.div variants={itemVariants} className="bg-slate-900 p-6 sm:p-8 rounded-[2rem] shadow-xl text-white flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mt-12 overflow-hidden">
                  <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl shrink-0 border border-white/20">
                     💡
                  </div>

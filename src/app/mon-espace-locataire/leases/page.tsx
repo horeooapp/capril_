@@ -221,8 +221,8 @@ export default function TenantLeasesPage() {
             )}
 
             {/* Educational Banner */}
-            <div className="bg-slate-900 border border-white/50 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-10">
-                <div className="h-40 w-40 flex-shrink-0 bg-white rounded-full shadow-2xl flex items-center justify-center text-6xl">
+            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-10 shadow-sm">
+                <div className="h-40 w-40 flex-shrink-0 bg-slate-50 border border-slate-100 rounded-full shadow-lg flex items-center justify-center text-6xl">
                     📜
                 </div>
                 <div className="space-y-4">
@@ -231,9 +231,9 @@ export default function TenantLeasesPage() {
                         Tous vos contrats sur QAPRIL sont enregistrés de manière sécurisée. La gestion de votre caution via notre système de **Séquestre Numérique** vous garantit une restitution juste en fin de contrat, indexée sur votre comportement locatif.
                     </p>
                     <div className="flex flex-wrap gap-4">
-                        <span className="bg-white px-4 py-2 rounded-full text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-widest cursor-default">Séquestre Sécurisé</span>
-                        <span className="bg-white px-4 py-2 rounded-full text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-widest cursor-default">Audit Permanent</span>
-                        <span className="bg-white px-4 py-2 rounded-full text-[10px] font-bold text-gray-500 border border-gray-100 uppercase tracking-widest cursor-default">Valeur Juridique</span>
+                        <span className="bg-slate-50 px-4 py-2 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200 uppercase tracking-widest cursor-default">Séquestre Sécurisé</span>
+                        <span className="bg-slate-50 px-4 py-2 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200 uppercase tracking-widest cursor-default">Audit Permanent</span>
+                        <span className="bg-slate-50 px-4 py-2 rounded-full text-[10px] font-bold text-gray-600 border border-gray-200 uppercase tracking-widest cursor-default">Valeur Juridique</span>
                     </div>
                 </div>
             </div>

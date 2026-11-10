@@ -46,21 +46,21 @@ export default async function TenantRightsPage() {
             )}
 
             {/* Educational Banner */}
-            <div className="bg-slate-50 p-8 rounded-[2rem] border border-[#C9A84C]/20 shadow-sm relative overflow-hidden group">
+            <div className="bg-white p-8 rounded-[2rem] border border-amber-200/80 shadow-sm relative overflow-hidden group">
                 <div className="flex items-start gap-4 z-10 relative">
-                    <div className="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center border border-white/50 shrink-0 mt-1">
-                        <ShieldCheck className="text-[#C9A84C]" size={24} />
+                    <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center border border-amber-200/60 shrink-0 mt-1">
+                        <ShieldCheck className="text-amber-600" size={24} />
                     </div>
                     <div>
-                        <h3 className="text-lg font-black text-[#97782A] uppercase tracking-widest leading-tight mb-2">
+                        <h3 className="text-lg font-black text-slate-900 uppercase tracking-widest leading-tight mb-2">
                             Assistance & Médiation QAPRIL
                         </h3>
-                        <p className="text-sm font-bold text-[#97782A]/80 leading-relaxed max-w-2xl">
-                            La plateforme agit comme un tiers de confiance. Lorsqu'un ticket est ouvert, votre bailleur dispose d'un temps imparti pour répondre. Sans réponse, <span className="font-black text-qred-dark bg-qred/10 px-1 rounded">le ticket sera fermé en votre faveur</span> et affectera automatiquement son Indice de Confiance (ICL).
+                        <p className="text-sm font-medium text-slate-600 leading-relaxed max-w-2xl">
+                            La plateforme agit comme un tiers de confiance. Lorsqu'un ticket est ouvert, votre bailleur dispose d'un temps imparti pour répondre. Sans réponse, <span className="font-black text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded">le ticket sera fermé en votre faveur</span> et affectera automatiquement son Indice de Confiance (ICL).
                         </p>
                     </div>
                 </div>
-                <div className="absolute -bottom-10 -right-10 opacity-10 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+                <div className="absolute -bottom-10 -right-10 opacity-5 group-hover:scale-110 transition-transform duration-700 pointer-events-none">
                     <ShieldCheck size={200} />
                 </div>
             </div>

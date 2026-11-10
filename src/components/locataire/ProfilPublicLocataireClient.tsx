@@ -237,7 +237,7 @@ export function ProfilPublicLocataireClient({ userId, initialData }: ProfilPubli
             <div className="lg:col-span-8 space-y-6">
 
                 {/* 1. CARTE PARTAGE DU PROFIL / CV LOCATIF */}
-                <div className="p-5 sm:p-6 rounded-3xl bg-slate-900 border border-amber-500/20 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="p-5 sm:p-6 rounded-3xl bg-white border border-amber-500/30 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
