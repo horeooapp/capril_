@@ -414,10 +414,13 @@ export default function BailleurAndAgencePrototypeScreen() {
     .toUpperCase()
     .substring(0, 2) || 'PR';
 
-  const fmt = (n: number) =>
-    eurMode && appMode === 'bailleur'
-      ? Math.round(n / EUR_RATE).toLocaleString('fr-FR') + ' €'
-      : n.toLocaleString('fr-FR') + ' F';
+  const fmt = (n?: number | string | null) => {
+    const num = typeof n === 'number' ? n : Number(n);
+    if (isNaN(num)) return eurMode && appMode === 'bailleur' ? '0 €' : '0 F';
+    return eurMode && appMode === 'bailleur'
+      ? Math.round(num / EUR_RATE).toLocaleString('fr-FR') + ' €'
+      : Math.round(num).toLocaleString('fr-FR') + ' F';
+  };
 
   if (loading) {
     return (
@@ -1438,10 +1441,10 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.heroSub}>{txRecouvrementAgence} %</Text>
                   </View>
                   <Text style={styles.heroBig}>
-                    {totalEncaisseAgence.toLocaleString('fr-FR')} F <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {totalLoyerAgence.toLocaleString('fr-FR')} F</Text>
+                    {(totalEncaisseAgence || 0).toLocaleString('fr-FR')} F <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {(totalLoyerAgence || 0).toLocaleString('fr-FR')} F</Text>
                   </Text>
                   <Text style={styles.heroSub}>
-                    À reverser aux bailleurs (net − 8 % d’honoraires) : {aReverserAgence.toLocaleString('fr-FR')} F
+                    À reverser aux bailleurs (net − 8 % d’honoraires) : {(aReverserAgence || 0).toLocaleString('fr-FR')} F
                   </Text>
                 </View>
 

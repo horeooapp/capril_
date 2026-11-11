@@ -40,10 +40,13 @@ export default function FinanceScreen() {
     fetchFinance();
   }, []);
 
-  const fmt = (n: number) =>
-    eur
-      ? Math.round(n / EUR_RATE).toLocaleString('fr-FR') + ' €'
-      : n.toLocaleString('fr-FR') + ' F';
+  const fmt = (n?: number | string | null) => {
+    const num = typeof n === 'number' ? n : Number(n);
+    if (isNaN(num)) return eur ? '0 €' : '0 F';
+    return eur
+      ? Math.round(num / EUR_RATE).toLocaleString('fr-FR') + ' €'
+      : Math.round(num).toLocaleString('fr-FR') + ' F';
+  };
 
   if (loading) {
     return (

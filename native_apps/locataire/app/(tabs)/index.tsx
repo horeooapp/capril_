@@ -727,7 +727,11 @@ export default function LocatairePrototypeScreen() {
   const propName = data?.propertyName || (data?.hasLease === false ? 'Aucun bail actif' : 'Votre logement');
   const propCommune = data?.propertyCommune || '';
   const bailRef = data?.lease?.leaseReference || data?.leaseReference || (data?.hasLease === false ? 'Aucun contrat' : 'BAIL EN COURS');
-  const fmt = (n: number) => n.toLocaleString('fr-FR') + ' F';
+  const fmt = (n?: number | string | null) => {
+    const num = typeof n === 'number' ? n : Number(n);
+    if (isNaN(num)) return '0 F';
+    return Math.round(num).toLocaleString('fr-FR') + ' F';
+  };
 
   if (loading) {
     return (
