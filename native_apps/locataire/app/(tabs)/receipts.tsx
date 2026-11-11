@@ -91,7 +91,7 @@ export default function ReceiptsScreen() {
             </Text>
             <Pressable
               style={{ backgroundColor: '#1B4D3E', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, marginTop: 16 }}
-              onPress={() => router.push('/(tabs)/' as any)}
+              onPress={() => router.push('/(tabs)' as any)}
             >
               <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Régler mon loyer en cours</Text>
             </Pressable>
@@ -107,7 +107,14 @@ export default function ReceiptsScreen() {
                 {item.period || 'Loyer mensuel'} · {(item.amount || 0).toLocaleString('fr-FR')} F
               </Text>
               <Text style={styles.meta}>
-                {item.date ? `Payé le ${new Date(item.date).toLocaleDateString('fr-FR')}` : 'En cours'} · {item.via || 'Mobile Money'}
+                {item.date ? (() => {
+                  try {
+                    const d = new Date(item.date);
+                    return isNaN(d.getTime()) ? 'En cours' : `Payé le ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                  } catch {
+                    return 'En cours';
+                  }
+                })() : 'En cours'} · {item.via || 'Mobile Money'}
               </Text>
             </View>
             <Pressable

@@ -77,15 +77,35 @@ const OCCUPANT_LABELS: Record<string, string> = {
   AUTRE: 'Autre',
 };
 
-function computeDueCountdown(paymentDay = 5) {
-  const now = new Date();
-  let due = new Date(now.getFullYear(), now.getMonth(), paymentDay);
-  if (now.getDate() > paymentDay) {
-    due = new Date(now.getFullYear(), now.getMonth() + 1, paymentDay);
+function safeFormatDate(dateVal?: string | Date | null, fallback = 'Date non précisée'): string {
+  if (!dateVal) return fallback;
+  try {
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return fallback;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return fallback;
   }
-  const diffDays = Math.max(1, Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24)));
-  const dueFormatted = due.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
-  return `À payer avant le ${dueFormatted} · dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+}
+
+function computeDueCountdown(paymentDay?: number | null) {
+  try {
+    const day = typeof paymentDay === 'number' && paymentDay >= 1 && paymentDay <= 31 ? Math.floor(paymentDay) : 5;
+    const now = new Date();
+    let due = new Date(now.getFullYear(), now.getMonth(), day);
+    if (now.getDate() > day) {
+      due = new Date(now.getFullYear(), now.getMonth() + 1, day);
+    }
+    const diffDays = Math.max(1, Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24)));
+    const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    const dueFormatted = `${due.getDate()} ${months[due.getMonth()] || ''}`;
+    return `À payer avant le ${dueFormatted} · dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+  } catch {
+    return 'À payer avant le 5 du mois';
+  }
 }
 
 type LocScreen =
@@ -970,7 +990,7 @@ export default function LocatairePrototypeScreen() {
                       Nouveau loyer proposé : {fmt(data.pendingPropositionLoyer.nouveauMontant)}
                     </Text>
                     <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
-                      Date d'effet demandée : {new Date(data.pendingPropositionLoyer.dateEffet).toLocaleDateString('fr-FR')} (Actuel : {fmt(data.pendingPropositionLoyer.montantActuel)})
+                      Date d'effet demandée : {safeFormatDate(data.pendingPropositionLoyer.dateEffet, 'Prochaine échéance')} (Actuel : {fmt(data.pendingPropositionLoyer.montantActuel)})
                     </Text>
                     <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
                       <Pressable
@@ -1004,7 +1024,7 @@ export default function LocatairePrototypeScreen() {
                       Confirmation d'état d'ouverture
                     </Text>
                     <Text style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>
-                      Prise d'effet d'origine : {new Date(data.leaseOpeningState.dateReprise).toLocaleDateString('fr-FR')} · Dernier mois réglé : {data.leaseOpeningState.dernierMoisPaye || 'Non précisé'}
+                      Prise d'effet d'origine : {safeFormatDate(data.leaseOpeningState.dateReprise, 'Date d’origine')} · Dernier mois réglé : {data.leaseOpeningState.dernierMoisPaye || 'Non précisé'}
                     </Text>
                     {data.leaseOpeningState.soldeOuverture !== 0 && (
                       <Text style={{ fontSize: 11, fontWeight: '700', color: data.leaseOpeningState.soldeOuverture > 0 ? '#DC2626' : '#16A34A', marginTop: 3 }}>
@@ -1601,7 +1621,7 @@ export default function LocatairePrototypeScreen() {
               <View style={[styles.rowBetween, { marginTop: 8 }]}>
                 <Text style={styles.subMuted}>Période du contrat</Text>
                 <Text style={styles.boldText}>
-                  {data?.lease?.startDate ? new Date(data.lease.startDate).toLocaleDateString('fr-FR') : 'Date non renseignée'} → {data?.lease?.endDate ? new Date(data.lease.endDate).toLocaleDateString('fr-FR') : 'Durée indéterminée'}
+                  {safeFormatDate(data?.lease?.startDate, 'Date non renseignée')} → {safeFormatDate(data?.lease?.endDate, 'Durée indéterminée')}
                 </Text>
               </View>
               <View style={[styles.rowBetween, { marginTop: 6 }]}>
@@ -3068,12 +3088,12 @@ export default function LocatairePrototypeScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.boldText}>{occ.nom} {occ.prenoms}</Text>
                       <Text style={styles.subMuted}>
-                        {OCCUPANT_LABELS[occ.typeLien] || occ.typeLien}{occ.statutConfirmation === 'CONFIRME' ? ' · ✓ Confirmé' : ''}
+                        {OCCUPANT_LABELS[occ?.typeLien || ''] || occ?.typeLien || 'Autre'}{occ?.statutConfirmation === 'CONFIRME' ? ' · ✓ Confirmé' : ''}
                       </Text>
                       {occ.telephone && <Text style={styles.subMuted}>Tél : {occ.telephone}</Text>}
                     </View>
                     <View style={styles.pillOk}>
-                      <Text style={styles.pillOkText}>{OCCUPANT_LABELS[occ.typeLien] || occ.typeLien}</Text>
+                      <Text style={styles.pillOkText}>{OCCUPANT_LABELS[occ?.typeLien || ''] || occ?.typeLien || 'Autre'}</Text>
                     </View>
                   </View>
                 ))
