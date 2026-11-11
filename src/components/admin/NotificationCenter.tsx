@@ -121,7 +121,13 @@ export default function NotificationCenter() {
                         </div>
 
                         <div className="p-3 bg-slate-50 border-top border-slate-100 text-center">
-                            <button className="text-[11px] font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    window.location.href = "/admin/audit";
+                                }}
+                                className="text-[11px] font-bold text-slate-600 hover:text-slate-900 transition-colors"
+                            >
                                 Voir tout l'historique
                             </button>
                         </div>

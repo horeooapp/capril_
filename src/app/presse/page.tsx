@@ -36,14 +36,14 @@ export default function PressePage() {
                         <h4 className="text-lg font-black text-ink mb-2">Logos Officiels (Pack .ZIP)</h4>
                         <p className="text-sm font-medium text-ink3">Versions vectorielles (.svg) et haute définition (.png).</p>
                     </div>
-                    <button className="bg-ink text-white px-6 py-3 rounded-xl font-bold text-sm tracking-wider hover:bg-ink/80 transition-colors">Télécharger</button>
+                    <a href="/logo.png" download="QAPRIL-Logo.png" className="bg-ink text-white px-6 py-3 rounded-xl font-bold text-sm tracking-wider hover:bg-ink/80 transition-colors">Télécharger</a>
                 </div>
                 <div className="bg-white p-8 rounded-[2rem] border border-black/5 shadow-xl shadow-black/5 flex items-center justify-between">
                     <div>
                         <h4 className="text-lg font-black text-ink mb-2">Photos & Visuels Presse</h4>
                         <p className="text-sm font-medium text-ink3">Visuels de l'application et de l'équipe fondatrice.</p>
                     </div>
-                    <button className="bg-ink text-white px-6 py-3 rounded-xl font-bold text-sm tracking-wider hover:bg-ink/80 transition-colors">Télécharger</button>
+                    <Link href="/contact" className="bg-ink text-white px-6 py-3 rounded-xl font-bold text-sm tracking-wider hover:bg-ink/80 transition-colors">Demander</Link>
                 </div>
             </div>
         </section>
@@ -60,7 +60,7 @@ export default function PressePage() {
                         <p className="text-ink3 font-medium">Le PropTech ivoirienne sécurise un tour de table historique auprès de fonds panafricains pour étendre sa présence.</p>
                     </div>
                     <div className="shrink-0">
-                        <button className="border-2 border-ink text-ink font-bold px-6 py-2 rounded-xl text-sm tracking-widest uppercase hover:bg-ink hover:text-white transition-all">Lire en PDF</button>
+                        <button onClick={() => window.print()} className="border-2 border-ink text-ink font-bold px-6 py-2 rounded-xl text-sm tracking-widest uppercase hover:bg-ink hover:text-white transition-all">Lire en PDF</button>
                     </div>
                 </div>
 
@@ -71,7 +71,7 @@ export default function PressePage() {
                         <p className="text-ink3 font-medium">Une intégration technologique permettant à plus de 4 millions de locataires de payer leurs loyers sans frais additionnels.</p>
                     </div>
                     <div className="shrink-0">
-                        <button className="border-2 border-ink text-ink font-bold px-6 py-2 rounded-xl text-sm tracking-widest uppercase hover:bg-ink hover:text-white transition-all">Lire en PDF</button>
+                        <button onClick={() => window.print()} className="border-2 border-ink text-ink font-bold px-6 py-2 rounded-xl text-sm tracking-widest uppercase hover:bg-ink hover:text-white transition-all">Lire en PDF</button>
                     </div>
                 </div>
 

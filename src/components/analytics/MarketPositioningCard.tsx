@@ -68,7 +68,10 @@ export function MarketPositioningCard({ benchmark }: { benchmark: BenchmarkResul
                 </div>
             </div>
 
-            <button className="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-blue-400 hover:text-white transition-all transform active:scale-95 uppercase text-xs tracking-tighter">
+            <button
+                onClick={() => window.location.href = "/dashboard/leases"}
+                className="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-blue-400 hover:text-white transition-all transform active:scale-95 uppercase text-xs tracking-tighter"
+            >
                 Appliquer la révision suggérée
             </button>
         </div>

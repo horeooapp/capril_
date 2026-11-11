@@ -130,7 +130,11 @@ export default function AdminMarketWidget({ data }: { data: MarketStats }) {
                                                  <span className="text-lg font-black">{region.avgRent?.toLocaleString?.() || region.avgRent} F</span>
                                                  <span className="text-[9px] text-gray-500">{region.sampleCount} échantillons</span>
                                              </div>
-                                             <button className="p-2 rounded-lg bg-white/5 group-hover:bg-ci-vert group-hover:text-black transition-all">
+                                             <button
+                                                 onClick={() => window.location.href = "/admin/observatory"}
+                                                 title={`Voir les détails de ${region.name}`}
+                                                 className="p-2 rounded-lg bg-white/5 group-hover:bg-ci-vert group-hover:text-black transition-all"
+                                             >
                                                  <ArrowRight className="w-3 h-3" />
                                              </button>
                                          </div>

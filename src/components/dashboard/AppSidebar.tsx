@@ -37,6 +37,7 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                 { href: "/mon-espace-locataire/messages", label: "Messagerie Bailleur", icon: <MessageSquare size={18} /> },
                 { href: "/dashboard/simulateur-conversationnel", label: "Canal Sans App (ADD-26)", icon: <Smartphone size={18} /> },
                 { href: "/mon-espace-locataire/leases", label: "Documents", icon: <FileText size={18} /> },
+                { href: "/mon-espace-locataire/occupants", label: "Foyer & Attestation", icon: <Users size={18} /> },
                 { href: "/mon-espace-locataire/receipts", label: "Mes loyers", icon: <Receipt size={18} /> },
                 { href: "/mon-espace-locataire/cie-sodeci", label: "Utilities", icon: <Zap size={18} /> },
                 { href: "/mon-espace-locataire/abonnements", label: "Box & Compteurs", icon: <Globe size={18} /> },

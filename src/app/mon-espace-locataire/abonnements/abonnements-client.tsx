@@ -117,7 +117,14 @@ export default function AbonnementsClient({ lease, abonnements: initialAbs }: { 
                                             <p className="text-[10px] text-slate-500 font-medium">À déposer en agence.</p>
                                         </div>
                                     </div>
-                                    <button className="p-3 bg-white rounded-xl text-slate-700 hover:bg-slate-900 hover:text-white transition-all shadow-sm group-hover:scale-105" title="Télécharger le PDF complet">
+                                    <button
+                                        onClick={() => {
+                                            toast.success(`Téléchargement du dossier ${abo.id} (${op.name})...`);
+                                            window.print();
+                                        }}
+                                        className="p-3 bg-white rounded-xl text-slate-700 hover:bg-slate-900 hover:text-white transition-all shadow-sm group-hover:scale-105"
+                                        title="Télécharger le PDF complet"
+                                    >
                                         <Download size={16} />
                                     </button>
                                 </div>

@@ -8,7 +8,7 @@ export default async function NewPropertyPage() {
     const session = await auth()
     
     if (!session?.user?.id) {
-        redirect("/auth/login")
+        redirect("/dashboard/login")
     }
 
     // Step 1: Enforce Agency Profile if the user has the AGENCY role

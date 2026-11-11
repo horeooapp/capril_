@@ -166,7 +166,8 @@ export default function FormQuittance({ leaseId, tenantName, bienName, rentAmoun
                 className={Q.btnPrimary + " flex-1"} 
                 onClick={(e) => { 
                   e.preventDefault(); 
-                  window.open(`/api/receipts/${result.receiptRef}/pdf`, "_blank");
+                  const targetId = (result as any).id || (result as any).receiptId || result.receiptRef;
+                  window.open(`/receipts/${targetId}`, "_blank");
                 }}
               >
                 ⬇ Télécharger PDF

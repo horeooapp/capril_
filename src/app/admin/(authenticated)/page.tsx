@@ -216,7 +216,7 @@ export default async function AdminDashboardOverview() {
             ((prisma as any).adresseMaPoste?.count?.() || Promise.resolve(0)).catch(() => 0),
             // Queries ADD-29 (Occupants & Attestations)
             ((prisma as any).occupant?.count?.() || Promise.resolve(0)).catch(() => 0),
-            ((prisma as any).occupant?.count?.({ where: { statutConfirmation: 'CONFIRME' } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).occupant?.count?.({ where: { statut: 'CONFIRME' } }) || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).attestationResidence?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).verificationAttestation?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).attestationResidence?.count?.({ where: { niveau: 'A' } }) || Promise.resolve(0)).catch(() => 0),

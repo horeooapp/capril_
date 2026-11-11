@@ -107,9 +107,9 @@ export default async function PrivacyCenterPage() {
             </div>
 
             <div className="mt-4 text-center">
-              <button className="text-sm text-primary font-medium hover:underline">
+              <Link href="/dashboard/privacy/requests" className="text-sm text-primary font-medium hover:underline">
                 Modifier mes préférences
-              </button>
+              </Link>
             </div>
           </div>
         </div>

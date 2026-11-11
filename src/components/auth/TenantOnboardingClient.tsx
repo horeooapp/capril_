@@ -76,7 +76,9 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
                     city: formData.city,
                     communesSouhaitees: formData.communesSouhaitees,
                     typeLogement: formData.typeLogement,
-                    visibilite: formData.visibilite
+                    visibilite: formData.visibilite,
+                    docType: formData.docType,
+                    fileName: formData.file?.name || null
                 }
 
                 console.log("Calling completeOnboarding...");
@@ -204,7 +206,7 @@ function IdentityStep({ data, update }: any) {
                     <label className="text-[11px] font-black uppercase text-gray-400 tracking-widest pl-1">Nom Complet</label>
                     <input 
                         type="text" 
-                        value={(data.firstName ? data.firstName + " " : "") + (data.lastName || "")}
+                        value={data.fullName || ""}
                         onChange={(e) => update({...data, fullName: e.target.value})}
                         className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-primary/20 font-bold text-slate-800"
                         placeholder="Ex: Jean Kouassi"

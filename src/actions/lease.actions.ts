@@ -427,7 +427,11 @@ export async function getLeaseById(id: string) {
                 tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } },
                 procedurePhases: true,
                 repaymentPlans: { orderBy: { createdAt: 'desc' }, take: 1 },
-                receipts: { orderBy: { periodMonth: 'desc' } }
+                receipts: { orderBy: { periodMonth: 'desc' } },
+                openingState: true,
+                historiqueLoyers: { orderBy: { effectiveLe: 'desc' } },
+                propositionsLoyer: { include: { consentement: true }, orderBy: { createdAt: 'desc' } },
+                declarationsPaiement: { orderBy: { createdAt: 'desc' } }
             }
         });
         if (lease) return serializeLease(lease);
@@ -1051,7 +1055,15 @@ export async function getTenantLeases() {
                 ...(user?.phone ? [{ tenant: { phone: user.phone } }] : [])
             ]
         },
-        include: { property: true, landlord: { select: { firstName: true, lastName: true } } },
+        include: {
+            property: true,
+            landlord: { select: { firstName: true, lastName: true, walletConfig: { select: { landlordCode: true } } } },
+            receipts: { orderBy: { periodMonth: 'desc' }, take: 5 },
+            openingState: true,
+            historiqueLoyers: { orderBy: { effectiveLe: 'desc' } },
+            propositionsLoyer: { include: { consentement: true }, orderBy: { createdAt: 'desc' } },
+            declarationsPaiement: { orderBy: { createdAt: 'desc' } }
+        },
         orderBy: { createdAt: 'desc' }
     });
     return leases.map(l => serializeLease(l));

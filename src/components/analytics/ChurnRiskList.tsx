@@ -89,7 +89,10 @@ export function ChurnRiskList({ risks }: { risks: ChurnRisk[] }) {
                 </div>
 
                 {/* Interaction Trigger */}
-                <button className="self-center bg-white text-black h-16 w-16 rounded-3xl flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all transform group-hover:scale-110 shadow-xl group-hover:rotate-12">
+                <button
+                    onClick={() => window.location.href = `/dashboard/leases/${risk.leaseId}`}
+                    className="self-center bg-white text-black h-16 w-16 rounded-3xl flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all transform group-hover:scale-110 shadow-xl group-hover:rotate-12"
+                >
                     <ArrowRight className="w-7 h-7" />
                 </button>
                 </div>

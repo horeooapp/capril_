@@ -7,22 +7,18 @@ import { useRouter } from "next/navigation";
 export const ExportCSVButton = ({ data, filename = "export.csv" }: { data?: any, filename?: string }) => {
     const handleExport = (e: React.MouseEvent) => {
         e.preventDefault();
-        toast.promise(
-            new Promise(r => setTimeout(r, 1500)),
-            {
-                loading: 'Génération du fichier CSV...',
-                success: () => {
-                    // Simulation du téléchargement
-                    const blob = new Blob(["Simulation CSV Data"], { type: "text/csv;charset=utf-8;" });
-                    const link = document.createElement("a");
-                    link.href = URL.createObjectURL(blob);
-                    link.download = filename;
-                    link.click();
-                    return "Fichier CSV exporté avec succès.";
-                },
-                error: 'Erreur lors de l\'export.'
-            }
-        );
+        const rows = Array.isArray(data) && data.length > 0
+            ? [
+                Object.keys(data[0]).join(","),
+                ...data.map((row: any) => Object.values(row).map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))
+              ].join("\n")
+            : "Reference,Statut,Date\nQAPRIL-EXPORT,CERTIFIE," + new Date().toISOString();
+        const blob = new Blob([rows], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        toast.success("Fichier CSV exporté avec succès.");
     };
 
     return (
@@ -34,12 +30,9 @@ export const ExportCSVButton = ({ data, filename = "export.csv" }: { data?: any,
 
 export const ExportPDFIconButton = ({ filename = "document.pdf", className = "p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-primary transition-colors" }: { filename?: string, className?: string }) => {
     return (
-        <button className={className} onClick={(e) => {
+        <button className={className} title={`Imprimer / Exporter ${filename}`} onClick={(e) => {
             e.preventDefault();
-            toast.promise(new Promise(r => setTimeout(r, 1000)), {
-                loading: "Compilation PDF...",
-                success: "Document stocké en cache local."
-            });
+            window.print();
         }}>
             <Download size={20} />
         </button>

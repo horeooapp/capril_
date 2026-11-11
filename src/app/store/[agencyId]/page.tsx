@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { MapPin, BedDouble, ShieldCheck, Home } from "lucide-react";
 
 export default async function StorefrontPage({ params }: { params: Promise<{ agencyId: string }> }) {
@@ -86,9 +87,13 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
                                             <p className="text-[10px] uppercase font-black tracking-widest text-gray-400">Loyer Mensuel</p>
                                             <p className="text-2xl font-black text-slate-800">{a.loyerDemande.toLocaleString()} XOF</p>
                                         </div>
-                                        <button className="bg-gray-100 text-slate-800 w-12 h-12 rounded-xl flex items-center justify-center font-black hover:bg-[#FF7A00] hover:text-white transition-colors">
+                                        <Link
+                                            href={`/mon-espace-locataire/marketplace`}
+                                            title="Candidater à ce logement"
+                                            className="bg-gray-100 text-slate-800 w-12 h-12 rounded-xl flex items-center justify-center font-black hover:bg-[#FF7A00] hover:text-white transition-colors"
+                                        >
                                             +
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

@@ -249,7 +249,7 @@ export default function LocataireDashboardPage() {
                             </p>
                             <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Link 
-                                    href="/valider-bail" 
+                                    href="/mon-espace-locataire/valider-bail" 
                                     className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
                                 >
                                     <span>Valider un code de bail reçu</span>

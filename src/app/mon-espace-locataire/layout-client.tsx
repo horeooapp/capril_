@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import AppSidebar from "@/components/dashboard/AppSidebar"
 import LocataireHeader from "@/components/locataire/LocataireHeader"
 import BottomNav from "@/components/BottomNav"
-import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake, Store, MessageSquare } from "lucide-react"
+import { Home, Receipt, Bell, User, LogOut, FileText, Zap, ShieldAlert, BookOpen, Handshake, Store, MessageSquare, Users } from "lucide-react"
 
 import { SessionProvider } from "next-auth/react"
 import { executeLogout } from "@/lib/auth-logout"
@@ -120,6 +120,7 @@ export default function LocataireLayoutClient({
                             { href: "/mon-espace-locataire/messages", label: "Messages", icon: <MessageSquare size={24} /> },
                             { href: "/mon-espace-locataire/marketplace", label: "Marketplace", icon: <Store size={24} /> },
                             { href: "/mon-espace-locataire/leases", label: "Bail", icon: <FileText size={20} /> },
+                            { href: "/mon-espace-locataire/occupants", label: "Occupants", icon: <Users size={24} /> },
                             { href: "/mon-espace-locataire/receipts", label: "Loyers", icon: <Receipt size={24} /> },
                             { href: "/mon-espace-locataire/cie-sodeci", label: "Factures", icon: <Zap size={24} /> },
                             { href: "/mon-espace-locataire/profil-public", label: "Matching", icon: <Handshake size={24} /> },
@@ -139,8 +140,8 @@ export default function LocataireLayoutClient({
                         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                             <p className="text-[14px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">© 2024 QAPRIL • Excellence en Gestion Immobilière de Précision</p>
                             <div className="flex gap-8">
-                                <span className="text-[14px] font-black text-slate-800 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Support Prioritaire</span>
-                                <span className="text-[14px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Mentions Légales</span>
+                                <Link href="/contact" className="text-[14px] font-black text-slate-800 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Support Prioritaire</Link>
+                                <Link href="/mentions-legales" className="text-[14px] font-black text-gray-400 uppercase tracking-widest cursor-pointer hover:opacity-70 transition-opacity">Mentions Légales</Link>
                             </div>
                         </div>
                     </footer>

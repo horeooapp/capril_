@@ -14,7 +14,16 @@ export default function PrintButton({
     className = "" 
 }: PrintButtonProps) {
     const handlePrint = () => {
-        // Déclenche l'impression avec isolation garantie du document
+        if (targetId && targetId !== "print-area") {
+            const targetEl = document.getElementById(targetId);
+            if (targetEl) {
+                const prevId = targetEl.id;
+                targetEl.id = "print-area";
+                window.print();
+                targetEl.id = prevId;
+                return;
+            }
+        }
         window.print();
     };
 

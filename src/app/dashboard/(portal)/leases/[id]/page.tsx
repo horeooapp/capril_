@@ -22,6 +22,8 @@ import ColocDashboardBox from "@/components/dashboard/coloc/ColocDashboardBox"
 import { getLeaseColocataires, getMonthlySynthesis } from "@/actions/coloc-actions"
 import { toast } from "sonner";
 import { InsuranceButton } from "@/components/dashboard/leases/InsuranceButton";
+import DeuxHorlogesBox from "@/components/leases/DeuxHorlogesBox";
+import MrlAndDeclarationsBox from "@/components/leases/MrlAndDeclarationsBox";
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -237,6 +239,17 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                     <div className="mt-8">
                         <ColocDashboardBox leaseId={leaseId} colocataires={colocataires} synthesis={synthesis} />
                     </div>
+
+                    {/* Architecture Deux Horloges (Reprise de bail antérieur & Historique Loyers) */}
+                    <DeuxHorlogesBox lease={tLease} role="LANDLORD" />
+
+                    {/* MRL-01 (Révision Loyer) & ADD-26 (Validation des paiements alternatifs déclarés) */}
+                    <MrlAndDeclarationsBox
+                        leaseId={tLease.id}
+                        currentRent={Number(tLease.rentAmount)}
+                        propositions={(tLease as any).propositionsLoyer || []}
+                        declarationsPaiement={(tLease as any).declarationsPaiement || []}
+                    />
 
                     {/* Procedure Tracking (Added) */}
                     {(((tLease.procedurePhases?.length ?? 0) > 0) || tLease.status !== "ACTIVE") && (

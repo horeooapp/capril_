@@ -104,7 +104,20 @@ export default function AuditPage() {
                         <RefreshCcw size={16} className={loading ? "animate-spin" : ""} />
                         Actualiser
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-gray-200 active:scale-95" onClick={(e) => { e.preventDefault(); toast.promise(new Promise(r => setTimeout(r,1500)), {loading:'Génération Export PDF...', success:'Fichier téléchargé et sauvegardé.'}) }}>
+                    <button
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-gray-200 active:scale-95"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const blob = new Blob([JSON.stringify(filteredLogs, null, 2)], { type: "application/json" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `qapril-audit-${new Date().toISOString().slice(0, 10)}.json`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            toast.success("Registre d'audit exporté (JSON).");
+                        }}
+                    >
                         <ExternalLink size={16} />
                         Exporter
                     </button>

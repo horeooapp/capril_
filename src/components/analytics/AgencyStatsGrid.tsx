@@ -72,7 +72,10 @@ export function AgencyStatsGrid({ kpis }: { kpis: AgencyKPIs }) {
         <p className="text-[10px] text-red-300/60 mt-6 font-medium">
           Dépassement du seuil de tolérance agence
         </p>
-        <button className="mt-2 text-[10px] text-blue-400 hover:underline font-bold uppercase tracking-tighter">
+        <button
+          onClick={() => window.location.href = "/dashboard/disputes"}
+          className="mt-2 text-[10px] text-blue-400 hover:underline font-bold uppercase tracking-tighter"
+        >
           Lancer recouvrement forcé
         </button>
       </div>

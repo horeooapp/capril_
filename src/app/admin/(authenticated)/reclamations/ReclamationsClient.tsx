@@ -142,7 +142,7 @@ export default function ReclamationsClient({ tickets, signalements }: { tickets:
                                             {s.statut === 'RESOLU' ? (
                                                 <span className="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-full">Clos</span>
                                             ) : (
-                                                <button className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-200 transition-colors shadow-sm shadow-red-500/20">À traiter</button>
+                                                <button onClick={(e) => { e.stopPropagation(); setSelectedSignalement(s); }} className="px-4 py-2 bg-red-100 text-red-600 rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-red-200 transition-colors shadow-sm shadow-red-500/20">À traiter</button>
                                             )}
                                         </td>
                                     </tr>

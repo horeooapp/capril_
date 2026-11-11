@@ -84,7 +84,7 @@ export default function CarrierePage() {
 
             <div className="mt-16 text-center">
                 <p className="text-ink3 font-medium mb-6">Vous ne trouvez pas le poste idéal ? Envoyez-nous une candidature spontanée.</p>
-                <button className="bg-ink text-white font-bold px-8 py-4 rounded-xl text-md tracking-widest uppercase hover:bg-ink/80 transition-colors">Candidature Spontanée</button>
+                <Link href="/contact" className="inline-block bg-ink text-white font-bold px-8 py-4 rounded-xl text-md tracking-widest uppercase hover:bg-ink/80 transition-colors">Candidature Spontanée</Link>
             </div>
         </section>
 

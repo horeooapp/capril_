@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { getTenantLeases } from "@/actions/lease.actions"
+import { repondrePropositionLoyerAction } from "@/actions/mrl-paiement.actions"
+import DeuxHorlogesBox from "@/components/leases/DeuxHorlogesBox"
 import Link from "next/link"
 import { motion, Variants } from "framer-motion"
 import { toast } from "sonner"
+import { TrendingUp, CheckCircle2, XCircle, Users } from "lucide-react"
 
 export default function TenantLeasesPage() {
     const [leases, setLeases] = useState<any[]>([])
@@ -174,6 +177,95 @@ export default function TenantLeasesPage() {
                                         )}
                                     </div>
 
+                                    {/* Architecture Deux Horloges (Confirmation Solde d'Ouverture & Historique Loyers) */}
+                                    <DeuxHorlogesBox lease={lease} role="TENANT" />
+
+                                    {/* MRL-01 : Propositions de Révision de Loyer en attente de consentement */}
+                                    {Array.isArray(lease.propositionsLoyer) && lease.propositionsLoyer.length > 0 && (
+                                        <div className="space-y-3 pt-2">
+                                            <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em] border-b border-indigo-100 pb-2 flex items-center gap-1.5">
+                                                <TrendingUp size={13} /> Révision de Loyer (MRL-01)
+                                            </h4>
+                                            {lease.propositionsLoyer.map((prop: any) => (
+                                                <div
+                                                    key={prop.id}
+                                                    className={`p-4 rounded-2xl border ${
+                                                        prop.statut === "EN_ATTENTE"
+                                                            ? "bg-amber-50/70 border-amber-200"
+                                                            : prop.statut === "ACCEPTEE"
+                                                            ? "bg-emerald-50/50 border-emerald-200"
+                                                            : "bg-slate-50 border-slate-200"
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                                        <div>
+                                                            <p className="text-xs font-black text-slate-900">
+                                                                {Number(prop.ancienMontant).toLocaleString("fr-FR")} →{" "}
+                                                                <span className="text-indigo-700">
+                                                                    {Number(prop.nouveauMontant).toLocaleString("fr-FR")} XOF
+                                                                </span>
+                                                            </p>
+                                                            <p className="text-[10px] text-slate-500 font-bold">
+                                                                Date d&apos;effet proposée : {new Date(prop.dateEffetProposee).toLocaleDateString("fr-FR")}
+                                                            </p>
+                                                        </div>
+                                                        <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-white border border-slate-200 text-slate-700">
+                                                            {prop.statut}
+                                                        </span>
+                                                    </div>
+                                                    {prop.justification && (
+                                                        <p className="text-[11px] text-slate-600 mb-3">{prop.justification}</p>
+                                                    )}
+                                                    {prop.statut === "EN_ATTENTE" && (
+                                                        <div className="flex flex-wrap gap-2 pt-1">
+                                                            <button
+                                                                type="button"
+                                                                onClick={async () => {
+                                                                    const res = await repondrePropositionLoyerAction({
+                                                                        propositionId: prop.id,
+                                                                        reponse: true,
+                                                                    });
+                                                                    if (!res.success) {
+                                                                        toast.error(res.error);
+                                                                    } else {
+                                                                        toast.success(res.message);
+                                                                        const refreshed = await getTenantLeases();
+                                                                        setLeases(refreshed || []);
+                                                                    }
+                                                                }}
+                                                                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider transition-all"
+                                                            >
+                                                                <CheckCircle2 size={13} /> Accepter le nouveau loyer
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={async () => {
+                                                                    const motif = window.prompt("Motif de votre refus de révision de loyer :");
+                                                                    if (motif === null) return;
+                                                                    const res = await repondrePropositionLoyerAction({
+                                                                        propositionId: prop.id,
+                                                                        reponse: false,
+                                                                        commentaire: motif,
+                                                                    });
+                                                                    if (!res.success) {
+                                                                        toast.error(res.error);
+                                                                    } else {
+                                                                        toast.success(res.message);
+                                                                        const refreshed = await getTenantLeases();
+                                                                        setLeases(refreshed || []);
+                                                                    }
+                                                                }}
+                                                                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-black uppercase tracking-wider transition-all"
+                                                            >
+                                                                <XCircle size={13} /> Refuser
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {/* Recent Receipts */}
                                     <div className="space-y-4">
                                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 pb-2">Dernières Quittances</h4>
@@ -206,9 +298,12 @@ export default function TenantLeasesPage() {
                                                 🖋️ Signer mon Bail maintenant
                                             </Link>
                                         )}
-                                        <div className="flex gap-3">
+                                        <div className="flex flex-wrap gap-3">
                                             {DownloadLeaseButton && <DownloadLeaseButton leaseId={lease.id} />}
-                                            <Link href={`/mon-espace-locataire/trust`} className="flex-1 bg-qnavy text-white py-3 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-lg shadow-qnavy/20 uppercase tracking-wider">
+                                            <Link href={`/mon-espace-locataire/occupants`} className="flex-1 bg-emerald-700 text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/15 uppercase tracking-wider flex items-center justify-center gap-1.5">
+                                                <Users size={14} /> Occupants &amp; Attestation
+                                            </Link>
+                                            <Link href={`/mon-espace-locataire/passeport`} className="flex-1 bg-qnavy text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:opacity-90 transition-opacity shadow-lg shadow-qnavy/20 uppercase tracking-wider flex items-center justify-center">
                                                 Voir mon score
                                             </Link>
                                         </div>

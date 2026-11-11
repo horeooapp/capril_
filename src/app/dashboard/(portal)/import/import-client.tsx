@@ -87,8 +87,21 @@ export default function ImportDashboardClient() {
                          <p className="text-[13px] text-slate-300 font-medium leading-relaxed mb-6">
                              Pour garantir l'intégrité de la base de données, vous devez utiliser le modèle standard QAPRIL fournissant les colonnes pré-requises (Locataire, Loyer, CNI, Échéance).
                          </p>
-                         <button onClick={() => toast.success('Matrice d\'importation téléchargée')} className="w-full bg-white text-slate-900 px-4 py-3 rounded-[8px] font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm flex justify-center items-center gap-2">
-                             <Download size={14} /> Model_QAPRIL.xlsx
+                         <button
+                             onClick={() => {
+                                 const csvTemplate = "nom_bien,commune,adresse,type_bien,loyer_fcfa,nom_locataire,telephone_locataire,date_debut\nVilla Riviera 3,Cocody,Rue des Jardins,villa,350000,Kouassi Jean,+2250700000000,2026-01-01\n";
+                                 const blob = new Blob([csvTemplate], { type: "text/csv;charset=utf-8;" });
+                                 const url = URL.createObjectURL(blob);
+                                 const a = document.createElement("a");
+                                 a.href = url;
+                                 a.download = "Model_QAPRIL.csv";
+                                 a.click();
+                                 URL.revokeObjectURL(url);
+                                 toast.success("Matrice d'importation téléchargée");
+                             }}
+                             className="w-full bg-white text-slate-900 px-4 py-3 rounded-[8px] font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-sm flex justify-center items-center gap-2"
+                         >
+                             <Download size={14} /> Model_QAPRIL.csv
                          </button>
                      </div>
 

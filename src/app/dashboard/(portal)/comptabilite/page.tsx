@@ -13,7 +13,7 @@ export default async function AgencyComptabilitePage() {
     const session = await auth();
 
     if (!session?.user?.id) {
-        redirect("/connexion");
+        redirect("/dashboard/login");
     }
 
     const userId = session.user.id;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, AlertTriangle, Zap, Scale, Award, FileText, Receipt, CheckCircle, ShieldCheck } from "lucide-react";
+import { Bell, AlertTriangle, Zap, Scale, Award, FileText, Receipt, CheckCircle, ShieldCheck, Users } from "lucide-react";
 import Link from "next/link";
 import { StatCard } from "@/components/dashboard/ui/StatCard";
 import { SectionCard } from "@/components/dashboard/ui/SectionCard";
@@ -73,13 +73,14 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
       </div>
 
       {/* ACTIONS RAPIDES (STYLE CLARITY) */}
-      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {[
               { label: "Mon Bail", icon: <FileText size={16} />, href: "/mon-espace-locataire/leases" },
               { label: "Paiements", icon: <Receipt size={16} />, href: "/mon-espace-locataire/receipts" },
-              { label: "CIE/SODECI", icon: <Zap size={16} />, href: "/mon-espace-locataire/utilities" },
+              { label: "Foyer & Attestation", icon: <Users size={16} />, href: "/mon-espace-locataire/occupants" },
+              { label: "CIE/SODECI", icon: <Zap size={16} />, href: "/mon-espace-locataire/cie-sodeci" },
               { label: "Mes Droits", icon: <Scale size={16} />, href: "/mon-espace-locataire/rights" },
-              { label: "Score ICL", icon: <Award size={16} />, href: "/mon-espace-locataire/trust" },
+              { label: "Score ICL", icon: <Award size={16} />, href: "/mon-espace-locataire/passeport" },
           ].map((action, i) => (
               <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-200 rounded-[10px] hover:border-sky-500 hover:bg-sky-50 text-slate-600 hover:text-sky-700 transition-all">
                   {action.icon}
@@ -150,7 +151,7 @@ export default function DashboardLocataireV2({ data, session }: { data: any; ses
               </div>
             </SectionCard>
 
-            <SectionCard title="Dernières Quittances" action="Historique complet">
+            <SectionCard title="Dernières Quittances" action={<Link href="/mon-espace-locataire/receipts" className="text-sky-600 hover:underline">Historique complet</Link>}>
                 <div className="-mx-1 px-1">
                 {data?.quittances?.length > 0 ? (
                     data.quittances.slice(0, 3).map((q: any, i: number) => (

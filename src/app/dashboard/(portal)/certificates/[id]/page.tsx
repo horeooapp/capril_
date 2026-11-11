@@ -11,7 +11,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
     const cert = await generateRentalCertificate(certificateId)
 
     return (
-        <div className="max-w-4xl mx-auto p-8 my-10 bg-white shadow-2xl border-t-8 border-orange-500 rounded-lg">
+        <div id="print-area" className="max-w-4xl mx-auto p-8 my-10 bg-white shadow-2xl border-t-8 border-orange-500 rounded-lg">
             <div className="flex justify-between items-start border-b pb-6 mb-6">
                 <div>
                     <h1 className="text-4xl font-black text-gray-900 tracking-tight">QAPRIL</h1>
@@ -82,7 +82,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
             </div>
 
             <div className="mt-10 text-center print:hidden">
-                <PrintButton />
+                <PrintButton label="Imprimer le Certificat" />
             </div>
         </div>
     )

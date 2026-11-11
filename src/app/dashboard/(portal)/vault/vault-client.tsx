@@ -124,7 +124,15 @@ export default function VaultClient({ data }: { data: any }) {
                                         </td>
                                         <td className="p-5 text-right">
                                             {caution.status === 'CONSIGNEE' ? (
-                                                <button className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 border border-slate-200 hover:bg-slate-100 transition-colors">
+                                                <button
+                                                    onClick={() => {
+                                                        setCautions(cautions.map((c: any) =>
+                                                            c.id === caution.id ? { ...c, status: "RESTITUEE" } : c
+                                                        ));
+                                                        toast.success(`Demande de restitution initiée pour ${caution.locataire}.`);
+                                                    }}
+                                                    className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 border border-slate-200 hover:bg-slate-100 transition-colors"
+                                                >
                                                     Restituer
                                                 </button>
                                             ) : (

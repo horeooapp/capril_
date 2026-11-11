@@ -53,21 +53,21 @@ export async function getAgencyTransactionsData() {
     const biensEnVente = await prisma.property.findMany({
       where: isAdmin ? {
         OR: [
-          { forSale: true },
-          { categorie_vente: { not: null } }
+          { enVente: true },
+          { categorieVente: { not: null } }
         ]
       } : {
         AND: [
           {
             OR: [
-              { ownerId: userId },
+              { ownerUserId: userId },
               { managedByUserId: userId }
             ]
           },
           {
             OR: [
-              { forSale: true },
-              { categorie_vente: { not: null } }
+              { enVente: true },
+              { categorieVente: { not: null } }
             ]
           }
         ]
@@ -110,7 +110,7 @@ export async function getAgencyTransactionsData() {
     const mandatsActifsCount = mandats.filter(m => m.statut === "ACTIF").length;
     const mandatsExclusifsCount = mandats.filter(m => m.typeMandat === "EXCLUSIF" && m.statut === "ACTIF").length;
     const transactionsEnCoursCount = transactions.filter(t => !['CLOTURE', 'ECHEC', 'CADUC', 'RETIRE'].includes(t.statutPipeline)).length;
-    const biensVerifiesAcdCount = biensEnVente.filter(b => b.titre_type === "ACD" || (b.niveau_verif_vente && b.niveau_verif_vente >= 3)).length;
+    const biensVerifiesAcdCount = biensEnVente.filter(b => b.titreType === "ACD" || (b.niveauVerifVente && b.niveauVerifVente >= 3)).length;
 
     return {
       success: true,
@@ -195,9 +195,12 @@ export async function createBienEtMandatVenteAction(input: CreateVenteMandatInpu
 
   const doublonTitre = await prisma.property.findFirst({
     where: {
-      titre_type: input.natureTitre,
-      titre_numero: titreClean,
-      city: { contains: communeClean, mode: "insensitive" }
+      titreType: input.natureTitre,
+      titreNumero: titreClean,
+      OR: [
+        { commune: { contains: communeClean, mode: "insensitive" } },
+        { city: { contains: communeClean, mode: "insensitive" } }
+      ]
     }
   });
 
@@ -230,31 +233,64 @@ export async function createBienEtMandatVenteAction(input: CreateVenteMandatInpu
   }
 
   // 3. Création du Bien dans la base de données
+  const propertyCode = `VTE-${anneeCourante}-${Date.now().toString().slice(-6)}`;
+  const natureInfo = NATURES_TITRES[input.natureTitre];
   const property = await prisma.property.create({
     data: {
+      propertyCode,
       name: input.titreBien || `${input.categorieBienVente} ${input.superficieM2}m² - ${input.commune}`,
-      type: input.categorieBienVente.startsWith("TERRAIN") ? "COMMERCIAL" : "RESIDENTIAL",
-      forSale: true,
+      propertyType: input.categorieBienVente.startsWith("TERRAIN") ? "TERRAIN" : "RESIDENTIAL",
+      leaseType: input.categorieBienVente.startsWith("TERRAIN") ? "commercial" : "residential",
+      enVente: true,
       prixVenteFcfa: input.prixPresentationFcfa,
-      price: input.prixPresentationFcfa,
+      declaredRentFcfa: Math.round(input.prixPresentationFcfa),
+      commune: input.commune,
       city: input.commune,
-      district: input.quartier || input.commune,
       address: `${input.commune}, ${input.quartier || 'Centre'} (Lot ${input.numeroLot || '-'}, Îlot ${input.numeroIlot || '-'})`,
-      surface: input.superficieM2,
-      superficie_m2: input.superficieM2,
-      categorie_vente: input.categorieBienVente,
-      titre_type: input.natureTitre,
-      titre_numero: titreClean,
-      titre_date: input.dateTitre ? new Date(input.dateTitre) : null,
-      numero_lot: input.numeroLot,
-      numero_ilot: input.numeroIlot,
-      est_viabilise: Boolean(input.estViabilise),
-      servitudes_declarees: input.servitudesDeclarees,
-      coordonnees_gps_bornes: input.coordonneesGpsBornes,
-      niveau_verif_vente: niveauVerif,
-      ownerId: userId,
+      superficieM2: input.superficieM2,
+      categorieVente: input.categorieBienVente,
+      titreType: input.natureTitre,
+      titreNumero: titreClean,
+      titreDate: input.dateTitre ? new Date(input.dateTitre) : null,
+      numeroLot: input.numeroLot || null,
+      numeroIlot: input.numeroIlot || null,
+      viabilisationEau: Boolean(input.estViabilise),
+      viabilisationElectricite: Boolean(input.estViabilise),
+      viabilisationVoirie: Boolean(input.estViabilise),
+      servitudesDeclarees: input.servitudesDeclarees || null,
+      coordonneesGpsBornes: input.coordonneesGpsBornes ? { raw: input.coordonneesGpsBornes } : undefined,
+      niveauVerifVente: niveauVerif,
+      isBienVerifie: niveauVerif >= 3,
+      titreSecuriteJuridique: natureInfo?.niveauSecurite || "ETAPE_ACD",
+      ownerUserId: userId,
       managedByUserId: userId,
       status: "ACTIVE"
+    }
+  });
+
+  // 3b. Indexation anti-double vente dans TitresIndex (RG-VTE-05)
+  await prisma.titresIndex.upsert({
+    where: {
+      titre_unique_par_commune: {
+        titreType: input.natureTitre,
+        titreNumero: titreClean,
+        commune: communeClean
+      }
+    },
+    update: {
+      propertyId: property.id,
+      statut: "ACTIF",
+      niveauSecuriteJuridique: natureInfo?.niveauSecurite || "ETAPE_ACD",
+      enregistreParUserId: userId
+    },
+    create: {
+      titreType: input.natureTitre,
+      titreNumero: titreClean,
+      commune: communeClean,
+      propertyId: property.id,
+      statut: "ACTIF",
+      niveauSecuriteJuridique: natureInfo?.niveauSecurite || "ETAPE_ACD",
+      enregistreParUserId: userId
     }
   });
 
@@ -296,7 +332,6 @@ export async function createBienEtMandatVenteAction(input: CreateVenteMandatInpu
   });
 
   // 5. Publication de l'annonce si niveau de vérification suffisant (RG-VTE-11)
-  const natureInfo = NATURES_TITRES[input.natureTitre];
   const referenceAnnonce = `ANN-VTE-${Date.now().toString().slice(-6)}`;
 
   await prisma.annonceVente.create({

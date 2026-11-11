@@ -6,6 +6,7 @@ import Link from "next/link"
 import { toast } from "sonner";
 import { renewLeaseAction, deleteLeaseAction } from "@/actions/lease.actions";
 import { modifierBailDeclaratif, supprimerBailDeclaratif } from "@/actions/bail-declaratif.actions";
+import { reprendreBailAnterieur } from "@/actions/reprise-bail.actions";
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
 
@@ -24,6 +25,22 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
     const [editingBdq, setEditingBdq] = useState<any | null>(null);
     const [viewingBdq, setViewingBdq] = useState<any | null>(null);
     const [deletingLease, setDeletingLease] = useState<any | null>(null);
+    const [showRepriseModal, setShowRepriseModal] = useState(false);
+
+    // Reprise Bail Antérieur (Deux Horloges) state
+    const [repPropertyId, setRepPropertyId] = useState(properties?.[0]?.id || "");
+    const [repTenantName, setRepTenantName] = useState("");
+    const [repTenantPhone, setRepTenantPhone] = useState("");
+    const [repQualification, setRepQualification] = useState<"ECRIT_ENREGISTRE" | "ECRIT_NON_ENREGISTRE" | "VERBAL">("ECRIT_NON_ENREGISTRE");
+    const [repStartDate, setRepStartDate] = useState("2022-01-01");
+    const [repLoyerInitial, setRepLoyerInitial] = useState("");
+    const [repLoyerEnVigueur, setRepLoyerEnVigueur] = useState("");
+    const [repCharges, setRepCharges] = useState("0");
+    const [repDeposit, setRepDeposit] = useState("0");
+    const [repDateReprise, setRepDateReprise] = useState(() => new Date().toISOString().split("T")[0]);
+    const [repDernierMoisPaye, setRepDernierMoisPaye] = useState(() => new Date().toISOString().substring(0, 7));
+    const [repSoldeOuverture, setRepSoldeOuverture] = useState("0");
+    const [isSubmittingReprise, setIsSubmittingReprise] = useState(false);
 
     // Edit form fields
     const [editNom, setEditNom] = useState("");
@@ -152,6 +169,57 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
         }
     };
 
+    const handleRepriseSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!repPropertyId) {
+            toast.error("Veuillez sélectionner un bien immobilier.");
+            return;
+        }
+        if (!repTenantName.trim() || !repTenantPhone.trim()) {
+            toast.error("Veuillez renseigner le nom et le téléphone du locataire.");
+            return;
+        }
+        const loyerActuel = Number(repLoyerEnVigueur);
+        if (!loyerActuel || loyerActuel <= 0) {
+            toast.error("Veuillez saisir un loyer en vigueur valide.");
+            return;
+        }
+        setIsSubmittingReprise(true);
+        const toastId = toast.loading("Création du bail repris (Deux Horloges)...");
+        try {
+            const res = await reprendreBailAnterieur({
+                propertyId: repPropertyId,
+                tenantName: repTenantName.trim(),
+                tenantPhone: repTenantPhone.trim(),
+                qualificationBail: repQualification,
+                startDate: repStartDate,
+                loyerInitial: Number(repLoyerInitial) || loyerActuel,
+                loyerEnVigueur: loyerActuel,
+                chargesEnVigueur: Number(repCharges) || 0,
+                depositAmount: Number(repDeposit) || 0,
+                dateReprise: repDateReprise,
+                dernierMoisPaye: repDernierMoisPaye || undefined,
+                soldeOuverture: Number(repSoldeOuverture) || 0,
+            });
+            if (!res.success) {
+                toast.error(res.error || "Erreur lors de la reprise du bail.", { id: toastId });
+            } else {
+                toast.success("Bail antérieur repris avec succès (Horloge 1 & Horloge 2 initialisées) !", { id: toastId });
+                setShowRepriseModal(false);
+                const targetId = (res as any).leaseId || (res as any).data?.leaseId;
+                if (targetId) {
+                    window.location.href = `/dashboard/leases/${targetId}`;
+                } else {
+                    window.location.reload();
+                }
+            }
+        } catch (err: any) {
+            toast.error(err?.message || "Erreur interne.", { id: toastId });
+        } finally {
+            setIsSubmittingReprise(false);
+        }
+    };
+
     const handleRenew = (leaseId: string) => {
         startTransition(async () => {
             const toastId = toast.loading("Traitement de la prolongation...");
@@ -219,6 +287,18 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                             Actifs ({leases.filter(l => l.status === 'ACTIVE' || l.status === 'ACTIF').length})
                         </button>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (!repPropertyId && properties.length > 0) setRepPropertyId(properties[0].id);
+                            setShowRepriseModal(true);
+                        }}
+                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[12.5px] font-bold shadow-sm transition-all"
+                        title="Reprendre un bail existant signé avant QAPRIL (Architecture Deux Horloges)"
+                    >
+                        <Clock size={15} className="text-amber-400" /> Reprendre un Bail Ancien
+                    </button>
 
                     <Link 
                         href="/dashboard/lease-wizard" 
@@ -850,6 +930,235 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                 )}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ======================================================== */}
+            {/* MODAL 4 : REPRISE DE BAIL ANCIEN (DEUX HORLOGES)          */}
+            {/* ======================================================== */}
+            {showRepriseModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 animate-in fade-in duration-150">
+                    <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
+                        <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+                            <div>
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-900 text-amber-400 rounded-full text-[10px] font-black uppercase tracking-wider mb-2">
+                                    <Clock size={12} />
+                                    Architecture Deux Horloges (CCH 2019)
+                                </div>
+                                <h3 className="text-lg font-extrabold text-slate-900">
+                                    Reprendre un Bail Antérieur en cours
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Fige l&apos;Horloge 1 (ancienneté du contrat d&apos;origine) et initialise l&apos;Horloge 2 (gestion QAPRIL &amp; état d&apos;ouverture contradictoire).
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowRepriseModal(false)}
+                                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleRepriseSubmit} className="space-y-4 mt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                                        Bien Immobilier <span className="text-rose-500">*</span>
+                                    </label>
+                                    <select
+                                        value={repPropertyId}
+                                        onChange={(e) => setRepPropertyId(e.target.value)}
+                                        required
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900"
+                                    >
+                                        <option value="">-- Sélectionner un bien --</option>
+                                        {properties.map(p => (
+                                            <option key={p.id} value={p.id}>
+                                                {p.name || p.address} ({p.commune || 'Abidjan'})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                                        Qualification du Bail d&apos;origine
+                                    </label>
+                                    <select
+                                        value={repQualification}
+                                        onChange={(e) => setRepQualification(e.target.value as any)}
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900"
+                                    >
+                                        <option value="ECRIT_ENREGISTRE">Bail écrit enregistré DGI</option>
+                                        <option value="ECRIT_NON_ENREGISTRE">Bail écrit sous seing privé</option>
+                                        <option value="VERBAL">Accord verbal antérieur</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                                        Nom complet du locataire <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={repTenantName}
+                                        onChange={(e) => setRepTenantName(e.target.value)}
+                                        placeholder="Ex: KOUAME Jean"
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                                        Téléphone du locataire <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        required
+                                        value={repTenantPhone}
+                                        onChange={(e) => setRepTenantPhone(e.target.value)}
+                                        placeholder="Ex: +225 07 00 00 00 00"
+                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Horloge 1 : Contrat d'origine */}
+                            <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-3">
+                                <p className="text-[11px] font-black uppercase tracking-widest text-amber-900">
+                                    Horloge 1 — Contrat d&apos;origine (Ancienneté &amp; Loyer)
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Date d&apos;entrée initiale *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={repStartDate}
+                                            onChange={(e) => setRepStartDate(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Loyer d&apos;origine (FCFA)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={repLoyerInitial}
+                                            onChange={(e) => setRepLoyerInitial(e.target.value)}
+                                            placeholder="Ex: 120000"
+                                            className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Loyer actuel en vigueur *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            value={repLoyerEnVigueur}
+                                            onChange={(e) => setRepLoyerEnVigueur(e.target.value)}
+                                            placeholder="Ex: 150000"
+                                            className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Charges mensuelles (FCFA)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={repCharges}
+                                            onChange={(e) => setRepCharges(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Caution historique versée (FCFA)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={repDeposit}
+                                            onChange={(e) => setRepDeposit(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Horloge 2 : Ouverture QAPRIL */}
+                            <div className="p-4 rounded-xl bg-sky-50/60 border border-sky-200 space-y-3">
+                                <p className="text-[11px] font-black uppercase tracking-widest text-sky-900">
+                                    Horloge 2 — Prise en charge QAPRIL &amp; Solde d&apos;ouverture
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Date de reprise QAPRIL
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={repDateReprise}
+                                            onChange={(e) => setRepDateReprise(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Dernier mois réglé (YYYY-MM)
+                                        </label>
+                                        <input
+                                            type="month"
+                                            value={repDernierMoisPaye}
+                                            onChange={(e) => setRepDernierMoisPaye(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                                            Arriéré pré-QAPRIL (FCFA)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={repSoldeOuverture}
+                                            onChange={(e) => setRepSoldeOuverture(e.target.value)}
+                                            className="w-full px-2.5 py-1.5 bg-white border border-sky-200 rounded-lg text-xs font-bold"
+                                        />
+                                    </div>
+                                </div>
+                                <p className="text-[10.5px] text-sky-800">
+                                    Neutralité garantie : l&apos;arriéré pré-QAPRIL est soumis à confirmation contradictoire du locataire et n&apos;impacte pas rétroactivement son score ICL.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRepriseModal(false)}
+                                    className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold"
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmittingReprise}
+                                    className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-50"
+                                >
+                                    {isSubmittingReprise ? "Enregistrement..." : "Activer la Reprise Deux Horloges"}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

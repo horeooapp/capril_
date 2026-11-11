@@ -461,7 +461,15 @@ export default function SimulatorClient({ user }: { user: any }) {
               </span>
               <button
                 type="button"
-                onClick={() => alert("Journal de preuve exporté au format JSON conforme ARTCI.")}
+                onClick={() => {
+                  const blob = new Blob([JSON.stringify(auditLog, null, 2)], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `registre-cnv-artci-${new Date().toISOString().slice(0, 10)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
                 className="flex items-center gap-1 text-primary hover:underline font-medium text-xs"
               >
                 <Download className="w-3.5 h-3.5" /> Exporter le registre certifié

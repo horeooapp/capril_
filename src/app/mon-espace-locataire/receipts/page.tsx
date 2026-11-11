@@ -1,5 +1,6 @@
 import { getReceiptsForTenant } from "@/actions/receipt.actions"
 import { getTenantDashboard } from "@/actions/tenant-actions"
+import { getDeclarationsPaiementForTenant } from "@/actions/mrl-paiement.actions"
 import { redirect } from "next/navigation"
 import ReceiptsContent from "./ReceiptsContent"
 
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic"
 export default async function TenantReceiptsPage() {
     const receipts = await getReceiptsForTenant()
     const dashboard = await getTenantDashboard()
+    const declarations = await getDeclarationsPaiementForTenant()
 
     const lease = (dashboard?.success && dashboard?.lease) 
         ? dashboard.lease 
@@ -22,6 +24,7 @@ export default async function TenantReceiptsPage() {
         <ReceiptsContent 
             receipts={receipts || []} 
             lease={lease} 
+            initialDeclarations={declarations || []}
         />
     )
 }

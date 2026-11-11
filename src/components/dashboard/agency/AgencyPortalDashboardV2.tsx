@@ -134,7 +134,7 @@ export function AgencyPortalDashboardV2({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <SectionCard title="Gestion des candidatures" action="Voir tout">
+            <SectionCard title="Gestion des candidatures" action={<Link href="/dashboard/matching" className="text-sky-600 hover:underline">Voir tout</Link>}>
               {candidatures.length === 0 ? (
                  <div className="text-[12px] text-slate-400 py-4 text-center">Aucune candidature vérifiée en cours.</div>
               ) : candidatures.slice(0, 3).map((c, i) => (
@@ -150,7 +150,7 @@ export function AgencyPortalDashboardV2({
               ))}
             </SectionCard>
 
-            <SectionCard title="Mandats & Reversements" action="Détails">
+            <SectionCard title="Mandats & Reversements" action={<Link href="/dashboard/mandates" className="text-sky-600 hover:underline">Détails</Link>}>
               <div className="text-[12px] text-slate-400 py-4 text-center">Aucun reversement de mandat en cours.</div>
             </SectionCard>
           </div>
@@ -158,11 +158,11 @@ export function AgencyPortalDashboardV2({
           <SectionCard title="Actions rapides de gestion">
              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 py-2">
                  {[
-                      { label: "Nouveau Locataire", icon: <Users size={16} />, href: "/dashboard/matching/new" },
+                      { label: "Nouveau Bail", icon: <Users size={16} />, href: "/dashboard/leases/new" },
                       { label: "Ventes & Terrains (ADD-25)", icon: <Compass size={16} />, href: "/dashboard/ventes" },
                       { label: "Comptabilité SYSCOHADA", icon: <Calculator size={16} />, href: "/dashboard/comptabilite" },
-                      { label: "Opération Caisse", icon: <Receipt size={16} />, href: "/dashboard/wallet/transaction" },
-                      { label: "Déclarer Incident", icon: <ShieldCheck size={16} />, href: "/dashboard/disputes/new" },
+                      { label: "Opération Caisse", icon: <Receipt size={16} />, href: "/dashboard/wallet" },
+                      { label: "Déclarer Incident", icon: <ShieldCheck size={16} />, href: "/dashboard/disputes" },
                       { label: "Générer CRG", icon: <ClipboardList size={16} />, href: "/dashboard/reports" },
                  ].map((action, i) => (
                      <Link key={i} href={action.href} className="flex flex-col items-center justify-center gap-2 p-4 bg-white border border-slate-200 rounded-[10px] hover:border-sky-500 hover:bg-sky-50 text-slate-600 hover:text-sky-700 transition-all">

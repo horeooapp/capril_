@@ -25,8 +25,8 @@ export default function BottomNav({ items }: BottomNavProps) {
         { href: "/dashboard", label: "Accueil", icon: <Home size={24} /> },
         { href: "/dashboard/payments", label: "Payer", icon: <Receipt size={24} /> },
         { href: "/dashboard/properties", label: "Mes biens", icon: <Building2 size={24} /> },
-        { href: "/dashboard/alerts", label: "Alertes", icon: <Bell size={24} /> },
-        { href: "/account", label: "Compte", icon: <User size={24} /> },
+        { href: "/dashboard/communications", label: "Alertes", icon: <Bell size={24} /> },
+        { href: "/dashboard/profile", label: "Compte", icon: <User size={24} /> },
     ]
 
     const navItems = items || defaultItems

@@ -9,7 +9,7 @@ export const DownloadLeaseButton = ({ leaseId }: { leaseId: string }) => {
             className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-black transition-colors shadow-lg shadow-gray-200 uppercase tracking-wider" 
             onClick={(e) => { 
                 e.preventDefault(); 
-                window.open(`/dashboard/leases/${leaseId}/print`, "_blank");
+                window.open(`/api/leases/${leaseId}/pdf`, "_blank");
             }}
         >
             Télécharger le bail
