@@ -22,7 +22,7 @@ export class FeexPayService {
   private isSandbox: boolean;
 
   constructor() {
-    this.shopId = process.env.FEEXPAY_SHOP_ID || "6qaYdqMwX6byG7Q";
+    this.shopId = process.env.FEEXPAY_SHOP_ID || "698dd650a7ffb88696f5id86";
     this.apiKey = process.env.FEEXPAY_API_KEY || "test_Hg7Kjl3ZAM63UuIUpuudD9nKuu3ZAM67Kjl3Uuhn";
     this.isSandbox = process.env.FEEXPAY_SANDBOX === "true" || this.apiKey.startsWith("test_");
   }
