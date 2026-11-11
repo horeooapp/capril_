@@ -1,6 +1,6 @@
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BackHandler, Platform, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Updates from "expo-updates";
@@ -10,6 +10,27 @@ import { confirmExitApp } from "../components/TopNavHeader";
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
+  const [updating, setUpdating] = useState(false);
+
+  const handleUpdateAndRestart = async () => {
+    setUpdating(true);
+    try {
+      if (!__DEV__) {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+        }
+        await Updates.reloadAsync();
+        return;
+      }
+    } catch (e) {
+      console.warn('[ErrorBoundary] Échec de la mise à jour OTA:', e);
+    } finally {
+      setUpdating(false);
+    }
+    retry();
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
       <Text style={{ color: '#EF4444', fontSize: 18, fontWeight: '700', marginBottom: 8, textAlign: 'center' }}>
@@ -19,10 +40,19 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
         {error?.message || 'Impossible de charger l\'écran d\'accueil. Veuillez relancer l\'application.'}
       </Text>
       <Pressable
-        onPress={retry}
-        style={{ backgroundColor: '#1E7E4E', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
+        onPress={handleUpdateAndRestart}
+        disabled={updating}
+        style={{ backgroundColor: '#1E7E4E', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12, minWidth: 200, alignItems: 'center', marginBottom: 12 }}
       >
-        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>Relancer l'application</Text>
+        <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>
+          {updating ? 'Mise à jour en cours...' : 'Relancer l\'application'}
+        </Text>
+      </Pressable>
+      <Pressable
+        onPress={retry}
+        style={{ paddingHorizontal: 16, paddingVertical: 8 }}
+      >
+        <Text style={{ color: '#64748B', fontSize: 12 }}>Réessayer sans recharger</Text>
       </Pressable>
     </SafeAreaView>
   );

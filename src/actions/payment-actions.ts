@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import crypto from "crypto"
-import { cinetpay } from "@/lib/cinetpay"
+import { feexpay } from "@/lib/feexpay"
 import { ensureAuthenticated, ensureLeaseAccess } from "./auth-helpers"
 import { Role } from "@prisma/client"
 import { NotificationService } from "@/lib/notification-service"
@@ -76,19 +76,16 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
             }
         });
 
-        // 2. Initialize CinetPay Payment
-        const paymentResult = await cinetpay.initializePayment({
-            transaction_id: intent.id,
+        // 2. Initialize FeexPay Payment (Agrégateur officiel par défaut)
+        const paymentResult = await feexpay.initializePayment({
+            transactionId: intent.id,
             amount: input.amount,
-            currency: "XOF",
             description: `Règlement Loyer - Contrat ${input.leaseId} (${input.monthsCount} mois)`,
-            customer_name: session.user.fullName || session.user.fullName || "Locataire",
-            customer_surname: "QAPRIL",
-            customer_email: session.user.email || "client@qapril.ci",
-            customer_phone_number: input.payerPhone,
-            notify_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/cinetpay`,
-            return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/payments/status?tid=${intent.id}`,
-            channels: "ALL" // Handles both MM and Cards via CinetPay
+            customerName: session.user.fullName || "Locataire",
+            customerEmail: session.user.email || "client@qapril.ci",
+            payerPhone: input.payerPhone,
+            operator: input.operator,
+            leaseId: input.leaseId,
         });
 
         if (!paymentResult.success) {
@@ -116,7 +113,7 @@ export async function createMMIntent(input: CreatePaymentIntentInput) {
             success: true, 
             intentId: intent.id, 
             paymentUrl: paymentResult.payment_url,
-            paymentToken: paymentResult.payment_token
+            paymentToken: paymentResult.payment_token || paymentResult.reference || intent.id
         };
 
     } catch (error: unknown) {

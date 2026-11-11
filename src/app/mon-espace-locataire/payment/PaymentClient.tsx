@@ -137,9 +137,9 @@ export default function PaymentClient({ leaseId, amount, defaultPhone }: Payment
                 className="w-full bg-qnavy hover:bg-qnavy-dark text-white font-black uppercase text-xs tracking-widest py-5 rounded-2xl shadow-xl shadow-qnavy/20 transition-all flex items-center justify-center gap-2 mt-4 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
             >
                 {loading ? (
-                    <><Loader2 size={18} className="animate-spin" /> Connexion CinetPay...</>
+                    <><Loader2 size={18} className="animate-spin" /> Connexion FeexPay...</>
                 ) : (
-                    <><ShieldCheck size={18} /> Procéder au paiement sécurisé</>
+                    <><ShieldCheck size={18} /> Procéder au paiement sécurisé FeexPay</>
                 )}
             </button>
             <p className="text-center text-[9px] font-bold text-qtext-light uppercase tracking-widest mt-4">

@@ -14,6 +14,11 @@ export default auth(async (req) => {
         || "anonymous";
     const path = req.nextUrl.pathname;
 
+    // Redirection automatique des webhooks FeexPay configurés sur la racine (ex: https://www.qapril.net)
+    if (req.method === "POST" && (path === "/" || path === "")) {
+        return NextResponse.rewrite(new URL("/api/webhooks/feexpay", req.url));
+    }
+
     // 0. URL Normalization (Prevent double slashes)
     if (path.includes("//")) {
         const normalizedPath = path.replace(/\/+/g, "/");

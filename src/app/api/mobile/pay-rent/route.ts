@@ -1,23 +1,33 @@
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import { NextResponse } from 'next/server';
-import { 
-    generateReceiptRef, 
-    generateQRToken, 
-    calculateReceiptHash 
-} from '@/lib/financial-utils';
-import { generateReceiptPDF } from '@/lib/pdf-generator';
-
-const PRIX_QUITTANCE = Number(process.env.QAPRIL_QUITTANCE_PRIX_FCFA ?? 90);
+import { feexpay } from '@/lib/feexpay';
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { token, leaseId, amount, operator } = body;
+        const { token, leaseId, amount, operator, action, paymentId } = body;
+
+        // Support d'une vérification de statut (polling ou bouton retour mobile)
+        if (action === 'verify' && paymentId) {
+            const existingPayment = await prisma.paymentPgw.findUnique({
+                where: { id: paymentId },
+                include: { quittance: true }
+            });
+            if (!existingPayment) {
+                return NextResponse.json({ error: "Paiement introuvable" }, { status: 404 });
+            }
+            return NextResponse.json({
+                success: true,
+                status: existingPayment.statut,
+                isConfirmed: existingPayment.statut === "CONFIRMEE",
+                receiptRef: existingPayment.quittance?.receiptRef,
+            });
+        }
 
         // Validation de sécurité avec JWT
         if (!token || !leaseId || !amount) {
-            return NextResponse.json({ error: "Paramètres manquants" }, { status: 400 });
+            return NextResponse.json({ error: "Paramètres manquants (token, leaseId, amount requis)" }, { status: 400 });
         }
 
         const payload = await verifyMobileToken(token);
@@ -43,156 +53,77 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Bail introuvable" }, { status: 404 });
         }
 
-        // [SEC-FIX F-02] Vérification IDOR : l'utilisateur authentifié doit être le locataire du bail
-        // Sans cette vérification, n'importe quel locataire peut payer le bail de quelqu'un d'autre
+        // Vérification IDOR : l'utilisateur authentifié doit être le locataire du bail
         if (lease.tenantId !== payeurId) {
             console.warn(`[SECURITY] IDOR attempt: user ${payeurId} tried to pay lease ${leaseId} owned by tenant ${lease.tenantId}`);
-            return NextResponse.json({ error: "Accès refusé." }, { status: 403 });
+            return NextResponse.json({ error: "Accès refusé. Vous n'êtes pas le titulaire de ce bail." }, { status: 403 });
         }
 
-        // [SEC-FIX F-07] Validation stricte du montant contre le loyer contractuel
+        // Validation stricte du montant contre le loyer contractuel
         const totalExpected = lease.rentAmount + (lease.chargesAmount || 0);
         if (Number(amount) < totalExpected) {
             return NextResponse.json({ 
-                error: `Montant invalide. Le montant requis pour ce loyer est de ${totalExpected.toLocaleString('fr-FR')} XOF.` 
+                error: `Montant invalide. Le montant requis pour ce loyer est de ${Math.round(totalExpected).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')} XOF.` 
             }, { status: 400 });
         }
 
-        // 2. RG-QUI-02: Vérification Wallet Bailleur (Comme sur le web)
-        const walletBalance = lease.landlord.walletConfig?.walletBalance || 0;
+        // RG-QUI-02: Vérification Wallet Bailleur
+        const walletBalance = lease.landlord?.walletConfig?.walletBalance || 0;
         if (walletBalance < -1500) {
             return NextResponse.json({ 
-                error: "Paiement impossible : Le compte du bailleur est débiteur. Veuillez contacter le support." 
+                error: "Paiement temporairement indisponible : Le compte du bailleur nécessite une régularisation technique. Contactez le support." 
             }, { status: 403 });
         }
 
-        // 3. Identification de la période (Pour cet exemple on prend le mois en cours ou le premier impayé)
-        const oldestArrear = await prisma.leaseArrear.findFirst({
-            where: {
+        const selectedCanal = operator === 'WAVE' 
+            ? 'WAVE' 
+            : (operator === 'MTN' 
+                ? 'MTN' 
+                : (operator === 'MOOV' 
+                    ? 'MOOV' 
+                    : (operator === 'CINETPAY_M17' ? 'CINETPAY_M17' : 'ORANGE')));
+
+        // 2. Création de la transaction dans PaymentPgw avec statut INITIEE
+        const paymentRef = `FP-${selectedCanal}-${Date.now().toString(36).toUpperCase()}`;
+        const payment = await prisma.paymentPgw.create({
+            data: {
                 leaseId,
-                status: { in: ["unpaid", "UNPAID", "PARTIAL"] }
-            },
-            orderBy: { dueDate: "asc" }
-        });
-
-        const periodMonth = oldestArrear 
-            ? oldestArrear.dueDate.toISOString().slice(0, 7) // YYYY-MM
-            : new Date().toISOString().slice(0, 7);
-
-        // 4. Transaction Prisma pour garantir l'atomicité
-        const result = await prisma.$transaction(async (tx) => {
-            // A. Débiter le wallet bailleur
-            const currentWallet = await tx.userWalletConfig.findUnique({
-                where: { userId: lease.landlordId },
-                select: { walletBalance: true }
-            });
-            const currentBal = currentWallet?.walletBalance ?? 0;
-            const newBal = Math.max(0, currentBal - PRIX_QUITTANCE);
-            await tx.userWalletConfig.upsert({
-                where: { userId: lease.landlordId },
-                create: { userId: lease.landlordId, walletBalance: 0 },
-                update: { walletBalance: newBal }
-            });
-
-            // B. Créer la quittance certifiée
-            const receiptRef = await generateReceiptRef(lease.leaseType);
-            const qrToken = generateQRToken();
-            const paidAt = new Date();
-            // [SEC-FIX F-07] Le montant est lu depuis la DB, jamais depuis le client
-            // Cela empêche le price tampering (envoyer amount: 1 pour un loyer de 150 000 XOF)
-            const totalAmount = lease.rentAmount + (lease.chargesAmount || 0);
-
-            const receiptHash = await calculateReceiptHash({
-                leaseId,
-                periodMonth,
-                totalAmount,
-                paidAt
-            });
-
-            const selectedCanal = operator === 'WAVE' 
-                ? 'WAVE' 
-                : (operator === 'MTN' 
-                    ? 'MTN' 
-                    : (operator === 'MOOV' 
-                        ? 'MOOV' 
-                        : (operator === 'CINETPAY_M17' ? 'CINETPAY_M17' : 'ORANGE')));
-
-            const paymentRef = `FEEXPAY-${selectedCanal}-${Date.now()}`;
-
-            const receipt = await tx.receipt.create({
-                data: {
-                    receiptRef,
-                    leaseId,
-                    periodMonth,
-                    rentAmount: lease.rentAmount,
-                    chargesAmount: lease.chargesAmount || 0,
-                    totalAmount,
-                    paymentMethod: selectedCanal === 'CINETPAY_M17' ? 'CREDIT_CARD' : 'MOBILE_MONEY',
-                    paymentRef,
-                    status: "paid",
-                    paidAt,
-                    qrToken,
-                    receiptHash
-                }
-            });
-
-            // C. Créer l'enregistrement de paiement passerelle (FeexPay agrégateur par défaut)
-            await tx.paymentPgw.create({
-                data: {
-                    leaseId,
-                    moisConcerne: new Date(),
-                    payeurId: payeurId,
-                    beneficiaireId: lease.landlordId || payeurId,
-                    montant: amount,
-                    canal: selectedCanal as any,
-                    statut: "CONFIRMEE",
-                    refInterne: `QAPRIL-FEEXPAY-${selectedCanal}-${leaseId}-${Date.now()}`,
-                    refOperateur: "FEEXPAY_PROD",
-                    quittanceId: receipt.id
-                }
-            });
-
-            // D. Mettre à jour l'arriéré s'il existe
-            if (oldestArrear && amount >= oldestArrear.amount) {
-                await tx.leaseArrear.update({
-                    where: { id: oldestArrear.id },
-                    data: { status: "paid" }
-                });
+                moisConcerne: new Date(),
+                payeurId: payeurId,
+                beneficiaireId: lease.landlordId || payeurId,
+                montant: Number(amount),
+                canal: selectedCanal as any,
+                statut: "INITIEE",
+                refInterne: paymentRef,
+                refOperateur: "FEEXPAY_PROD",
             }
-
-            return { receipt, lease };
         });
 
-        // 5. Génération du PDF à la volée (Base64)
-        const pdfBuffer = await generateReceiptPDF({
-            receiptRef: result.receipt.receiptRef,
-            leaseRef: lease.leaseReference || "",
-            periodMonth: result.receipt.periodMonth,
-            rentAmount: result.receipt.rentAmount,
-            chargesAmount: result.receipt.chargesAmount,
-            totalAmount: result.receipt.totalAmount,
-            paymentMethod: result.receipt.paymentMethod,
-            paidAt: result.receipt.paidAt,
-            tenantName: `${lease.tenant?.firstName || ""} ${lease.tenant?.lastName || ""}`.trim() || "Locataire",
-            propertyAddress: lease.property.address || "Adresse non spécifiée",
-            landlordName: `${lease.landlord.firstName || ""} ${lease.landlord.lastName || ""}`.trim() || "Bailleur",
-            receiptHash: result.receipt.receiptHash || undefined,
-            qrToken: result.receipt.qrToken || undefined
+        // 3. Initialiser le paiement auprès de FeexPay (Agrégateur officiel de production)
+        const tenantName = `${lease.tenant?.firstName || ""} ${lease.tenant?.lastName || ""}`.trim() || "Locataire";
+        const feexResult = await feexpay.initializePayment({
+            transactionId: payment.id,
+            amount: Number(amount),
+            description: `Loyer ${lease.property?.title || 'QAPRIL'}`,
+            payerPhone: lease.tenant?.phone || "",
+            customerName: tenantName,
+            customerEmail: lease.tenant?.email || "locataire@qapril.ci",
+            operator: operator,
+            leaseId: lease.id,
         });
-
-        const pdfBase64 = pdfBuffer.toString('base64');
 
         return NextResponse.json({
             success: true,
-            message: "Paiement opérationnel effectué",
-            receiptRef: result.receipt.receiptRef,
-            pdfBase64
+            paymentUrl: feexResult.payment_url,
+            paymentId: payment.id,
+            reference: paymentRef,
+            message: "Guichet FeexPay initialisé"
         });
 
     } catch (error: any) {
-        console.error("Erreur Paiement Mobile Opérationnel:", error);
+        console.error("Erreur Paiement Mobile FeexPay:", error);
         return NextResponse.json({ 
-            error: "Échec de l'opération : " + (error.message || "Erreur serveur")
+            error: "Échec de l'initialisation du paiement : " + (error.message || "Erreur serveur")
         }, { status: 500 });
     }
 }

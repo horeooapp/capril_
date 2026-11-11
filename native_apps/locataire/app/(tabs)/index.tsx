@@ -747,11 +747,11 @@ export default function LocatairePrototypeScreen() {
 
     Alert.alert(
       'Confirmation de règlement',
-      `Confirmez-vous le paiement de ${fmt(totalAmount)} (${payPeriod} mois de loyer) par ${payOp} ?\n\nVotre quittance certifiée sera générée immédiatement.`,
+      `Confirmez-vous le paiement de ${fmt(totalAmount)} (${payPeriod} mois de loyer) par ${payOp} ?\n\nVous serez redirigé vers le guichet sécurisé FeexPay pour finaliser votre transaction.`,
       [
         { text: 'Annuler', style: 'cancel' },
         {
-          text: 'Payer maintenant',
+          text: 'Payer avec FeexPay',
           onPress: async () => {
             setIsPayingRent(true);
             try {
@@ -774,29 +774,63 @@ export default function LocatairePrototypeScreen() {
 
               const json = await res.json();
               if (res.ok && json.success) {
-                Alert.alert(
-                  '✅ Règlement validé !',
-                  `Votre loyer de ${fmt(totalAmount)} a été validé avec succès.\nQuittance officielle : ${json.receiptRef || 'Émise'}.\nLa quittance est consultable dans "Mes quittances".`,
-                  [
-                    {
-                      text: 'Voir mes quittances',
-                      onPress: async () => {
-                        try {
-                          const [dashRes, recRes] = await Promise.all([
-                            fetchWithAuth('/locataire/dashboard'),
-                            fetchWithAuth('/locataire/receipts'),
-                          ]);
-                          if (dashRes.ok) setData(await dashRes.json());
-                          if (recRes.ok) {
-                            const rj = await recRes.json();
-                            if (rj.receipts) setReceiptsList(rj.receipts);
-                          }
-                        } catch {}
-                        setScreen('quittances');
+                if (json.paymentUrl) {
+                  // Ouvrir le guichet officiel FeexPay
+                  try {
+                    await Linking.openURL(json.paymentUrl);
+                  } catch (linkErr) {
+                    console.warn('[FeexPay] Impossible d\'ouvrir le lien:', linkErr);
+                  }
+
+                  Alert.alert(
+                    'Passerelle FeexPay ouverte',
+                    `Votre session de paiement FeexPay a été initiée.\n\nFinalisez votre paiement sur la page sécurisée. Dès validation, votre quittance certifiée sera disponible.`,
+                    [
+                      {
+                        text: 'Vérifier mon règlement',
+                        onPress: async () => {
+                          try {
+                            const [dashRes, recRes] = await Promise.all([
+                              fetchWithAuth('/locataire/dashboard'),
+                              fetchWithAuth('/locataire/receipts'),
+                            ]);
+                            if (dashRes.ok) setData(await dashRes.json());
+                            if (recRes.ok) {
+                              const rj = await recRes.json();
+                              if (rj.receipts) setReceiptsList(rj.receipts);
+                            }
+                          } catch {}
+                          setScreen('quittances');
+                        },
                       },
-                    },
-                  ]
-                );
+                      { text: 'Fermer', style: 'cancel' }
+                    ]
+                  );
+                } else {
+                  Alert.alert(
+                    '✅ Règlement validé !',
+                    `Votre loyer de ${fmt(totalAmount)} a été validé avec succès.\nQuittance officielle : ${json.receiptRef || 'Émise'}.\nLa quittance est consultable dans "Mes quittances".`,
+                    [
+                      {
+                        text: 'Voir mes quittances',
+                        onPress: async () => {
+                          try {
+                            const [dashRes, recRes] = await Promise.all([
+                              fetchWithAuth('/locataire/dashboard'),
+                              fetchWithAuth('/locataire/receipts'),
+                            ]);
+                            if (dashRes.ok) setData(await dashRes.json());
+                            if (recRes.ok) {
+                              const rj = await recRes.json();
+                              if (rj.receipts) setReceiptsList(rj.receipts);
+                            }
+                          } catch {}
+                          setScreen('quittances');
+                        },
+                      },
+                    ]
+                  );
+                }
                 try {
                   const [dashRes, recRes] = await Promise.all([
                     fetchWithAuth('/locataire/dashboard'),
