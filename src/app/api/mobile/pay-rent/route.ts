@@ -109,6 +109,16 @@ export async function POST(req: Request) {
                 paidAt
             });
 
+            const selectedCanal = operator === 'WAVE' 
+                ? 'WAVE' 
+                : (operator === 'MTN' 
+                    ? 'MTN' 
+                    : (operator === 'MOOV' 
+                        ? 'MOOV' 
+                        : (operator === 'CINETPAY_M17' ? 'CINETPAY_M17' : 'ORANGE')));
+
+            const paymentRef = `FEEXPAY-${selectedCanal}-${Date.now()}`;
+
             const receipt = await tx.receipt.create({
                 data: {
                     receiptRef,
@@ -117,8 +127,8 @@ export async function POST(req: Request) {
                     rentAmount: lease.rentAmount,
                     chargesAmount: lease.chargesAmount || 0,
                     totalAmount,
-                    paymentMethod: "MOBILE_MONEY",
-                    paymentRef: `MOB-${operator}-${Date.now()}`,
+                    paymentMethod: selectedCanal === 'CINETPAY_M17' ? 'CREDIT_CARD' : 'MOBILE_MONEY',
+                    paymentRef,
                     status: "paid",
                     paidAt,
                     qrToken,
@@ -126,7 +136,7 @@ export async function POST(req: Request) {
                 }
             });
 
-            // C. Créer l'enregistrement de paiement passerelle
+            // C. Créer l'enregistrement de paiement passerelle (FeexPay agrégateur par défaut)
             await tx.paymentPgw.create({
                 data: {
                     leaseId,
@@ -134,9 +144,10 @@ export async function POST(req: Request) {
                     payeurId: payeurId,
                     beneficiaireId: lease.landlordId || payeurId,
                     montant: amount,
-                    canal: operator === 'WAVE' ? 'WAVE' : (operator === 'MTN' ? 'MTN' : 'ORANGE'),
+                    canal: selectedCanal as any,
                     statut: "CONFIRMEE",
-                    refInterne: `PGW-${Date.now()}`,
+                    refInterne: `QAPRIL-FEEXPAY-${selectedCanal}-${leaseId}-${Date.now()}`,
+                    refOperateur: "FEEXPAY_PROD",
                     quittanceId: receipt.id
                 }
             });

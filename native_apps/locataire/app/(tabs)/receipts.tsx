@@ -17,6 +17,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Download, FileText, CheckCircle2, ShieldCheck, X, ExternalLink } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
+const fmtFcfa = (n?: number | string | null) => {
+  const num = typeof n === 'number' ? n : Number(n);
+  if (isNaN(num)) return '0 F';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+};
+
 export default function ReceiptsScreen() {
   const router = useRouter();
   const [receipts, setReceipts] = useState<any[]>([]);
@@ -104,7 +110,7 @@ export default function ReceiptsScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.month}>
-                {item.period || 'Loyer mensuel'} · {(item.amount || 0).toLocaleString('fr-FR')} F
+                {item.period || 'Loyer mensuel'} · {fmtFcfa(item.amount)}
               </Text>
               <Text style={styles.meta}>
                 {item.date ? (() => {
@@ -164,7 +170,7 @@ export default function ReceiptsScreen() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                   <Text style={{ fontSize: 12, color: '#64748B' }}>Montant total réglé</Text>
                   <Text style={{ fontSize: 16, fontWeight: '800', color: '#1E7E4E' }}>
-                    {(selectedReceipt?.amount || 0).toLocaleString('fr-FR')} FCFA
+                    {fmtFcfa(selectedReceipt?.amount)}
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>

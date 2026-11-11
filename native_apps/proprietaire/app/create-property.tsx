@@ -35,6 +35,12 @@ try {
   LocationModule = null;
 }
 
+const fmtFcfa = (n?: number | string | null) => {
+  const num = typeof n === 'number' ? n : Number(n);
+  if (isNaN(num)) return '0 F';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+};
+
 const COMMUNES_ABIDJAN = [
   'Cocody',
   'Marcory',
@@ -692,7 +698,7 @@ export default function CreatePropertyScreen() {
                   {isForSale ? 'Prix de vente saisi :' : 'Loyer mensuel saisi :'}
                 </Text>
                 <Text style={styles.valuePreviewText}>
-                  {Number(rent.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                  {fmtFcfa(rent.replace(/\s/g, ''))}
                 </Text>
               </View>
             )}

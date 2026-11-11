@@ -21,6 +21,12 @@ const HON = 0.08;
 const FRAIS_QAPRIL = 2000;
 const PAGES_STD = 4;
 
+const fmtFcfa = (n?: number | string | null) => {
+  const num = typeof n === 'number' ? n : Number(n);
+  if (isNaN(num)) return '0 F';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+};
+
 function calcDroitsDgi(loyer: number, duree: number, pages = PAGES_STD) {
   return Math.round(0.025 * loyer * duree) + 500 * pages;
 }
@@ -150,10 +156,10 @@ export default function AgencePrototypeHomeScreen() {
                 <Text style={styles.heroSub}>{tauxOccupation}% OCCUPATION</Text>
               </View>
               <Text style={styles.heroBig}>
-                {totalLoyers.toLocaleString('fr-FR')} XOF
+                {fmtFcfa(totalLoyers)}
               </Text>
               <Text style={styles.heroSub}>
-                À reverser aux bailleurs mandants (net − 8 % d'honoraires) : {netBailleursEstime.toLocaleString('fr-FR')} XOF
+                À reverser aux bailleurs mandants (net − 8 % d'honoraires) : {fmtFcfa(netBailleursEstime)}
               </Text>
             </View>
 
@@ -165,7 +171,7 @@ export default function AgencePrototypeHomeScreen() {
               </View>
               <View style={styles.card}>
                 <Text style={styles.subMuted}>Honoraires Agence (8%)</Text>
-                <Text style={{ fontSize: 20, fontWeight: '900', color: '#E11D48', marginTop: 4 }}>{honorairesEstimes.toLocaleString('fr-FR')} XOF</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: '#E11D48', marginTop: 4 }}>{fmtFcfa(honorairesEstimes)}</Text>
                 <Text style={{ fontSize: 10, color: '#64748B', fontWeight: '600', marginTop: 2 }}>Génération certifiée</Text>
               </View>
             </View>
@@ -226,7 +232,7 @@ export default function AgencePrototypeHomeScreen() {
                   </Text>
                 </View>
                 <Text style={styles.subMuted}>
-                  {p.commune} · {p.propertyType} · {Number(p.currentRent || p.declaredRentFcfa || 0).toLocaleString('fr-FR')} XOF
+                  {p.commune} · {p.propertyType} · {fmtFcfa(p.currentRent || p.declaredRentFcfa)}
                 </Text>
                 <Text style={[styles.subMuted, { marginTop: 4 }]}>
                   Locataire : {roleView === 'collab' ? 'Locataire Masqué (Protection agence)' : (p.tenantName || 'Aucun')}
@@ -289,7 +295,7 @@ export default function AgencePrototypeHomeScreen() {
                 const notaire = Math.round(pv * 0.025);
                 const totalFrais = dgi + notaire + com;
                 const netVendeur = pv - com;
-                const fmtM = (n: number) => n.toLocaleString('fr-FR');
+                const fmtM = (n: number) => (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 return (
                   <View style={{ marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9', gap: 6 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -346,7 +352,7 @@ export default function AgencePrototypeHomeScreen() {
                     <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1F5F9', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text style={{ fontSize: 10, color: '#94A3B8', textTransform: 'uppercase', fontWeight: '700' }}>Prix de vente</Text>
                       <Text style={{ fontSize: 13, fontWeight: '900', color: '#0F172A' }}>
-                        {(bien.prixVenteFcfa || bien.price || 0).toLocaleString('fr-FR')} FCFA
+                        {fmtFcfa(bien.prixVenteFcfa || bien.price)}
                       </Text>
                     </View>
                   </View>
@@ -393,7 +399,7 @@ export default function AgencePrototypeHomeScreen() {
               <TextInput value={exDuree} onChangeText={setExDuree} keyboardType="numeric" style={styles.input} />
               <Text style={styles.boldText}>
                 Total DGI + Timbres + Service QAPRIL :{' '}
-                {(calcDroitsDgi(Number(exLoyer) || 0, Number(exDuree) || 12) + FRAIS_QAPRIL).toLocaleString('fr-FR')} F
+                {fmtFcfa(calcDroitsDgi(Number(exLoyer) || 0, Number(exDuree) || 12) + FRAIS_QAPRIL)}
               </Text>
               <Pressable
                 style={styles.btnPrimary}
@@ -420,7 +426,7 @@ export default function AgencePrototypeHomeScreen() {
                 <View key={p.id} style={styles.card}>
                   <Text style={styles.boldText}>{p.name}</Text>
                   <Text style={styles.subMuted}>
-                    Loyer : {loyer.toLocaleString('fr-FR')} F · Net bailleur : {net.toLocaleString('fr-FR')} F (Honoraires agence : {Math.round(loyer * HON).toLocaleString('fr-FR')} F)
+                    Loyer : {fmtFcfa(loyer)} · Net bailleur : {fmtFcfa(net)} (Honoraires agence : {fmtFcfa(Math.round(loyer * HON))})
                   </Text>
                 </View>
               );

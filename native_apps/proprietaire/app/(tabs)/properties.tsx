@@ -38,6 +38,12 @@ try {
   LocationModule = null;
 }
 
+const fmtFcfa = (n?: number | string | null) => {
+  const num = typeof n === 'number' ? n : Number(n);
+  if (isNaN(num)) return '0 F';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+};
+
 export default function PropertiesScreen() {
   const router = useRouter();
   const [properties, setProperties] = useState<any[]>([]);
@@ -419,7 +425,7 @@ export default function PropertiesScreen() {
 
               <View style={styles.footerRow}>
                 <Text style={styles.rent}>
-                  {Number(item.currentRent || item.declaredRentFcfa || 0).toLocaleString('fr-FR')} F / mois
+                  {fmtFcfa(item.currentRent || item.declaredRentFcfa)} / mois
                 </Text>
                 <View style={styles.badgesRight}>
                   <View style={[styles.nivPill, !item.isBienVerifie && !(item.gpsLatitude != null) && { backgroundColor: '#F1F5F9' }]}>

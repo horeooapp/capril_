@@ -18,9 +18,13 @@ import { FeexpayAdapter } from "./adapters/feexpay";
  * - MOOV     → FeexPay (requesttopay/moov_ci)
  */
 export class PaymentGateway {
+  /**
+   * Agrégateur par défaut : FEEXPAY (Production)
+   * Couvre en direct l'ensemble des opérateurs CI : WAVE, MTN, ORANGE, MOOV.
+   */
   private static adapters: Partial<Record<PaymentCanal, PgwAdapter>> = {
     SMS_DECLARATIF: new SMSDeclaratifAdapter(),
-    WAVE: new WaveAdapter(),
+    WAVE: new FeexpayAdapter("WAVE"),
     MTN: new FeexpayAdapter("MTN"),
     ORANGE: new FeexpayAdapter("ORANGE"),
     MOOV: new FeexpayAdapter("MOOV"),
@@ -28,10 +32,11 @@ export class PaymentGateway {
 
   /**
    * Initie un paiement en détectant automatiquement le canal.
+   * FeexPay est utilisé comme agrégateur prioritaire par défaut.
    */
   static async initiate(req: PaymentInitiateRequest): Promise<PaymentInitiateResponse> {
     // 1. Détection du canal
-    let canal: PaymentCanal = "SMS_DECLARATIF" as any; // Fallback par défaut
+    let canal: PaymentCanal = "ORANGE" as any; // FeexPay par défaut
 
     if (req.forceCanal) {
       canal = req.forceCanal as PaymentCanal;
@@ -40,8 +45,8 @@ export class PaymentGateway {
       if (detected) canal = detected;
     }
 
-    // 2. Sélection de l'adaptateur
-    const adapter = (this.adapters as any)[canal] || (this.adapters as any)["SMS_DECLARATIF"];
+    // 2. Sélection de l'adaptateur (FeexPay par défaut pour tout paiement Mobile Money)
+    const adapter = (this.adapters as any)[canal] || new FeexpayAdapter("ORANGE");
 
     if (!adapter) {
       throw new Error(`Aucun adaptateur disponible pour le canal : ${canal}`);

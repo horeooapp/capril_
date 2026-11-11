@@ -35,6 +35,12 @@ const DURATION_OPTIONS = [
   { id: '36', label: '36 mois (3 ans)' },
 ];
 
+const fmtFcfa = (n?: number | string | null) => {
+  const num = typeof n === 'number' ? n : Number(n);
+  if (isNaN(num)) return '0 F';
+  return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+};
+
 export default function CreateLeaseScreen() {
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -142,7 +148,7 @@ export default function CreateLeaseScreen() {
     if (isDepositOverLimit || isAdvanceOverLimit) {
       Alert.alert(
         'Plafonnement Légal Dépassé',
-        `Selon la Loi N° 2019-576 (Art. 415 & 416 CCH), la caution et l'avance sont strictement plafonnées à 2 mois maximum (soit ${(maxLegalCaution).toLocaleString('fr-FR')} FCFA). Veuillez ajuster les montants.`
+        `Selon la Loi N° 2019-576 (Art. 415 & 416 CCH), la caution et l'avance sont strictement plafonnées à 2 mois maximum (soit ${fmtFcfa(maxLegalCaution)}). Veuillez ajuster les montants.`
       );
       return;
     }
@@ -272,7 +278,7 @@ export default function CreateLeaseScreen() {
                           style={[styles.propChipSub, active && styles.propChipSubActive]}
                           numberOfLines={1}
                         >
-                          {p.commune || 'Abidjan'} · {(p.currentRent || p.declaredRentFcfa || 0).toLocaleString('fr-FR')} F
+                          {p.commune || 'Abidjan'} · {fmtFcfa(p.currentRent || p.declaredRentFcfa)}
                         </Text>
                       </View>
                       {active && <CheckCircle2 color="#FFFFFF" size={16} />}
@@ -405,7 +411,7 @@ export default function CreateLeaseScreen() {
               <View style={styles.valuePreviewCard}>
                 <Text style={styles.valuePreviewLabel}>Loyer mensuel saisi :</Text>
                 <Text style={styles.valuePreviewText}>
-                  {Number(rentAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                  {fmtFcfa(rentAmount.replace(/\s/g, ''))}
                 </Text>
               </View>
             )}
@@ -413,7 +419,7 @@ export default function CreateLeaseScreen() {
             <View style={{ marginTop: 8 }}>
               <View style={styles.rowBetween}>
                 <Text style={styles.fieldLabel}>Dépôt de garantie / Caution (FCFA)</Text>
-                <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
+                <Text style={styles.helperLabel}>Max 2 mois : {fmtFcfa(maxLegalCaution)}</Text>
               </View>
               <View style={styles.inputWithSuffixContainer}>
                 <TextInput
@@ -438,7 +444,7 @@ export default function CreateLeaseScreen() {
                 <View style={styles.valuePreviewCard}>
                   <Text style={styles.valuePreviewLabel}>Caution saisie :</Text>
                   <Text style={styles.valuePreviewText}>
-                    {Number(depositAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                    {fmtFcfa(depositAmount.replace(/\s/g, ''))}
                   </Text>
                 </View>
               )}
@@ -452,7 +458,7 @@ export default function CreateLeaseScreen() {
             <View style={{ marginTop: 8 }}>
               <View style={styles.rowBetween}>
                 <Text style={styles.fieldLabel}>Avance sur Loyer (FCFA)</Text>
-                <Text style={styles.helperLabel}>Max 2 mois : {maxLegalCaution.toLocaleString('fr-FR')} F</Text>
+                <Text style={styles.helperLabel}>Max 2 mois : {fmtFcfa(maxLegalCaution)}</Text>
               </View>
               <View style={styles.inputWithSuffixContainer}>
                 <TextInput
@@ -477,7 +483,7 @@ export default function CreateLeaseScreen() {
                 <View style={styles.valuePreviewCard}>
                   <Text style={styles.valuePreviewLabel}>Avance saisie :</Text>
                   <Text style={styles.valuePreviewText}>
-                    {Number(advanceAmount.replace(/\s/g, '') || 0).toLocaleString('fr-FR')} FCFA
+                    {fmtFcfa(advanceAmount.replace(/\s/g, ''))}
                   </Text>
                 </View>
               )}

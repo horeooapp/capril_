@@ -43,9 +43,10 @@ export default function FinanceScreen() {
   const fmt = (n?: number | string | null) => {
     const num = typeof n === 'number' ? n : Number(n);
     if (isNaN(num)) return eur ? '0 €' : '0 F';
-    return eur
-      ? Math.round(num / EUR_RATE).toLocaleString('fr-FR') + ' €'
-      : Math.round(num).toLocaleString('fr-FR') + ' F';
+    const s = Math.round(eur ? num / EUR_RATE : num)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return eur ? `${s} €` : `${s} F`;
   };
 
   if (loading) {

@@ -15,7 +15,7 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
+import { fetchWithAuth, getStoredToken, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter } from 'expo-router';
 import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
@@ -140,7 +140,8 @@ export default function LocatairePrototypeScreen() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   // Interactive states from QAPRIL Locataire — maquette
-  const [payOp, setPayOp] = useState<'Wave' | 'Orange Money' | 'MTN MoMo' | 'Moov'>('Wave');
+  const [payOp, setPayOp] = useState<'Wave' | 'Orange Money' | 'MTN MoMo' | 'Moov' | 'Carte bancaire'>('Wave');
+  const [isPayingRent, setIsPayingRent] = useState(false);
   const [payPeriod, setPayPeriod] = useState<number>(1);
   const [procheModal, setProcheModal] = useState(false);
   const [attestationModal, setAttestationModal] = useState(false);
@@ -730,7 +731,95 @@ export default function LocatairePrototypeScreen() {
   const fmt = (n?: number | string | null) => {
     const num = typeof n === 'number' ? n : Number(n);
     if (isNaN(num)) return '0 F';
-    return Math.round(num).toLocaleString('fr-FR') + ' F';
+    return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
+  };
+
+  const handlePayRent = async () => {
+    if (!data?.lease?.id) {
+      Alert.alert('Information', 'Aucun contrat de bail actif à régler.');
+      return;
+    }
+    const totalAmount = loyer * payPeriod;
+    if (totalAmount <= 0) {
+      Alert.alert('Montant invalide', 'Le montant du loyer doit être supérieur à 0 F.');
+      return;
+    }
+
+    Alert.alert(
+      'Confirmation de règlement',
+      `Confirmez-vous le paiement de ${fmt(totalAmount)} (${payPeriod} mois de loyer) par ${payOp} ?\n\nVotre quittance certifiée sera générée immédiatement.`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Payer maintenant',
+          onPress: async () => {
+            setIsPayingRent(true);
+            try {
+              const token = await getStoredToken();
+              let opCode = 'WAVE';
+              if (payOp === 'Orange Money') opCode = 'ORANGE';
+              else if (payOp === 'MTN MoMo') opCode = 'MTN';
+              else if (payOp === 'Moov') opCode = 'MOOV';
+              else if (payOp === 'Carte bancaire') opCode = 'CINETPAY_M17';
+
+              const res = await fetchWithAuth('/pay-rent', {
+                method: 'POST',
+                body: JSON.stringify({
+                  token,
+                  leaseId: data.lease.id,
+                  amount: totalAmount,
+                  operator: opCode,
+                }),
+              });
+
+              const json = await res.json();
+              if (res.ok && json.success) {
+                Alert.alert(
+                  '✅ Règlement validé !',
+                  `Votre loyer de ${fmt(totalAmount)} a été validé avec succès.\nQuittance officielle : ${json.receiptRef || 'Émise'}.\nLa quittance est consultable dans "Mes quittances".`,
+                  [
+                    {
+                      text: 'Voir mes quittances',
+                      onPress: async () => {
+                        try {
+                          const [dashRes, recRes] = await Promise.all([
+                            fetchWithAuth('/locataire/dashboard'),
+                            fetchWithAuth('/locataire/receipts'),
+                          ]);
+                          if (dashRes.ok) setData(await dashRes.json());
+                          if (recRes.ok) {
+                            const rj = await recRes.json();
+                            if (rj.receipts) setReceiptsList(rj.receipts);
+                          }
+                        } catch {}
+                        setScreen('quittances');
+                      },
+                    },
+                  ]
+                );
+                try {
+                  const [dashRes, recRes] = await Promise.all([
+                    fetchWithAuth('/locataire/dashboard'),
+                    fetchWithAuth('/locataire/receipts'),
+                  ]);
+                  if (dashRes.ok) setData(await dashRes.json());
+                  if (recRes.ok) {
+                    const rj = await recRes.json();
+                    if (rj.receipts) setReceiptsList(rj.receipts);
+                  }
+                } catch {}
+              } else {
+                Alert.alert('Échec du paiement', json.error || 'Impossible d\'effectuer le règlement.');
+              }
+            } catch (err: any) {
+              Alert.alert('Erreur réseau', err.message || 'Impossible de joindre le serveur de paiement.');
+            } finally {
+              setIsPayingRent(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
@@ -1469,13 +1558,13 @@ export default function LocatairePrototypeScreen() {
                 </View>
               )}
 
-              <Text style={[styles.label, { marginTop: 14 }]}>OPÉRATEUR MOBILE MONEY</Text>
-              <View style={styles.segRow}>
-                {(['Wave', 'Orange Money', 'MTN MoMo', 'Moov'] as const).map((op) => (
+              <Text style={[styles.label, { marginTop: 14 }]}>MOYEN DE PAIEMENT (PRODUCTION SÉCURISÉE)</Text>
+              <View style={[styles.segRow, { flexWrap: 'wrap', gap: 6 }]}>
+                {(['Wave', 'Orange Money', 'MTN MoMo', 'Moov', 'Carte bancaire'] as const).map((op) => (
                   <Pressable
                     key={op}
                     onPress={() => setPayOp(op)}
-                    style={[styles.segBtn, payOp === op && styles.segBtnOn]}
+                    style={[styles.segBtn, payOp === op && styles.segBtnOn, { minWidth: '30%', flexGrow: 1 }]}
                   >
                     <Text style={[styles.segText, payOp === op && styles.segTextOn]}>{op}</Text>
                   </Pressable>
@@ -1498,16 +1587,18 @@ export default function LocatairePrototypeScreen() {
               </View>
 
               <Pressable
-                style={styles.btnPrimary}
-                onPress={() =>
-                  Alert.alert(
-                    'Paiement initié',
-                    `Redirection vers ${payOp} pour ${fmt(loyer * payPeriod)}. Votre quittance officielle sera émise dès validation.`
-                  )
-                }
+                style={[styles.btnPrimary, isPayingRent && { opacity: 0.7 }]}
+                disabled={isPayingRent}
+                onPress={handlePayRent}
               >
-                <CreditCard color="#fff" size={18} />
-                <Text style={styles.btnPrimaryText}>Payer {fmt(loyer * payPeriod)} avec {payOp}</Text>
+                {isPayingRent ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <CreditCard color="#fff" size={18} />
+                )}
+                <Text style={styles.btnPrimaryText}>
+                  {isPayingRent ? 'Traitement du paiement...' : `Payer ${fmt(loyer * payPeriod)} avec ${payOp}`}
+                </Text>
               </Pressable>
 
               <Pressable style={styles.btnGhost} onPress={() => setProcheModal(true)}>

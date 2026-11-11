@@ -417,9 +417,10 @@ export default function BailleurAndAgencePrototypeScreen() {
   const fmt = (n?: number | string | null) => {
     const num = typeof n === 'number' ? n : Number(n);
     if (isNaN(num)) return eurMode && appMode === 'bailleur' ? '0 €' : '0 F';
-    return eurMode && appMode === 'bailleur'
-      ? Math.round(num / EUR_RATE).toLocaleString('fr-FR') + ' €'
-      : Math.round(num).toLocaleString('fr-FR') + ' F';
+    const s = Math.round(eurMode && appMode === 'bailleur' ? num / EUR_RATE : num)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return eurMode && appMode === 'bailleur' ? `${s} €` : `${s} F`;
   };
 
   if (loading) {
@@ -1441,10 +1442,10 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.heroSub}>{txRecouvrementAgence} %</Text>
                   </View>
                   <Text style={styles.heroBig}>
-                    {(totalEncaisseAgence || 0).toLocaleString('fr-FR')} F <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {(totalLoyerAgence || 0).toLocaleString('fr-FR')} F</Text>
+                    {fmt(totalEncaisseAgence || 0)} <Text style={{ fontSize: 15, fontWeight: '500' }}>/ {fmt(totalLoyerAgence || 0)}</Text>
                   </Text>
                   <Text style={styles.heroSub}>
-                    À reverser aux bailleurs (net − 8 % d’honoraires) : {(aReverserAgence || 0).toLocaleString('fr-FR')} F
+                    À reverser aux bailleurs (net − 8 % d’honoraires) : {fmt(aReverserAgence || 0)}
                   </Text>
                 </View>
 
@@ -1501,7 +1502,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         </Text>
                       </View>
                       <Text style={styles.subMuted}>
-                        {b.struct} · {b.type} · Loyer : {Number(b.loyer || 0).toLocaleString('fr-FR')} XOF
+                        {b.struct} · {b.type} · Loyer : {fmt(b.loyer)}
                       </Text>
                       <Text style={[styles.subMuted, { marginTop: 4 }]}>
                         Locataire : {roleView === 'collab' && b.masque ? 'Locataire Masqué (Identité protégée)' : b.loc}
@@ -1579,7 +1580,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={styles.boldText}>{b.bien} · {b.loc}</Text>
                         <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{b.ref}</Text>
                       </View>
-                      <Text style={styles.subMuted}>{Number(b.loyer || 0).toLocaleString('fr-FR')} F / mois · Durée {b.duree} mois</Text>
+                      <Text style={styles.subMuted}>{fmt(b.loyer)} / mois · Durée {b.duree} mois</Text>
                       <View style={[styles.rowBetween, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                           <Eye color="#1F2A44" size={15} />
@@ -1650,10 +1651,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <View style={styles.recapBox}>
                     <Text style={styles.boldText}>
                       Total DGI + Timbres + Service QAPRIL :{' '}
-                      {(
-                        calcDroitsDgi(Number(exLoyer) || 0, Number(exDuree) || 12) + FRAIS_QAPRIL
-                      ).toLocaleString('fr-FR')}{' '}
-                      F
+                      {fmt(calcDroitsDgi(Number(exLoyer) || 0, Number(exDuree) || 12) + FRAIS_QAPRIL)}
                     </Text>
                   </View>
                   <Pressable
@@ -1682,7 +1680,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={styles.boldText}>
                           {roleView === 'chef' || !m.mask ? m.nom : m.bai}
                         </Text>
-                        <Text style={styles.boldText}>Net : {net.toLocaleString('fr-FR')} F</Text>
+                        <Text style={styles.boldText}>Net : {fmt(net)}</Text>
                       </View>
                       {m.rev === 'du' ? (
                         <Pressable
@@ -1695,7 +1693,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                           }}
                         >
                           <Text style={styles.btnPrimaryText}>
-                            Reverser {net.toLocaleString('fr-FR')} F
+                            Reverser {fmt(net)}
                           </Text>
                         </Pressable>
                       ) : (
