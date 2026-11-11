@@ -45,6 +45,7 @@ import AdminMarketWidget from "@/components/admin/AdminMarketWidget"
 import { getNationalMarketComparison } from "@/actions/observatory-national"
 import AddendaOverviewWidget from "@/components/admin/AddendaOverviewWidget"
 import AdoptionEngineOverviewWidget from "@/components/admin/AdoptionEngineOverviewWidget"
+import ContractualGovernanceWidget from "@/components/admin/ContractualGovernanceWidget"
 import GlobalSessionRevokeCard from "@/components/admin/GlobalSessionRevokeCard"
 import { getLastRevocationInfo } from "@/lib/session-revocation"
 
@@ -140,7 +141,16 @@ export default async function AdminDashboardOverview() {
             payDecAmountPending,
             preavisTotal,
             preavisPending,
-            geolocatedPropsExact
+            geolocatedPropsExact,
+            // Métriques IC-01-R1 & MRL-01 & Deux Horloges
+            candidaturesTotal,
+            candidaturesPending,
+            propositionsLoyerTotal,
+            propositionsLoyerPending,
+            propositionsLoyerAccepted,
+            leaseOpeningStatesTotal,
+            leaseOpeningStatesConfirmed,
+            leaseOpeningStatesContested
         ] = await Promise.all([
             prisma.user.count().catch(() => 0),
             prisma.user.count({ where: { kycStatus: "verified" } }).catch(() => 0),
@@ -235,7 +245,18 @@ export default async function AdminDashboardOverview() {
             ((prisma as any).declarationPaiement?.aggregate?.({ _sum: { montant: true }, where: { statut: "DECLARE" } }) || Promise.resolve(null)).catch(() => null),
             ((prisma as any).preavisBail?.count?.() || Promise.resolve(0)).catch(() => 0),
             ((prisma as any).preavisBail?.count?.({ where: { statut: "EMIS" } }) || Promise.resolve(0)).catch(() => 0),
-            prisma.property.count({ where: { gpsLatitude: { not: null }, gpsLongitude: { not: null } } }).catch(() => 0)
+            prisma.property.count({ where: { gpsLatitude: { not: null }, gpsLongitude: { not: null } } }).catch(() => 0),
+            // Candidatures IC-01
+            ((prisma as any).candidature?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).candidature?.count?.({ where: { statut: "ENVOYEE" } }) || Promise.resolve(0)).catch(() => 0),
+            // Révisions de loyer MRL-01
+            ((prisma as any).propositionLoyer?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).propositionLoyer?.count?.({ where: { statut: "EN_ATTENTE" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).propositionLoyer?.count?.({ where: { statut: "ACCEPTEE" } }) || Promise.resolve(0)).catch(() => 0),
+            // Reprise des baux Deux Horloges
+            ((prisma as any).leaseOpeningState?.count?.() || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).leaseOpeningState?.count?.({ where: { statut: "CONFIRME" } }) || Promise.resolve(0)).catch(() => 0),
+            ((prisma as any).leaseOpeningState?.count?.({ where: { statut: "CONTESTE" } }) || Promise.resolve(0)).catch(() => 0)
         ]);
         
         // Process trends with safety guards
@@ -421,6 +442,20 @@ export default async function AdminDashboardOverview() {
                         B: attestB_Count,
                         C: attestC_Count,
                     }}
+                />
+
+                {/* GOUVERNANCE CONTRACTUELLE & CONFORMITÉ CCH (IC-01-R1 / MRL-01 / DEUX HORLOGES) */}
+                <ContractualGovernanceWidget
+                    candidaturesTotal={candidaturesTotal}
+                    candidaturesPending={candidaturesPending}
+                    propositionsLoyerTotal={propositionsLoyerTotal}
+                    propositionsLoyerPending={propositionsLoyerPending}
+                    propositionsLoyerAccepted={propositionsLoyerAccepted}
+                    leaseOpeningStatesTotal={leaseOpeningStatesTotal}
+                    leaseOpeningStatesConfirmed={leaseOpeningStatesConfirmed}
+                    leaseOpeningStatesContested={leaseOpeningStatesContested}
+                    attestationsTotal={attestationsCount}
+                    occupantsTotal={declaredOccupantsCount}
                 />
 
                 {marketIntelligence?.success && marketIntelligence.data && (

@@ -294,7 +294,7 @@ export default function QaprilLandingV2({
               </h1>
 
               <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-8 max-w-3xl">
-                Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, et sécurisez vos 2 mois de caution en compte séquestre dédié. Tout est clair, rapide et protégé.
+                Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, dans le respect strict du plafond légal de 2 mois de caution. Tout est clair, rapide et protégé.
               </p>
 
               {/* 3 Portails Métiers Directs */}
@@ -322,7 +322,7 @@ export default function QaprilLandingV2({
                     Propriétaires bailleurs
                   </div>
                   <p className="text-xs text-slate-400 font-normal mt-1 leading-relaxed relative z-10">
-                    Gérez vos biens, validez les déclarations locataires en 1 clic et encaissez en toute sérénité.
+                    Gérez vos biens, validez les déclarations locataires facilement et encaissez en toute sérénité.
                   </p>
                 </button>
 
@@ -490,7 +490,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
-                  <span>Cautions & Séquestre</span>
+                  <span>Cautions Réglementées</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
@@ -506,7 +506,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-sky-600 shrink-0" />
-                  <span>Attestation Résidence SHA-256</span>
+                  <span>Attestation de Résidence</span>
                 </div>
 
                 {/* ── Set 2 (Duplication pour boucle infinie sans saut) ── */}
@@ -532,7 +532,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0" />
-                  <span>Cautions & Séquestre</span>
+                  <span>Cautions Réglementées</span>
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" />
@@ -548,7 +548,7 @@ export default function QaprilLandingV2({
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-800 whitespace-nowrap shrink-0">
                   <span className="w-2 h-2 rounded-full bg-sky-600 shrink-0" />
-                  <span>Attestation Résidence SHA-256</span>
+                  <span>Attestation de Résidence</span>
                 </div>
               </div>
             </div>
@@ -588,7 +588,7 @@ export default function QaprilLandingV2({
           <div className="mb-12 max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[#064E3B] text-xs font-semibold uppercase tracking-wider mb-3">
               <BadgeCheck className="w-4 h-4 text-emerald-600" />
-              Réformes 2026 & Décret n° 2019-576
+              Réformes 2026 & Code de la Construction et de l'Habitat
             </div>
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
               Quatre avancées majeures pour la sécurité locative et le confort de gestion
@@ -599,7 +599,7 @@ export default function QaprilLandingV2({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* CARTE 1 : ADOPTION IMMÉDIATE & PAIEMENT 1-CLIC */}
+            {/* CARTE 1 : ADOPTION IMMÉDIATE & PAIEMENT DIRECT */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -614,12 +614,12 @@ export default function QaprilLandingV2({
                   Déclaration en 30s & Quittance instantanée
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
-                  Le locataire déclare son logement et invite son bailleur par SMS ou WhatsApp. Déclaration de paiements directs (Wave, Orange, MTN, Moov, Espèces) avec émission immédiate de quittance certifiée dès validation bailleur en 1 clic.
+                  Le locataire déclare son logement et invite son bailleur par SMS ou WhatsApp. Déclaration de paiements directs (Wave, Orange, MTN, Moov, Espèces) avec émission immédiate de quittance certifiée dès validation par le propriétaire.
                 </p>
                 <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <span>Déclaration locataire & validation propriétaire en 1 clic</span>
+                    <span>Déclaration locataire & validation propriétaire simplifiée</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -632,7 +632,7 @@ export default function QaprilLandingV2({
                 </div>
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-amber-700">
-                <span>Validation 1-clic républicaine</span>
+                <span>Validation instantanée républicaine</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
@@ -708,12 +708,12 @@ export default function QaprilLandingV2({
                 </div>
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-sky-700">
-                <span>Adressage officiel Décret 2019-576</span>
+                <span>Adressage officiel et boîte postale numérique</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
             </div>
 
-            {/* CARTE 4 : ATTESTATION DE RÉSIDENCE & CONFORMITÉ CCH */}
+            {/* CARTE 4 : FOYER & ATTESTATION DE RÉSIDENCE OFFICIELLE */}
             <div className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors shadow-sm">
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -721,27 +721,27 @@ export default function QaprilLandingV2({
                     <FileCheck2 className="w-5 h-5" />
                   </div>
                   <span className="text-xs font-medium text-indigo-800 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-md">
-                    Conformité CCH
+                    Foyer & Résidence
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  Attestations & Plafonds CCH
+                  Attestations & Protection du Foyer
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
-                  Attestation de domicile officielle avec empreinte numérique certifiée et QR Code. Plafonds stricts (caution ≤ 2 mois, avance ≤ 2 mois) et générateur de préavis légal de 30 jours.
+                  Déclarez les membres du foyer (conjoint, enfants, tiers) et générez votre Attestation de Résidence officielle avec code QR certifié pour vos démarches administratives et bancaires.
                 </p>
                 <div className="space-y-2 pt-3 border-t border-slate-100 text-xs text-slate-700">
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                    <span>Plafonds légaux stricts Art. 415-416 CCH respectés</span>
+                    <span>Plafonds légaux stricts respectés (caution ≤ 2 mois)</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                    <span>Générateur de préavis avec délai légal de 30 jours (Art. 434)</span>
+                    <span>Générateur de préavis avec délai légal de 30 jours</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <Check className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                    <span>Attestation de domicile opposable banques & visas</span>
+                    <span>Attestation de résidence officielle acceptée partout</span>
                   </div>
                 </div>
               </div>
@@ -833,25 +833,25 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Validation en 1 clic :</strong> Votre locataire déclare son logement ou ses règlements directs (Wave, MoMo, Espèces) ? Validez en 1 clic pour émettre instantanément la quittance certifiée.
+                        <strong className="text-slate-900">Validation immédiate des loyers :</strong> Votre locataire déclare son logement ou ses règlements directs (Wave, MoMo, Espèces) ? Validez en un geste pour émettre instantanément la quittance certifiée.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Versement automatique :</strong> Loyers reçus directement sur votre compte Wave, Mobile Money ou compte bancaire dès que le locataire paie.
+                        <strong className="text-slate-900">Reprise de baux antérieurs (Deux Horloges) :</strong> Importez facilement vos baux signés avant QAPRIL, avec préservation de vos antécédents, clauses particulières et historique sans rupture.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Confidentialité & Géocodage :</strong> Masquez votre identité personnelle sous le label républicain « Bailleur certifié » et géolocalisez votre bien en 1 appui (GPS + Commune/Quartier).
+                        <strong className="text-slate-900">Révision triennale encadrée :</strong> Proposez un ajustement de loyer dans le respect du délai légal de 3 ans, avec notification formelle et traçabilité claire de l'accord locataire.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Bilan clair pour vos impôts :</strong> Obtenez en un clic la liste certifiée de tous vos loyers pour votre déclaration foncière.
+                        <strong className="text-slate-900">Confidentialité & Géocodage :</strong> Masquez votre numéro de téléphone personnel sous le label « Bailleur certifié » et géolocalisez votre bien automatiquement (GPS + Commune/Quartier).
                       </div>
                     </div>
                   </div>
@@ -882,7 +882,7 @@ export default function QaprilLandingV2({
                         <span className="text-[#059669] font-bold text-sm">4 250 000 XOF</span>
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
-                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Cautions Sécurisées</span>
+                        <span className="text-slate-500 block text-[10px] uppercase font-bold">Cautions Réglementées</span>
                         <span className="text-[#0284C7] font-bold text-sm">8 500 000 XOF</span>
                       </div>
                     </div>
@@ -907,25 +907,25 @@ export default function QaprilLandingV2({
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Déclaration de logement & quittance immédiate :</strong> Déclarez votre logement en 30 secondes et notifiez tout paiement (Wave, MoMo, Espèces) pour recevoir immédiatement votre quittance officielle certifiée.
+                        <strong className="text-slate-900">Déclaration de logement & quittance immédiate :</strong> Déclarez votre logement en quelques questions simples et recevez immédiatement votre quittance officielle certifiée.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Recherche & Passeport Locatif :</strong> Trouvez le bien idéal selon 5 critères et candidatez en toute sécurité avec votre Passeport Locatif consenti et score de ponctualité.
+                        <strong className="text-slate-900">Bouton « J'ai payé autrement » :</strong> Vous avez réglé par espèces, virement ou un autre canal ? Déclarez le paiement en 10 secondes avec preuve pour inviter votre bailleur à confirmer.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Caution de 2 mois protégée (CCH) :</strong> Plafonds stricts respectés (2 mois max de caution et 2 mois d'avance) avec mise en sécurité sur compte séquestre dédié.
+                        <strong className="text-slate-900">Foyer & Attestation de Résidence :</strong> Déclarez les membres de votre foyer (conjoint, enfants, colocataires, tiers) et téléchargez une Attestation de Résidence officielle avec code QR certifié pour vos démarches.
                       </div>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                       <div className="text-xs text-slate-700">
-                        <strong className="text-slate-900">Préavis légal de départ (Art. 434) :</strong> Générateur de préavis avec respect scrupuleux du délai légal de 30 jours et référence formelle d'opposabilité.
+                        <strong className="text-slate-900">Candidature Unique & Plafond légal :</strong> Candidatez sereinement aux annonces avec un dossier vérifié sans doublons, et bénéficiez du respect strict du plafond de caution (2 mois maximum).
                       </div>
                     </div>
                   </div>
@@ -957,7 +957,7 @@ export default function QaprilLandingV2({
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
                         <span className="text-slate-500 block text-[10px] uppercase font-bold">Caution Protégée</span>
-                        <span className="text-[#D97706] font-bold text-sm">360 000 XOF (Séquestre)</span>
+                        <span className="text-[#D97706] font-bold text-sm">360 000 XOF (Plafond 2 mois)</span>
                       </div>
                     </div>
                   </div>
@@ -1090,7 +1090,7 @@ export default function QaprilLandingV2({
                       </div>
                       <div className="p-2.5 bg-slate-50 rounded border border-slate-200">
                         <span className="text-slate-500 block text-[10px] uppercase font-bold">Sécurité Dépôts</span>
-                        <span className="text-[#059669] font-bold text-sm">Séquestre de Garantie Réglementé</span>
+                        <span className="text-[#059669] font-bold text-sm">Dépôt de Garantie Réglementé</span>
                       </div>
                     </div>
                   </div>
@@ -1187,7 +1187,7 @@ export default function QaprilLandingV2({
                     Paiement en espèces de la main à la main, risque de vol ou de contestation, perte de temps.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Wave, Orange, MTN ou Moov :</span> Payez en 1 clic sans vous déplacer, avec preuve instantanée pour chacun.
+                    <span className="text-[#059669] font-bold">Wave, Orange, MTN ou Moov :</span> Payez facilement sans vous déplacer, avec preuve instantanée pour chacun.
                   </td>
                 </tr>
 
@@ -1211,7 +1211,7 @@ export default function QaprilLandingV2({
                     On exige souvent 3 à 6 mois de caution, et il est très difficile de récupérer son argent à la sortie.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">2 mois de caution maximum :</span> Respect strict de la loi, argent protégé en compte séquestre dédié et rendu sans palabre.
+                    <span className="text-[#059669] font-bold">2 mois de caution maximum :</span> Respect strict de la loi ivoirienne, montant consigné et restitué sans palabre.
                   </td>
                 </tr>
 
@@ -1247,7 +1247,7 @@ export default function QaprilLandingV2({
                     Certificats manuscrits ou de complaisance, démarches longues et refus fréquents en banque ou consulat.
                   </td>
                   <td className="p-4 sm:p-5 text-slate-900 font-semibold">
-                    <span className="text-[#059669] font-bold">Attestation officielle QR (Niveaux A/B/C) :</span> Scellée SHA-256 en 10 secondes, vérifiable en ligne et opposable aux institutions.
+                    <span className="text-[#059669] font-bold">Attestation officielle avec code QR (Niveaux A/B/C) :</span> Délivrée en 10 secondes, vérifiable en ligne et acceptée par les institutions.
                   </td>
                 </tr>
               </tbody>
@@ -1324,7 +1324,15 @@ export default function QaprilLandingV2({
               },
               {
                 q: "Comment sont protégés les 2 mois de caution ?",
-                a: "La loi ivoirienne interdit d'exiger plus de 2 mois de caution. Sur QAPRIL, cette somme est mise en sécurité sur un compte séquestre dédié conformément à la loi. À la fin du bail, après vérification de l'état des lieux de sortie, l'argent est restitué au locataire sans difficulté.",
+                a: "La loi ivoirienne interdit d'exiger plus de 2 mois de caution. Sur QAPRIL, cette somme est formellement consignée dans le contrat de bail conformément à la réglementation. À la fin du bail, après l'état des lieux de sortie contradictoire, le dépôt de garantie est restitué sans palabre.",
+              },
+              {
+                q: "Que faire si mon contrat de bail a été signé avant mon inscription sur QAPRIL ?",
+                a: "QAPRIL intègre un module de reprise de bail antérieur (Deux Horloges). Vous renseignez la date de prise d'effet d'origine, le loyer en vigueur et l'historique des paiements. Le propriétaire et le locataire confirment ensemble cet état d'ouverture sans rompre l'ancienneté du bail.",
+              },
+              {
+                q: "Comment s'effectue la révision légale du loyer ?",
+                a: "La loi ivoirienne encadre la révision du loyer, qui ne peut intervenir qu'après 3 ans de location (délai triennal légal). QAPRIL calcule automatiquement cette échéance et permet au bailleur de notifier une proposition formelle, avec recueil clair de l'accord du locataire.",
               },
               {
                 q: "Combien ça coûte pour les propriétaires et les locataires ?",
@@ -1340,11 +1348,11 @@ export default function QaprilLandingV2({
               },
               {
                 q: "Comment obtenir une Attestation de Résidence officielle et est-elle acceptée par les consulats et banques ?",
-                a: "L'attestation de résidence QAPRIL remplace les certificats de complaisance. Elle est générée en 10 secondes avec un niveau de certification clair (Niveau A pour le titulaire d'un bail enregistré DGI, Niveau B pour les résidents vérifiés sur le terrain, Niveau C sur déclaration sur l'honneur). Dotée d'un sceau cryptographique SHA-256 et d'un QR Code vérifiable en temps réel, elle est pleinement opposable aux banques, ambassades et administrations, tout en protégeant l'identité privée du propriétaire.",
+                a: "L'attestation de résidence QAPRIL certifie officiellement votre domicile pour l'ensemble du foyer (titulaire, conjoint, enfants, tiers à charge). Elle est générée en 10 secondes selon 3 niveaux de preuve formelle (Niveau A avec bail enregistré, Niveau B avec résidence constatée, Niveau C sur déclaration sur l'honneur). Dotée d'un code QR officiel vérifiable instantanément, elle est acceptée par les banques, ambassades et administrations publiques, tout en préservant la vie privée du bailleur.",
               },
               {
                 q: "À quoi sert la géolocalisation certifiée et l'adresse numérique La Poste CI ?",
-                a: "Conformément au Décret n° 2019-576 sur l'adressage national, QAPRIL certifie la position exacte du bien sur le terrain (précision ≤ 50 m avec détection anti-usurpation). Le logement bénéficie d'un Code Localisation National souverain (ex. QAP-COCODY-XXXX) et d'une boîte postale numérique officielle de La Poste de Côte d'Ivoire rattachée au bail.",
+                a: "Conformément à la réglementation sur l'adressage en Côte d'Ivoire, QAPRIL certifie la position exacte du bien sur le terrain. Le logement bénéficie d'une référence territoriale claire (Commune, Quartier) et d'une boîte postale numérique officielle de La Poste de Côte d'Ivoire directement rattachée au bail.",
               },
             ].map((faq, index) => (
               <div
