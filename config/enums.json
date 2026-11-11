@@ -1,0 +1,211 @@
+{
+  "_regle": "Toute valeur d'énumération affichée à un utilisateur passe par ce fichier (IC-M3). Clé = valeur en base. Valeur = libellé français. Une valeur absente est ajoutée ici, jamais affichée en dur.",
+  "_version": "1.0 — 10 novembre 2026 — IC-01-R1",
+  "role": {
+    "LOCATAIRE": "Locataire",
+    "BAILLEUR": "Bailleur",
+    "AGENCE": "Agence agréée",
+    "INTERMEDIAIRE": "Intermédiaire",
+    "ADMIN": "Administration QAPRIL"
+  },
+  "statut_compte": {
+    "PENDING": "Numéro à vérifier",
+    "ACTIF": "Actif",
+    "SUSPENDU": "Suspendu",
+    "CLOS": "Clos"
+  },
+  "niveau_verification_compte": {
+    "1": "Numéro de téléphone vérifié",
+    "2": "Pièce d'identité et Mobile Money vérifiés"
+  },
+  "niveau_verification_bien": {
+    "1": "Déclaré",
+    "2": "Déclaré, position confirmée",
+    "3": "Bien vérifié — titre contrôlé",
+    "4": "Bien vérifié — visite d'agence agréée"
+  },
+  "type_structure": {
+    "MAISON_INDEPENDANTE": "Maison indépendante",
+    "RESIDENCE": "Résidence",
+    "COUR_COMMUNE": "Cour commune",
+    "IMMEUBLE": "Immeuble",
+    "TERRAIN": "Terrain"
+  },
+  "type_logement": {
+    "STUDIO": "Studio",
+    "CHAMBRE": "Chambre",
+    "CHAMBRE_SALON": "Chambre salon",
+    "ENTRER_COUCHER": "Entrer-coucher",
+    "APPARTEMENT": "Appartement",
+    "VILLA": "Villa",
+    "DUPLEX": "Duplex",
+    "MAISON_BASSE": "Maison basse",
+    "LOCAL_COMMERCIAL": "Local commercial",
+    "TERRAIN_NU": "Terrain nu"
+  },
+  "statut_bail": {
+    "BROUILLON": "En préparation",
+    "A_SIGNER": "À signer",
+    "SIGNE_LOCATAIRE": "Signé par le locataire, en attente du bailleur",
+    "ACTIF_NON_ENREGISTRE": "Actif, en attente d'enregistrement",
+    "ACTIF": "Actif",
+    "PREAVIS": "Préavis en cours",
+    "CLOS": "Clos",
+    "RESILIE": "Résilié"
+  },
+  "statut_position": {
+    "PROVISOIRE": "Provisoire",
+    "CONFIRMEE": "Confirmée",
+    "GELEE": "Gelée"
+  },
+  "jour_echeance": {
+    "1": "Avant le 1er",
+    "5": "Avant le 5",
+    "10": "Avant le 10",
+    "15": "Avant le 15"
+  },
+  "mode_paiement": {
+    "WAVE": "Wave",
+    "ORANGE_MONEY": "Orange Money",
+    "MTN_MOMO": "MTN MoMo",
+    "MOOV_MONEY": "Moov Money",
+    "ESPECES": "Espèces",
+    "VIREMENT": "Virement",
+    "CARTE": "Carte bancaire",
+    "PROCHE": "Payé par un proche"
+  },
+  "statut_paiement": {
+    "EN_ATTENTE": "En attente",
+    "RECU": "Reçu",
+    "DECLARE": "Déclaré, à confirmer",
+    "CONFIRME": "Confirmé",
+    "CONTESTE": "Contesté",
+    "NON_CONFIRME": "Non confirmé",
+    "PARTIEL": "Paiement partiel",
+    "ECHOUE": "Échoué"
+  },
+  "statut_quittance": {
+    "EMISE": "Quittance émise",
+    "ACOMPTE": "Reçu d'acompte",
+    "IMPAYEE": "Impayé",
+    "ANNULEE": "Annulée"
+  },
+  "decision_partiel": {
+    "REFUSER": "Refuser",
+    "ACCEPTER": "Accepter",
+    "ACCEPTER_AVEC_PLAN": "Accepter avec plan d'apurement"
+  },
+  "lien_occupant": {
+    "CONJOINT": "Conjoint",
+    "ENFANT_MAJEUR": "Enfant majeur",
+    "ENFANT_MINEUR": "Enfant mineur",
+    "PARENT": "Parent",
+    "COLOCATAIRE": "Colocataire",
+    "AUTRE": "Autre"
+  },
+  "statut_occupant": {
+    "DECLARE": "Déclaré",
+    "EN_ATTENTE_BAILLEUR": "En attente de confirmation du bailleur",
+    "CONFIRME": "Confirmé",
+    "RETIRE": "Retiré"
+  },
+  "type_incident": {
+    "PLOMBERIE": "Plomberie, eau",
+    "ELECTRICITE": "Électricité",
+    "SERRURERIE": "Serrure, porte",
+    "TOITURE": "Toiture, infiltration",
+    "NUISANCE": "Nuisance",
+    "AUTRE": "Autre"
+  },
+  "statut_incident": {
+    "RECU": "Reçu par le bailleur",
+    "A_TRAITER": "À traiter",
+    "PLANIFIE": "Intervention planifiée",
+    "EN_COURS": "En cours",
+    "RESOLU": "Résolu",
+    "CLOS": "Clos",
+    "CONTESTE": "Contesté"
+  },
+  "type_reclamation": {
+    "TRAVAUX": "Travaux non réalisés",
+    "LOYER_QUITTANCE": "Loyer ou quittance",
+    "COMPORTEMENT": "Comportement"
+  },
+  "statut_candidature": {
+    "ENVOYEE": "Envoyée",
+    "VUE": "Vue",
+    "VISITE_PROPOSEE": "Visite proposée",
+    "RETENUE": "Retenue",
+    "NON_RETENUE": "Non retenue",
+    "RETIREE": "Retirée",
+    "EXPIREE": "Annonce plus disponible"
+  },
+  "statut_recherche": {
+    "ACTIVE": "Active",
+    "PAUSE": "En pause",
+    "EXPIREE": "Expirée"
+  },
+  "statut_offre_recue": {
+    "RECUE": "Reçue",
+    "VUE": "Vue",
+    "CANDIDATE": "Candidature envoyée",
+    "VISITE": "Visite demandée",
+    "DECLINEE": "Déclinée",
+    "EXPIREE": "Expirée"
+  },
+  "motif_declin": {
+    "TROP_CHER": "Trop cher",
+    "QUARTIER": "Mauvais quartier",
+    "TROP_PETIT": "Trop petit",
+    "DATE": "Pas disponible à ma date",
+    "DEJA_TROUVE": "Déjà trouvé",
+    "AUTRE": "Autre"
+  },
+  "tranche_confiance": {
+    "A": "Tranche A",
+    "B": "Tranche B",
+    "C": "Tranche C",
+    "D": "Tranche D",
+    "NA": "En construction"
+  },
+  "statut_mandat": {
+    "PROPOSE": "Proposé",
+    "SIGNE_MANDANT": "Signé par le mandant, en attente de l'agence",
+    "ACTIF": "Actif",
+    "SUSPENDU": "Suspendu",
+    "TERMINE": "Terminé"
+  },
+  "statut_reversement": {
+    "PREVU": "Prévu",
+    "EN_COURS": "En cours",
+    "EFFECTUE": "Effectué",
+    "ECHOUE": "Échoué"
+  },
+  "statut_visite_verification": {
+    "DEMANDEE": "Demandée",
+    "PLANIFIEE": "Planifiée",
+    "RAPPORT_EMIS": "Rapport émis",
+    "RAPPORT_AVEC_RESERVES": "Rapport émis avec réserves",
+    "DECLINEE": "Déclinée"
+  },
+  "statut_maposte": {
+    "NON_DEMANDEE": "Disponible prochainement",
+    "EN_CREATION": "En cours de création",
+    "CREEE": "Créée"
+  },
+  "niveau_attestation": {
+    "A": "Niveau A",
+    "B": "Niveau B",
+    "C": "Niveau C"
+  },
+  "canal_prefere": {
+    "WHATSAPP": "WhatsApp",
+    "SMS": "SMS",
+    "APP": "Application"
+  },
+  "formule_pro": {
+    "STARTER": "PRO Starter",
+    "STANDARD": "PRO Standard",
+    "PREMIUM": "PRO Premium"
+  }
+}

@@ -32,7 +32,7 @@ export async function GET(req: Request) {
       orderBy: { createdAt: 'desc' }
     });
 
-    // Map to UI structure
+    // Map to UI structure selon S-05 (certifié = empreinte SHA présente)
     const mapping = receipts.map(r => ({
       id: r.id,
       ref: r.receiptRef,
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
       montant: Number(r.totalAmount),
       date: r.paidAt ? r.paidAt.toISOString() : r.createdAt.toISOString(),
       statut: r.status === 'paid' ? 'Payée' : 'En attente',
-      certifie: true,
+      certifie: Boolean((r as any).sha256Proof || (r as any).sha256 || (r as any).proofHash),
       url: r.pdfUrl || null
     }));
 

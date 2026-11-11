@@ -1548,25 +1548,36 @@ model Prestataire {
 }
 
 model Candidature {
-  id            String   @id @default(uuid()) @map("cand_id")
-  logementId    String   @map("logement_id")
-  candidatId    String?  @map("candidat_id")
-  nom           String
-  prenom        String
-  telephone     String
-  revenuMensuel Float?   @map("revenu_mensuel")
-  employeur     String?
-  scoreQapril   Int?     @map("score_qapril")
-  tauxEffort    Float?   @map("taux_effort")
-  docsJsonb     Json?    @map("docs_jsonb")
-  statut        String   @default("SOUMISE")
-  noteAgence    String?  @map("note_agence")
-  createdAt     DateTime @default(now()) @map("created_at")
-  candidat      User?    @relation("UserCandidatures", fields: [candidatId], references: [id])
-  logement      Property @relation(fields: [logementId], references: [id])
+  id               String    @id @default(uuid()) @map("cand_id")
+  logementId       String    @map("logement_id")
+  annonceId        String?   @map("annonce_id")
+  candidatId       String?   @map("candidat_id")
+  nom              String
+  prenom           String
+  telephone        String
+  revenuMensuel    Float?    @map("revenu_mensuel")
+  employeur        String?
+  scoreQapril      Int?      @map("score_qapril")
+  tauxEffort       Float?    @map("taux_effort")
+  docsJsonb        Json?     @map("docs_jsonb")
+  statut           String    @default("ENVOYEE")
+  noteAgence       String?   @map("note_agence")
+  envoyeeAt        DateTime? @default(now()) @map("envoyee_at")
+  vueAt            DateTime? @map("vue_at")
+  visiteProposeeAt DateTime? @map("visite_proposee_at")
+  statueeAt        DateTime? @map("statuee_at")
+  retireeAt        DateTime? @map("retiree_at")
+  expireeAt        DateTime? @map("expiree_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime? @updatedAt @map("updated_at")
+
+  candidat         User?     @relation("UserCandidatures", fields: [candidatId], references: [id])
+  logement         Property  @relation(fields: [logementId], references: [id])
+  annonce          Annonce?  @relation(fields: [annonceId], references: [id])
 
   @@index([logementId])
   @@index([candidatId])
+  @@index([annonceId])
   @@map("candidatures")
 }
 
@@ -1619,6 +1630,7 @@ model Annonce {
   archiveeAt     DateTime? @map("archivee_at")
   agence         User      @relation("AgenceAnnonces", fields: [agenceId], references: [id])
   logement       Property  @relation(fields: [logementId], references: [id])
+  candidatures   Candidature[]
 
   @@index([logementId])
   @@index([agenceId])

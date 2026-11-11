@@ -36,3 +36,19 @@ export function isNormalized(phone: string | null | undefined): boolean {
     if (!phone) return true;
     return phone === normalizePhone(phone);
 }
+
+/**
+ * Masque un numéro de téléphone selon le format lexique IC-01-R1
+ * +225 {prefixe} •• •• •• {fin}
+ */
+export function maskPhone(phone: string | null | undefined): string {
+    if (!phone) return '';
+    const norm = normalizePhone(phone);
+    const digitsOnly = norm.replace(/\D/g, '');
+    if (digitsOnly.length >= 8) {
+        const prefix = digitsOnly.startsWith('225') ? digitsOnly.slice(3, 5) : digitsOnly.slice(0, 2);
+        const fin = digitsOnly.slice(-2);
+        return `+225 ${prefix} •• •• •• ${fin}`;
+    }
+    return phone;
+}

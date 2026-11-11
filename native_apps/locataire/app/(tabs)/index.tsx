@@ -106,7 +106,6 @@ export default function LocatairePrototypeScreen() {
   const [procheModal, setProcheModal] = useState(false);
   const [attestationModal, setAttestationModal] = useState(false);
   const [vueBailleurModal, setVueBailleurModal] = useState(false);
-  const [epargneAmount, setEpargneAmount] = useState(125000);
   const [searchActive, setSearchActive] = useState(true);
   const [shareRev, setShareRev] = useState(true);
   const [shareGarant, setShareGarant] = useState(true);
@@ -1436,25 +1435,6 @@ export default function LocatairePrototypeScreen() {
                 • L’usure normale du logement n’est jamais imputable au locataire.
               </Text>
             </View>
-
-            <View style={styles.card}>
-              <View style={styles.rowBetween}>
-                <Text style={styles.boldText}>Tirelire « Ma prochaine caution »</Text>
-                <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(epargneAmount)} / {fmt(300000)}</Text>
-              </View>
-              <Text style={[styles.subMuted, { marginTop: 4 }]}>
-                Épargnez à votre rythme pour votre futur déménagement. Vos fonds restent disponibles à tout moment.
-              </Text>
-              <Pressable
-                style={[styles.btnPrimary, { marginTop: 12 }]}
-                onPress={() => {
-                  setEpargneAmount((prev) => prev + 25000);
-                  Alert.alert('Épargne créditée', '+25 000 F ajoutés à votre tirelire caution.');
-                }}
-              >
-                <Text style={styles.btnPrimaryText}>Ajouter 25 000 F à ma tirelire</Text>
-              </Pressable>
-            </View>
           </View>
         )}
 
@@ -2300,7 +2280,7 @@ export default function LocatairePrototypeScreen() {
                         setCandidatureModal(true);
                       }}
                     >
-                      <Text style={styles.btnPrimaryText}>Candidater en 1 clic</Text>
+                      <Text style={styles.btnPrimaryText}>Candidater avec mon passeport</Text>
                     </Pressable>
 
                     <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>

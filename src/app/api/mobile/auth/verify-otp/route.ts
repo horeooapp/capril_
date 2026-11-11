@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { redis } from '@/lib/redis';
 import { prisma } from '@/lib/prisma';
 import { signMobileToken } from '@/lib/mobile-auth';
-import { normalizePhone } from '@/lib/phone';
+import { normalizePhone, maskPhone } from '@/lib/phone';
 
 export async function POST(request: Request) {
     try {
@@ -130,7 +130,8 @@ export async function POST(request: Request) {
             user: {
                 id: user.id,
                 email: user.email,
-                phone: user.phone,
+                phone: user.phone?.startsWith("PENDING_") ? null : maskPhone(user.phone),
+                rawPhone: user.phone?.startsWith("PENDING_") ? null : user.phone,
                 role: user.role,
                 firstName: user.firstName,
                 lastName: user.lastName,

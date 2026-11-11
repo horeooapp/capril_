@@ -1,0 +1,243 @@
+{
+  "_regle": "Tout libellé visible par un utilisateur vient de ce fichier. Sections 7 de l'IC-01 et de l'IC-01-R1. Une phrase par libellé, sujet « vous » ou « je », pas d'exclamation, pas de référence technique ni légale.",
+  "_interdits": ["RG-", "ADD-", "SHA-256", "SHA256", "HMAC", "OTA", "preview", "build", "hash", "webhook", "KYC", "Loi 2013", "Loi 2019", "2013-450", "2013-546", "2019-576", "APARTMENT", "BUILDING", "certifié SHA", "infalsifiable", "opposable", "séquestre", "Immatriculation", "1 clic"],
+  "_version": "1.0 — 10 novembre 2026",
+
+  "navigation": {
+    "locataire": ["Accueil", "Mon bail", "Payer", "Recherche", "Moi"],
+    "bailleur": ["Accueil", "Biens", "Baux", "Flux", "Plus"],
+    "agence": ["Accueil", "Portefeuille", "Mandants", "Candidats", "Plus"],
+    "retour": "Retour",
+    "a_propos": "À propos",
+    "aide": "Aide",
+    "deconnexion": "Me déconnecter"
+  },
+
+  "identite": {
+    "numero_masque": "+225 {prefixe} •• •• •• {fin}",
+    "niveau_1": "Numéro de téléphone vérifié",
+    "niveau_2": "Pièce d'identité et Mobile Money vérifiés",
+    "niveau_2_action": "Ajouter ma pièce d'identité",
+    "identite_non_verifiee": "Identité non vérifiée — ajouter ma pièce",
+    "otp_titre": "Votre code par SMS",
+    "otp_aide": "Saisissez le code à 6 chiffres reçu au {numero}. Il est valable 10 minutes.",
+    "otp_erreur": "Code incorrect. Il vous reste {restant} essai(s).",
+    "otp_expire": "Le code a expiré. Demandez un nouveau code.",
+    "email_optionnel": "E-mail (facultatif)",
+    "migration_titre": "Confirmez votre numéro de téléphone",
+    "migration_aide": "Votre numéro devient votre identifiant QAPRIL. Votre e-mail reste un moyen de contact."
+  },
+
+  "accueil": {
+    "bonjour": "Bonjour, {prenom}",
+    "loyer_titre": "Loyer de {mois}",
+    "loyer_echeance": "À payer avant le {date} · dans {jours} jours",
+    "loyer_echeance_depassee": "Échéance du {date} dépassée depuis {jours} jours",
+    "payer": "Payer",
+    "paye_autrement": "J'ai payé autrement",
+    "faire_payer_proche": "Faire payer par un proche",
+    "aucun_logement_titre": "Aucun logement déclaré",
+    "aucun_logement_texte": "Déclarez votre logement en 4 questions. Vous obtenez des quittances pour chaque loyer et une attestation de résidence, même si votre bailleur n'a pas l'application.",
+    "declarer_logement": "Déclarer mon logement",
+    "inviter_bailleur": "Inviter mon bailleur",
+    "attente_confirmation": "En attente de confirmation du bailleur",
+    "a_confirmer_titre": "À confirmer",
+    "paiements_a_confirmer_titre": "Paiements à confirmer"
+  },
+
+  "declaration_logement": {
+    "q1": "Qui est votre bailleur ?",
+    "q2": "Son numéro de téléphone",
+    "q2_aide": "QAPRIL lui envoie un message. Il n'a pas besoin de l'application pour confirmer.",
+    "q3": "Votre logement",
+    "q4": "Loyer et jour de paiement",
+    "message_bailleur": "Bonjour {bailleur}, {locataire} vous déclare comme bailleur de : {logement}, loyer {loyer} F avant le {jour} de chaque mois. Répondez 1 si c'est votre locataire, 2 pour corriger le loyer, 3 si vous ne connaissez pas cette personne.",
+    "reponse_1": "C'est mon locataire",
+    "reponse_2": "Corriger le loyer",
+    "reponse_3": "Je ne connais pas cette personne"
+  },
+
+  "paiement": {
+    "payer_avance": "Payer d'avance",
+    "une_quittance_par_mois": "Une quittance par mois",
+    "info_avance_fiscale": "Au-delà de 2 mois d'avance, le total figure sur votre déclaration fiscale. Votre bailleur ne peut jamais l'exiger : c'est votre choix.",
+    "paye_autrement_aide": "Vous avez payé en espèces, par virement ou directement sur le numéro de votre bailleur ? Déclarez-le : il confirme, et vous recevez la même quittance.",
+    "preuve_optionnelle": "Avec photo du reçu",
+    "envoyer_confirmation": "Envoyer la demande de confirmation",
+    "declare_statut": "Paiement de {montant} déclaré ({moyen}) · en attente de confirmation de votre bailleur",
+    "confirmer_oui": "Oui, j'ai reçu ce paiement",
+    "confirmer_non": "Non, je n'ai rien reçu",
+    "confirmation_effet": "En confirmant, la quittance de {mois} est émise et envoyée à {locataire}, identique à un paiement via QAPRIL.",
+    "ma_dette": "Ma dette",
+    "ce_que_je_dois": "Ce que je dois",
+    "ce_que_je_peux_payer": "Ce que je peux payer aujourd'hui",
+    "apercu_imputation": "Aperçu de l'imputation",
+    "imputation_aide": "Les loyers les plus anciens sont soldés en premier. Un acompte ne produit pas de quittance, mais un reçu daté.",
+    "plan_reste": "Plan pour le reste",
+    "accepter_avec_plan": "Accepter avec plan d'apurement",
+    "accepter": "Accepter",
+    "refuser": "Refuser"
+  },
+
+  "quittances": {
+    "titre": "Mes quittances",
+    "bandeau": "La preuve de vos paiements, acceptée par les banques et les administrations.",
+    "vide_titre": "Aucune quittance pour l'instant",
+    "vide_action": "Payer mon loyer de {mois}",
+    "exporter": "Exporter 12 mois",
+    "dossier_bancaire": "Dossier bancaire",
+    "pied_pdf": "Empreinte numérique : {empreinte}. Toute modification du document l'invalide. Vérifiable sur qapril.ci/verifier.",
+    "statut_payee": "Payé",
+    "statut_impayee": "Impayé",
+    "statut_declaree": "Déclaré"
+  },
+
+  "bail": {
+    "titre": "Mon bail",
+    "caution": "Ma caution, bloquée jusqu'aux clés",
+    "caution_restitution": "Restitution sous 30 jours maximum après remise des clés",
+    "contrat": "Mon contrat de bail",
+    "contrat_sous_titre": "Signé par code SMS, conforme à la loi",
+    "enregistre_le": "Enregistré le {date}",
+    "en_attente_enregistrement": "Signé, en attente d'enregistrement",
+    "mes_droits": "Mes droits sur ce bail",
+    "mes_droits_sous_titre": "Dépôt, avance, préavis, restitution",
+    "etat_des_lieux": "État des lieux",
+    "occupants": "Occupants de mon logement",
+    "heberger_invite": "Héberger un invité",
+    "donner_conge": "Donner congé",
+    "conge_aide": "Votre préavis est de 3 mois. Il commence à la date d'envoi de la lettre.",
+    "fin_calculee": "Fin du bail calculée",
+    "duree_requise": "Indiquez la durée du bail : 12, 24 ou 36 mois.",
+    "depot_max": "Le dépôt de garantie ne peut pas dépasser 2 mois de loyer.",
+    "avance_max": "L'avance exigée ne peut pas dépasser 2 mois de loyer.",
+    "mention_loi_pdf": "Bail soumis à la loi n° 2019-576 relative au bail à usage d'habitation."
+  },
+
+  "occupants": {
+    "declarer": "Déclarer un occupant",
+    "lien": "Lien avec le titulaire",
+    "certification": "Je certifie que cette personne réside dans ce logement.",
+    "responsabilite": "Une fausse déclaration engage votre responsabilité.",
+    "ajoute": "Occupant ajouté",
+    "aide": "Les occupants déclarés figurent sur votre attestation de résidence. Votre bailleur en est informé, sans accès à leurs pièces."
+  },
+
+  "documents": {
+    "titre": "Mes documents",
+    "attestation": "Attestation de résidence",
+    "attestation_validite": "Valable jusqu'au {date}",
+    "attestation_qr": "Le code vérifie l'attestation sans révéler votre bailleur ni le montant de votre loyer.",
+    "niveau_b_aide": "Bail actif et loyers payés depuis plus de 6 mois. Le niveau A s'obtient après 12 mois et la confirmation de la position du logement."
+  },
+
+  "messagerie": {
+    "titre": "Messages",
+    "bandeau": "Vous échangez avec : {nom}",
+    "bandeau_bailleur": "Vous apparaissez comme : {nom}",
+    "identite_protegee": "Bailleur (identité protégée)",
+    "conserves": "Vos échanges sont conservés et datés",
+    "gere_par_agence": "Fil géré par {agence}",
+    "ecrire": "Écrire un message"
+  },
+
+  "signalement": {
+    "titre": "Signaler un problème",
+    "photo": "Photo datée qui fait preuve",
+    "envoyer": "Envoyer à mon bailleur",
+    "destinataire": "Envoyé à {destinataire} pour {logement}",
+    "envoye": "Signalement envoyé à votre bailleur",
+    "statut_recu": "Reçu par le bailleur",
+    "statut_planifie": "Intervention planifiée le {date}",
+    "statut_resolu": "Résolu"
+  },
+
+  "recherche": {
+    "titre": "Trouver un logement",
+    "sous_titre": "Logements à louer",
+    "ma_recherche": "Ma recherche",
+    "dites_nous": "Dites-nous ce que vous cherchez",
+    "dites_nous_aide": "En 5 questions. Ensuite, les logements compatibles viennent à vous.",
+    "active": "Active · {jours} jours restants",
+    "pause": "En pause",
+    "mettre_en_pause": "Mettre en pause",
+    "offres_recues": "Offres reçues",
+    "annonces": "Annonces",
+    "carte": "Carte",
+    "mes_candidatures": "Mes candidatures",
+    "compte": "{total} logements, {compatibles} compatibles avec votre recherche",
+    "bloc_ou": "Où",
+    "bloc_quoi": "Quoi",
+    "bloc_combien": "Combien",
+    "bloc_quand": "Quand",
+    "bloc_qui": "Qui",
+    "resume": "{type} {pieces} pièces à {communes}, {min} à {max} F, pour le {date}, famille de {personnes}.",
+    "enregistree": "Votre recherche est enregistrée pour {jours} jours",
+    "bien_verifie": "Bien vérifié",
+    "declare": "Déclaré",
+    "bailleur_particulier": "Bailleur particulier",
+    "negociable": "Négociable de {min} à {max}",
+    "non_negociable": "Non négociable",
+    "caution_consignee": "Caution consignée jusqu'aux clés",
+    "candidater": "Candidater avec mon passeport",
+    "candidature_envoyee": "Candidature envoyée le {date}",
+    "deja_envoyee": "Vous avez déjà candidaté le {date}.",
+    "proposer_loyer": "Proposer un loyer",
+    "proposition_bornes": "Proposez entre {min} et {max}.",
+    "demander_visite": "Demander une visite",
+    "enregistrer": "Enregistrer",
+    "signaler": "Signaler",
+    "consentement_titre": "Ce que {destinataire} recevra",
+    "consentement_aide": "Vos pièces d'identité et vos quittances ne sont jamais transmises. {destinataire} voit votre tranche, jamais votre score.",
+    "consentement_valider": "J'accepte et j'envoie ma candidature",
+    "decliner": "Décliner",
+    "position_aide": "Les logements sont placés au quartier, jamais à l'adresse exacte."
+  },
+
+  "passeport": {
+    "titre": "Mon passeport locatif",
+    "tranche": "Tranche de confiance",
+    "tranche_aide": "Les bailleurs voient la tranche (A, B, C ou D), jamais le calcul.",
+    "en_construction_aide": "Payez vos 3 premiers loyers à l'heure pour obtenir la tranche C.",
+    "ce_que_je_montre": "Ce que je montre aux bailleurs",
+    "je_montre": "Je montre",
+    "je_ne_montre_pas": "Je ne montre pas",
+    "voir_comme_bailleur": "Voir mon passeport comme un bailleur le voit",
+    "qui_a_consulte": "Qui a consulté mon profil",
+    "jamais_transmis": "Jamais transmis : votre score, vos pièces d'identité, vos quittances, le nom de votre bailleur, le montant de votre loyer."
+  },
+
+  "maposte": {
+    "titre": "Ma boîte MaPoste",
+    "consentement": "J'accepte la création de ma boîte MaPoste et le dépôt de mes documents.",
+    "statut_prochainement": "Disponible prochainement",
+    "statut_en_creation": "En cours de création",
+    "statut_creee": "Créée · identifiant {identifiant}",
+    "aide": "Votre boîte MaPoste recevra automatiquement vos quittances, votre bail et vos attestations."
+  },
+
+  "bailleur": {
+    "ajouter_bien": "Ajouter un bien",
+    "masquer_identite": "Masquer mon identité à ce locataire",
+    "masque_mandat": "Toujours masqué : ce bien est sous mandat de {agence}.",
+    "niveau_confiance": "Votre niveau de confiance",
+    "diaspora": "Je gère depuis l'étranger — 7 € par mois",
+    "capturer_position": "Je suis sur place, capturer la position",
+    "publier_offre": "Publier une offre",
+    "cout_vacance": "Coût de la vacance : {montant} / mois",
+    "retenir": "Retenir",
+    "c_est_mon_locataire": "C'est mon locataire"
+  },
+
+  "a_propos": {
+    "version": "Version {version}",
+    "mise_a_jour": "Vérifier les mises à jour",
+    "empreinte_explication": "Chaque PDF porte une empreinte numérique : toute modification l'invalide."
+  },
+
+  "confidentialite": {
+    "titre": "Confidentialité",
+    "donnees": "Vos données vous appartiennent : aucun bailleur ne voit votre score ni vos pièces sans votre accord.",
+    "pied_de_page": "Traitement déclaré conformément à la loi n° 2013-450 relative à la protection des données à caractère personnel."
+  }
+}
