@@ -59,6 +59,12 @@ export default function CreateLeaseScreen() {
   const [maskIdentity, setMaskIdentity] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // États Reprise de bail antérieur (Deux Horloges)
+  const [isRepriseBail, setIsRepriseBail] = useState(false);
+  const [dateRepriseOrigine, setDateRepriseOrigine] = useState('2024-01-01');
+  const [dernierMoisPaye, setDernierMoisPaye] = useState('Octobre 2026');
+  const [soldeOuverture, setSoldeOuverture] = useState('0');
+
   // Charger les biens du propriétaire
   useEffect(() => {
     const loadProperties = async () => {
@@ -155,6 +161,10 @@ export default function CreateLeaseScreen() {
           avanceLoyer: advanceAmount.trim() || String(maxLegalCaution),
           durationMonths: durationMonths,
           bailleurMasque: maskIdentity,
+          isRepriseBail,
+          dateRepriseOrigine: isRepriseBail ? dateRepriseOrigine : undefined,
+          dernierMoisPaye: isRepriseBail ? dernierMoisPaye : undefined,
+          soldeOuverture: isRepriseBail ? soldeOuverture : undefined,
         }),
       });
 
@@ -269,6 +279,64 @@ export default function CreateLeaseScreen() {
                     </Pressable>
                   );
                 })}
+              </View>
+            )}
+          </View>
+
+          {/* 1bis. TYPE DE CONTRAT (NOUVEAU OU REPRISE DEUX HORLOGES) */}
+          <View style={styles.formSection}>
+            <Text style={styles.sectionTitle}>TYPE DE CONTRAT</Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+              <Pressable
+                style={[styles.input, { flex: 1, alignItems: 'center', backgroundColor: !isRepriseBail ? '#E3F5EC' : '#FFFFFF', borderColor: !isRepriseBail ? '#1B4D3E' : '#E5E7EB' }]}
+                onPress={() => setIsRepriseBail(false)}
+              >
+                <Text style={{ fontWeight: '700', color: !isRepriseBail ? '#1B4D3E' : '#6B7280', fontSize: 13 }}>Nouveau Bail</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.input, { flex: 1, alignItems: 'center', backgroundColor: isRepriseBail ? '#EEF2FF' : '#FFFFFF', borderColor: isRepriseBail ? '#4F46E5' : '#E5E7EB' }]}
+                onPress={() => setIsRepriseBail(true)}
+              >
+                <Text style={{ fontWeight: '700', color: isRepriseBail ? '#4F46E5' : '#6B7280', fontSize: 13 }}>Reprise de Bail (Ancien)</Text>
+              </Pressable>
+            </View>
+
+            {isRepriseBail && (
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, marginTop: 12, borderWidth: 1, borderColor: '#CBD5E1' }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#1E293B', marginBottom: 4 }}>
+                  Transition Deux Horloges (Baux conclus avant QAPRIL)
+                </Text>
+                <Text style={{ fontSize: 11, color: '#64748B', marginBottom: 10 }}>
+                  Préserve l'ancienneté du locataire, ses droits acquis et régularise les antécédents sans rupture.
+                </Text>
+
+                <Text style={styles.fieldLabel}>Date d'entrée initiale dans les lieux *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="AAAA-MM-JJ (Ex: 2023-04-01)"
+                  placeholderTextColor="#9CA3AF"
+                  value={dateRepriseOrigine}
+                  onChangeText={setDateRepriseOrigine}
+                />
+
+                <Text style={styles.fieldLabel}>Dernier mois de loyer acquitté</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: Octobre 2026"
+                  placeholderTextColor="#9CA3AF"
+                  value={dernierMoisPaye}
+                  onChangeText={setDernierMoisPaye}
+                />
+
+                <Text style={styles.fieldLabel}>Solde d'ouverture (Arriéré en FCFA, 0 si à jour)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="0"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  value={soldeOuverture}
+                  onChangeText={setSoldeOuverture}
+                />
               </View>
             )}
           </View>

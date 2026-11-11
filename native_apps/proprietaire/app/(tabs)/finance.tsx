@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Pressable,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowDownLeft, FileText } from 'lucide-react-native';
@@ -75,9 +76,12 @@ export default function FinanceScreen() {
         </Text>
         <Pressable
           style={styles.reportBtn}
-          onPress={() =>
-            Alert.alert('Rapport mensuel PDF', 'Rapport PDF mensuel certifié et infalsifiable téléchargé.')
-          }
+          onPress={() => {
+            const reportUrl = 'https://qapril.net/dashboard/reports';
+            Linking.openURL(reportUrl).catch(() => {
+              Alert.alert('Rapport mensuel', 'Accédez à votre espace Web QAPRIL pour exporter le bilan comptable complet.');
+            });
+          }}
         >
           <FileText color="#1B4D3E" size={16} />
           <Text style={styles.reportBtnText}>Télécharger le rapport mensuel PDF</Text>

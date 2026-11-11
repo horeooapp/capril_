@@ -8,14 +8,18 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  Modal,
+  ScrollView,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Download, FileText, CheckCircle2 } from 'lucide-react-native';
+import { Download, FileText, CheckCircle2, ShieldCheck, X, ExternalLink } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
 export default function ReceiptsScreen() {
   const [receipts, setReceipts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
   useEffect(() => {
     const fetchReceipts = async () => {
@@ -58,9 +62,12 @@ export default function ReceiptsScreen() {
         {receipts.length > 0 && (
           <Pressable
             style={styles.packBtn}
-            onPress={() =>
-              Alert.alert('Pack Quittances', 'Téléchargement de vos quittances certifiées.')
-            }
+            onPress={() => {
+              const exportUrl = 'https://qapril.net/mon-espace-locataire/receipts';
+              Linking.openURL(exportUrl).catch(() => {
+                Alert.alert('Pack Quittances', 'Exportez vos quittances complètes depuis votre espace Web QAPRIL.');
+              });
+            }}
           >
             <Text style={styles.packBtnText}>Tout exporter</Text>
           </Pressable>
@@ -97,16 +104,98 @@ export default function ReceiptsScreen() {
             </View>
             <Pressable
               style={styles.pdfBtn}
-              onPress={() =>
-                Alert.alert('Quittance certifiée', `Référence quittance: ${item.id}\nStatut: ${item.status || 'VALIDE'}`)
-              }
+              onPress={() => setSelectedReceipt(item)}
             >
               <Download color="#2C3E6B" size={16} />
-              <Text style={styles.pdfBtnText}>Détail</Text>
+              <Text style={styles.pdfBtnText}>Afficher</Text>
             </Pressable>
           </View>
         )}
       />
+
+      {/* MODALE : VISUALISATION COMPLÈTE DE LA QUITTANCE CERTIFIÉE */}
+      <Modal visible={!!selectedReceipt} transparent animationType="slide" onRequestClose={() => setSelectedReceipt(null)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '85%', padding: 20 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#E3F5EC', alignItems: 'center', justifyContent: 'center' }}>
+                  <ShieldCheck color="#1E7E4E" size={20} />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>Quittance de Loyer Officielle</Text>
+                  <Text style={{ fontSize: 11, color: '#64748B' }}>Preuve certifiée conforme</Text>
+                </View>
+              </View>
+              <Pressable onPress={() => setSelectedReceipt(null)} style={{ padding: 6 }}>
+                <X color="#64748B" size={22} />
+              </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 16 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Référence</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#0F172A', fontFamily: 'monospace' }}>
+                    {selectedReceipt?.receiptRef || selectedReceipt?.id}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Période réglée</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#0F172A' }}>
+                    {selectedReceipt?.period || 'Loyer mensuel'}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Montant total réglé</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#1E7E4E' }}>
+                    {(selectedReceipt?.amount || 0).toLocaleString('fr-FR')} FCFA
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Canal de paiement</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#334155' }}>
+                    {selectedReceipt?.via || 'Wave / Mobile Money'}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Date d'encaissement</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#334155' }}>
+                    {selectedReceipt?.date ? new Date(selectedReceipt.date).toLocaleDateString('fr-FR') : 'Confirmé'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BBF7D0', marginBottom: 16 }}>
+                <Text style={{ fontSize: 11, color: '#166534', lineHeight: 16 }}>
+                  Dont quittance, sous réserve de tous droits. Ce document certifié constitue une preuve formelle opposable aux banques, administrations et consulats.
+                </Text>
+              </View>
+
+              <Pressable
+                style={{ backgroundColor: '#2C3E6B', borderRadius: 12, paddingVertical: 14, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 10 }}
+                onPress={() => {
+                  const ref = selectedReceipt?.receiptRef || selectedReceipt?.id;
+                  const verifyUrl = `https://qapril.net/verifier?ref=${ref}`;
+                  Linking.openURL(verifyUrl).catch(() => {
+                    Alert.alert('Vérification en ligne', `Référence : ${ref}\nVérification disponible sur qapril.net`);
+                  });
+                }}
+              >
+                <ExternalLink color="#FFFFFF" size={16} />
+                <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '700' }}>Vérifier / Télécharger le PDF officiel</Text>
+              </Pressable>
+
+              <Pressable
+                style={{ backgroundColor: '#F1F5F9', borderRadius: 12, paddingVertical: 12, alignItems: 'center' }}
+                onPress={() => setSelectedReceipt(null)}
+              >
+                <Text style={{ color: '#475569', fontSize: 13, fontWeight: '700' }}>Fermer</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

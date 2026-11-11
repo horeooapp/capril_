@@ -413,9 +413,10 @@ export default function ProfileScreen() {
       <Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>QAPRIL Bailleur</Text>
+            <Text style={styles.modalTitle}>QAPRIL Propriétaire</Text>
             <Text style={styles.modalSubtitle}>
-              Version 2.0.0 · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Version 2.0.0 (Build 8) · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Dernière mise à jour appliquée : 11/11/2026 à 08:10 UTC.{'\n'}
               Gestion locative conforme à la réglementation en vigueur (Code de la Construction et de l’Habitat).
             </Text>
             <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>

@@ -287,6 +287,22 @@ export async function POST(request: Request) {
             data: { status: 'rented' }
         }).catch(() => null);
 
+        // 8b. Deux Horloges : Reprise d'un bail antérieur
+        if (body.isRepriseBail && body.dateRepriseOrigine) {
+            await prisma.leaseOpeningState.create({
+                data: {
+                    leaseId: newLease.id,
+                    dateReprise: new Date(body.dateRepriseOrigine),
+                    loyerEnVigueur: rentNum,
+                    chargesEnVigueur: finalCharges,
+                    dernierMoisPaye: body.dernierMoisPaye || null,
+                    soldeOuverture: Math.round(Number(body.soldeOuverture) || 0),
+                    statut: 'EN_ATTENTE',
+                    confirmeBailleurAt: new Date()
+                }
+            }).catch((err) => console.warn('[DEUX_HORLOGES] Erreur creation leaseOpeningState:', err));
+        }
+
         // 9. Notification par SMS du locataire
         if (tenant.phone) {
             await sendSMS(

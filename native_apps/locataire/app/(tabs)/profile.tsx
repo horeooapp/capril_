@@ -364,8 +364,9 @@ export default function ProfileScreen() {
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>QAPRIL Locataire</Text>
             <Text style={styles.modalSubtitle}>
-              Version 2.0.0 · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
-              Conçue conformément au Code de la Construction et de l’Habitat et à la protection des données personnelles.
+              Version 2.0.0 (Build 8) · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Dernière mise à jour appliquée : 11/11/2026 à 08:10 UTC.{'\n'}
+              Conçue conformément au Code de la Construction et de l’Habitat et aux normes républicaines de traçabilité.
             </Text>
             <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
               <RefreshCw color="#2C3E6B" size={16} />

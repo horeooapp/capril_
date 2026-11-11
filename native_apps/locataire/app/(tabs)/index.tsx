@@ -208,6 +208,12 @@ export default function LocatairePrototypeScreen() {
   const [visiteModal, setVisiteModal] = useState(false);
   const [visiteSlot, setVisiteSlot] = useState('Samedi · 10h00');
   const [mesCandModal, setMesCandModal] = useState(false);
+
+  // Visualisation Quittance détaillée & Contrat de bail & Révision / Deux Horloges
+  const [selectedReceiptLoc, setSelectedReceiptLoc] = useState<any>(null);
+  const [bailModalVisible, setBailModalVisible] = useState(false);
+  const [respondingRevision, setRespondingRevision] = useState(false);
+  const [confirmingReprise, setConfirmingReprise] = useState(false);
   const [myCandidatures, setMyCandidatures] = useState<any[]>([
     { id: 'c1', titre: '3 pièces · Cocody Angré 8e Tranche', loyer: 180000, statut: 'Visite proposée', date: 'Hier' },
   ]);
@@ -471,6 +477,56 @@ export default function LocatairePrototypeScreen() {
     };
     loadDashboard();
   }, []);
+
+  const handleRepondreRevision = async (reponse: boolean) => {
+    const propId = data?.pendingPropositionLoyer?.id;
+    if (!propId) return;
+    try {
+      setRespondingRevision(true);
+      const res = await fetchWithAuth(`/locataire/propositions-loyer/${propId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reponse })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        Alert.alert('Révision de loyer', json.message);
+        const dashRes = await fetchWithAuth('/locataire/dashboard');
+        if (dashRes.ok) setData(await dashRes.json());
+      } else {
+        Alert.alert('Erreur', json.error || 'Impossible de traiter la révision.');
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur réseau', e.message || 'Impossible de joindre le serveur.');
+    } finally {
+      setRespondingRevision(false);
+    }
+  };
+
+  const handleConfirmerReprise = async (action: 'CONFIRMER' | 'CONTESTER') => {
+    const stateId = data?.leaseOpeningState?.id;
+    if (!stateId) return;
+    try {
+      setConfirmingReprise(true);
+      const res = await fetchWithAuth(`/locataire/reprise-bail/${stateId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        Alert.alert('Reprise de bail', json.message);
+        const dashRes = await fetchWithAuth('/locataire/dashboard');
+        if (dashRes.ok) setData(await dashRes.json());
+      } else {
+        Alert.alert('Erreur', json.error || 'Impossible de traiter la demande.');
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur réseau', e.message || 'Impossible de joindre le serveur.');
+    } finally {
+      setConfirmingReprise(false);
+    }
+  };
 
   const fullName = data?.user ? ((data.user.firstName || "") + " " + (data.user.lastName || "")).trim() : "";
   const userName = fullName || (data?.user?.phone ? `Locataire (${data.user.phone})` : (data?.user?.email ? data.user.email.split('@')[0] : "Locataire"));
@@ -885,6 +941,79 @@ export default function LocatairePrototypeScreen() {
                     <Pressable style={styles.btnOutlineWhite} onPress={() => setProcheModal(true)}>
                       <Text style={styles.btnOutlineWhiteText}>Faire payer par un proche</Text>
                     </Pressable>
+                  </View>
+                )}
+
+                {/* ALERTE RÉVISION TRIENNALE DE LOYER (MRL-01) */}
+                {data?.pendingPropositionLoyer && (
+                  <View style={{ backgroundColor: '#FFFBEB', borderRadius: 14, padding: 14, marginTop: 12, borderWidth: 1, borderColor: '#FCD34D' }}>
+                    <View style={styles.rowBetween}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#B45309', textTransform: 'uppercase' }}>Révision de loyer proposée</Text>
+                      <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#92400E' }}>CCH 3 ans</Text>
+                      </View>
+                    </View>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#1A1D26', marginTop: 4 }}>
+                      Nouveau loyer proposé : {fmt(data.pendingPropositionLoyer.nouveauMontant)}
+                    </Text>
+                    <Text style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>
+                      Date d'effet demandée : {new Date(data.pendingPropositionLoyer.dateEffet).toLocaleDateString('fr-FR')} (Actuel : {fmt(data.pendingPropositionLoyer.montantActuel)})
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                      <Pressable
+                        style={{ flex: 1, backgroundColor: '#1E7E4E', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}
+                        onPress={() => handleRepondreRevision(true)}
+                        disabled={respondingRevision}
+                      >
+                        <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Accepter</Text>
+                      </Pressable>
+                      <Pressable
+                        style={{ flex: 1, backgroundColor: '#DC2626', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}
+                        onPress={() => handleRepondreRevision(false)}
+                        disabled={respondingRevision}
+                      >
+                        <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Refuser / Médiation</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
+
+                {/* ALERTE REPRISE DE BAIL ANTERIEUR (DEUX HORLOGES) */}
+                {data?.leaseOpeningState && !data.leaseOpeningState.confirmeLocataireAt && (
+                  <View style={{ backgroundColor: '#EEF2FF', borderRadius: 14, padding: 14, marginTop: 12, borderWidth: 1, borderColor: '#C7D2FE' }}>
+                    <View style={styles.rowBetween}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#4338CA', textTransform: 'uppercase' }}>Reprise de bail antérieur</Text>
+                      <View style={{ backgroundColor: '#E0E7FF', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#3730A3' }}>Deux Horloges</Text>
+                      </View>
+                    </View>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#1A1D26', marginTop: 4 }}>
+                      Confirmation d'état d'ouverture
+                    </Text>
+                    <Text style={{ fontSize: 11, color: '#4B5563', marginTop: 2 }}>
+                      Prise d'effet d'origine : {new Date(data.leaseOpeningState.dateReprise).toLocaleDateString('fr-FR')} · Dernier mois réglé : {data.leaseOpeningState.dernierMoisPaye || 'Non précisé'}
+                    </Text>
+                    {data.leaseOpeningState.soldeOuverture !== 0 && (
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: data.leaseOpeningState.soldeOuverture > 0 ? '#DC2626' : '#16A34A', marginTop: 3 }}>
+                        {data.leaseOpeningState.soldeOuverture > 0 ? `Arriéré antérieur : ${fmt(data.leaseOpeningState.soldeOuverture)}` : `Avance créditrice : ${fmt(Math.abs(data.leaseOpeningState.soldeOuverture))}`}
+                      </Text>
+                    )}
+                    <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                      <Pressable
+                        style={{ flex: 1, backgroundColor: '#4F46E5', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}
+                        onPress={() => handleConfirmerReprise('CONFIRMER')}
+                        disabled={confirmingReprise}
+                      >
+                        <Text style={{ color: '#fff', fontSize: 11, fontWeight: '700' }}>Confirmer</Text>
+                      </Pressable>
+                      <Pressable
+                        style={{ flex: 1, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#4F46E5', paddingVertical: 8, borderRadius: 8, alignItems: 'center' }}
+                        onPress={() => handleConfirmerReprise('CONTESTER')}
+                        disabled={confirmingReprise}
+                      >
+                        <Text style={{ color: '#4F46E5', fontSize: 11, fontWeight: '700' }}>Divergence</Text>
+                      </Pressable>
+                    </View>
                   </View>
                 )}
               </View>
@@ -1400,9 +1529,9 @@ export default function LocatairePrototypeScreen() {
                   </View>
                   <Pressable
                     style={styles.pillTint}
-                    onPress={() => Alert.alert('Quittance PDF', `Quittance certifiée ${q.receiptRef || q.period} horodatée.`)}
+                    onPress={() => setSelectedReceiptLoc(q)}
                   >
-                    <Text style={styles.pillTintText}>PDF</Text>
+                    <Text style={styles.pillTintText}>Afficher</Text>
                   </Pressable>
                 </View>
               ))
@@ -1471,6 +1600,15 @@ export default function LocatairePrototypeScreen() {
             </View>
 
             {/* ACTIONS DU BAIL COMME DANS LA MAQUETTE IC-01 (V.bail) */}
+            <Pressable style={[styles.cardRow, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]} onPress={() => setBailModalVisible(true)}>
+              <FileSpreadsheet color="#1D4ED8" size={20} />
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.boldText, { color: '#1E40AF' }]}>Afficher le contrat de bail complet</Text>
+                <Text style={styles.subMuted}>Texte intégral conforme CCH, clauses et certificat officiel</Text>
+              </View>
+              <ChevronRight color="#1D4ED8" size={18} />
+            </Pressable>
+
             <Pressable style={styles.cardRow} onPress={() => setRightsModal(true)}>
               <ShieldCheck color="#2C3E6B" size={20} />
               <View style={{ flex: 1 }}>
@@ -3390,6 +3528,182 @@ export default function LocatairePrototypeScreen() {
             <Pressable style={styles.btnPrimary} onPress={() => setMesCandModal(false)}>
               <Text style={styles.btnPrimaryText}>Fermer</Text>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : VISUALISATION COMPLÈTE DE LA QUITTANCE LOCATAIRE */}
+      <Modal visible={!!selectedReceiptLoc} transparent animationType="slide" onRequestClose={() => setSelectedReceiptLoc(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '85%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#E3F5EC', alignItems: 'center', justifyContent: 'center' }}>
+                  <ShieldCheck color="#1E7E4E" size={20} />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>Quittance de Loyer Officielle</Text>
+                  <Text style={{ fontSize: 11, color: '#64748B' }}>Preuve certifiée conforme</Text>
+                </View>
+              </View>
+              <Pressable onPress={() => setSelectedReceiptLoc(null)} style={{ padding: 6 }}>
+                <X color="#64748B" size={22} />
+              </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 14 }}>
+                <View style={[styles.rowBetween, { marginBottom: 8 }]}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Référence</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#0F172A', fontFamily: 'monospace' }}>
+                    {selectedReceiptLoc?.receiptRef || selectedReceiptLoc?.id}
+                  </Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 8 }]}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Période réglée</Text>
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#0F172A' }}>
+                    {selectedReceiptLoc?.period || selectedReceiptLoc?.periodMonth || 'Loyer mensuel'}
+                  </Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 8 }]}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Montant total réglé</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#1E7E4E' }}>
+                    {fmt(selectedReceiptLoc?.amount)}
+                  </Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 8 }]}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Mode de règlement</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#334155' }}>
+                    {selectedReceiptLoc?.paymentMethod || selectedReceiptLoc?.via || 'Wave / Mobile Money'}
+                  </Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={{ fontSize: 12, color: '#64748B' }}>Date de paiement</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#334155' }}>
+                    {selectedReceiptLoc?.date || 'Règlement validé'}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BBF7D0', marginBottom: 14 }}>
+                <Text style={{ fontSize: 11, color: '#166534', lineHeight: 16 }}>
+                  Dont quittance, sous réserve de tous droits. Ce document électronique horodaté constitue une preuve irréfutable pour vos démarches bancaires, administratives et de visa.
+                </Text>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 8 }]}
+                onPress={() => {
+                  const ref = selectedReceiptLoc?.receiptRef || selectedReceiptLoc?.id;
+                  const verifyUrl = `https://qapril.net/verifier?ref=${ref}`;
+                  Linking.openURL(verifyUrl).catch(() => {
+                    Alert.alert('Vérification en ligne', `Référence : ${ref}\nVérifiable sur qapril.net`);
+                  });
+                }}
+              >
+                <ExternalLink color="#FFFFFF" size={16} />
+                <Text style={styles.btnPrimaryText}>Télécharger le PDF certifié</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btnGhost, { backgroundColor: '#F1F5F9' }]}
+                onPress={() => setSelectedReceiptLoc(null)}
+              >
+                <Text style={{ color: '#475569', fontSize: 13, fontWeight: '700' }}>Fermer</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE : VISUALISATION COMPLÈTE DU CONTRAT DE BAIL */}
+      <Modal visible={bailModalVisible} transparent animationType="slide" onRequestClose={() => setBailModalVisible(false)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { maxHeight: '85%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileText color="#1D4ED8" size={20} />
+                </View>
+                <View>
+                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0F172A' }}>Contrat de Bail d'Habitation</Text>
+                  <Text style={{ fontSize: 11, color: '#64748B' }}>Réf. {bailRef} · Conforme Code CCH</Text>
+                </View>
+              </View>
+              <Pressable onPress={() => setBailModalVisible(false)} style={{ padding: 6 }}>
+                <X color="#64748B" size={22} />
+              </Pressable>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 14 }}>
+                <Text style={[styles.label, { color: '#1E40AF', marginBottom: 8 }]}>DÉSIGNATION DU LOGEMENT & PARTIES</Text>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Commune & Quartier</Text>
+                  <Text style={styles.boldText}>{data?.propertyCommune || 'Cocody, Abidjan'}</Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Adresse précise</Text>
+                  <Text style={styles.boldText}>{data?.propertyAddress || 'Non précisée'}</Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Bailleur certifié</Text>
+                  <Text style={styles.boldText}>{data?.landlordName || 'Bailleur certifié'}</Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Locataire titulaire</Text>
+                  <Text style={styles.boldText}>{userName}</Text>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', marginBottom: 14 }}>
+                <Text style={[styles.label, { color: '#1E40AF', marginBottom: 8 }]}>CONDITIONS FINANCIÈRES (LOI CCH)</Text>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Loyer mensuel principal</Text>
+                  <Text style={[styles.boldText, { color: '#1E7E4E' }]}>{fmt(loyer)}</Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Dépôt de garantie légal</Text>
+                  <Text style={styles.boldText}>{fmt(depositAmount)} (Plafond 2 mois)</Text>
+                </View>
+                <View style={[styles.rowBetween, { marginBottom: 6 }]}>
+                  <Text style={styles.subMuted}>Jour d'exigibilité</Text>
+                  <Text style={styles.boldText}>Le {data?.lease?.paymentDay || 5} de chaque mois</Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Durée du bail</Text>
+                  <Text style={styles.boldText}>{data?.lease?.durationMonths || 12} mois (Reconduction tacite)</Text>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: '#EFF6FF', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BFDBFE', marginBottom: 14 }}>
+                <Text style={{ fontSize: 11, color: '#1E40AF', lineHeight: 16 }}>
+                  Le présent contrat est régi par le Code de la Construction et de l'Habitat de Côte d'Ivoire. Les révisions de loyer sont soumises à un délai triennal strict (3 ans). La résiliation obéit à un préavis légal de 3 mois.
+                </Text>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1E40AF', flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 8 }]}
+                onPress={() => {
+                  const leaseId = data?.lease?.id;
+                  if (leaseId) {
+                    Linking.openURL(`https://qapril.net/api/mobile/leases/${leaseId}/pdf`).catch(() => {
+                      Alert.alert('Contrat de bail', `Contrat ${bailRef} scellé sur la plateforme.`);
+                    });
+                  }
+                }}
+              >
+                <Download color="#FFFFFF" size={16} />
+                <Text style={styles.btnPrimaryText}>Télécharger le PDF scellé du bail</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btnGhost, { backgroundColor: '#F1F5F9' }]}
+                onPress={() => setBailModalVisible(false)}
+              >
+                <Text style={{ color: '#475569', fontSize: 13, fontWeight: '700' }}>Fermer</Text>
+              </Pressable>
+            </ScrollView>
           </View>
         </View>
       </Modal>

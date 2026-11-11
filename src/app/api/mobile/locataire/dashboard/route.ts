@@ -169,6 +169,23 @@ export async function GET(request: Request) {
             nextPaymentDate = new Date(now.getFullYear(), now.getMonth() + 1, paymentDay);
         }
 
+        // Proposition de révision de loyer active (MRL-01)
+        const pendingPropositionLoyer = await prisma.propositionLoyer.findFirst({
+            where: {
+                leaseId: lease.id,
+                statut: "EN_ATTENTE"
+            },
+            include: {
+                consentement: true
+            },
+            orderBy: { createdAt: "desc" }
+        }).catch(() => null);
+
+        // État d'ouverture Deux Horloges (reprise de bail)
+        const leaseOpeningState = await prisma.leaseOpeningState.findUnique({
+            where: { leaseId: lease.id }
+        }).catch(() => null);
+
         return NextResponse.json({
             hasLease: true,
             user: userRecord,
@@ -203,6 +220,29 @@ export async function GET(request: Request) {
                 date: pendingPayment.datePaiement,
                 month: pendingPayment.mois,
                 status: pendingPayment.statut,
+            } : null,
+            pendingPropositionLoyer: pendingPropositionLoyer ? {
+                id: pendingPropositionLoyer.id,
+                montantActuel: pendingPropositionLoyer.montantActuel,
+                nouveauMontant: pendingPropositionLoyer.nouveauMontant,
+                dateEffet: pendingPropositionLoyer.dateEffet,
+                raison: pendingPropositionLoyer.raison,
+                statut: pendingPropositionLoyer.statut,
+                estConformeDelaiAns: pendingPropositionLoyer.estConformeDelaiAns,
+                estConformePreavis: pendingPropositionLoyer.estConformePreavis,
+                motifNullite: pendingPropositionLoyer.motifNullite,
+            } : null,
+            leaseOpeningState: leaseOpeningState ? {
+                id: leaseOpeningState.id,
+                dateReprise: leaseOpeningState.dateReprise,
+                loyerEnVigueur: leaseOpeningState.loyerEnVigueur,
+                chargesEnVigueur: leaseOpeningState.chargesEnVigueur,
+                dernierMoisPaye: leaseOpeningState.dernierMoisPaye,
+                soldeOuverture: leaseOpeningState.soldeOuverture,
+                statut: leaseOpeningState.statut,
+                motifContestation: leaseOpeningState.motifContestation,
+                confirmeBailleurAt: leaseOpeningState.confirmeBailleurAt,
+                confirmeLocataireAt: leaseOpeningState.confirmeLocataireAt,
             } : null,
         });
 

@@ -11,6 +11,7 @@ import {
   Alert,
   TextInput,
   Modal,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -298,7 +299,14 @@ export default function ProprietaireMaintenanceScreen() {
                 <Pressable
                   style={[styles.modalActionBtn, { backgroundColor: '#F3F4F6', borderWidth: 1, borderColor: '#E5E7EB' }]}
                   onPress={() => {
-                    Alert.alert('Appel au locataire', `Composer le ${selectedIncident?.telephone} pour convenir d’un créneau.`);
+                    const phone = selectedIncident?.telephone;
+                    if (phone) {
+                      Linking.openURL(`tel:${phone}`).catch(() => {
+                        Alert.alert('Appel au locataire', `Composer le ${phone} pour convenir d’un créneau.`);
+                      });
+                    } else {
+                      Alert.alert('Numéro non disponible', 'Aucun numéro de téléphone rattaché à ce locataire.');
+                    }
                   }}
                 >
                   <Phone color="#1F2937" size={16} />
