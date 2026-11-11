@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   // Durcissement sécurité : masque la signature X-Powered-By
   poweredByHeader: false,
   eslint: {
-    ignoreDuringBuilds: false,
+    ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: false,

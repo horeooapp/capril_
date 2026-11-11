@@ -8,8 +8,8 @@ function FeexPayCheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const tid = searchParams.get("tid") || `INT-${Date.now()}`;
-  const ref = searchParams.get("ref") || `FP-${Date.now().toString(36).toUpperCase()}`;
+  const tid = searchParams.get("tid") || "INT-FEEXPAY";
+  const ref = searchParams.get("ref") || "FP-PROD";
   const amountStr = searchParams.get("amount") || "100000";
   const desc = searchParams.get("desc") || "Règlement de loyer";
   const initialOp = (searchParams.get("op") || "wave").toLowerCase();
