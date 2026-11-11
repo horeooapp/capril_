@@ -57,9 +57,26 @@ export async function POST(
                 paidAt: declaration.datePaiement 
             })).digest('hex');
 
-            // 1. Créer la quittance officielle
-            const receipt = await prisma.receipt.create({
-                data: {
+            // 1. Créer ou mettre à jour la quittance officielle (Upsert anti-collision)
+            const receipt = await prisma.receipt.upsert({
+                where: {
+                    leaseId_periodMonth: {
+                        leaseId: declaration.bailId,
+                        periodMonth: periodMonth
+                    }
+                },
+                update: {
+                    receiptRef: ref,
+                    rentAmount: total,
+                    chargesAmount: 0,
+                    totalAmount: total,
+                    paymentMethod: declaration.moyen,
+                    paymentRef: `DECL-${declaration.id.slice(0, 8)}`,
+                    paidAt: declaration.datePaiement || new Date(),
+                    receiptHash: sha256,
+                    status: 'PAID'
+                },
+                create: {
                     receiptRef: ref,
                     leaseId: declaration.bailId,
                     periodMonth: periodMonth,

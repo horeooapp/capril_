@@ -254,3 +254,4 @@ export default function FeexPayCheckoutPage() {
     </Suspense>
   );
 }
+

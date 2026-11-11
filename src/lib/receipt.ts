@@ -51,36 +51,80 @@ export async function createAndNotifyReceipt(data: {
 
     if (!lease) throw new Error("Bail introuvable");
 
-    // 2. Reference & Hash
+    // 2. Reference & Target Period Search (Idempotence & Anti-collision)
     const receiptRef = await generateReceiptRef();
+
+    let targetPeriod = data.periodMonth;
+    let existingReceipt = await prisma.receipt.findUnique({
+        where: {
+            leaseId_periodMonth: {
+                leaseId: data.leaseId,
+                periodMonth: targetPeriod,
+            }
+        }
+    });
+
+    // Si une quittance soldée existe déjà pour ce mois, chercher le premier mois suivant non soldé
+    let loopGuard = 0;
+    while (existingReceipt && (existingReceipt.status === 'paid' || existingReceipt.status === 'PAID') && loopGuard < 24) {
+        loopGuard++;
+        const [y, m] = targetPeriod.split('-').map(Number);
+        const nextDate = new Date(Date.UTC(y, m, 1)); // m est 1-based, donc y, m donne le 1er du mois suivant
+        targetPeriod = nextDate.toISOString().slice(0, 7);
+        existingReceipt = await prisma.receipt.findUnique({
+            where: {
+                leaseId_periodMonth: {
+                    leaseId: data.leaseId,
+                    periodMonth: targetPeriod,
+                }
+            }
+        });
+    }
+
     const documentHash = await generateProofHash({
         receiptRef,
         leaseId: data.leaseId,
         totalAmount: data.rentAmount + data.chargesAmount,
-        period: data.periodMonth,
+        period: targetPeriod,
         receiptType: data.receiptType
     });
 
     // Generate Robust QR Token (PHASE 1)
     const qrToken = documentHash.slice(0, 12).toUpperCase();
 
-    // 3. Database Record
-    const receipt = await prisma.receipt.create({
-        data: {
-            receiptRef,
-            leaseId: data.leaseId,
-            periodMonth: data.periodMonth,
-            rentAmount: data.rentAmount,
-            chargesAmount: data.chargesAmount,
-            totalAmount: data.rentAmount + data.chargesAmount,
-            paymentMethod: data.paymentChannel,
-            paymentRef: data.paymentReference,
-            paidAt: new Date(),
-            receiptHash: documentHash,
-            qrToken: qrToken,
-            status: "PAID"
-        }
-    });
+    // 3. Database Record (Upsert sécurisé)
+    const receipt = existingReceipt
+        ? await prisma.receipt.update({
+            where: { id: existingReceipt.id },
+            data: {
+                receiptRef,
+                rentAmount: data.rentAmount,
+                chargesAmount: data.chargesAmount,
+                totalAmount: data.rentAmount + data.chargesAmount,
+                paymentMethod: data.paymentChannel,
+                paymentRef: data.paymentReference,
+                paidAt: new Date(),
+                receiptHash: documentHash,
+                qrToken: qrToken,
+                status: "PAID"
+            }
+        })
+        : await prisma.receipt.create({
+            data: {
+                receiptRef,
+                leaseId: data.leaseId,
+                periodMonth: targetPeriod,
+                rentAmount: data.rentAmount,
+                chargesAmount: data.chargesAmount,
+                totalAmount: data.rentAmount + data.chargesAmount,
+                paymentMethod: data.paymentChannel,
+                paymentRef: data.paymentReference,
+                paidAt: new Date(),
+                receiptHash: documentHash,
+                qrToken: qrToken,
+                status: "PAID"
+            }
+        });
 
     // 4. Scoring (ICL)
     if (data.receiptType === "RENT" && lease.tenantId) {
