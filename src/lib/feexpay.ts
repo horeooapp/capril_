@@ -14,6 +14,8 @@ export interface FeexPayInitializeOptions {
   callbackUrl?: string;
   returnUrl?: string;
   leaseId?: string;
+  source?: string;
+  app?: string;
 }
 
 export class FeexPayService {
@@ -80,7 +82,8 @@ export class FeexPayService {
     }
 
     // 2. Guichet de paiement officiel FeexPay intégré
-    const checkoutUrl = `${appUrl}/checkout/feexpay?tid=${encodeURIComponent(options.transactionId)}&ref=${encodeURIComponent(ref)}&amount=${options.amount}&desc=${encodeURIComponent(options.description)}&op=${encodeURIComponent(options.operator || 'wave')}&phone=${encodeURIComponent(options.payerPhone || '')}${options.leaseId ? `&leaseId=${encodeURIComponent(options.leaseId)}` : ''}`;
+    const extraParams = `${options.leaseId ? `&leaseId=${encodeURIComponent(options.leaseId)}` : ''}${options.source ? `&source=${encodeURIComponent(options.source)}` : ''}${options.app ? `&app=${encodeURIComponent(options.app)}` : ''}`;
+    const checkoutUrl = `${appUrl}/checkout/feexpay?tid=${encodeURIComponent(options.transactionId)}&ref=${encodeURIComponent(ref)}&amount=${options.amount}&desc=${encodeURIComponent(options.description)}&op=${encodeURIComponent(options.operator || 'wave')}&phone=${encodeURIComponent(options.payerPhone || '')}${extraParams}`;
 
     return {
       success: true,

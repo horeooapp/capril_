@@ -1,6 +1,6 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Modal,
   ScrollView,
   Linking,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Download, FileText, CheckCircle2, ShieldCheck, X, ExternalLink } from 'lucide-react-native';
@@ -27,24 +28,35 @@ export default function ReceiptsScreen() {
   const router = useRouter();
   const [receipts, setReceipts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchReceipts = async () => {
-      try {
-        const response = await fetchWithAuth('/locataire/receipts');
-        const json = await response.json();
-        if (response.ok && json.receipts) {
-          setReceipts(json.receipts);
-        }
-      } catch (e) {
-        console.error("Erreur chargement quittances", e);
-      } finally {
-        setLoading(false);
+  const fetchReceipts = useCallback(async (isPull = false) => {
+    try {
+      if (isPull) setRefreshing(true);
+      const response = await fetchWithAuth('/locataire/receipts');
+      const json = await response.json();
+      if (response.ok && json.receipts) {
+        setReceipts(json.receipts);
       }
-    };
-    fetchReceipts();
+    } catch (e) {
+      console.error("Erreur chargement quittances", e);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchReceipts();
+  }, [fetchReceipts]);
+
+  // Actualisation automatique dès que l'écran reprend le focus (ex: retour après paiement FeexPay)
+  useFocusEffect(
+    useCallback(() => {
+      fetchReceipts();
+    }, [fetchReceipts])
+  );
 
   if (loading) {
     return (
@@ -86,7 +98,14 @@ export default function ReceiptsScreen() {
         data={receipts}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
-        ListEmptyComponent={
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => fetchReceipts(true)}
+            colors={['#2C3E6B']}
+            tintColor="#2C3E6B"
+          />
+        }
           <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
             <FileText size={40} color="#94A3B8" />
             <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>

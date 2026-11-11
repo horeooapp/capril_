@@ -110,6 +110,8 @@ export async function POST(req: Request) {
             customerEmail: lease.tenant?.email || "locataire@qapril.ci",
             operator: operator,
             leaseId: lease.id,
+            source: "mobile",
+            app: "locataire",
         });
 
         return NextResponse.json({

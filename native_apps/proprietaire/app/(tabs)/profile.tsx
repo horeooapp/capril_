@@ -19,6 +19,7 @@ import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
 import { ShieldCheck, Globe, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download } from 'lucide-react-native';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
+import { BUILD_NUMBER, APP_VERSION, BUILD_TIMESTAMP } from '../../lib/version';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -359,8 +360,8 @@ export default function ProfileScreen() {
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>QAPRIL Propriétaire</Text>
             <Text style={styles.modalSubtitle}>
-              Version 2.0.0 (Build 8) · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
-              Dernière mise à jour appliquée : 11/11/2026 à 08:10 UTC.{'\n'}
+              Version {APP_VERSION} (Build {BUILD_NUMBER}) · Application officielle QAPRIL Côte d’Ivoire.{'\n'}
+              Dernière mise à jour appliquée : {BUILD_TIMESTAMP}.{'\n'}
               Gestion locative conforme à la réglementation en vigueur (Code de la Construction et de l’Habitat).
             </Text>
             <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>

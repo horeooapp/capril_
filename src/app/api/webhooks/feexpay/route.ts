@@ -48,13 +48,34 @@ export async function POST(request: NextRequest) {
 
     // Idempotence : ne pas retraiter un paiement déjà confirmé
     if (payment.statut === "CONFIRMEE") {
-      return NextResponse.json({ received: true, message: "Déjà traité." });
+      const quittance = await prisma.receipt.findFirst({
+        where: { leaseId: payment.leaseId },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json({ 
+        received: true, 
+        message: "Déjà traité.",
+        receiptRef: quittance?.receiptRef || reference,
+        receiptId: quittance?.id,
+      });
     }
 
     if (status === "SUCCESSFUL" || status === "SUCCESS") {
       // Confirmer le paiement et déclencher les workflows (Quittance, Scoring, etc.)
       await PaymentGateway.confirmPayment(payment.id, reference);
       console.log(`[Webhook FeexPay] ✅ Paiement ${payment.id} confirmé. Ref: ${reference}`);
+
+      const quittance = await prisma.receipt.findFirst({
+        where: { leaseId: payment.leaseId },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return NextResponse.json({
+        received: true,
+        success: true,
+        receiptRef: quittance?.receiptRef || reference,
+        receiptId: quittance?.id,
+      });
     } else if (status === "FAILED" || status === "CANCELLED") {
       await (prisma as any).paymentPgw.update({
         where: { id: payment.id },

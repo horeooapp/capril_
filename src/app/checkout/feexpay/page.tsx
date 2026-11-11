@@ -15,8 +15,18 @@ function FeexPayCheckoutContent() {
   const initialOp = (searchParams.get("op") || "wave").toLowerCase();
   const phoneParam = searchParams.get("phone") || "";
   const leaseId = searchParams.get("leaseId") || "";
+  const source = searchParams.get("source") || "";
+  const appParam = searchParams.get("app") || "locataire"; // "locataire" | "proprietaire"
 
   const amount = parseInt(amountStr, 10) || 100000;
+
+  const isProprio = appParam === "proprietaire";
+  const appScheme = isProprio ? "qaprilproprietaire" : "qaprillocataire";
+  const appPackage = isProprio ? "ci.qapril.proprietaire" : "ci.qapril.locataire";
+  const appName = isProprio ? "QAPRIL Propriétaire" : "QAPRIL Locataire";
+
+  const deepLink = `${appScheme}://receipts`;
+  const intentUrl = `intent://receipts#Intent;scheme=${appScheme};package=${appPackage};end`;
 
   const [operator, setOperator] = useState<"wave" | "orange" | "mtn" | "moov" | "carte">(
     initialOp.includes("orange")
@@ -34,10 +44,40 @@ function FeexPayCheckoutContent() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"IDLE" | "PROCESSING" | "SUCCESS" | "ERROR">("IDLE");
   const [receiptRef, setReceiptRef] = useState<string>("");
+  const [receiptId, setReceiptId] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const formatFcfa = (n: number) =>
     Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " F CFA";
+
+  const handleReturnToMobile = () => {
+    try {
+      window.location.href = deepLink;
+    } catch {}
+
+    if (typeof navigator !== "undefined" && /android/i.test(navigator.userAgent)) {
+      setTimeout(() => {
+        try {
+          window.location.href = intentUrl;
+        } catch {}
+      }, 400);
+    }
+  };
+
+  // Redirection automatique douce vers l'application mobile lors du succès
+  useEffect(() => {
+    if (status !== "SUCCESS") return;
+    const isMobileDevice =
+      source === "mobile" ||
+      (typeof navigator !== "undefined" && /android|iphone|ipad|ipod/i.test(navigator.userAgent));
+
+    if (isMobileDevice) {
+      const timer = setTimeout(() => {
+        handleReturnToMobile();
+      }, 1800);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   const handleConfirmPayment = async () => {
     if (operator !== "carte" && (!phone || phone.trim().length < 8)) {
@@ -68,7 +108,10 @@ function FeexPayCheckoutContent() {
       // 2. Si le webhook confirme ou si on finalise la quittance
       setTimeout(() => {
         setStatus("SUCCESS");
-        setReceiptRef(ref);
+        setReceiptRef(json.receiptRef || ref);
+        if (json.receiptId) {
+          setReceiptId(json.receiptId);
+        }
         setLoading(false);
       }, 1200);
     } catch (e: any) {
@@ -128,13 +171,56 @@ function FeexPayCheckoutContent() {
                 </div>
               </div>
 
-              <div className="pt-4 space-y-2">
-                <button
-                  onClick={() => router.push("/mon-espace-locataire")}
-                  className="w-full bg-[#1E293B] hover:bg-slate-900 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all"
+              {/* ACTIONS RETOUR & QUITTANCES */}
+              <div className="pt-4 space-y-3">
+                {/* 1. Bouton natif pour revenir à l'application mobile */}
+                <a
+                  href={deepLink}
+                  onClick={(e) => {
+                    handleReturnToMobile();
+                  }}
+                  className="w-full bg-[#1E293B] hover:bg-slate-900 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2.5 text-sm"
                 >
-                  Accéder à mes quittances
-                </button>
+                  <Smartphone size={18} className="text-emerald-400" />
+                  <span>Afficher mes quittances dans l'application</span>
+                </a>
+
+                {/* Secours Android si l'app ne s'est pas ouverte automatiquement */}
+                <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500">
+                  <span>L'application ne s'est pas rouverte ?</span>
+                  <a
+                    href={intentUrl}
+                    className="font-bold text-blue-600 underline"
+                  >
+                    Ouvrir {appName}
+                  </a>
+                </div>
+
+                {/* 2. Bouton secondaire : Quittance certifiée directe (sans passer par la page de login web) */}
+                {receiptId ? (
+                  <a
+                    href={`/receipts/${receiptId}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
+                  >
+                    <span>📄 Télécharger / Imprimer ma quittance (PDF)</span>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (receiptRef) {
+                        window.open(`/v/${receiptRef}`, "_blank");
+                      } else {
+                        router.push("/mon-espace-locataire");
+                      }
+                    }}
+                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
+                  >
+                    <span>📄 Télécharger / Imprimer ma quittance (PDF)</span>
+                  </button>
+                )}
               </div>
             </div>
           ) : (

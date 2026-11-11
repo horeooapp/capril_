@@ -4,10 +4,10 @@ import { Platform } from 'react-native';
 export const APP_NAME = 'QAPRIL Propriétaire';
 export const APP_KEY = 'proprietaire';
 export const APP_VERSION = '2.0.0';
-export const BUILD_NUMBER = 10;
+export const BUILD_NUMBER = 11;
 export const BUILD_DATE = '11/11/2026';
-export const BUILD_TIME = '10:15 UTC';
-export const BUILD_TIMESTAMP = '11/11/2026 à 10:15 UTC';
+export const BUILD_TIME = '23:30 UTC';
+export const BUILD_TIMESTAMP = '11/11/2026 à 23:30 UTC';
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;
