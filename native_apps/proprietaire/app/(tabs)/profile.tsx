@@ -33,8 +33,6 @@ export default function ProfileScreen() {
   const [isSavingEmail, setIsSavingEmail] = useState(false);
   const [diasporaModalVisible, setDiasporaModalVisible] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
-  const [maposteCode, setMaposteCode] = useState('CI-ABJ-COC-01180');
-  const [editMaposteVisible, setEditMaposteVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -231,45 +229,21 @@ export default function ProfileScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Ma boîte MaPoste</Text>
                 <Text style={styles.cardSub}>
-                  Code postal numérique : {maposteCode} · Utilisé pour vos courriers officiels.
+                  Boîte MaPoste : disponible prochainement (intégration La Poste CI).
                 </Text>
               </View>
-              <Pressable
-                style={{ backgroundColor: '#F5F2EC', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
-                onPress={() => setEditMaposteVisible(true)}
-              >
-                <Text style={{ fontSize: 12, fontWeight: '600', color: '#1B4D3E' }}>Modifier</Text>
-              </Pressable>
+              <View style={{ backgroundColor: '#F5F2EC', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#6B7280' }}>Bientôt disponible</Text>
+              </View>
             </View>
 
-            {/* Manuel d'Utilisation Officiel QAPRIL v2.0 */}
-            <View style={styles.card}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <BookOpen color="#D97706" size={20} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>Manuel d'Utilisation Officiel</Text>
-                  <Text style={styles.cardSub}>
-                    Guide officiel complet v2.0 (espace bailleur, baux et adoption).
-                  </Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
-                <Pressable
-                  style={[styles.btnSecondary, { flex: 1, backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }]}
-                  onPress={() => Linking.openURL('https://qapril.net/manuel')}
-                >
-                  <ExternalLink color="#B45309" size={14} />
-                  <Text style={[styles.btnSecondaryText, { color: '#B45309', fontSize: 12 }]}>Consulter en ligne</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.btnSecondary, { flex: 1, backgroundColor: '#F8FAFC', borderColor: '#E2E8F0' }]}
-                  onPress={() => Linking.openURL('https://qapril.net/api/manual/download')}
-                >
-                  <Download color="#1B4D3E" size={14} />
-                  <Text style={[styles.btnSecondaryText, { color: '#1B4D3E', fontSize: 12 }]}>Télécharger</Text>
-                </Pressable>
-              </View>
-            </View>
+            <Pressable
+              style={styles.btnSecondary}
+              onPress={() => Linking.openURL('https://qapril.net/manuel')}
+            >
+              <BookOpen color="#1B4D3E" size={16} />
+              <Text style={styles.btnSecondaryText}>Aide & Manuel d’utilisation</Text>
+            </Pressable>
 
             <Pressable style={styles.btnSecondary} onPress={() => setAboutModalVisible(true)}>
               <RefreshCw color="#1B4D3E" size={16} />
@@ -282,7 +256,6 @@ export default function ProfileScreen() {
             </Pressable>
           </>
         )}
-        <AppVersionBadge />
       </ScrollView>
 
       {/* Modal Modification Adresse Mail */}
@@ -378,36 +351,7 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* Modal MaPoste */}
-      <Modal visible={editMaposteVisible} transparent animationType="fade" onRequestClose={() => setEditMaposteVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Ma boîte MaPoste</Text>
-            <Text style={styles.modalSubtitle}>Renseignez votre code postal numérique MaPoste pour vos notifications officielles.</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={maposteCode}
-              onChangeText={setMaposteCode}
-              placeholder="CI-ABJ-COC-01180"
-              autoCapitalize="characters"
-            />
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
-              <Pressable style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} onPress={() => setEditMaposteVisible(false)}>
-                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]}
-                onPress={() => {
-                  setEditMaposteVisible(false);
-                  Alert.alert('MaPoste enregistrée', `Votre code postal numérique ${maposteCode} est bien lié à votre compte.`);
-                }}
-              >
-                <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+
 
       {/* Modal À propos */}
       <Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>

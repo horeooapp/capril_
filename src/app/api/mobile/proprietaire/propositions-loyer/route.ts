@@ -16,13 +16,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Tous les champs sont requis (bail, montant, date d'effet)." }, { status: 400 });
         }
 
-        const lease = await prisma.lease.findFirst({
-            where: {
-                OR: [
-                    { id: leaseId },
-                    { leaseReference: leaseId },
-                ]
-            },
+        const lease = await prisma.lease.findUnique({
+            where: { id: leaseId },
             include: { property: true }
         });
 
@@ -39,7 +34,7 @@ export async function POST(request: Request) {
 
         // Calcul triennal
         const lastHist = await prisma.leaseRentHistory.findFirst({
-            where: { leaseId: lease.id },
+            where: { leaseId },
             orderBy: { effectiveLe: "desc" }
         });
         const refDate = lastHist?.effectiveLe ? new Date(lastHist.effectiveLe) : new Date(lease.startDate);
@@ -58,7 +53,7 @@ export async function POST(request: Request) {
 
         const prop = await prisma.propositionLoyer.create({
             data: {
-                leaseId: lease.id,
+                leaseId,
                 montantActuel: lease.rentAmount,
                 nouveauMontant: Math.round(nouveauMontant),
                 dateEffet: dateEffetObj,
@@ -82,3 +77,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: e.message || "Erreur serveur" }, { status: 500 });
     }
 }
+

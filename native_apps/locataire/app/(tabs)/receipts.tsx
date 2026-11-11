@@ -1,5 +1,6 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -17,6 +18,7 @@ import { Download, FileText, CheckCircle2, ShieldCheck, X, ExternalLink } from '
 import { fetchWithAuth } from '../../lib/api';
 
 export default function ReceiptsScreen() {
+  const router = useRouter();
   const [receipts, setReceipts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
@@ -85,8 +87,14 @@ export default function ReceiptsScreen() {
               Aucune quittance émise pour le moment
             </Text>
             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
-              Vos quittances apparaîtront ici dès la validation de vos règlements de loyer.
+              Vos quittances certifiées apparaîtront ici dès la validation de votre loyer.
             </Text>
+            <Pressable
+              style={{ backgroundColor: '#1B4D3E', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, marginTop: 16 }}
+              onPress={() => router.push('/(tabs)/' as any)}
+            >
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Régler mon loyer en cours</Text>
+            </Pressable>
           </View>
         }
         renderItem={({ item }) => (

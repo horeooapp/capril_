@@ -116,15 +116,33 @@ export async function POST(request: Request) {
             }).catch(() => null);
         }
 
-        // 3. Traitement financier & plafonnements légaux (Loi 2019-576 Arts. 415 & 416 CCH)
+        // 3. Traitement financier & plafonnements légaux stricts (Loi 2019-576 Arts. 415 & 416 CCH)
         const maxLegalLimit = rentNum * 2;
         const requestedDeposit = depositAmount ? Math.round(parseFloat(String(depositAmount).replace(/\s/g, ''))) : maxLegalLimit;
         const requestedAdvance = avanceLoyer ? Math.round(parseFloat(String(avanceLoyer).replace(/\s/g, ''))) : maxLegalLimit;
 
-        const finalDeposit = Math.min(requestedDeposit, maxLegalLimit);
-        const finalAdvance = Math.min(requestedAdvance, maxLegalLimit);
+        if (requestedDeposit > maxLegalLimit) {
+            return NextResponse.json({
+                error: `Conformément au Code de la Construction et de l'Habitation (art. 415), le dépôt de garantie ne peut excéder 2 mois de loyer (maximum ${formatNumber(maxLegalLimit)} FCFA).`
+            }, { status: 400 });
+        }
+
+        if (requestedAdvance > maxLegalLimit) {
+            return NextResponse.json({
+                error: `Conformément au Code de la Construction et de l'Habitation (art. 416), l'avance de loyer ne peut excéder 2 mois de loyer (maximum ${formatNumber(maxLegalLimit)} FCFA).`
+            }, { status: 400 });
+        }
+
+        const finalDeposit = requestedDeposit;
+        const finalAdvance = requestedAdvance;
         const finalCharges = chargesAmount ? Math.round(parseFloat(String(chargesAmount).replace(/\s/g, ''))) : 0;
         const parsedDuration = durationMonths ? parseInt(String(durationMonths), 10) : 12;
+
+        if (!parsedDuration || parsedDuration <= 0) {
+            return NextResponse.json({
+                error: "La durée contractuelle du bail est obligatoire (12, 24 ou 36 mois)."
+            }, { status: 400 });
+        }
 
         const ownerFullName = cleanPdfText(
             `${dbUser.firstName || ''} ${dbUser.lastName || ''}`.trim() || dbUser.email || dbUser.phone || 'Propriétaire QAPRIL'

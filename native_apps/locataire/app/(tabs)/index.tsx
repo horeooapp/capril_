@@ -69,6 +69,25 @@ const formatImageUrl = (uri?: string | null) => {
   return `https://qapril.net/${uri}`;
 };
 
+const OCCUPANT_LABELS: Record<string, string> = {
+  CONJOINT: 'Conjoint',
+  ENFANT_MAJEUR: 'Enfant majeur',
+  ENFANT_MINEUR: 'Enfant mineur',
+  COLOCATAIRE: 'Colocataire',
+  AUTRE: 'Autre',
+};
+
+function computeDueCountdown(paymentDay = 5) {
+  const now = new Date();
+  let due = new Date(now.getFullYear(), now.getMonth(), paymentDay);
+  if (now.getDate() > paymentDay) {
+    due = new Date(now.getFullYear(), now.getMonth() + 1, paymentDay);
+  }
+  const diffDays = Math.max(1, Math.ceil((due.getTime() - now.getTime()) / (1000 * 3600 * 24)));
+  const dueFormatted = due.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  return `À payer avant le ${dueFormatted} · dans ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
+}
+
 type LocScreen =
   | 'accueil'
   | 'factures'
@@ -646,7 +665,7 @@ export default function LocatairePrototypeScreen() {
       return;
     }
     if (!occHonneur) {
-      Alert.alert('Engagement requis', 'Veuillez cocher la déclaration sur l’honneur (Art. 14 Loi 2013-546).');
+      Alert.alert('Engagement requis', 'Veuillez cocher l’engagement sur l’honneur. Une fausse déclaration engage votre responsabilité.');
       return;
     }
     setSubmittingOcc(true);
@@ -880,12 +899,6 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.h1}>{userName}</Text>
                 <Text style={styles.subMuted}>{propName}</Text>
               </View>
-              <Pressable
-                style={styles.iconBtn}
-                onPress={() => router.push('/notifications' as any)}
-              >
-                <Bell color="#1A1D26" size={20} />
-              </Pressable>
             </View>
 
             {/* HERO LOYER OU ÉTAT SANS BAIL (P0-02 & P0-04) */}
@@ -909,13 +922,13 @@ export default function LocatairePrototypeScreen() {
                         ? 'À jour · Loyer réglé'
                         : data?.rentStatus === 'DECLARED_PENDING'
                         ? 'En attente de confirmation'
-                        : 'À régler'}
+                        : 'À payer'}
                     </Text>
                   </View>
                 </View>
                 <Text style={styles.heroBig}>{fmt(loyer)}</Text>
                 <Text style={styles.heroSub}>
-                  Bail {bailRef} · Prochaine échéance le {data?.lease?.paymentDay || 5} du mois · Frais : 0 F
+                  Bail {bailRef} · {computeDueCountdown(data?.lease?.paymentDay || 5)}
                 </Text>
 
                 {data?.rentStatus === 'DECLARED_PENDING' ? (
@@ -1505,7 +1518,7 @@ export default function LocatairePrototypeScreen() {
               <View style={styles.rowBetween}>
                 <Text style={styles.boldText}>{receiptsList.length} quittance(s) enregistrée(s)</Text>
                 <View style={styles.pillOk}>
-                  <Text style={styles.pillOkText}>Quittances officielles</Text>
+                  <Text style={styles.pillOkText}>Mes quittances</Text>
                 </View>
               </View>
             </View>
@@ -1517,6 +1530,12 @@ export default function LocatairePrototypeScreen() {
                 <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 4 }]}>
                   Vos quittances apparaîtront ici dès le règlement validé.
                 </Text>
+                <Pressable
+                  style={[styles.btnPrimary, { marginTop: 14, backgroundColor: '#1B4D3E' }]}
+                  onPress={() => setScreen('payer')}
+                >
+                  <Text style={styles.btnPrimaryText}>Payer mon loyer</Text>
+                </Pressable>
               </View>
             ) : (
               receiptsList.map((q: any, i: number) => (
@@ -1786,12 +1805,14 @@ export default function LocatairePrototypeScreen() {
 
               <Pressable style={styles.toggleRow} onPress={() => setShareTranche(!shareTranche)}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.boldText}>Ma tranche de confiance (A, B ou C)</Text>
+                  <Text style={styles.boldText}>Ma tranche de confiance (A, B, C ou D)</Text>
                   <Text style={styles.subMuted}>Jamais le détail du calcul</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareTranche ? '#1E7E4E' : '#6B7280' }]}>
-                  {shareTranche ? 'Partagé' : 'Masqué'}
-                </Text>
+                <View style={{ backgroundColor: shareTranche ? '#DCFCE7' : '#F1F5F9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                  <Text style={[styles.boldText, { fontSize: 12, color: shareTranche ? '#166534' : '#64748B' }]}>
+                    {shareTranche ? 'Je montre' : 'Je ne montre pas'}
+                  </Text>
+                </View>
               </Pressable>
 
               <Pressable style={styles.toggleRow} onPress={() => setShareRev(!shareRev)}>
@@ -1799,9 +1820,11 @@ export default function LocatairePrototypeScreen() {
                   <Text style={styles.boldText}>Mes badges (Ponctuel, Revenus ≥ 3× loyer, Garant)</Text>
                   <Text style={styles.subMuted}>Sans jamais révéler le montant de votre salaire</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareRev ? '#1E7E4E' : '#6B7280' }]}>
-                  {shareRev ? 'Partagé' : 'Masqué'}
-                </Text>
+                <View style={{ backgroundColor: shareRev ? '#DCFCE7' : '#F1F5F9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                  <Text style={[styles.boldText, { fontSize: 12, color: shareRev ? '#166534' : '#64748B' }]}>
+                    {shareRev ? 'Je montre' : 'Je ne montre pas'}
+                  </Text>
+                </View>
               </Pressable>
 
               <Pressable style={styles.toggleRow} onPress={() => setShareFoyer(!shareFoyer)}>
@@ -1809,9 +1832,11 @@ export default function LocatairePrototypeScreen() {
                   <Text style={styles.boldText}>Composition de mon foyer</Text>
                   <Text style={styles.subMuted}>Nombre d’occupants prévus dans le logement</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareFoyer ? '#1E7E4E' : '#6B7280' }]}>
-                  {shareFoyer ? 'Partagé' : 'Masqué'}
-                </Text>
+                <View style={{ backgroundColor: shareFoyer ? '#DCFCE7' : '#F1F5F9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                  <Text style={[styles.boldText, { fontSize: 12, color: shareFoyer ? '#166534' : '#64748B' }]}>
+                    {shareFoyer ? 'Je montre' : 'Je ne montre pas'}
+                  </Text>
+                </View>
               </Pressable>
 
               <Pressable style={styles.toggleRow} onPress={() => setShareDuree(!shareDuree)}>
@@ -1819,9 +1844,11 @@ export default function LocatairePrototypeScreen() {
                   <Text style={styles.boldText}>Durée de mon bail actuel</Text>
                   <Text style={styles.subMuted}>Ancienneté dans votre logement actuel</Text>
                 </View>
-                <Text style={[styles.boldText, { color: shareDuree ? '#1E7E4E' : '#6B7280' }]}>
-                  {shareDuree ? 'Partagé' : 'Masqué'}
-                </Text>
+                <View style={{ backgroundColor: shareDuree ? '#DCFCE7' : '#F1F5F9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                  <Text style={[styles.boldText, { fontSize: 12, color: shareDuree ? '#166534' : '#64748B' }]}>
+                    {shareDuree ? 'Je montre' : 'Je ne montre pas'}
+                  </Text>
+                </View>
               </Pressable>
             </View>
           </View>
@@ -2947,7 +2974,7 @@ export default function LocatairePrototypeScreen() {
           <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
             <Text style={styles.h2}>Attestation de résidence officielle</Text>
             <Text style={[styles.subMuted, { marginTop: 4 }]}>
-              Certifiée par QAPRIL · Conforme Décret n° 2019-576 et Loi 2013-546
+              Attestation certifiée QAPRIL · Document officiel de résidence
             </Text>
 
             <View style={styles.recapBox}>
@@ -3041,12 +3068,12 @@ export default function LocatairePrototypeScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.boldText}>{occ.nom} {occ.prenoms}</Text>
                       <Text style={styles.subMuted}>
-                        {occ.typeLien} · {occ.statutConfirmation === 'CONFIRME' ? '✓ Confirmé' : 'En attente'}
+                        {OCCUPANT_LABELS[occ.typeLien] || occ.typeLien}{occ.statutConfirmation === 'CONFIRME' ? ' · ✓ Confirmé' : ''}
                       </Text>
                       {occ.telephone && <Text style={styles.subMuted}>Tél : {occ.telephone}</Text>}
                     </View>
                     <View style={styles.pillOk}>
-                      <Text style={styles.pillOkText}>{occ.typeLien}</Text>
+                      <Text style={styles.pillOkText}>{OCCUPANT_LABELS[occ.typeLien] || occ.typeLien}</Text>
                     </View>
                   </View>
                 ))
@@ -3079,7 +3106,7 @@ export default function LocatairePrototypeScreen() {
                 </Pressable>
               </View>
               <Text style={[styles.subMuted, { marginTop: 4 }]}>
-                Conformément à la Loi 2013-546, toute fausse déclaration engage la responsabilité du déclarant.
+                Une fausse déclaration engage votre responsabilité.
               </Text>
 
               <View style={{ width: '100%', gap: 10, marginVertical: 12 }}>
@@ -3110,7 +3137,7 @@ export default function LocatairePrototypeScreen() {
                       ]}
                     >
                       <Text style={[styles.filterChipText, occTypeLien === lien && { color: '#FFF' }]}>
-                        {lien}
+                        {OCCUPANT_LABELS[lien] || lien}
                       </Text>
                     </Pressable>
                   ))}
