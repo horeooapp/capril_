@@ -1059,24 +1059,31 @@ export default function LocatairePrototypeScreen() {
                       ? styles.pillOk
                       : data?.rentStatus === 'DECLARED_PENDING'
                       ? [styles.pillOk, { backgroundColor: '#FEF3C7' }]
-                      : [styles.pillOk, { backgroundColor: '#FEE2E2' }]
+                      : data?.est_en_retard
+                      ? [styles.pillOk, { backgroundColor: '#FEE2E2' }]
+                      : styles.pillOk
                   }>
                     <Text style={[
                       styles.pillOkText,
                       data?.rentStatus === 'DECLARED_PENDING' && { color: '#B45309' },
-                      data?.rentStatus !== 'PAID' && data?.rentStatus !== 'DECLARED_PENDING' && { color: '#B91C1C' },
+                      data?.rentStatus !== 'PAID' && data?.rentStatus !== 'DECLARED_PENDING' && data?.est_en_retard && { color: '#B91C1C' },
+                      data?.rentStatus !== 'PAID' && data?.rentStatus !== 'DECLARED_PENDING' && !data?.est_en_retard && { color: '#1E3A8A' },
                     ]}>
                       {data?.rentStatus === 'PAID'
                         ? 'À jour · Loyer réglé'
                         : data?.rentStatus === 'DECLARED_PENDING'
                         ? 'En attente de confirmation'
-                        : 'À payer'}
+                        : data?.est_en_retard
+                        ? `En retard · ${data?.retard_jours || 1}j`
+                        : data?.est_jour_j
+                        ? 'Échéance aujourd’hui'
+                        : `Dans ${data?.jours_restants || 1}j`}
                     </Text>
                   </View>
                 </View>
                 <Text style={styles.heroBig}>{fmt(loyer)}</Text>
                 <Text style={styles.heroSub}>
-                  Bail {bailRef} · {computeDueCountdown(data?.lease?.paymentDay || 5)}
+                  Bail {bailRef} · {data?.texte_echeance || computeDueCountdown(data?.lease?.paymentDay || 5)}
                 </Text>
 
                 {data?.rentStatus === 'DECLARED_PENDING' ? (
@@ -1610,10 +1617,6 @@ export default function LocatairePrototypeScreen() {
                 <View style={styles.rowBetween}>
                   <Text style={styles.subMuted}>Montant du loyer ({payPeriod} mois)</Text>
                   <Text style={styles.boldText}>{fmt(loyer * payPeriod)}</Text>
-                </View>
-                <View style={styles.rowBetween}>
-                  <Text style={styles.subMuted}>Frais QAPRIL locataire</Text>
-                  <Text style={[styles.boldText, { color: '#1E7E4E' }]}>0 F (Gratuit)</Text>
                 </View>
                 <View style={[styles.rowBetween, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#E5E7EF' }]}>
                   <Text style={styles.boldText}>Total à payer</Text>

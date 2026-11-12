@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { calculerEcheanceBail } from '@/lib/echeance';
 
 export async function GET(request: Request) {
     try {
@@ -161,13 +162,20 @@ export async function GET(request: Request) {
             }
         });
 
-        // Calculate next payment date
-        const now = new Date();
-        const paymentDay = lease.paymentDay || 5;
-        let nextPaymentDate = new Date(now.getFullYear(), now.getMonth(), paymentDay);
-        if (now.getDate() > paymentDay) {
-            nextPaymentDate = new Date(now.getFullYear(), now.getMonth() + 1, paymentDay);
-        }
+        // Calcul d'échéance certifiée côté serveur (Ticket S-07)
+        const allPaidReceipts = await prisma.receipt.findMany({
+            where: {
+                leaseId: lease.id,
+                status: { in: ['PAID', 'paid'] }
+            },
+            select: { periodMonth: true }
+        });
+        const paidMonthsList = allPaidReceipts.map(r => r.periodMonth);
+        const echeance = calculerEcheanceBail({
+            paymentDay: lease.paymentDay,
+            paidMonths: paidMonthsList,
+            startDate: lease.startDate,
+        });
 
         // Proposition de révision de loyer active (MRL-01)
         const pendingPropositionLoyer = await prisma.propositionLoyer.findFirst({
@@ -212,7 +220,14 @@ export async function GET(request: Request) {
             currency: 'XOF',
             recentReceipts: mappedReceipts,
             openMaintenanceCount,
-            nextPaymentDate: nextPaymentDate.toISOString(),
+            nextPaymentDate: echeance.prochaine_echeance_date,
+            prochaine_echeance_date: echeance.prochaine_echeance_date,
+            jours_restants: echeance.jours_restants,
+            retard_jours: echeance.retard_jours,
+            est_en_retard: echeance.est_en_retard,
+            est_jour_j: echeance.est_jour_j,
+            texte_echeance: echeance.texte_echeance,
+            echeancePeriodeMois: echeance.periode_mois,
             pendingPayment: pendingPayment ? {
                 id: pendingPayment.id,
                 amount: pendingPayment.montant,
