@@ -8,6 +8,7 @@ import fsSync from 'fs';
 import path from 'path';
 import { UPLOADS_DIR } from '@/lib/storage';
 import { sendSMS } from '@/lib/sms';
+import { validateLeaseInput, calculerDroitsEnregistrement } from '@/lib/lease-validation';
 
 // Fonction de nettoyage strict pour PDF (compatible Helvetica / WinAnsi)
 function cleanPdfText(str: string): string {
@@ -116,33 +117,33 @@ export async function POST(request: Request) {
             }).catch(() => null);
         }
 
-        // 3. Traitement financier & plafonnements légaux stricts (Loi 2019-576 Arts. 415 & 416 CCH)
-        const maxLegalLimit = rentNum * 2;
+        // 3. Traitement financier & contrôles stricts de bail (S-06 / Loi 2019-576 Arts. 415 & 416 CCH)
+        const validation = validateLeaseInput({
+            rentAmount: rentNum,
+            depositAmount: depositAmount ? parseFloat(String(depositAmount).replace(/\s/g, '')) : undefined,
+            avanceLoyer: avanceLoyer ? parseFloat(String(avanceLoyer).replace(/\s/g, '')) : undefined,
+            durationMonths: durationMonths,
+        });
+
+        if (!validation.isValid) {
+            return NextResponse.json({
+                error: validation.error,
+                code: validation.code,
+                errors: validation.errors,
+                maxLegalDeposit: validation.maxLegalDeposit,
+                maxLegalAdvance: validation.maxLegalAdvance,
+            }, { status: 422 });
+        }
+
+        const maxLegalLimit = validation.maxLegalDeposit;
         const requestedDeposit = depositAmount ? Math.round(parseFloat(String(depositAmount).replace(/\s/g, ''))) : maxLegalLimit;
         const requestedAdvance = avanceLoyer ? Math.round(parseFloat(String(avanceLoyer).replace(/\s/g, ''))) : maxLegalLimit;
-
-        if (requestedDeposit > maxLegalLimit) {
-            return NextResponse.json({
-                error: `Conformément au Code de la Construction et de l'Habitation (art. 415), le dépôt de garantie ne peut excéder 2 mois de loyer (maximum ${formatNumber(maxLegalLimit)} FCFA).`
-            }, { status: 400 });
-        }
-
-        if (requestedAdvance > maxLegalLimit) {
-            return NextResponse.json({
-                error: `Conformément au Code de la Construction et de l'Habitation (art. 416), l'avance de loyer ne peut excéder 2 mois de loyer (maximum ${formatNumber(maxLegalLimit)} FCFA).`
-            }, { status: 400 });
-        }
 
         const finalDeposit = requestedDeposit;
         const finalAdvance = requestedAdvance;
         const finalCharges = chargesAmount ? Math.round(parseFloat(String(chargesAmount).replace(/\s/g, ''))) : 0;
-        const parsedDuration = durationMonths ? parseInt(String(durationMonths), 10) : 12;
-
-        if (!parsedDuration || parsedDuration <= 0) {
-            return NextResponse.json({
-                error: "La durée contractuelle du bail est obligatoire (12, 24 ou 36 mois)."
-            }, { status: 400 });
-        }
+        const parsedDuration = validation.parsedDuration || 12;
+        const recapitulatifDgi = validation.recapitulatifDroitsEnregistrement || calculerDroitsEnregistrement(rentNum, parsedDuration);
 
         const ownerFullName = cleanPdfText(
             `${dbUser.firstName || ''} ${dbUser.lastName || ''}`.trim() || dbUser.email || dbUser.phone || 'Propriétaire QAPRIL'
@@ -278,7 +279,7 @@ export async function POST(request: Request) {
         const protocol = request.url.startsWith('https') ? 'https' : 'https';
         const fullPublicPdfUrl = `${protocol}://${host}${publicRelativeUrl}`;
 
-        // 7. Enregistrement du Bail dans la base de données
+        // 7. Enregistrement du Bail dans la base de données (avec récapitulatif DGI S-06)
         const newLease = await prisma.lease.create({
             data: {
                 leaseReference: leaseRef,
@@ -295,7 +296,12 @@ export async function POST(request: Request) {
                 status: 'ACTIVE',
                 bailleurMasque: Boolean(body.bailleurMasque),
                 qrCodeUrl: fullPublicPdfUrl,
-                modeCreation: 'NUMERIQUE'
+                modeCreation: 'NUMERIQUE',
+                droitsDgiCalcules: recapitulatifDgi.totalDroitsDgi,
+                droitsEnregistrement: recapitulatifDgi.droitsEnregistrement,
+                fraisTimbre: recapitulatifDgi.fraisTimbre,
+                totalFiscalBail: recapitulatifDgi.totalDroitsDgi,
+                dgiDroitsCalcules: recapitulatifDgi.totalDroitsDgi,
             }
         });
 
@@ -333,6 +339,7 @@ export async function POST(request: Request) {
             success: true, 
             message: "Bail généré avec succès",
             lease: newLease,
+            recapitulatifDroitsEnregistrement: recapitulatifDgi,
             pdfUrl: fullPublicPdfUrl
         }, { status: 201 });
 

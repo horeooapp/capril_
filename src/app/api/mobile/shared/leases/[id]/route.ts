@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { calculerDroitsEnregistrement } from '@/lib/lease-validation';
 
 export async function GET(
     request: Request,
@@ -46,7 +47,19 @@ export async function GET(
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
-        return NextResponse.json({ lease });
+        // S-06 : Récapitulatif des droits d'enregistrement calculé avant signature
+        const duration = lease.durationMonths || 12;
+        const rent = lease.rentAmount || 0;
+        const recapitulatifDroitsEnregistrement = calculerDroitsEnregistrement(rent, duration);
+
+        return NextResponse.json({ 
+            lease: {
+                ...lease,
+                recapitulatifDroitsEnregistrement,
+                droitsDgiCalcules: lease.droitsDgiCalcules || recapitulatifDroitsEnregistrement.totalDroitsDgi,
+            },
+            recapitulatifDroitsEnregistrement
+        });
     } catch (error) {
         console.error("[MOBILE API] shared/leases/[id] error:", error);
         return NextResponse.json({ error: "Erreur interne" }, { status: 500 });

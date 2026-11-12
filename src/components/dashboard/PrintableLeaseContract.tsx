@@ -37,6 +37,13 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
       avanceMonthsStr = months.join(" et ");
   }
 
+  // S-06 : Récapitulatif Droits d'Enregistrement DGI (Art. 550 CGI)
+  const durationMonths = lease.durationMonths || 12;
+  const baseCalculDgi = rentAmount * Math.min(durationMonths, 12);
+  const droitsEnregDgi = Math.round(baseCalculDgi * 0.025);
+  const fraisTimbreDgi = 1000;
+  const totalDgiEstime = Number(lease.droitsDgiCalcules) || (droitsEnregDgi + fraisTimbreDgi);
+
   return (
     <div id="print-area" className="max-w-4xl mx-auto p-4 sm:p-8 md:p-12 bg-white text-black font-serif shadow-xl rounded my-4 md:my-8 print:shadow-none print:m-0 print:p-0 print:w-full print:max-w-none print:rounded-none">
       {/* HEADER */}
@@ -155,11 +162,20 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
         )}
       </div>
 
-      <h3 className="font-bold underline mt-6 mb-2 text-sm md:text-base">ARTICLE 6 - ENREGISTREMENT</h3>
-      <div className="text-justify mb-4 text-xs">
-        <p>Le bail à usage d'habitation fait obligatoirement l'objet d'enregistrement auprès de l'administration fiscale.</p>
-        <p>Le bail à usage d'habitation est enregistré conformément aux conditions et modalités prévues par le Code Général des Impôts.</p>
-        <p>Le BAILLEUR ou son représentant remet au LOCATAIRE, dans le délai de trente (30) jours calendaires, après l'accomplissement des formalités requises, un exemplaire de l'acte d'enregistrement du bail à usage d'habitation délivré par l'administration fiscale.</p>
+      <h3 className="font-bold underline mt-6 mb-2 text-sm md:text-base">ARTICLE 6 - ENREGISTREMENT FISCAL (DGI)</h3>
+      <div className="text-justify mb-4 text-xs space-y-2">
+        <p>Le bail à usage d'habitation fait obligatoirement l'objet d'enregistrement auprès de l'administration fiscale (Direction Générale des Impôts) dans un délai de trente (30) jours calendaires suivant sa signature.</p>
+        <p>Le bail est enregistré conformément aux conditions et modalités prévues par l'article 550 du Code Général des Impôts (CGI de Côte d'Ivoire).</p>
+        <div className="p-3 bg-gray-50 border border-gray-300 rounded font-sans text-[11px] my-2 space-y-1">
+          <p className="font-bold text-gray-800 uppercase tracking-wider text-[10px]">Récapitulatif des Droits d'Enregistrement Calculé Avant Signature (Art. 550 CGI) :</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            <div><span className="text-gray-500">Assiette annuelle :</span> <strong className="text-gray-900">{baseCalculDgi.toLocaleString()} XOF</strong></div>
+            <div><span className="text-gray-500">Droits DGI (2,5 %) :</span> <strong className="text-gray-900">{droitsEnregDgi.toLocaleString()} XOF</strong></div>
+            <div><span className="text-gray-500">Timbres fiscaux (2 p.) :</span> <strong className="text-gray-900">{fraisTimbreDgi.toLocaleString()} XOF</strong></div>
+            <div><span className="text-gray-500">Total prévisionnel :</span> <strong className="text-gray-900">{totalDgiEstime.toLocaleString()} XOF</strong></div>
+          </div>
+        </div>
+        <p>Le BAILLEUR ou son représentant remet au LOCATAIRE, dans le délai légal après l'accomplissement des formalités requises, un exemplaire de l'acte d'enregistrement du bail à usage d'habitation délivré par l'administration fiscale ou accessible numériquement via la plateforme QAPRIL.</p>
       </div>
 
       <p className="text-center font-bold mt-8 mb-4 border-b border-black pb-2 uppercase text-sm md:text-base">SECTION 1: OBLIGATIONS DU BAILLEUR</p>

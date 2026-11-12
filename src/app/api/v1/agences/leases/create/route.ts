@@ -15,6 +15,13 @@ export async function POST(req: Request) {
     }
 
     const result = await createLease(data);
+    if ((result as any)?.error) {
+        return NextResponse.json({ 
+            error: (result as any).error, 
+            code: (result as any).code, 
+            errors: (result as any).errors 
+        }, { status: (result as any).status || 422 });
+    }
     return NextResponse.json({ success: true, lease: result });
   } catch (error: any) {
     console.error('[API LEASE CREATE ERROR]', error);

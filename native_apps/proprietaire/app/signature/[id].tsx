@@ -152,6 +152,14 @@ export default function SignatureScreen() {
             <Text style={styles.paragraph}>
               Ce bail est consenti pour une durée de {lease.durationMonths} mois, commençant le {new Date(lease.startDate).toLocaleDateString('fr-FR')}.
             </Text>
+
+            <Text style={styles.sectionTitle}>Enregistrement Fiscal (DGI) :</Text>
+            <Text style={styles.paragraph}>
+              - Assiette annuelle : {((lease.rentAmount || 0) * Math.min(lease.durationMonths || 12, 12)).toLocaleString('fr-FR')} FCFA{'\n'}
+              - Droits d'enregistrement (2,5 %) : {Math.round(((lease.rentAmount || 0) * Math.min(lease.durationMonths || 12, 12)) * 0.025).toLocaleString('fr-FR')} FCFA{'\n'}
+              - Timbre fiscal : 1 000 FCFA{'\n'}
+              - Total prévisionnel DGI : {(lease.recapitulatifDroitsEnregistrement?.totalDroitsDgi || lease.droitsDgiCalcules || (Math.round(((lease.rentAmount || 0) * Math.min(lease.durationMonths || 12, 12)) * 0.025) + 1000)).toLocaleString('fr-FR')} FCFA
+            </Text>
             
             <Text style={styles.sectionTitle}>Clauses Générales :</Text>
             <Text style={styles.paragraph}>

@@ -55,6 +55,7 @@ function LeaseRegistrationForm() {
     const [chargesAmount, setChargesAmount] = useState<number>(0)
     const [depositMonths, setDepositMonths] = useState<number>(2)
     const [advanceMonths, setAdvanceMonths] = useState<number>(2)
+    const [durationMonths, setDurationMonths] = useState<number>(12)
     const [agencyFees, setAgencyFees] = useState<number>(0)
     const [paymentDayLimit, setPaymentDayLimit] = useState<number>(5)
     const [paymentMethod, setPaymentMethod] = useState<string>("WAVE")
@@ -90,6 +91,12 @@ function LeaseRegistrationForm() {
     const depositTotal = depositMonths * rentAmount;
     const advanceTotal = advanceMonths * rentAmount;
     const totalInitialPayable = rentAmount + depositTotal + advanceTotal + chargesAmount + agencyFees;
+    
+    // Droits d'Enregistrement DGI (Art. 550 CGI CI - S-06)
+    const baseCalculDgi = rentAmount * Math.min(durationMonths || 12, 12);
+    const droitsDgi = Math.round(baseCalculDgi * 0.025);
+    const timbresDgi = 1000;
+    const totalDroitsDgi = droitsDgi + timbresDgi;
 
     const selectedProp = properties.find(p => p.id === propertyId);
 
@@ -116,11 +123,14 @@ function LeaseRegistrationForm() {
             if (rentAmount <= 0) {
                 return setError("Veuillez indiquer un montant de loyer mensuel supérieur à zéro.")
             }
+            if (!durationMonths || ![12, 24, 36].includes(durationMonths)) {
+                return setError("Indiquez la durée du bail : 12, 24 ou 36 mois.")
+            }
             if (depositMonths > 2) {
-                return setError("La réglementation en vigueur limite le dépôt de garantie (caution) à 2 mois maximum.")
+                return setError("Le dépôt de garantie ne peut pas dépasser 2 mois de loyer.")
             }
             if (advanceMonths > 2) {
-                return setError("L'avance sur loyer est limitée à 2 mois de loyer au maximum.")
+                return setError("L'avance exigée ne peut pas dépasser 2 mois de loyer.")
             }
         }
         setStep(step + 1)
@@ -130,8 +140,11 @@ function LeaseRegistrationForm() {
         e.preventDefault()
         setError(null)
 
-        if (depositMonths > 2) return setError("La caution ne peut excéder 2 mois de loyer.")
-        if (advanceMonths > 2) return setError("L'avance ne peut excéder 2 mois de loyer.")
+        if (!durationMonths || ![12, 24, 36].includes(durationMonths)) {
+            return setError("Indiquez la durée du bail : 12, 24 ou 36 mois.")
+        }
+        if (depositMonths > 2) return setError("Le dépôt de garantie ne peut pas dépasser 2 mois de loyer.")
+        if (advanceMonths > 2) return setError("L'avance exigée ne peut pas dépasser 2 mois de loyer.")
 
         const data = {
             propertyId,
@@ -142,7 +155,7 @@ function LeaseRegistrationForm() {
             tenantName,
             startDate: new Date(startDate),
             rentAmount,
-            durationMonths: 12,
+            durationMonths: Number(durationMonths),
             chargesAmount,
             depositAmount: depositTotal,
             avanceLoyer: advanceTotal,
@@ -521,6 +534,38 @@ function LeaseRegistrationForm() {
                                         </p>
                                     </div>
 
+                                    {/* Durée contractuelle obligatoire (S-06) */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                                            <span>Durée contractuelle du bail</span>
+                                            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">12, 24 ou 36 mois</span>
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-2">
+                                            {[
+                                                { val: 12, label: "12 mois", sub: "1 an (Standard)" },
+                                                { val: 24, label: "24 mois", sub: "2 ans" },
+                                                { val: 36, label: "36 mois", sub: "3 ans" }
+                                            ].map((d) => (
+                                                <button
+                                                    key={d.val}
+                                                    type="button"
+                                                    onClick={() => setDurationMonths(d.val)}
+                                                    className={`p-3 rounded-2xl border text-left flex flex-col transition-all ${
+                                                        durationMonths === d.val
+                                                            ? 'border-slate-900 bg-slate-900 text-white font-black shadow-sm'
+                                                            : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300'
+                                                    }`}
+                                                >
+                                                    <span className="text-sm font-black">{d.label}</span>
+                                                    <span className={`text-[10px] ${durationMonths === d.val ? 'text-slate-300' : 'text-slate-400'}`}>{d.sub}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <p className="text-[11px] text-slate-500">
+                                            Conformément à la réglementation, la durée doit être explicitement fixée à 12, 24 ou 36 mois.
+                                        </p>
+                                    </div>
+
                                     {/* Frais de gestion / agence */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-slate-700 block">
@@ -574,6 +619,40 @@ function LeaseRegistrationForm() {
                                         <div className="text-2xl sm:text-3xl font-black text-[#FF8200]">
                                             {totalInitialPayable.toLocaleString()} <span className="text-sm text-white font-normal">XOF</span>
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* RÉCAPITULATIF DROITS D'ENREGISTREMENT DGI (S-06) */}
+                                <div className="bg-emerald-950 text-emerald-100 rounded-3xl p-6 sm:p-7 space-y-4 shadow-xl border border-emerald-800/60">
+                                    <div className="flex items-center justify-between border-b border-emerald-800/80 pb-3">
+                                        <div className="flex items-center gap-2">
+                                            <ShieldCheck className="text-emerald-400" size={20} />
+                                            <span className="font-bold text-sm tracking-wide text-white">Droits d'Enregistrement DGI (Art. 550 CGI)</span>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-emerald-300 bg-emerald-900/80 px-2.5 py-1 rounded-full uppercase tracking-wider">Calculé avant signature</span>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-2 text-xs">
+                                        <div className="space-y-1">
+                                            <span className="text-emerald-300/80">Assiette annuelle</span>
+                                            <p className="text-sm font-bold text-white">{baseCalculDgi.toLocaleString()} XOF</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-emerald-300/80">Droits DGI (2,5 %)</span>
+                                            <p className="text-sm font-bold text-white">{droitsDgi.toLocaleString()} XOF</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-emerald-300/80">Timbre fiscal (2 p.)</span>
+                                            <p className="text-sm font-bold text-white">{timbresDgi.toLocaleString()} XOF</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-emerald-300/80">Total prévisionnel</span>
+                                            <p className="text-sm font-black text-emerald-300">{totalDroitsDgi.toLocaleString()} XOF</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-emerald-800/80 pt-3 text-[11px] text-emerald-300/80">
+                                        Bail soumis à la loi n° 2019-576. Enregistrement obligatoire auprès de la Direction Générale des Impôts sous 30 jours.
                                     </div>
                                 </div>
                             </div>

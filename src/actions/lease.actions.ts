@@ -22,6 +22,7 @@ import { generateProofHash } from "@/lib/proof";
 import { LoyerService } from "@/lib/loyer-service";
 import { FiscalService } from "@/lib/fiscal-service";
 import { NotificationService } from "@/lib/notification-service";
+import { validateLeaseInput, calculerDroitsEnregistrement } from "@/lib/lease-validation";
 
 // --- [CORE] Baux Standard ---
 
@@ -143,12 +144,28 @@ export async function createLease(data: {
             if (!tenantEmail && tenant.email) tenantEmail = tenant.email;
         }
 
-        // 4. Legal Validations (Arts. 415, 416, 440, 442 CCH)
+        // 4. Legal Validations (S-06 / Arts. 415, 416, 440, 442 CCH)
+        const validation = validateLeaseInput({
+            rentAmount: data.rentAmount,
+            depositAmount: data.depositAmount,
+            avanceLoyer: data.avanceLoyer,
+            durationMonths: data.durationMonths,
+        });
+
+        if (!validation.isValid) {
+            return { 
+                error: validation.error, 
+                code: validation.code, 
+                status: 422,
+                errors: validation.errors 
+            };
+        }
+
         const preavis = data.preavisRequisMois ?? 3;
         if (preavis < 3) throw new Error("Le préavis ne peut être inférieur à 3 mois (Arts. 440 et 442 CCH).");
-        const maxLoyerAvanceCaution = data.rentAmount * 2;
-        if ((data.avanceLoyer || 0) > maxLoyerAvanceCaution) throw new Error("Avances illégales : maximum 2 mois autorisés (Art. 415 CCH).");
-        if ((data.depositAmount || 0) > maxLoyerAvanceCaution) throw new Error("Caution illégale : maximum 2 mois autorisés (Art. 416 CCH).");
+        
+        const finalDuration = validation.parsedDuration || 12;
+        const recapitulatifDgi = validation.recapitulatifDroitsEnregistrement || calculerDroitsEnregistrement(data.rentAmount, finalDuration);
 
         // 5. Certification Fee (2000 XOF)
         const CERTIFICATION_FEE = 2000;
@@ -183,7 +200,7 @@ export async function createLease(data: {
                 tenantEntityId: data.tenantEntityId,
                 mandatGestionId: finalMandatId,
                 startDate: data.startDate,
-                durationMonths: data.durationMonths,
+                durationMonths: finalDuration,
                 rentAmount: data.rentAmount,
                 chargesAmount: data.chargesAmount || 0,
                 depositAmount: data.depositAmount || 0,
@@ -195,7 +212,12 @@ export async function createLease(data: {
                 signingOtp: signingOtp,
                 signingOtpExpiresAt: otpExpiresAt,
                 status: data.typeBail === TypeBail.DECLARATIF_BDQ ? LeaseStatus.PENDING_CONFIRMATION : LeaseStatus.PENDING_SIGNATURE,
-                deadlineEnregistrement: new Date(new Date(data.startDate).getTime() + (30 * 24 * 60 * 60 * 1000))
+                deadlineEnregistrement: new Date(new Date(data.startDate).getTime() + (30 * 24 * 60 * 60 * 1000)),
+                droitsDgiCalcules: recapitulatifDgi.totalDroitsDgi,
+                droitsEnregistrement: recapitulatifDgi.droitsEnregistrement,
+                fraisTimbre: recapitulatifDgi.fraisTimbre,
+                totalFiscalBail: recapitulatifDgi.totalDroitsDgi,
+                dgiDroitsCalcules: recapitulatifDgi.totalDroitsDgi,
             }
         });
 
