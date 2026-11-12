@@ -26,12 +26,15 @@ export function normalizeProfileRole(roleOrCapacity?: string | null): UserProfil
  * Liste exhaustive des routes autorisées par profil dans le Dashboard
  */
 export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
-    // 1. Locataire : Redirigé systématiquement vers /mon-espace-locataire
-    TENANT: [],
+    // 1. Locataire : Accès au simulateur conversationnel ADD-26 autorisé
+    TENANT: [
+        '/dashboard/simulateur-conversationnel',
+    ],
 
     // 2. Propriétaire : Gestion patrimoniale directe et mandats confiés aux agences
     LANDLORD: [
         '/dashboard',
+        '/dashboard/simulateur-conversationnel',
         '/dashboard/mandates',
         '/dashboard/biens-sous-mandat',
         '/dashboard/properties',
@@ -58,6 +61,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
     // 3. Agence Agréée : Gestion déléguée, biens sous mandat, CRG, équipe et observatoire
     AGENCY: [
         '/dashboard',
+        '/dashboard/simulateur-conversationnel',
         '/dashboard/biens-sous-mandat',
         '/dashboard/mandates',
         '/dashboard/properties',
@@ -86,6 +90,7 @@ export const ALLOWED_DASHBOARD_ROUTES: Record<UserProfileType, string[]> = {
     // 4. Démarcheur / Intermédiaire : Mandats de prospection, candidatures, commissions
     BROKER: [
         '/dashboard',
+        '/dashboard/simulateur-conversationnel',
         '/dashboard/biens-sous-mandat',
         '/dashboard/mandates',
         '/dashboard/properties',

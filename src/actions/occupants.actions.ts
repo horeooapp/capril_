@@ -97,7 +97,19 @@ export async function declarerOccupantWeb(input: {
     mineur?: boolean;
     lien: string;
     dateEntree?: string;
+    dateSortie?: string;
     nni?: string;
+    sexe?: string;
+    typeSejour?: string;
+    dureeMois?: number;
+    motifArrivee?: string;
+    motifPrecision?: string;
+    espaceOccupe?: string;
+    priseEnCharge?: string;
+    contactUrgenceNom?: string;
+    contactUrgenceTel?: string;
+    pieceIdentiteType?: string;
+    observations?: string;
 }) {
     try {
         const session = await ensureAuthenticated();
@@ -139,6 +151,7 @@ export async function declarerOccupantWeb(input: {
             : null;
         const isMinorBool = Boolean(input.mineur);
         const dateEntreeObj = input.dateEntree ? new Date(input.dateEntree) : new Date();
+        const dateSortieObj = input.dateSortie ? new Date(input.dateSortie) : null;
 
         if (!isMinorBool && nniHash) {
             const activeElsewhere = await prisma.occupant.findFirst({
@@ -164,6 +177,21 @@ export async function declarerOccupantWeb(input: {
         const payloadToSign = `${input.leaseId}:${userId}:${cleanNom}:${cleanPrenoms}:${dateEntreeObj.toISOString()}`;
         const declarationSha256 = crypto.createHash("sha256").update(payloadToSign).digest("hex");
 
+        const detailsMetadata = {
+            sexe: input.sexe || null,
+            typeSejour: input.typeSejour || (input.dateSortie ? "TEMPORAIRE" : "PERMANENT"),
+            dureeMois: input.dureeMois || null,
+            motifArrivee: input.motifArrivee || "REMARQUE_GENERALE",
+            motifPrecision: input.motifPrecision || "",
+            espaceOccupe: input.espaceOccupe || "CHAMBRE_INDIVIDUELLE",
+            priseEnCharge: input.priseEnCharge || "CHARGE_TITULAIRE",
+            contactUrgenceNom: input.contactUrgenceNom || "",
+            contactUrgenceTel: input.contactUrgenceTel || "",
+            pieceIdentiteType: input.pieceIdentiteType || "CNI",
+            observations: input.observations || "",
+            dateSortiePrevue: input.dateSortie || null
+        };
+
         const occupant = await prisma.occupant.create({
             data: {
                 leaseId: input.leaseId,
@@ -178,10 +206,12 @@ export async function declarerOccupantWeb(input: {
                 declareRole: "TITULAIRE",
                 declarationSha256,
                 dateEntree: dateEntreeObj,
+                dateSortie: dateSortieObj,
                 nniHash,
                 statut: "CONFIRME",
                 confirmeAt: new Date(),
-                niveau: "C"
+                niveau: "C",
+                motifDesaccord: JSON.stringify(detailsMetadata)
             }
         });
 

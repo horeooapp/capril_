@@ -196,3 +196,4 @@ console.log('\n--- Test 4 : Paiements d\'avance (Novembre 2026 à Mars 2027 déj
 }
 
 console.log('\n🎉 TOUS LES TESTS S-07 SONT VALIDÉS AVEC SUCCÈS (DoD CONFORME).\n');
+

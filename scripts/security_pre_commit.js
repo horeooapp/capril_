@@ -107,3 +107,4 @@ function runSecurityScan() {
 
 const status = runSecurityScan();
 process.exit(status);
+

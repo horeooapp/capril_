@@ -32,25 +32,27 @@ export default async function DashboardLayout({
         redirect("/dashboard/login")
     }
 
+    const headersList = await headers();
+    const currentPath = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
+    const isSimulateur = currentPath.includes("simulateur-conversationnel");
+
     // RÔLE ACTIF STRICT : priorité à la capacité active choisie en base par l'utilisateur
     const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
 
-    // Règle stricte : Pas de bascule en cours de session. Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire sans se déconnecter.
-    if (activeRole === "TENANT" || activeRole === "LOCATAIRE") {
+    // Règle stricte : Pas de bascule en cours de session. Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire sans se déconnecter (sauf outil simulateur conversationnel universel).
+    if ((activeRole === "TENANT" || activeRole === "LOCATAIRE") && !isSimulateur) {
         return redirect("/mon-espace-locataire");
     }
 
     // Si le rôle actif est Admin, redirection vers la console admin
-    if (activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") {
+    if ((activeRole === "ADMIN" || activeRole === "SUPER_ADMIN") && !isSimulateur) {
         return redirect("/admin");
     }
 
     // [RÈGLE 3 & 4] RBAC SERVER-SIDE ENFORCEMENT : Empêcher l'accès par URL directe non autorisée
     const profile = normalizeProfileRole(activeRole);
-    const headersList = await headers();
-    const currentPath = headersList.get("x-pathname") || headersList.get("x-invoke-path") || "";
 
-    if (currentPath && currentPath.startsWith("/dashboard") && currentPath !== "/dashboard") {
+    if (currentPath && currentPath.startsWith("/dashboard") && currentPath !== "/dashboard" && !isSimulateur) {
         if (!isRouteAllowedForProfile(currentPath, profile)) {
             console.warn(`[RBAC] Accès direct refusé: profil ${profile} a tenté d'accéder à ${currentPath}`);
             redirect("/dashboard");
