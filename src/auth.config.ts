@@ -106,6 +106,9 @@ export const authConfig = {
                 pathname.startsWith("/setup") ||
                 pathname.startsWith("/uploads/") ||
                 pathname.startsWith("/verif") ||
+                pathname.startsWith("/v/") ||
+                pathname.startsWith("/receipts/") ||
+                pathname.startsWith("/checkout/") ||
                 pathname.startsWith("/manuel") ||
                 pathname.startsWith("/downloads") ||
                 pathname.startsWith("/telecharger") ||

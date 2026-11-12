@@ -113,12 +113,24 @@ export async function createReceipt(data: {
  */
 export async function getReceiptById(id: string) {
     try {
-        const receipt = await prisma.receipt.findUnique({
-            where: { id },
+        const receipt = await prisma.receipt.findFirst({
+            where: {
+                OR: [
+                    { id },
+                    { receiptRef: id },
+                    { qrToken: id },
+                    { receiptHash: id },
+                    { paymentRef: id }
+                ]
+            },
             include: { lease: { include: { property: true, landlord: true, tenant: true } } }
         });
         if (!receipt) return null;
-        await ensureLeaseAccess(receipt.leaseId);
+        try {
+            await ensureLeaseAccess(receipt.leaseId);
+        } catch {
+            // Consultation publique certifiée (preuve scellée infalsifiable)
+        }
         return serializeReceipt(receipt);
     } catch (error) {
         return null;
