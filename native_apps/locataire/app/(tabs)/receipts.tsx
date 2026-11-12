@@ -106,6 +106,7 @@ export default function ReceiptsScreen() {
             tintColor="#2C3E6B"
           />
         }
+        ListEmptyComponent={
           <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
             <FileText size={40} color="#94A3B8" />
             <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center', marginTop: 12 }}>
