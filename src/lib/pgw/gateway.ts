@@ -101,15 +101,22 @@ export class PaymentGateway {
 
     // 3. Génération de Quittance (Receipt)
     const { createAndNotifyReceipt } = await import("../receipt");
-    await createAndNotifyReceipt({
+    const receipt = await createAndNotifyReceipt({
       leaseId: payment.leaseId,
       periodMonth: monthKey,
-      rentAmount: payment.montant,
+      rentAmount: Math.round(Number(payment.montant) || 0),
       chargesAmount: 0,
       paymentChannel: payment.canal,
       paymentReference: operatorRef,
       receiptType: "RENT",
     });
+
+    if (receipt?.id) {
+      await prisma.paymentPgw.update({
+        where: { id: payment.id },
+        data: { quittanceId: receipt.id },
+      });
+    }
 
     return updatedPayment;
   }

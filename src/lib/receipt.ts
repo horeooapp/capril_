@@ -81,10 +81,14 @@ export async function createAndNotifyReceipt(data: {
         });
     }
 
+    const rentAmountInt = Math.round(Number(data.rentAmount) || 0);
+    const chargesAmountInt = Math.round(Number(data.chargesAmount) || 0);
+    const totalAmountInt = rentAmountInt + chargesAmountInt;
+
     const documentHash = await generateProofHash({
         receiptRef,
         leaseId: data.leaseId,
-        totalAmount: data.rentAmount + data.chargesAmount,
+        totalAmount: totalAmountInt,
         period: targetPeriod,
         receiptType: data.receiptType
     });
@@ -98,9 +102,9 @@ export async function createAndNotifyReceipt(data: {
             where: { id: existingReceipt.id },
             data: {
                 receiptRef,
-                rentAmount: data.rentAmount,
-                chargesAmount: data.chargesAmount,
-                totalAmount: data.rentAmount + data.chargesAmount,
+                rentAmount: rentAmountInt,
+                chargesAmount: chargesAmountInt,
+                totalAmount: totalAmountInt,
                 paymentMethod: data.paymentChannel,
                 paymentRef: data.paymentReference,
                 paidAt: new Date(),
@@ -114,9 +118,9 @@ export async function createAndNotifyReceipt(data: {
                 receiptRef,
                 leaseId: data.leaseId,
                 periodMonth: targetPeriod,
-                rentAmount: data.rentAmount,
-                chargesAmount: data.chargesAmount,
-                totalAmount: data.rentAmount + data.chargesAmount,
+                rentAmount: rentAmountInt,
+                chargesAmount: chargesAmountInt,
+                totalAmount: totalAmountInt,
                 paymentMethod: data.paymentChannel,
                 paymentRef: data.paymentReference,
                 paidAt: new Date(),

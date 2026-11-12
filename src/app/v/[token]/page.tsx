@@ -15,11 +15,21 @@ export default async function ShortTokenPage({ params }: { params: Promise<{ tok
     // mais rediriger vers /receipts/[id] est plus cohérent si on a l'ID.
     
     if (result.type === "RECEIPT") {
-        // Le verifyQRToken retourne la référence, mais pour la redirection on a besoin du UUID.
-        // On va donc chercher l'ID via le token.
+        if ((result as any).receiptId) {
+            redirect(`/receipts/${(result as any).receiptId}`);
+        }
+
         const { prisma } = await import("@/lib/prisma");
         const receipt = await prisma.receipt.findFirst({
-            where: { OR: [{ qrToken: token }, { receiptHash: token }] },
+            where: {
+                OR: [
+                    { qrToken: token },
+                    { receiptHash: token },
+                    { receiptRef: token },
+                    { paymentRef: token },
+                    { id: token }
+                ]
+            },
             select: { id: true }
         });
         

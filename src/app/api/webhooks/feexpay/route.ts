@@ -27,11 +27,19 @@ export async function POST(request: NextRequest) {
 
     // Trouver le paiement via l'ID fourni en query param ou via la référence opérateur
     let payment = null;
+    let isIntent = false;
 
     if (paymentId) {
       payment = await (prisma as any).paymentPgw.findUnique({
         where: { id: paymentId },
       });
+      if (!payment) {
+        payment = await (prisma as any).paymentIntent.findUnique({
+          where: { id: paymentId },
+          include: { lease: true },
+        });
+        if (payment) isIntent = true;
+      }
     }
 
     if (!payment) {
@@ -41,12 +49,101 @@ export async function POST(request: NextRequest) {
     }
 
     if (!payment) {
+      payment = await (prisma as any).paymentIntent.findFirst({
+        where: { operatorRef: reference },
+        include: { lease: true },
+      });
+      if (payment) isIntent = true;
+    }
+
+    if (!payment) {
+      // Rechercher par préfixe d'ID extrait de reference (ex: FP-9611d8a2-1794445483348)
+      const match = reference.match(/^FP-([a-f0-9-]+)-\d+$/);
+      if (match) {
+        const idPrefix = match[1];
+        payment = await (prisma as any).paymentIntent.findFirst({
+          where: { id: { startsWith: idPrefix } },
+          include: { lease: true },
+        });
+        if (payment) isIntent = true;
+      }
+    }
+
+    if (!payment) {
       console.warn(`[Webhook FeexPay] Paiement introuvable pour ref: ${reference} / paymentId: ${paymentId}`);
-      // Retourner 200 pour éviter que FeexPay ne reessaie indéfiniment
       return NextResponse.json({ received: true });
     }
 
-    // Idempotence : ne pas retraiter un paiement déjà confirmé
+    // Traitement spécifique PaymentIntent (généré depuis le web)
+    if (isIntent) {
+      if (payment.status === "COMPLETED" || payment.status === "SUCCESS") {
+        const quittance = await prisma.receipt.findFirst({
+          where: { leaseId: payment.leaseId },
+          orderBy: { createdAt: "desc" },
+        });
+        return NextResponse.json({
+          received: true,
+          message: "Déjà traité.",
+          receiptRef: quittance?.receiptRef || reference,
+          receiptId: quittance?.id,
+        });
+      }
+
+      if (status === "SUCCESSFUL" || status === "SUCCESS") {
+        await (prisma as any).paymentIntent.update({
+          where: { id: payment.id },
+          data: { status: "COMPLETED", operatorRef: reference },
+        });
+
+        const monthKey = new Date().toISOString().substring(0, 7);
+        const { createAndNotifyReceipt } = await import("@/lib/receipt");
+        const receipt = await createAndNotifyReceipt({
+          leaseId: payment.leaseId,
+          periodMonth: monthKey,
+          rentAmount: Math.round(Number(payment.amount) || 0),
+          chargesAmount: 0,
+          paymentChannel: payment.operator || "FEEXPAY",
+          paymentReference: reference,
+          receiptType: "RENT",
+        });
+
+        try {
+          await (prisma as any).paymentPgw.create({
+            data: {
+              leaseId: payment.leaseId,
+              moisConcerne: new Date(),
+              payeurId: payment.lease?.tenantId || "",
+              beneficiaireId: payment.lease?.landlordId || "",
+              montant: payment.amount,
+              canal: (payment.operator === "WAVE" ? "WAVE" : "ORANGE") as any,
+              statut: "CONFIRMEE",
+              refInterne: reference,
+              refOperateur: reference,
+              quittanceId: receipt.id,
+            },
+          });
+        } catch (e) {
+          console.warn("[Webhook FeexPay] PaymentPgw insert error:", e);
+        }
+
+        console.log(`[Webhook FeexPay] ✅ PaymentIntent ${payment.id} confirmé. Quittance: ${receipt.receiptRef}`);
+        return NextResponse.json({
+          received: true,
+          success: true,
+          receiptRef: receipt.receiptRef,
+          receiptId: receipt.id,
+        });
+      } else if (status === "FAILED" || status === "CANCELLED") {
+        await (prisma as any).paymentIntent.update({
+          where: { id: payment.id },
+          data: { status: "FAILED" },
+        });
+        return NextResponse.json({ received: true });
+      }
+      return NextResponse.json({ received: true });
+    }
+
+    // Traitement PaymentPgw (généré depuis le mobile ou API PGW)
     if (payment.statut === "CONFIRMEE") {
       const quittance = await prisma.receipt.findFirst({
         where: { leaseId: payment.leaseId },

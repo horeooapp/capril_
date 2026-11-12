@@ -46,6 +46,14 @@ function FeexPayCheckoutContent() {
   const [receiptRef, setReceiptRef] = useState<string>("");
   const [receiptId, setReceiptId] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isMobileDevice, setIsMobileDevice] = useState<boolean>(false);
+
+  useEffect(() => {
+    const isMobile =
+      source === "mobile" ||
+      (typeof navigator !== "undefined" && /android|iphone|ipad|ipod/i.test(navigator.userAgent));
+    setIsMobileDevice(isMobile);
+  }, [source]);
 
   const formatFcfa = (n: number) =>
     Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " F CFA";
@@ -67,17 +75,13 @@ function FeexPayCheckoutContent() {
   // Redirection automatique douce vers l'application mobile lors du succès
   useEffect(() => {
     if (status !== "SUCCESS") return;
-    const isMobileDevice =
-      source === "mobile" ||
-      (typeof navigator !== "undefined" && /android|iphone|ipad|ipod/i.test(navigator.userAgent));
-
     if (isMobileDevice) {
       const timer = setTimeout(() => {
         handleReturnToMobile();
       }, 1800);
       return () => clearTimeout(timer);
     }
-  }, [status]);
+  }, [status, isMobileDevice]);
 
   const handleConfirmPayment = async () => {
     if (operator !== "carte" && (!phone || phone.trim().length < 8)) {
@@ -173,53 +177,57 @@ function FeexPayCheckoutContent() {
 
               {/* ACTIONS RETOUR & QUITTANCES */}
               <div className="pt-4 space-y-3">
-                {/* 1. Bouton natif pour revenir à l'application mobile */}
-                <a
-                  href={deepLink}
-                  onClick={(e) => {
-                    handleReturnToMobile();
-                  }}
-                  className="w-full bg-[#1E293B] hover:bg-slate-900 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2.5 text-sm"
-                >
-                  <Smartphone size={18} className="text-emerald-400" />
-                  <span>Afficher mes quittances dans l'application</span>
-                </a>
+                {isMobileDevice ? (
+                  <>
+                    {/* Mode Mobile : Bouton retour vers l'application mobile */}
+                    <a
+                      href={deepLink}
+                      onClick={() => handleReturnToMobile()}
+                      className="w-full bg-[#1E293B] hover:bg-slate-900 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2.5 text-sm"
+                    >
+                      <Smartphone size={18} className="text-emerald-400" />
+                      <span>Afficher mes quittances dans l&apos;application</span>
+                    </a>
 
-                {/* Secours Android si l'app ne s'est pas ouverte automatiquement */}
-                <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500">
-                  <span>L'application ne s'est pas rouverte ?</span>
-                  <a
-                    href={intentUrl}
-                    className="font-bold text-blue-600 underline"
-                  >
-                    Ouvrir {appName}
-                  </a>
-                </div>
+                    {/* Secours Android */}
+                    <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500">
+                      <span>L&apos;application ne s&apos;est pas rouverte ?</span>
+                      <a href={intentUrl} className="font-bold text-blue-600 underline">
+                        Ouvrir {appName}
+                      </a>
+                    </div>
 
-                {/* 2. Bouton secondaire : Quittance certifiée directe (sans passer par la page de login web) */}
-                {receiptId ? (
-                  <a
-                    href={`/receipts/${receiptId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
-                  >
-                    <span>📄 Télécharger / Imprimer ma quittance (PDF)</span>
-                  </a>
+                    {/* Mobile : Télécharger PDF en direct */}
+                    <a
+                      href={receiptId ? `/receipts/${receiptId}` : `/v/${receiptRef || ref}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
+                    >
+                      <span>📄 Télécharger / Imprimer ma quittance (PDF)</span>
+                    </a>
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (receiptRef) {
-                        window.open(`/v/${receiptRef}`, "_blank");
-                      } else {
-                        router.push("/mon-espace-locataire");
-                      }
-                    }}
-                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
-                  >
-                    <span>📄 Télécharger / Imprimer ma quittance (PDF)</span>
-                  </button>
+                  <>
+                    {/* Mode Web Desktop : Télécharger PDF en priorité 1 */}
+                    <a
+                      href={receiptId ? `/receipts/${receiptId}` : `/v/${receiptRef || ref}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-full bg-[#1E293B] hover:bg-slate-900 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm"
+                    >
+                      <span>📄 Télécharger / Imprimer ma quittance certifiée (PDF)</span>
+                    </a>
+
+                    {/* Mode Web Desktop : Accéder au portail web */}
+                    <button
+                      type="button"
+                      onClick={() => router.push("/mon-espace-locataire")}
+                      className="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs"
+                    >
+                      <span>Accéder à mon espace locataire</span>
+                    </button>
+                  </>
                 )}
               </div>
             </div>
