@@ -25,6 +25,166 @@ export async function generateReceiptRef(): Promise<string> {
 }
 
 /**
+ * Helper sécurisé pour émettre une quittance unitaire avec protection absolue contre les collisions d'unicité
+ */
+async function issueSingleReceipt(params: {
+    lease: any,
+    initialPeriod: string,
+    rentAmount: number,
+    chargesAmount: number,
+    paymentChannel: string,
+    paymentReference?: string,
+    receiptType: string,
+    creatorName?: string
+}) {
+    let targetPeriod = params.initialPeriod;
+    let receipt: any = null;
+    let attempts = 0;
+
+    while (!receipt && attempts < 24) {
+        attempts++;
+
+        // 1. Chercher si une quittance existe déjà pour ce mois
+        const existing = await prisma.receipt.findUnique({
+            where: {
+                leaseId_periodMonth: {
+                    leaseId: params.lease.id,
+                    periodMonth: targetPeriod,
+                }
+            }
+        });
+
+        // Si déjà payée, avancer au mois suivant
+        if (existing && (existing.status === 'paid' || existing.status === 'PAID')) {
+            const [y, m] = targetPeriod.split('-').map(Number);
+            const nextDate = new Date(Date.UTC(y, m, 1));
+            targetPeriod = nextDate.toISOString().slice(0, 7);
+            continue;
+        }
+
+        const receiptRef = await generateReceiptRef();
+        const totalAmountInt = params.rentAmount + params.chargesAmount;
+        const documentHash = await generateProofHash({
+            receiptRef,
+            leaseId: params.lease.id,
+            totalAmount: totalAmountInt,
+            period: targetPeriod,
+            receiptType: params.receiptType
+        });
+        const qrToken = documentHash.slice(0, 12).toUpperCase();
+
+        try {
+            if (existing) {
+                receipt = await prisma.receipt.update({
+                    where: { id: existing.id },
+                    data: {
+                        receiptRef,
+                        rentAmount: params.rentAmount,
+                        chargesAmount: params.chargesAmount,
+                        totalAmount: totalAmountInt,
+                        paymentMethod: params.paymentChannel,
+                        paymentRef: params.paymentReference,
+                        paidAt: new Date(),
+                        receiptHash: documentHash,
+                        qrToken: qrToken,
+                        status: "PAID"
+                    }
+                });
+            } else {
+                receipt = await prisma.receipt.create({
+                    data: {
+                        receiptRef,
+                        leaseId: params.lease.id,
+                        periodMonth: targetPeriod,
+                        rentAmount: params.rentAmount,
+                        chargesAmount: params.chargesAmount,
+                        totalAmount: totalAmountInt,
+                        paymentMethod: params.paymentChannel,
+                        paymentRef: params.paymentReference,
+                        paidAt: new Date(),
+                        receiptHash: documentHash,
+                        qrToken: qrToken,
+                        status: "PAID"
+                    }
+                });
+            }
+        } catch (dbErr: any) {
+            // Collision d'unicité lease_id + period_month interceptée en toute sécurité
+            if (dbErr?.code === 'P2002' || (dbErr?.message && dbErr.message.includes('Unique constraint'))) {
+                console.warn(`[RECEIPT_COLLISION] Conflit sur période ${targetPeriod} pour bail ${params.lease.id}, passage au mois suivant...`);
+                const [y, m] = targetPeriod.split('-').map(Number);
+                const nextDate = new Date(Date.UTC(y, m, 1));
+                targetPeriod = nextDate.toISOString().slice(0, 7);
+                continue;
+            }
+            throw dbErr;
+        }
+    }
+
+    if (!receipt) {
+        throw new Error(`Impossible de trouver une période libre pour émettre la quittance du bail ${params.lease.id}`);
+    }
+
+    // 4. Scoring (ICL)
+    if (params.receiptType === "RENT" && params.lease.tenantId) {
+        try {
+            const [year, month] = targetPeriod.split('-').map(Number);
+            const dueDate = new Date(year, month - 1, params.lease.paymentDay || 5);
+            const today = new Date();
+            const diffTime = today.getTime() - dueDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            await scoreRentPayment(params.lease.tenantId, diffDays, receipt.id);
+        } catch (e) {
+            console.warn("[SCORING_ERROR]", e);
+        }
+    }
+
+    // 5. PDF Generation & Delivery (M-DOC-PDF - PHASE 1 ROBUST)
+    if (params.lease.tenantId) {
+        try {
+            const { generateReceiptPDF } = await import('./pdf-generator');
+            const pdfBuffer = await generateReceiptPDF({
+                receiptRef: receipt.receiptRef,
+                leaseRef: params.lease.leaseReference,
+                periodMonth: receipt.periodMonth,
+                rentAmount: receipt.rentAmount,
+                chargesAmount: receipt.chargesAmount,
+                totalAmount: receipt.totalAmount,
+                paymentMethod: params.paymentChannel,
+                paidAt: receipt.paidAt || new Date(),
+                tenantName: (params.lease.tenant?.firstName ? params.lease.tenant.firstName + " " : "") + (params.lease.tenant?.lastName || "") || 'Locataire',
+                propertyAddress: params.lease.property?.address || "Adresse non spécifiée",
+                landlordName: params.creatorName || (params.lease.landlord?.firstName ? params.lease.landlord.firstName + " " : "") + (params.lease.landlord?.lastName || "") || 'Propriétaire QAPRIL',
+                receiptHash: receipt.receiptHash || undefined,
+                qrToken: receipt.qrToken || undefined,
+                declarative: params.receiptType === 'DECLARATIVE'
+            });
+
+            // Trigger Notification (Async - Simultaneous SMS + WA)
+            NotificationService.envoyerNotification(
+                params.lease.tenantId,
+                "QUITTANCE_GENEREE",
+                {
+                    referenceId: receipt.receiptRef,
+                    receiptBuffer: pdfBuffer,
+                    payload: {
+                        parameters: [(params.lease.tenant?.firstName ? params.lease.tenant.firstName + " " : "") + (params.lease.tenant?.lastName || "") || "Locataire", params.lease.property?.address || "Propriété"],
+                        smsText: `[QAPRIL] Votre quittance Certifiée SHA-256 pour ${receipt.periodMonth} est disponible. Réf: ${receipt.receiptRef}.`,
+                        html: `<p>Votre quittance certifiée pour le mois de ${receipt.periodMonth} a été générée.</p>`
+                    }
+                }
+            ).catch(err => console.error("[NOTIF_ERROR]", err));
+
+        } catch (e) {
+            console.error("[PDF_ERROR]", e);
+        }
+    }
+
+    return receipt;
+}
+
+/**
  * CORE LOGIC: Create and notify receipt (System-level)
  * Does NOT check auth - assumption is that it's called by a trusted source (WEBHOOK, ACTION, CRON)
  */
@@ -51,140 +211,54 @@ export async function createAndNotifyReceipt(data: {
 
     if (!lease) throw new Error("Bail introuvable");
 
-    // 2. Reference & Target Period Search (Idempotence & Anti-collision)
-    const receiptRef = await generateReceiptRef();
-
-    let targetPeriod = data.periodMonth;
-    let existingReceipt = await prisma.receipt.findUnique({
-        where: {
-            leaseId_periodMonth: {
-                leaseId: data.leaseId,
-                periodMonth: targetPeriod,
-            }
-        }
-    });
-
-    // Si une quittance soldée existe déjà pour ce mois, chercher le premier mois suivant non soldé
-    let loopGuard = 0;
-    while (existingReceipt && (existingReceipt.status === 'paid' || existingReceipt.status === 'PAID') && loopGuard < 24) {
-        loopGuard++;
-        const [y, m] = targetPeriod.split('-').map(Number);
-        const nextDate = new Date(Date.UTC(y, m, 1)); // m est 1-based, donc y, m donne le 1er du mois suivant
-        targetPeriod = nextDate.toISOString().slice(0, 7);
-        existingReceipt = await prisma.receipt.findUnique({
-            where: {
-                leaseId_periodMonth: {
-                    leaseId: data.leaseId,
-                    periodMonth: targetPeriod,
-                }
-            }
-        });
-    }
-
     const rentAmountInt = Math.round(Number(data.rentAmount) || 0);
     const chargesAmountInt = Math.round(Number(data.chargesAmount) || 0);
     const totalAmountInt = rentAmountInt + chargesAmountInt;
 
-    const documentHash = await generateProofHash({
-        receiptRef,
-        leaseId: data.leaseId,
-        totalAmount: totalAmountInt,
-        period: targetPeriod,
-        receiptType: data.receiptType
-    });
+    const contractualMonthlyRent = Math.round(Number(lease.rentAmount) || 0);
+    const contractualMonthlyCharges = Math.round(Number(lease.chargesAmount) || 0);
+    const contractualMonthlyTotal = contractualMonthlyRent + contractualMonthlyCharges;
 
-    // Generate Robust QR Token (PHASE 1)
-    const qrToken = documentHash.slice(0, 12).toUpperCase();
+    // Détection de paiement multi-mois (ex: 500 000 F pour un loyer de 250 000 F = 2 mois)
+    const nbMois = (contractualMonthlyTotal > 0 && totalAmountInt >= (contractualMonthlyTotal * 2))
+        ? Math.floor(totalAmountInt / contractualMonthlyTotal)
+        : 1;
 
-    // 3. Database Record (Upsert sécurisé)
-    const receipt = existingReceipt
-        ? await prisma.receipt.update({
-            where: { id: existingReceipt.id },
-            data: {
-                receiptRef,
-                rentAmount: rentAmountInt,
-                chargesAmount: chargesAmountInt,
-                totalAmount: totalAmountInt,
-                paymentMethod: data.paymentChannel,
-                paymentRef: data.paymentReference,
-                paidAt: new Date(),
-                receiptHash: documentHash,
-                qrToken: qrToken,
-                status: "PAID"
-            }
-        })
-        : await prisma.receipt.create({
-            data: {
-                receiptRef,
-                leaseId: data.leaseId,
-                periodMonth: targetPeriod,
-                rentAmount: rentAmountInt,
-                chargesAmount: chargesAmountInt,
-                totalAmount: totalAmountInt,
-                paymentMethod: data.paymentChannel,
-                paymentRef: data.paymentReference,
-                paidAt: new Date(),
-                receiptHash: documentHash,
-                qrToken: qrToken,
-                status: "PAID"
-            }
-        });
+    let startPeriod = data.periodMonth;
+    let primaryReceipt: any = null;
 
-    // 4. Scoring (ICL)
-    if (data.receiptType === "RENT" && lease.tenantId) {
-        try {
-            const [year, month] = data.periodMonth.split('-').map(Number);
-            const dueDate = new Date(year, month - 1, lease.paymentDay || 5);
-            const today = new Date();
-            const diffTime = today.getTime() - dueDate.getTime();
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            
-            await scoreRentPayment(lease.tenantId, diffDays, receipt.id);
-        } catch (e) {
-            console.warn("[SCORING_ERROR]", e);
-        }
-    }
-
-    // 5. PDF Generation & Delivery (M-DOC-PDF - PHASE 1 ROBUST)
-    if (lease.tenantId) {
-        try {
-            const { generateReceiptPDF } = await import('./pdf-generator');
-            const pdfBuffer = await generateReceiptPDF({
-                receiptRef,
-                leaseRef: lease.leaseReference,
-                periodMonth: data.periodMonth,
-                rentAmount: data.rentAmount,
-                chargesAmount: data.chargesAmount,
-                totalAmount: data.rentAmount + data.chargesAmount,
-                paymentMethod: data.paymentChannel,
-                paidAt: new Date(),
-                tenantName: (lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || 'Locataire',
-                propertyAddress: lease.property.address,
-                landlordName: data.creatorName || (lease.landlord.firstName ? lease.landlord.firstName + " " : "") + (lease.landlord.lastName || "") || 'Propriétaire QAPRIL',
-                receiptHash: documentHash,
-                qrToken: qrToken,
-                declarative: data.receiptType === 'DECLARATIVE'
+    if (nbMois > 1) {
+        console.log(`[RECEIPT] Paiement multi-mois détecté : ${nbMois} mois couverts (Montant total: ${totalAmountInt} XOF)`);
+        for (let i = 0; i < nbMois; i++) {
+            const r = await issueSingleReceipt({
+                lease,
+                initialPeriod: startPeriod,
+                rentAmount: contractualMonthlyRent,
+                chargesAmount: contractualMonthlyCharges,
+                paymentChannel: data.paymentChannel,
+                paymentReference: data.paymentReference,
+                receiptType: data.receiptType,
+                creatorName: data.creatorName
             });
+            if (!primaryReceipt) primaryReceipt = r;
 
-            // Trigger Notification (Async - Simultaneous SMS + WA)
-            NotificationService.envoyerNotification(
-                lease.tenantId,
-                "QUITTANCE_GENEREE",
-                {
-                    referenceId: receiptRef,
-                    receiptBuffer: pdfBuffer,
-                    payload: {
-                        parameters: [(lease.tenant?.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant?.lastName || "") || "Locataire", lease.property.address || "Propriété"],
-                        smsText: `[QAPRIL] Votre quittance Certifiée SHA-256 pour ${data.periodMonth} est disponible. Réf: ${receiptRef}.`,
-                        html: `<p>Votre quittance certifiée pour le mois de ${data.periodMonth} a été générée.</p>`
-                    }
-                }
-            ).catch(err => console.error("[NOTIF_ERROR]", err));
-
-        } catch (e) {
-            console.error("[PDF_ERROR]", e);
+            // Préparer le mois suivant pour la prochaine quittance
+            const [y, m] = r.periodMonth.split('-').map(Number);
+            const nextDate = new Date(Date.UTC(y, m, 1));
+            startPeriod = nextDate.toISOString().slice(0, 7);
         }
+    } else {
+        primaryReceipt = await issueSingleReceipt({
+            lease,
+            initialPeriod: startPeriod,
+            rentAmount: rentAmountInt,
+            chargesAmount: chargesAmountInt,
+            paymentChannel: data.paymentChannel,
+            paymentReference: data.paymentReference,
+            receiptType: data.receiptType,
+            creatorName: data.creatorName
+        });
     }
 
-    return receipt;
+    return primaryReceipt;
 }

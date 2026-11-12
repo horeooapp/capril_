@@ -125,10 +125,12 @@ export async function POST(request: Request) {
         }
 
         // Vérifier doublon
-        const existing = await prisma.receipt.findFirst({
-            where: { leaseId, periodMonth, status: 'PAID' },
+        const existing = await prisma.receipt.findUnique({
+            where: {
+                leaseId_periodMonth: { leaseId, periodMonth }
+            },
         });
-        if (existing) {
+        if (existing && (existing.status === 'PAID' || existing.status === 'paid')) {
             return NextResponse.json(
                 { error: `Un paiement existe déjà pour ${periodMonth}.`, code: 'DOUBLON' },
                 { status: 409 }
@@ -136,20 +138,34 @@ export async function POST(request: Request) {
         }
 
         const ref = `MAN-${periodMonth}-${randomUUID().slice(0, 6).toUpperCase()}`;
-        const receipt = await prisma.receipt.create({
-            data: {
-                receiptRef:   ref,
-                leaseId,
-                periodMonth,
-                rentAmount:   Number(amount),
-                totalAmount:  Number(amount),
-                paymentMethod,
-                paymentRef:   paymentRef ?? null,
-                paidAt:       new Date(),
-                qrToken:      randomUUID(),
-                status:       'PAID',
-            },
-        });
+        const receipt = existing
+            ? await prisma.receipt.update({
+                where: { id: existing.id },
+                data: {
+                    receiptRef:   ref,
+                    rentAmount:   Number(amount),
+                    totalAmount:  Number(amount),
+                    paymentMethod,
+                    paymentRef:   paymentRef ?? null,
+                    paidAt:       new Date(),
+                    qrToken:      randomUUID(),
+                    status:       'PAID',
+                }
+            })
+            : await prisma.receipt.create({
+                data: {
+                    receiptRef:   ref,
+                    leaseId,
+                    periodMonth,
+                    rentAmount:   Number(amount),
+                    totalAmount:  Number(amount),
+                    paymentMethod,
+                    paymentRef:   paymentRef ?? null,
+                    paidAt:       new Date(),
+                    qrToken:      randomUUID(),
+                    status:       'PAID',
+                },
+            });
 
         return NextResponse.json({
             success:    true,

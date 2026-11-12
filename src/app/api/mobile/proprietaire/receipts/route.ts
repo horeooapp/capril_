@@ -161,22 +161,44 @@ export async function POST(request: Request) {
             update: { walletBalance: newBal },
         });
 
-        const receipt = await prisma.receipt.create({
-            data: {
-                receiptRef:    ref,
-                leaseId,
-                periodMonth,
-                rentAmount:    rentNum,
-                chargesAmount: charges,
-                totalAmount:   total,
-                paymentMethod,
-                paymentRef:    paymentRef ?? null,
-                paidAt:        paidAt ? new Date(paidAt) : new Date(),
-                qrToken:       randomUUID(),
-                receiptHash:   sha256Hash,
-                status:        'PAID',
-            },
+        const existingReceipt = await prisma.receipt.findUnique({
+            where: {
+                leaseId_periodMonth: { leaseId, periodMonth }
+            }
         });
+
+        const receipt = existingReceipt
+            ? await prisma.receipt.update({
+                where: { id: existingReceipt.id },
+                data: {
+                    receiptRef:    ref,
+                    rentAmount:    rentNum,
+                    chargesAmount: charges,
+                    totalAmount:   total,
+                    paymentMethod,
+                    paymentRef:    paymentRef ?? null,
+                    paidAt:        paidAt ? new Date(paidAt) : new Date(),
+                    qrToken:       randomUUID(),
+                    receiptHash:   sha256Hash,
+                    status:        'PAID',
+                }
+            })
+            : await prisma.receipt.create({
+                data: {
+                    receiptRef:    ref,
+                    leaseId,
+                    periodMonth,
+                    rentAmount:    rentNum,
+                    chargesAmount: charges,
+                    totalAmount:   total,
+                    paymentMethod,
+                    paymentRef:    paymentRef ?? null,
+                    paidAt:        paidAt ? new Date(paidAt) : new Date(),
+                    qrToken:       randomUUID(),
+                    receiptHash:   sha256Hash,
+                    status:        'PAID',
+                },
+            });
 
         return NextResponse.json({
             success:    true,

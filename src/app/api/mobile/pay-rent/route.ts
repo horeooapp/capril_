@@ -100,11 +100,16 @@ export async function POST(req: Request) {
         });
 
         // 3. Initialiser le paiement auprès de FeexPay (Agrégateur officiel de production)
+        const monthsCount = Number(body.monthsCount) || 1;
+        const description = monthsCount > 1 
+            ? `Loyer (${monthsCount} mois) ${lease.property?.title || 'QAPRIL'}`
+            : `Loyer ${lease.property?.title || 'QAPRIL'}`;
+
         const tenantName = `${lease.tenant?.firstName || ""} ${lease.tenant?.lastName || ""}`.trim() || "Locataire";
         const feexResult = await feexpay.initializePayment({
             transactionId: payment.id,
             amount: Number(amount),
-            description: `Loyer ${lease.property?.title || 'QAPRIL'}`,
+            description,
             payerPhone: lease.tenant?.phone || "",
             customerName: tenantName,
             customerEmail: lease.tenant?.email || "locataire@qapril.ci",

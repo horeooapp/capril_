@@ -65,23 +65,49 @@ export async function createReceipt(data: {
 
         const targetStatus = data.status || (data.paidAt ? "PAID" : "PENDING");
 
-        const receipt = await prisma.receipt.create({
-            data: {
-                receiptRef: ref,
-                leaseId: data.leaseId,
-                periodMonth: data.periodMonth,
-                rentAmount: Number(data.rentAmount),
-                chargesAmount: Number(data.chargesAmount || 0),
-                totalAmount: total,
-                paymentMethod: data.paymentMethod || "WAVE",
-                paymentRef: data.paymentRef || undefined,
-                paidAt: targetStatus === "PAID" ? (data.paidAt || new Date()) : null,
-                qrToken: randomUUID(),
-                receiptHash: sha256,
-                status: targetStatus,
-                commentaireInterne: data.notes || undefined
+        const existingReceipt = await prisma.receipt.findUnique({
+            where: {
+                leaseId_periodMonth: {
+                    leaseId: data.leaseId,
+                    periodMonth: data.periodMonth,
+                }
             }
         });
+
+        const receipt = existingReceipt
+            ? await prisma.receipt.update({
+                where: { id: existingReceipt.id },
+                data: {
+                    receiptRef: ref,
+                    rentAmount: Number(data.rentAmount),
+                    chargesAmount: Number(data.chargesAmount || 0),
+                    totalAmount: total,
+                    paymentMethod: data.paymentMethod || "WAVE",
+                    paymentRef: data.paymentRef || undefined,
+                    paidAt: targetStatus === "PAID" ? (data.paidAt || new Date()) : null,
+                    qrToken: randomUUID(),
+                    receiptHash: sha256,
+                    status: targetStatus,
+                    commentaireInterne: data.notes || undefined
+                }
+            })
+            : await prisma.receipt.create({
+                data: {
+                    receiptRef: ref,
+                    leaseId: data.leaseId,
+                    periodMonth: data.periodMonth,
+                    rentAmount: Number(data.rentAmount),
+                    chargesAmount: Number(data.chargesAmount || 0),
+                    totalAmount: total,
+                    paymentMethod: data.paymentMethod || "WAVE",
+                    paymentRef: data.paymentRef || undefined,
+                    paidAt: targetStatus === "PAID" ? (data.paidAt || new Date()) : null,
+                    qrToken: randomUUID(),
+                    receiptHash: sha256,
+                    status: targetStatus,
+                    commentaireInterne: data.notes || undefined
+                }
+            });
 
         await writeAuditLog({ userId: session.user.id, action: "RECEIPT_CREATED", module: "RECEIPT", entityId: receipt.id });
 

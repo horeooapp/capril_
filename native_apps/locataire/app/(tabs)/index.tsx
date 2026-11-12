@@ -769,6 +769,7 @@ export default function LocatairePrototypeScreen() {
                   leaseId: data.lease.id,
                   amount: totalAmount,
                   operator: opCode,
+                  monthsCount: payPeriod,
                 }),
               });
 
