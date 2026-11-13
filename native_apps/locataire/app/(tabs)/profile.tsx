@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
-import { ShieldCheck, Lock, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download } from 'lucide-react-native';
+import { ShieldCheck, Lock, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download, ChevronRight } from 'lucide-react-native';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { BUILD_NUMBER, APP_VERSION, BUILD_TIMESTAMP } from '../../lib/version';
 
@@ -105,15 +105,15 @@ export default function ProfileScreen() {
     try {
       setIsCheckingUpdate(true);
       if (__DEV__ || !Updates.isEnabled) {
-        Alert.alert('Mode Développement', 'Les mises à jour OTA sont actives sur les versions installées (Canal: ' + (Updates.channel || 'défaut') + ').');
+        Alert.alert('Mode Développement', 'Les mises à jour sont actives sur les versions installées (Canal: ' + (Updates.channel || 'défaut') + ').');
         return;
       }
       const update = await Updates.checkForUpdateAsync();
       if (update.isAvailable) {
         setUpdateAvailable(true);
         Alert.alert(
-          'Mise à jour disponible !',
-          'Une nouvelle version est disponible pour votre application. Voulez-vous la télécharger et l\'appliquer maintenant ?',
+          'Mise à jour disponible',
+          "Une nouvelle version est disponible pour votre application. Voulez-vous la télécharger et l'appliquer maintenant ?",
           [
             {
               text: 'Installer maintenant',
@@ -225,17 +225,18 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <View style={styles.card}>
+            <Pressable style={styles.card} onPress={() => router.push('/passeport')}>
               <View style={styles.row}>
                 <ShieldCheck color="#2C3E6B" size={20} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle}>Confidentialité & Passeport locatif</Text>
+                  <Text style={styles.cardTitle}>Passeport locataire</Text>
                   <Text style={styles.cardSub}>
-                    Vos données vous appartiennent. Aucun bailleur ne voit votre tranche de confiance ni vos pièces sans votre accord explicite.
+                    Gérez ce que vous partagez avec les bailleurs : tranche, attestations, foyer, durée de bail.
                   </Text>
                 </View>
+                <ChevronRight color="#2C3E6B" size={16} />
               </View>
-            </View>
+            </Pressable>
 
             <Pressable
               style={styles.btnSecondary}

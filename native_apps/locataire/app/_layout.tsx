@@ -24,7 +24,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
         return;
       }
     } catch (e) {
-      console.warn('[ErrorBoundary] Échec de la mise à jour OTA:', e);
+      console.warn('[ErrorBoundary] Échec de la mise à jour:', e);
     } finally {
       setUpdating(false);
     }
@@ -62,7 +62,7 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    async function checkOTAUpdates() {
+    async function checkAppUpdates() {
       if (__DEV__) return;
       try {
         const update = await Updates.checkForUpdateAsync();
@@ -75,7 +75,7 @@ export default function RootLayout() {
         // En cas d'erreur réseau ou hors-ligne, continuer normalement
       }
     }
-    checkOTAUpdates();
+    checkAppUpdates();
 
     const timeout = setTimeout(async () => {
       await SplashScreen.hideAsync().catch(() => {});

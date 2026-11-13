@@ -125,3 +125,29 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
         clearTimeout(timeoutId);
     }
 }
+
+export async function logoutAndRedirect(router: any): Promise<void> {
+    try {
+        await removeStoredToken();
+    } catch {}
+    try {
+        router.replace('/login');
+    } catch {
+        try {
+            router.replace('/');
+        } catch {}
+    }
+}
+
+export async function logoutAndRedirect(router: any): Promise<void> {
+  try {
+    await removeStoredToken();
+  } catch {}
+  try {
+    router.replace('/login');
+  } catch {
+    try {
+      router.replace('/');
+    } catch {}
+  }
+}

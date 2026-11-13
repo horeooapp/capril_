@@ -920,7 +920,7 @@ export default function LocatairePrototypeScreen() {
           dateEntree: guestDateEntree,
           dateSortie: guestDateSortie,
           motif: guestMotifArrivee,
-          sha256: json.occupant?.declarationSha256 || 'SHA-256 certifié ADD-29',
+          sha256: json.occupant?.declarationSha256 || 'Empreinte certifiée',
         });
         // Réinitialisation des saisies
         setGuestNom('');
@@ -3345,7 +3345,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : ATTESTATION DE RÉSIDENCE QR (ADD-29) */}
+      {/* MODALE : ATTESTATION DE RÉSIDENCE QR (Occupants) */}
       <Modal visible={attestationModal} transparent animationType="slide" onRequestClose={() => setAttestationModal(false)}>
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalSheet, { maxHeight: '90%' }]}>
@@ -3418,7 +3418,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : OCCUPANTS DECLARÉS (ADD-29) */}
+      {/* MODALE : OCCUPANTS DECLARÉS (Occupants) */}
       <Modal visible={occupantsModal} transparent animationType="slide" onRequestClose={() => setOccupantsModal(false)}>
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalSheet, { maxHeight: '85%' }]}>
@@ -3474,7 +3474,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : FORMULAIRE DÉCLARATION OCCUPANT (ADD-29) */}
+      {/* MODALE : FORMULAIRE DÉCLARATION OCCUPANT (Occupants) */}
       <Modal visible={newOccupantModal} transparent animationType="slide" onRequestClose={() => setNewOccupantModal(false)}>
         <View style={styles.modalBackdrop}>
           <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
@@ -3760,7 +3760,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : HÉBERGER UN INVITÉ / DÉCLARATION D'OCCUPANT (ADD-29 ENRICHI) */}
+      {/* MODALE : HÉBERGER UN INVITÉ / DÉCLARATION D'OCCUPANT (Occupants) */}
       <Modal visible={guestModal} transparent animationType="slide" onRequestClose={() => setGuestModal(false)}>
         <View style={styles.modalBackdrop}>
           <View style={[styles.modalSheet, { maxHeight: '92%', paddingBottom: 16 }]}>
@@ -3769,7 +3769,7 @@ export default function LocatairePrototypeScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                   <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, borderWidth: 1, borderColor: '#FDE68A' }}>
                     <Text style={{ fontSize: 10, fontWeight: '800', color: '#92400E', textTransform: 'uppercase' }}>
-                      Norme ADD-29 · Scellé Numérique
+                      Déclaration officielle · Scellé Numérique
                     </Text>
                   </View>
                 </View>
@@ -3792,7 +3792,7 @@ export default function LocatairePrototypeScreen() {
                     Déclaration officielle d'accueil
                   </Text>
                   <Text style={{ fontSize: 11, color: '#64748B', lineHeight: 16, marginTop: 2 }}>
-                    Plafond légal : jusqu’à 10 occupants simultanés. Un scellé SHA-256 sera généré et permettra d'émettre l'attestation d'hébergement.
+                    Plafond légal : jusqu’à 10 occupants simultanés. Une empreinte numérique sera générée et permettra d'émettre l'attestation d'hébergement.
                   </Text>
                 </View>
               </View>
@@ -4091,7 +4091,7 @@ export default function LocatairePrototypeScreen() {
                     {guestHonneur && <Check color="#fff" size={16} />}
                   </View>
                   <Text style={{ fontSize: 11, color: '#334155', lineHeight: 17, flex: 1, fontWeight: '500' }}>
-                    Je certifie sur l’honneur l’exactitude des informations fournies sur cet invité/occupant. Un scellé cryptographique SHA-256 certifié sera généré et rattaché au contrat de bail.
+                    Je certifie sur l’honneur l’exactitude des informations fournies sur cet invité/occupant. Un scellé cryptographique certifié certifié sera généré et rattaché au contrat de bail.
                   </Text>
                 </Pressable>
               </View>
@@ -4157,7 +4157,7 @@ export default function LocatairePrototypeScreen() {
                   </Text>
                 </View>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.subMuted}>Scellé SHA-256</Text>
+                  <Text style={styles.subMuted}>Scellé certifié</Text>
                   <Text style={{ fontSize: 10, fontFamily: 'monospace', color: '#1E7E4E', maxWidth: 160 }} numberOfLines={1}>
                     {guestSuccessModal.sha256}
                   </Text>
@@ -4169,7 +4169,7 @@ export default function LocatairePrototypeScreen() {
               style={[styles.btnPrimary, { backgroundColor: '#1E7E4E' }]}
               onPress={() => {
                 if (guestSuccessModal) {
-                  const text = `Attestation d'hébergement temporaire QAPRIL pour ${guestSuccessModal.nom} rattachée au bail ${bailRef}. Scellé SHA-256 : ${guestSuccessModal.sha256}`;
+                  const text = `Attestation d'hébergement temporaire QAPRIL pour ${guestSuccessModal.nom} rattachée au bail ${bailRef}. Scellé certifié : ${guestSuccessModal.sha256}`;
                   Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
                     Alert.alert('Attestation prête', text);
                   });
@@ -4504,7 +4504,7 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* Assistant Vocal QAPRIL (ADD-27) */}
+      {/* Assistant Vocal QAPRIL (Assistant vocal) */}
       <VoiceAssistantFAB moduleName="LOCATAIRE" primaryColor="#1B4D3E" />
     </SafeAreaView>
   );

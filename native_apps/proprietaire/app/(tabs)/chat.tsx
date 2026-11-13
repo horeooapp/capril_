@@ -161,23 +161,28 @@ export default function ProprietaireChatScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
-      <TopNavHeader title="Messagerie Locataires" subtitle="Échanges directs & quittances" />
+      <TopNavHeader title="Messages" subtitle="Échanges directs & quittances" />
             {/* HEADER CHAT */}
             <View style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Messagerie Locataires
+                            Messages
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#1B4D3E' }}>
                             Vos échanges sont conservés et datés
                         </Text>
                     </View>
-                    <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN DIRECT</Text>
-                    </View>
                 </View>
             </View>
+
+            {interlocutorName === 'Locataire (identité protégée)' && (
+              <View style={{ backgroundColor: '#FFF7ED', paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#FED7AA' }}>
+                <Text style={{ fontSize: 11, color: '#9A3412', fontWeight: '700' }}>
+                  L'identité de ce locataire est protégée pour ce bail.
+                </Text>
+              </View>
+            )}
 
             <KeyboardAvoidingView 
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 

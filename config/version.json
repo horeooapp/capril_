@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "buildNumber": 17,
+  "buildNumber": 18,
   "releaseDate": "2026-11-13",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
@@ -8,16 +8,16 @@
     "locataire": {
       "name": "QAPRIL Locataire",
       "version": "2.0.0",
-      "versionCode": 17,
+      "versionCode": 18,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Mise à jour Vague 3 : Formulaire Invité ADD-29 enrichi, Référentiel Lieux S-08, 4 Interrupteurs Passeport Locatif S-09, Signalements S-10 et Paiements déclarés idempotents S-14"
+      "releaseNotes": "Mise à jour Vague 5 & 6 : Nouvelle barre de navigation unifiée (Accueil · Mon bail · Payer · Recherche · Moi), écrans Mon bail, Payer, Recherche et Passeport locatif, messagerie épurée, conformité lexique républicaine intégrale."
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
       "version": "2.0.0",
-      "versionCode": 17,
+      "versionCode": 18,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Mise à jour Vague 3 : Confirmation idempotente des paiements déclarés S-14, Traitement et planification des signalements S-10, Référentiel Lieux S-08"
+      "releaseNotes": "Mise à jour Vague 5 & 6 : Nouvelle barre de navigation unifiée (Accueil · Biens · Baux · Flux · Plus), écrans Baux, Espace Diaspora, récapitulatif fiscal DGI, interrupteur d'identité confidentielle, conformité lexique."
     }
   }
 }

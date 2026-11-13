@@ -26,7 +26,7 @@ const { width } = Dimensions.get('window');
 const ONBOARDING_SLIDES = [
   {
     id: '1',
-    badge: 'LOI 2019-576 CCH',
+    badge: 'CADRE LÉGAL CCH',
     title: 'Contrats de bail certifiés',
     description:
       'Rédigez, validez et scellez vos baux d\'habitation et commerciaux en 3 minutes. Plafonnement légal de la caution (2 mois) et signature numérique par code OTP SMS.',
@@ -97,7 +97,7 @@ export default function OnboardingScreen() {
             <View style={styles.separator} />
 
             <Text style={styles.consentBody}>
-              Conformément à la Loi N° 2019-576 régissant les baux d'habitation et à la Loi N° 2013-450 sur la protection des données personnelles (ARTCI), QAPRIL garantit la sécurité juridique et financière de votre patrimoine.
+              Conformément au Code de la Construction et de l'Habitat et aux règles de protection des données personnelles (ARTCI), QAPRIL garantit la sécurité juridique et financière de votre patrimoine.
               {'\n\n'}
               Pour certifier vos actes, émettre les quittances officielles et notifier vos parties prenantes, l’application utilise vos canaux de communication certifiés (SMS & WhatsApp).
               {'\n\n'}

@@ -25,7 +25,7 @@ const { width } = Dimensions.get('window');
 const ONBOARDING_SLIDES = [
   {
     id: '1',
-    badge: 'PROTECTION LOCATAIRE (LOI 2019-576)',
+    badge: 'PROTECTION LOCATAIRE',
     title: 'Baux certifiés & caution protégée',
     description:
       'Vos droits sont garantis par le Code de la Construction et de l\'Habitat : caution et avance strictement plafonnées à 2 mois, signées par code OTP SMS.',
@@ -96,7 +96,7 @@ export default function LocataireOnboardingScreen() {
             <View style={styles.separator} />
 
             <Text style={styles.consentBody}>
-              QAPRIL protège votre relation locative conformément à la Loi N° 2019-576 (Code de la Construction et de l'Habitat) et à la réglementation ARTCI sur les données personnelles.
+              QAPRIL protège votre relation locative conformément au Code de la Construction et de l'Habitat et à la réglementation ARTCI sur les données personnelles.
               {'\n\n'}
               Accédez à vos quittances certifiées, suivez vos versements de loyer et recevez vos alertes de signature de bail par code OTP sécurisé.
               {'\n\n'}

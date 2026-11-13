@@ -96,3 +96,4 @@ export function formatRelanceJ15SMS(params: RelanceLoyerJ15Params): string {
 export function formatQuittanceEmiseSMS(params: QuittanceEmiseParams): string {
   return `Bonjour ${params.locataire}, votre quittance de ${params.mois} est disponible. Référence : ${params.ref}. Vérifiable sur qapril.ci/verifier.`;
 }
+

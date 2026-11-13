@@ -107,7 +107,7 @@ export default function ProfileScreen() {
     try {
       setIsCheckingUpdate(true);
       if (__DEV__ || !Updates.isEnabled) {
-        Alert.alert('Mode Développement', 'Les mises à jour OTA sont actives sur les versions installées (Canal: ' + (Updates.channel || 'défaut') + ').');
+        Alert.alert('Mode Développement', 'Les mises à jour sont actives sur les versions installées (Canal: ' + (Updates.channel || 'défaut') + ').');
         return;
       }
       const update = await Updates.checkForUpdateAsync();

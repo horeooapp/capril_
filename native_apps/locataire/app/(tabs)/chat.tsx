@@ -161,23 +161,28 @@ export default function ChatScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
-      <TopNavHeader title="Messagerie Bailleur" subtitle="Échanges directs" />
+      <TopNavHeader title="Messages" subtitle="Échanges directs" />
             {/* HEADER CHAT */}
             <View style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Messagerie Sécurisée
+                            Messages
                         </Text>
                         <Text style={{ fontSize: 11, fontWeight: '700', color: '#0D2B6E' }}>
                             Vos échanges sont conservés et datés
                         </Text>
                     </View>
-                    <View style={{ backgroundColor: '#DCFCE7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#15803D' }}>EN DIRECT</Text>
-                    </View>
                 </View>
             </View>
+
+            {interlocutorName === 'Bailleur (identité protégée)' && (
+              <View style={{ backgroundColor: '#FFF7ED', paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#FED7AA' }}>
+                <Text style={{ fontSize: 11, color: '#9A3412', fontWeight: '700' }}>
+                  L'identité de votre bailleur est protégée pour ce bail.
+                </Text>
+              </View>
+            )}
 
             <KeyboardAvoidingView 
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 

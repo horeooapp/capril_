@@ -17,11 +17,13 @@ import { useRouter } from 'expo-router';
 interface VoiceAssistantFABProps {
   moduleName?: 'BAILLEUR' | 'LOCATAIRE' | 'AGENCE';
   primaryColor?: string;
+  visible?: boolean;
 }
 
 export function VoiceAssistantFAB({
   moduleName = 'LOCATAIRE',
   primaryColor = '#1B4D3E',
+  visible = true,
 }: VoiceAssistantFABProps) {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
@@ -129,13 +131,16 @@ export function VoiceAssistantFAB({
 
   return (
     <>
-      {/* Bouton Micro Flottant Universel (RG-AST-06 : 56px min, bas-droite) */}
-      <Pressable
-        style={[styles.fab, { backgroundColor: primaryColor }]}
-        onPress={handleOpen}
-        accessibilityLabel="Parler à QAPRIL"
-      >
-        <Mic color="#FFFFFF" size={24} />
+      {/* Bouton Micro Flottant Universel (ML-06 : marge basse 80 px, masquable au défilement) */}
+      {visible && (
+        <Pressable
+          style={[styles.fab, { backgroundColor: primaryColor }]}
+          onPress={handleOpen}
+          accessibilityLabel="Parler à QAPRIL"
+        >
+          <Mic color="#FFFFFF" size={24} />
+        </Pressable>
+      )}
       </Pressable>
 
       {/* Modal interactif du pilote vocal */}
@@ -235,7 +240,7 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     right: 20,
-    bottom: 85,
+    bottom: 80,
     width: 56,
     height: 56,
     borderRadius: 28,

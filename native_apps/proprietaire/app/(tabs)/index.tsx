@@ -374,7 +374,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               avance: l.avanceLoyer || (l.rentAmount ? l.rentAmount * 2 : 0),
               duree: l.durationMonths || 12,
               dgi: true,
-              sha: l.id ? l.id.substring(0, 12).toUpperCase() : 'SHA256-QAPRIL'
+              sha: l.id ? l.id.substring(0, 12).toUpperCase() : 'EMP-QAPRIL'
             })));
           }
         }
@@ -2134,7 +2134,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <View style={styles.recapBox}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                         <ShieldCheck color="#1B4D3E" size={16} />
-                        <Text style={[styles.boldText, { color: '#1B4D3E' }]}>Certification numérique SHA-256</Text>
+                        <Text style={[styles.boldText, { color: '#1B4D3E' }]}>Certification numérique officielle</Text>
                       </View>
                       <Text style={styles.subMuted}>
                         Dont quittance, sous réserve de tous droits. Ce document électronique horodaté constitue une preuve légale de paiement conforme au CCH ivoirien.
@@ -2182,7 +2182,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   <View style={styles.rowBetween}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.label, { color: primaryColor, fontWeight: '800' }]}>
-                        CONTRAT OFFICIEL · LOI N° 2019-576 (CCH CI)
+                        CONTRAT OFFICIEL · CODE DE LA CONSTRUCTION
                       </Text>
                       <Text style={styles.h2}>Contrat de Bail ({b.ref})</Text>
                     </View>
@@ -2284,7 +2284,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         Contrat rédigé conformément aux articles 414 et suivants du Code de la Construction et de l’Habitation de Côte d’Ivoire.
                       </Text>
                       <Text style={[styles.subMuted, { marginTop: 4 }]}>
-                        Empreinte SHA-256 : {b.sha} · Droits DGI : {fmt(calcDroitsDgi(b.loyer || 0, b.duree || 12))}
+                        Empreinte certifiée : {b.sha} · Droits DGI : {fmt(calcDroitsDgi(b.loyer || 0, b.duree || 12))}
                       </Text>
                     </View>
                   </ScrollView>
@@ -2317,7 +2317,7 @@ export default function BailleurAndAgencePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* Assistant Vocal QAPRIL (ADD-27) */}
+      {/* Assistant Vocal QAPRIL */}
       <VoiceAssistantFAB moduleName={isBailleur ? 'BAILLEUR' : 'AGENCE'} primaryColor={primaryColor} />
     </SafeAreaView>
   );

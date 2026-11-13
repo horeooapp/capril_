@@ -113,13 +113,13 @@ export default function ReceiptsScreen() {
               Aucune quittance émise pour le moment
             </Text>
             <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 6, lineHeight: 18 }}>
-              Vos quittances certifiées apparaîtront ici dès la validation de votre loyer.
+              Vos quittances apparaîtront ici après confirmation de vos paiements.
             </Text>
             <Pressable
               style={{ backgroundColor: '#1B4D3E', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, marginTop: 16 }}
-              onPress={() => router.push('/(tabs)' as any)}
+              onPress={() => router.push('/(tabs)/payer' as any)}
             >
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Régler mon loyer en cours</Text>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>Payer mon loyer</Text>
             </Pressable>
           </View>
         }
@@ -209,7 +209,9 @@ export default function ReceiptsScreen() {
 
               <View style={{ backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#BBF7D0', marginBottom: 16 }}>
                 <Text style={{ fontSize: 11, color: '#166534', lineHeight: 16 }}>
-                  Dont quittance, sous réserve de tous droits. Ce document certifié constitue une preuve formelle opposable aux banques, administrations et consulats.
+                  {selectedReceipt?.statutDgi === 'ENREGISTRE'
+                    ? `Enregistré le ${selectedReceipt?.dateEnregistrement ? new Date(selectedReceipt.dateEnregistrement).toLocaleDateString('fr-FR') : '—'}`
+                    : "Signé, en attente d'enregistrement"}
                 </Text>
               </View>
 

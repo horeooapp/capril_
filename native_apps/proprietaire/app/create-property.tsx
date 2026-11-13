@@ -59,13 +59,13 @@ const COMMUNES_ABIDJAN = [
 ];
 
 const PROPERTY_TYPES = [
-  { id: 'APARTMENT', label: 'Appartement' },
+  { id: 'APPARTEMENT', label: 'Appartement' },
   { id: 'VILLA', label: 'Villa / Maison' },
   { id: 'TERRAIN_URBAIN_NU', label: 'Terrain urbain nu' },
   { id: 'TERRAIN_RURAL', label: 'Terrain rural' },
   { id: 'STUDIO', label: 'Studio' },
   { id: 'COMMERCIAL', label: 'Commerce / Local' },
-  { id: 'BUILDING', label: 'Immeuble entier' },
+  { id: 'IMMEUBLE', label: 'Immeuble entier' },
 ];
 
 const NATURES_TITRES = [
@@ -87,7 +87,7 @@ export default function CreatePropertyScreen() {
 
   // Form states
   const [name, setName] = useState('');
-  const [propertyType, setPropertyType] = useState('APARTMENT');
+  const [propertyType, setPropertyType] = useState('APPARTEMENT');
   const [leaseType, setLeaseType] = useState('residential');
   const [commune, setCommune] = useState('Cocody');
   const [customCommune, setCustomCommune] = useState('');
@@ -370,7 +370,7 @@ export default function CreatePropertyScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Enregistrement Officiel QAPRIL</Text>
               <Text style={styles.legalNoticeDesc}>
-                Votre bien sera immatriculé avec un code officiel unique pour la DGI, garantissant sa conformité à la Loi 2019-576.
+                Votre bien sera immatriculé avec un code officiel unique pour la DGI, garantissant sa conformité au cadre légal.
               </Text>
             </View>
           </View>
@@ -583,7 +583,7 @@ export default function CreatePropertyScreen() {
               onChangeText={setUnitLabel}
             />
 
-            {/* ADD-28 : GÉOLOCALISATION CERTIFIÉE DU BIEN */}
+            {/* GÉOLOCALISATION DU BIEN */}
             <View style={styles.geoBox}>
               <View style={styles.geoHeader}>
                 <View style={styles.geoIconCircle}>

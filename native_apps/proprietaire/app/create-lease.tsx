@@ -62,6 +62,7 @@ export default function CreateLeaseScreen() {
   const [depositAmount, setDepositAmount] = useState('');
   const [advanceAmount, setAdvanceAmount] = useState('');
   const [durationMonths, setDurationMonths] = useState('12');
+  const [paymentDay, setPaymentDay] = useState('5');
   const [maskIdentity, setMaskIdentity] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -148,7 +149,7 @@ export default function CreateLeaseScreen() {
     if (isDepositOverLimit || isAdvanceOverLimit) {
       Alert.alert(
         'Plafonnement Légal Dépassé',
-        `Selon la Loi N° 2019-576 (Art. 415 & 416 CCH), la caution et l'avance sont strictement plafonnées à 2 mois maximum (soit ${fmtFcfa(maxLegalCaution)}). Veuillez ajuster les montants.`
+        `Selon le cadre légal en vigueur (Art. 415 & 416 CCH), la caution et l'avance sont strictement plafonnées à 2 mois maximum (soit ${fmtFcfa(maxLegalCaution)}). Veuillez ajuster les montants.`
       );
       return;
     }
@@ -166,6 +167,7 @@ export default function CreateLeaseScreen() {
           depositAmount: depositAmount.trim() || String(maxLegalCaution),
           avanceLoyer: advanceAmount.trim() || String(maxLegalCaution),
           durationMonths: durationMonths,
+          paymentDay: parseInt(paymentDay, 10) || 5,
           bailleurMasque: maskIdentity,
           isRepriseBail,
           dateRepriseOrigine: isRepriseBail ? dateRepriseOrigine : undefined,
@@ -178,7 +180,7 @@ export default function CreateLeaseScreen() {
 
       if (res.ok && data.success) {
         Alert.alert(
-          'Bail Créé & Envoyé !',
+          'Bail créé et envoyé',
           `Le contrat de bail officiel a été généré en PDF et scellé numériquement.\n\nUne notification SMS a été transmise au locataire pour sa signature par code SMS.\n\nRéf : ${data.lease?.leaseReference || 'Enregistré'}`,
           [
             {
@@ -199,7 +201,7 @@ export default function CreateLeaseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavHeader title="Nouveau Bail Certifié" subtitle="Contrat conforme Loi 2019-576" />
+      <TopNavHeader title="Nouveau Bail Certifié" subtitle="Contrat conforme à la loi" />
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -219,7 +221,7 @@ export default function CreateLeaseScreen() {
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Sécurisation Intégrale & Signature SMS</Text>
               <Text style={styles.legalNoticeDesc}>
-                Le bail est scellé avec un certificat numérique infalsifiable. Les deux parties signent par code SMS certifié, et les quittances à code de vérification sont immédiatement activées.
+                Le bail est scellé avec un certificat numérique vérifié. Les deux parties signent par code SMS certifié, et les quittances à code de vérification sont immédiatement activées.
               </Text>
             </View>
           </View>
@@ -384,7 +386,7 @@ export default function CreateLeaseScreen() {
 
           {/* 3. CONDITIONS FINANCIÈRES & LÉGALES */}
           <View style={styles.formSection}>
-            <Text style={styles.sectionTitle}>3. CONDITIONS FINANCIÈRES (LOI 2019-576)</Text>
+            <Text style={styles.sectionTitle}>3. CONDITIONS FINANCIÈRES</Text>
 
             <Text style={styles.fieldLabel}>Loyer Mensuel (FCFA) *</Text>
             <View style={styles.inputWithSuffixContainer}>
@@ -511,6 +513,24 @@ export default function CreateLeaseScreen() {
                 );
               })}
             </View>
+
+            <Text style={[styles.fieldLabel, { marginTop: 14 }]}>Jour d'échéance mensuelle</Text>
+            <View style={styles.chipsWrapHorizontal}>
+              {['1', '5', '10', '15'].map((d) => {
+                const active = paymentDay === d;
+                return (
+                  <Pressable
+                    key={d}
+                    onPress={() => setPaymentDay(d)}
+                    style={[styles.durationChip, active && styles.durationChipActive]}
+                  >
+                    <Text style={[styles.durationChipText, active && styles.durationChipTextActive]}>
+                      Le {d} du mois
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
 
           {/* 4. CONFIDENTIALITÉ DU BAILLEUR (IC-01 P1-01 / P1-02) */}
@@ -554,6 +574,41 @@ export default function CreateLeaseScreen() {
               </View>
             </Pressable>
           </View>
+
+          {/* 5. RÉCAPITULATIF FISCAL DGI (MB-07) */}
+          {rentNum > 0 && (
+            <View style={{
+              backgroundColor: '#EFF6FF',
+              borderRadius: 14,
+              padding: 16,
+              borderWidth: 1,
+              borderColor: '#BFDBFE',
+              marginBottom: 16,
+            }}>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#1E40AF', marginBottom: 8, textTransform: 'uppercase' }}>
+                Droits d'enregistrement DGI estimés
+              </Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text style={{ fontSize: 13, color: '#475569' }}>Assiette fiscale ({durationMonths} mois)</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#1E293B' }}>{fmtFcfa(rentNum * (parseInt(durationMonths, 10) || 12))}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text style={{ fontSize: 13, color: '#475569' }}>Droits d'enregistrement (2,5%)</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#1E293B' }}>{fmtFcfa(Math.round(rentNum * (parseInt(durationMonths, 10) || 12) * 0.025))}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                <Text style={{ fontSize: 13, color: '#475569' }}>Droit de timbre fiscal</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#1E293B' }}>1 000 F</Text>
+              </View>
+              <View style={{ height: 1, backgroundColor: '#DBEAFE', marginVertical: 6 }} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 13, fontWeight: '800', color: '#1E40AF' }}>Total estimé</Text>
+                <Text style={{ fontSize: 15, fontWeight: '900', color: '#1E40AF' }}>
+                  {fmtFcfa(Math.round(rentNum * (parseInt(durationMonths, 10) || 12) * 0.025) + 1000)}
+                </Text>
+              </View>
+            </View>
+          )}
 
           {/* BOUTON D'ACTION PRINCIPAL */}
           <Pressable

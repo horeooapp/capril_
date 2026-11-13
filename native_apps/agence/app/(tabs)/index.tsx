@@ -264,7 +264,7 @@ export default function AgencePrototypeHomeScreen() {
                 Séquestre Notarial Obligatoire
               </Text>
               <Text style={{ fontSize: 11, color: '#334155', marginTop: 4, lineHeight: 16 }}>
-                QAPRIL ne détient, n'achemine ni ne séquestre aucun acompte, prix ou arrhes. Tous les paiements de vente transitent obligatoirement par le compte séquestre de l'étude notariale désignée.
+                QAPRIL ne détient, n'achemine ni ne garde aucun acompte, prix ou arrhes. Tous les paiements de vente transitent obligatoirement par le compte de consignation de l'office ministériel désigné.
               </Text>
             </View>
 

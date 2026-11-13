@@ -165,7 +165,7 @@ export default function SignatureScreen() {
             
             <Text style={styles.sectionTitle}>Clauses Générales :</Text>
             <Text style={styles.paragraph}>
-              Conformément à la Loi N°2019-576 du 26 juin 2019 instituant le Code de la Construction et de l'Habitat, le présent bail engage les deux parties à respecter les clauses stipulées dans le contrat officiel disponible sur votre portail QAPRIL.
+              Conformément au Code de la Construction et de l'Habitat, le présent bail engage les deux parties à respecter les clauses stipulées dans le contrat officiel disponible sur votre portail QAPRIL.
             </Text>
           </ScrollView>
 

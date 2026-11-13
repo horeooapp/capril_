@@ -44,7 +44,7 @@ const ONBOARDING_SLIDES = [
     badge: 'MULTICANAL & FLUX FINANCIERS',
     title: 'Comptabilité SYSCOHADA & Mobile Money',
     description:
-      'Suivi en temps réel des encaissements locatifs, ventilation automatisée des honoraires de gestion et rapports mensuels opposables.',
+      'Suivi en temps réel des encaissements locatifs, ventilation automatisée des honoraires de gestion et rapports mensuels vérifiés et conformes.',
     icon: Users2,
   },
 ];
@@ -85,7 +85,7 @@ export default function AgenceOnboardingScreen() {
           <View style={styles.consentCard}>
             <View style={styles.consentBadge}>
               <ShieldCheck color="#C2410C" size={15} />
-              <Text style={styles.consentBadgeText}>AGRÉMENT NOTARIAL & CPRAIMA-CI</Text>
+              <Text style={styles.consentBadgeText}>AGRÉMENT OFFICIEL & CPRAIMA-CI</Text>
             </View>
 
             <Text style={styles.consentTitle}>Bienvenue sur QAPRIL Agence</Text>
