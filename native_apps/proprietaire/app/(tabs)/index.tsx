@@ -50,6 +50,7 @@ import {
   Edit3,
   BookOpen,
   Download,
+  Globe,
 } from 'lucide-react-native';
 
 const EUR_RATE = 655.957;
@@ -67,6 +68,7 @@ const BAILLEUR_MENU_ITEMS = [
   { id: 'baux', label: 'Mes baux & DGI', desc: 'Enregistrement fiscal et contrats certifiés', icon: FileSpreadsheet },
   { id: 'quit', label: 'Quittances certifiées', desc: 'Émission et historique mensuel', icon: FileText },
   { id: 'flux', label: 'Flux financiers (FCFA/€)', desc: 'Reversements Wave, Orange et virements diaspora', icon: Wallet },
+  { id: 'diaspora', label: 'Espace Diaspora (€)', desc: 'Gestion à distance et affichage en euros', icon: Globe },
   { id: 'mandats', label: 'Mandats de gestion', desc: 'Agences agréées et intermédiaires', icon: Briefcase },
   { id: 'cand', label: 'Vivier de candidats', desc: 'Demandes de location et dossiers vérifiés', icon: Users },
   { id: 'params', label: 'Paramètres de gestion', desc: 'Relances J+3/J+7/J+15, paiements partiels et Diaspora', icon: Wrench },
@@ -607,6 +609,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                         Linking.openURL('https://qapril.net/manuel');
                         return;
                       }
+                      if (item.id === 'diaspora') {
+                        setMenuOpen(false);
+                        router.push('/(tabs)/diaspora' as any);
+                        return;
+                      }
                       if (isBailleur) {
                         setBTab(item.id as any);
                       } else {
@@ -670,7 +677,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   onPress={() => setEurMode(!eurMode)}
                 >
                   <View style={styles.drawerItemIconWrap}>
-                    <Wallet color={primaryColor} size={18} />
+                    <Globe color={primaryColor} size={18} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.drawerItemLabel}>Affichage devise : {eurMode ? 'Euros (€)' : 'FCFA (F)'}</Text>

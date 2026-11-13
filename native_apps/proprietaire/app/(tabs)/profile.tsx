@@ -213,7 +213,7 @@ export default function ProfileScreen() {
               </Text>
             </View>
 
-            <Pressable style={styles.cardRow} onPress={() => setDiasporaModalVisible(true)}>
+            <Pressable style={styles.cardRow} onPress={() => router.push('/(tabs)/diaspora' as any)}>
               <Globe color="#1B4D3E" size={20} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Je gère depuis l’étranger — 7 € par mois</Text>

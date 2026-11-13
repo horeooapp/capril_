@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import { Home, Building2, FileText, Wallet, MoreHorizontal, MessageCircle, Wrench } from 'lucide-react-native';
+import { Home, Building2, FileText, Wallet, MoreHorizontal, MessageCircle, Wrench, Globe } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
@@ -94,6 +94,16 @@ export default function TabLayout() {
           title: 'Plus',
           tabBarAccessibilityLabel: 'Plus',
           tabBarIcon: ({ color, focused }) => <MoreHorizontal color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
+        }}
+      />
+
+      {/* Diaspora avec Logotype Globe officiel */}
+      <Tabs.Screen
+        name="diaspora"
+        options={{
+          title: 'Diaspora',
+          tabBarAccessibilityLabel: 'Espace Diaspora',
+          tabBarIcon: ({ color, focused }) => <Globe color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
 
