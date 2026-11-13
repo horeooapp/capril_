@@ -78,7 +78,7 @@ export async function GET(request: Request) {
             summary: {
                 enAttente:     formatted.filter(t => t.statut === 'EN_ATTENTE').length,
                 enCours:       formatted.filter(t => t.statut === 'PRIS_EN_CHARGE').length,
-                resolus:       formatted.filter(t => t.statut === 'RÉSOLU').length,
+                resolus:       formatted.filter(t => t.statut === 'RESOLU' || t.statut === 'RÉSOLU').length,
             },
         });
     } catch (error: any) {

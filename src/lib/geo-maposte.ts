@@ -154,10 +154,16 @@ export async function confirmerPositionParConcordance(propertyId: string): Promi
         const w3w = deriveSimulatedW3W(property.commune, meanLat, meanLng);
         const codeLocalisation = generateLocalisationCode(property.commune, meanLat, meanLng);
 
+        // S-17 : Si le bien a un bail actif ou fait l'objet d'un état des lieux, la position devient GELEE
+        const activeLease = await prisma.lease.findFirst({
+            where: { propertyId, status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] } }
+        });
+        const finalStatut = activeLease ? 'GELEE' : 'CONFIRMEE';
+
         await prisma.property.update({
             where: { id: propertyId },
             data: {
-                statutPosition: 'CONFIRMEE',
+                statutPosition: finalStatut,
                 gpsLatitude: meanLat,
                 gpsLongitude: meanLng,
                 precisionM: Math.round((captureBailleur.precisionM + captureLocataire.precisionM) / 2),
@@ -170,8 +176,8 @@ export async function confirmerPositionParConcordance(propertyId: string): Promi
         return {
             confirmee: true,
             distance,
-            statut: 'CONFIRMEE',
-            message: `Position confirmée avec succès par concordance des parties (écart : ${distance} m). Bien certifié niveau 2.`
+            statut: finalStatut,
+            message: `Position ${finalStatut === 'GELEE' ? 'gelée' : 'confirmée'} avec succès par concordance des parties (écart : ${distance} m). Bien certifié.`
         };
     } else if (distance > 100) {
         // Alerte écart > 100 m (RG-GEO-05)

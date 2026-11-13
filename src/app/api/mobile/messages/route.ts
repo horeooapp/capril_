@@ -54,20 +54,63 @@ export async function POST(request: Request) {
         }
 
         if (action === 'FETCH') {
+            const lease = await prisma.lease.findUnique({
+                where: { id: leaseId },
+                include: {
+                    property: true,
+                }
+            });
+
             const messages = await prisma.messagerieBail.findMany({
                 where: { leaseId },
                 orderBy: { dateEnvoi: 'asc' },
                 include: {
                     expediteur: {
                         select: {
+                            id: true,
                             firstName: true,
                             lastName: true,
+                            companyName: true,
                             avatarUrl: true
                         }
                     }
                 }
             });
-            return NextResponse.json({ success: true, data: messages });
+
+            // S-11 & S-15 : RG-CONF et calcul d'identité
+            // Si le lecteur est le locataire et que le bailleur est masqué, masquer le nom du bailleur
+            const isTenant = lease?.tenantId === user.id;
+            const hasAgency = Boolean(lease?.managedByUserId || lease?.property?.managedByUserId);
+            const isMasked = Boolean(lease?.bailleurMasque);
+
+            const safeMessages = messages.map(m => {
+                const isLandlordMessage = m.roleExpediteur === 'PROPRIO';
+                if (isTenant && isLandlordMessage) {
+                    if (hasAgency) {
+                        return {
+                            ...m,
+                            expediteur: {
+                                ...m.expediteur,
+                                firstName: m.expediteur?.companyName || 'Agence de gestion',
+                                lastName: '',
+                            }
+                        };
+                    }
+                    if (isMasked) {
+                        return {
+                            ...m,
+                            expediteur: {
+                                ...m.expediteur,
+                                firstName: 'Bailleur',
+                                lastName: '(identité protégée)',
+                            }
+                        };
+                    }
+                }
+                return m;
+            });
+
+            return NextResponse.json({ success: true, data: safeMessages });
         }
 
         if (action === 'SEND') {

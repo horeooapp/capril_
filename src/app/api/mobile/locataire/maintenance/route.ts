@@ -19,16 +19,25 @@ export async function GET(request: Request) {
         const propertyName = activeLease?.property?.name || 'Votre logement';
 
         if (activeLease) {
-            const landlordId = activeLease.landlordId || activeLease.property?.ownerUserId;
-            if (landlordId) {
-                const landlord = await prisma.user.findUnique({
-                    where: { id: landlordId },
-                    select: { firstName: true, lastName: true }
+            const managerId = activeLease.managedByUserId || activeLease.property?.managedByUserId;
+            if (managerId) {
+                const manager = await prisma.user.findUnique({
+                    where: { id: managerId },
+                    select: { firstName: true, lastName: true, companyName: true }
                 });
-                if (landlord) {
-                    landlordName = activeLease.bailleurMasque
-                        ? 'Bailleur certifié'
-                        : `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+                landlordName = manager?.companyName || `${manager?.firstName || ''} ${manager?.lastName || ''}`.trim() || 'Agence de gestion';
+            } else {
+                const landlordId = activeLease.landlordId || activeLease.property?.ownerUserId;
+                if (landlordId) {
+                    const landlord = await prisma.user.findUnique({
+                        where: { id: landlordId },
+                        select: { firstName: true, lastName: true }
+                    });
+                    if (landlord) {
+                        landlordName = activeLease.bailleurMasque
+                            ? 'Bailleur (identité protégée)'
+                            : `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+                    }
                 }
             }
         }
