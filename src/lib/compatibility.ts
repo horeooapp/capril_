@@ -135,3 +135,4 @@ export function calculerScoreCompatibilite(input: CompatibilityInput): Compatibi
         manques,
     };
 }
+

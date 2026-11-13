@@ -86,3 +86,4 @@ export async function PATCH(
         return NextResponse.json({ error: 'Erreur lors de la mise à jour du signalement.' }, { status: 500 });
     }
 }
+
