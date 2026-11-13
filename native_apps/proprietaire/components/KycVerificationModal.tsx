@@ -41,7 +41,7 @@ interface KycVerificationModalProps {
 
 type KycStep = 'intro' | 'document' | 'scan' | 'liveness' | 'bank';
 
-// Statuts de scan d'un cÃ´tÃ© de document
+// Statuts de scan d'un côté de document
 type ScanStatus = 'idle' | 'requesting' | 'scanning' | 'done';
 
 export default function KycVerificationModal({
@@ -71,10 +71,10 @@ export default function KycVerificationModal({
   const [livenessStep, setLivenessStep] = useState(0);
   const LIVENESS_PROMPTS = [
     'Positionnez votre visage dans le cadre circulaire',
-    'Regardez droit vers la camÃ©ra...',
+    'Regardez droit vers la caméra...',
     'Clignez lentement des deux yeux...',
-    'Tournez lÃ©gÃ¨rement la tÃªte Ã  droite...',
-    'ContrÃ´le biomÃ©trique validÃ© âœ“ (ConformitÃ© 99.8%)',
+    'Tournez légèrement la tête à droite...',
+    'Contrôle biométrique validé ✓ (Conformité 99.8%)',
   ];
 
   // Banque
@@ -83,9 +83,9 @@ export default function KycVerificationModal({
 
   const [submitting, setSubmitting] = useState(false);
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // Reset COMPLET Ã  chaque ouverture du modal
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
+  // Reset COMPLET à chaque ouverture du modal
+  // ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (visible) {
       setStep('intro');
@@ -115,23 +115,23 @@ export default function KycVerificationModal({
     onClose();
   };
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // SCAN RECTO â€” l'utilisateur doit confirmer la prise de vue
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
+  // SCAN RECTO — l'utilisateur doit confirmer la prise de vue
+  // ─────────────────────────────────────────────────────────────
   const handleScanRecto = () => {
     Alert.alert(
-      'NumÃ©riser le Recto',
-      'Placez la face avant de votre piÃ¨ce dans un bon Ã©clairage, sans reflets ni doigts masquant les inscriptions.\n\nAppuyez sur Â« Lancer la capture Â» pour dÃ©marrer.',
+      'Numériser le Recto',
+      'Placez la face avant de votre pièce dans un bon éclairage, sans reflets ni doigts masquant les inscriptions.\n\nAppuyez sur « Lancer la capture » pour démarrer.',
       [
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'Lancer la capture',
           onPress: () => {
             setRectoStatus('scanning');
-            // Simulation d'une capture rÃ©elle avec traitement OCR (2.5s)
+            // Simulation d'une capture réelle avec traitement OCR (2.5s)
             setTimeout(() => {
               setRectoStatus('done');
-              // PrÃ©-remplir le numÃ©ro si vide
+              // Pré-remplir le numéro si vide
               if (!docNumber.trim()) {
                 setDocNumber(docType === 'CNI_CI' ? 'CI009845123' : 'AB1234567');
               }
@@ -147,8 +147,8 @@ export default function KycVerificationModal({
 
   const handleScanVerso = () => {
     Alert.alert(
-      'NumÃ©riser le Verso',
-      'Retournez votre document et placez la face arriÃ¨re (bande MRZ / signature) dans le cadre.\n\nAppuyez sur Â« Lancer la capture Â» pour dÃ©marrer.',
+      'Numériser le Verso',
+      'Retournez votre document et placez la face arrière (bande MRZ / signature) dans le cadre.\n\nAppuyez sur « Lancer la capture » pour démarrer.',
       [
         { text: 'Annuler', style: 'cancel' },
         {
@@ -164,9 +164,9 @@ export default function KycVerificationModal({
     );
   };
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // LIVENESS â€” sÃ©quence progressive
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
+  // LIVENESS — séquence progressive
+  // ─────────────────────────────────────────────────────────────
   const handleStartLiveness = () => {
     setLivenessState('scanning');
     setLivenessStep(1);
@@ -188,12 +188,12 @@ export default function KycVerificationModal({
     setTimeout(() => { setLivenessStep(2); advance(3); }, 1500);
   };
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
   // SOUMISSION FINALE
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
   const handleSubmitKyc = async () => {
     if (!docNumber.trim()) {
-      Alert.alert('NumÃ©ro requis', 'Veuillez renseigner le numÃ©ro officiel de la piÃ¨ce.');
+      Alert.alert('Numéro requis', 'Veuillez renseigner le numéro officiel de la pièce.');
       return;
     }
     if (!fullName.trim()) {
@@ -201,15 +201,15 @@ export default function KycVerificationModal({
       return;
     }
     if (!rectoCaptured) {
-      Alert.alert('NumÃ©risation incomplÃ¨te', 'Veuillez numÃ©riser le recto de votre piÃ¨ce.');
+      Alert.alert('Numérisation incomplète', 'Veuillez numériser le recto de votre pièce.');
       return;
     }
     if (docType === 'CNI_CI' && !versoCaptured) {
-      Alert.alert('NumÃ©risation incomplÃ¨te', 'Veuillez numÃ©riser le verso de votre CNI.');
+      Alert.alert('Numérisation incomplète', 'Veuillez numériser le verso de votre CNI.');
       return;
     }
     if (livenessState !== 'passed') {
-      Alert.alert('ContrÃ´le biomÃ©trique requis', 'Veuillez valider le test de vivacitÃ© faciale.');
+      Alert.alert('Contrôle biométrique requis', 'Veuillez valider le test de vivacité faciale.');
       return;
     }
 
@@ -233,14 +233,14 @@ export default function KycVerificationModal({
 
       const data = await res.json();
       if (!res.ok) {
-        Alert.alert('Erreur KYC', data.error || 'La vÃ©rification a Ã©chouÃ©. Veuillez vÃ©rifier vos donnÃ©es.');
+        Alert.alert('Erreur KYC', data.error || 'La vérification a échoué. Veuillez vérifier vos données.');
         setSubmitting(false);
         return;
       }
 
       Alert.alert(
-        'VÃ©rification KYC ValidÃ©e',
-        'FÃ©licitations ! Votre profil est dÃ©sormais certifiÃ© Niveau 2 avec conformitÃ© bancaire intÃ©grale.',
+        'Vérification KYC Bailleur Validée',
+        'Félicitations ! Votre profil est désormais certifié Niveau 2 avec conformité bancaire intégrale.',
         [
           {
             text: 'Parfait',
@@ -253,15 +253,15 @@ export default function KycVerificationModal({
       );
     } catch (err: any) {
       console.error('Erreur soumission KYC:', err);
-      Alert.alert('Erreur rÃ©seau', 'Impossible de contacter le serveur sÃ©curisÃ© de vÃ©rification.');
+      Alert.alert('Erreur réseau', 'Impossible de contacter le serveur sécurisé de vérification.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
   // Composant ScanCard
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────
   const ScanCard = ({
     title,
     subtitle,
@@ -282,9 +282,9 @@ export default function KycVerificationModal({
       </View>
       <Text style={styles.scanBoxDesc}>
         {status === 'done'
-          ? 'âœ“ Document numÃ©risÃ© avec succÃ¨s â€” traitement OCR bancaire conforme'
+          ? '✓ Document numérisé avec succès — traitement OCR bancaire conforme'
           : status === 'scanning'
-          ? 'â³ Capture en cours, traitement OCR...'
+          ? '⏳ Capture en cours, traitement OCR...'
           : subtitle}
       </Text>
       <Pressable
@@ -307,7 +307,7 @@ export default function KycVerificationModal({
               ? <CheckCircle2 color="#1B4D3E" size={18} />
               : icon}
             <Text style={[styles.scanBtnText, status === 'done' && { color: '#1B4D3E' }]}>
-              {status === 'done' ? 'Reprendre la numÃ©risation' : 'NumÃ©riser (camÃ©ra)'}
+              {status === 'done' ? 'Reprendre la numérisation' : 'Numériser (caméra)'}
             </Text>
           </>
         )}
@@ -325,13 +325,13 @@ export default function KycVerificationModal({
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.overlay}>
             <View style={styles.container}>
-              {/* En-tÃªte sÃ©curisÃ© */}
+              {/* En-tête sécurisé */}
               <View style={styles.header}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <ShieldCheck color="#1B4D3E" size={22} />
                   <View>
-                    <Text style={styles.headerTitle}>VÃ©rification KYC</Text>
-                    <Text style={styles.headerSub}>Protocole de certification bancaire Â· BCEAO LAB/FT</Text>
+                    <Text style={styles.headerTitle}>Vérification KYC Bailleur</Text>
+                    <Text style={styles.headerSub}>Protocole de certification bancaire · BCEAO LAB/FT</Text>
                   </View>
                 </View>
                 <Pressable onPress={handleClose} style={styles.closeBtn}>
@@ -339,7 +339,7 @@ export default function KycVerificationModal({
                 </Pressable>
               </View>
 
-              {/* Ã‰tape : INTRODUCTION */}
+              {/* Étape : INTRODUCTION */}
               {step === 'intro' && (
                 <ScrollView
                   contentContainerStyle={styles.content}
@@ -347,22 +347,22 @@ export default function KycVerificationModal({
                 >
                   <View style={styles.badgeBanner}>
                     <Lock color="#1B4D3E" size={16} />
-                    <Text style={styles.badgeBannerText}>Certification d'identitÃ© souveraine et bancaire</Text>
+                    <Text style={styles.badgeBannerText}>Certification d'identité souveraine et bancaire</Text>
                   </View>
 
-                  <Text style={styles.introHeading}>Passez au Niveau 2 CertifiÃ©</Text>
+                  <Text style={styles.introHeading}>Passez au Niveau 2 Certifié</Text>
                   <Text style={styles.introParagraph}>
-                    La vÃ©rification KYC associe votre piÃ¨ce d'identitÃ© officielle Ã  votre compte Mobile Money
-                    ou bancaire et Ã  votre profil pour certifier votre authenticitÃ©, sÃ©curiser vos transactions
+                    La Vérification KYC Bailleur associe votre pièce d'identité officielle à votre compte Mobile Money
+                    ou bancaire et à votre profil pour certifier votre authenticité, sécuriser vos transactions
                     et renforcer votre passeport de confiance.
                   </Text>
 
                   <View style={styles.stepsList}>
                     {[
-                      { n: '1', title: 'Document officiel d'identitÃ©', desc: 'CNI ivoirienne (ONECI), Passeport biomÃ©trique ou Carte de rÃ©sident.' },
-                      { n: '2', title: 'NumÃ©risation haute dÃ©finition', desc: 'Capture nette du recto et du verso avec contrÃ´le anti-reflets.' },
-                      { n: '3', title: 'ContrÃ´le biomÃ©trique de vivacitÃ©', desc: 'Liveness detection anti-usurpation par vidÃ©o faciale instantanÃ©e.' },
-                      { n: '4', title: 'Rapprochement Mobile Money / Bancaire', desc: 'Validation du compte Ã©metteur au mÃªme nom certifiÃ©.' },
+                      { n: '1', title: 'Document officiel d'identité', desc: 'CNI ivoirienne (ONECI), Passeport biométrique ou Carte de résident.' },
+                      { n: '2', title: 'Numérisation haute définition', desc: 'Capture nette du recto et du verso avec contrôle anti-reflets.' },
+                      { n: '3', title: 'Contrôle biométrique de vivacité', desc: 'Liveness detection anti-usurpation par vidéo faciale instantanée.' },
+                      { n: '4', title: 'Rapprochement Mobile Money / Bancaire', desc: 'Validation du compte émetteur au même nom certifié.' },
                     ].map((item) => (
                       <View key={item.n} style={styles.stepItem}>
                         <View style={styles.stepNumber}>
@@ -377,28 +377,28 @@ export default function KycVerificationModal({
                   </View>
 
                   <Pressable style={styles.primaryBtn} onPress={() => setStep('document')}>
-                    <Text style={styles.primaryBtnText}>Commencer la vÃ©rification</Text>
+                    <Text style={styles.primaryBtnText}>Commencer la vérification</Text>
                     <ArrowRight color="#FFFFFF" size={18} />
                   </Pressable>
                 </ScrollView>
               )}
 
-              {/* Ã‰tape 1 : SÃ‰LECTION DU DOCUMENT */}
+              {/* Étape 1 : SÉLECTION DU DOCUMENT */}
               {step === 'document' && (
                 <ScrollView
                   contentContainerStyle={styles.content}
                   keyboardShouldPersistTaps="handled"
                 >
-                  <Text style={styles.sectionTitle}>1. Type de piÃ¨ce d'identitÃ©</Text>
+                  <Text style={styles.sectionTitle}>1. Type de pièce d'identité</Text>
                   <Text style={styles.sectionSubtitle}>
-                    SÃ©lectionnez votre piÃ¨ce officielle en cours de validitÃ©.
+                    Sélectionnez votre pièce officielle en cours de validité.
                   </Text>
 
                   <View style={styles.typeSelector}>
                     {([
-                      { key: 'CNI_CI', label: 'CNI Ivoirienne (ONECI)', desc: 'NumÃ©ro National d'Identification (11 chiffres)' },
-                      { key: 'PASS_CI', label: 'Passeport BiomÃ©trique', desc: 'Passeport officiel CEDEAO / International' },
-                      { key: 'CARTE_RESIDENT', label: 'Carte de RÃ©sident', desc: 'Titre de sÃ©jour en cours de validitÃ©' },
+                      { key: 'CNI_CI', label: 'CNI Ivoirienne (ONECI)', desc: 'Numéro National d'Identification (11 chiffres)' },
+                      { key: 'PASS_CI', label: 'Passeport Biométrique', desc: 'Passeport officiel CEDEAO / International' },
+                      { key: 'CARTE_RESIDENT', label: 'Carte de Résident', desc: 'Titre de séjour en cours de validité' },
                     ] as const).map((opt) => (
                       <Pressable
                         key={opt.key}
@@ -413,7 +413,7 @@ export default function KycVerificationModal({
                     ))}
                   </View>
 
-                  <Text style={[styles.inputLabel, { marginTop: 14 }]}>NumÃ©ro officiel de la piÃ¨ce *</Text>
+                  <Text style={[styles.inputLabel, { marginTop: 14 }]}>Numéro officiel de la pièce *</Text>
                   <TextInput
                     style={styles.input}
                     value={docNumber}
@@ -423,12 +423,12 @@ export default function KycVerificationModal({
                     returnKeyType="next"
                   />
 
-                  <Text style={[styles.inputLabel, { marginTop: 12 }]}>Nom et PrÃ©noms officiels *</Text>
+                  <Text style={[styles.inputLabel, { marginTop: 12 }]}>Nom et Prénoms officiels *</Text>
                   <TextInput
                     style={styles.input}
                     value={fullName}
                     onChangeText={setFullName}
-                    placeholder="Ex: KouamÃ© Jean-Baptiste"
+                    placeholder="Ex: Kouamé Jean-Baptiste"
                     returnKeyType="next"
                   />
 
@@ -453,7 +453,7 @@ export default function KycVerificationModal({
                       onPress={() => {
                         Keyboard.dismiss();
                         if (!docNumber.trim() || !fullName.trim()) {
-                          Alert.alert('Champs requis', 'Veuillez remplir le numÃ©ro et votre nom officiel.');
+                          Alert.alert('Champs requis', 'Veuillez remplir le numéro et votre nom officiel.');
                           return;
                         }
                         setStep('scan');
@@ -466,19 +466,19 @@ export default function KycVerificationModal({
                 </ScrollView>
               )}
 
-              {/* Ã‰tape 2 : SCAN RECTO / VERSO */}
+              {/* Étape 2 : SCAN RECTO / VERSO */}
               {step === 'scan' && (
                 <ScrollView
                   contentContainerStyle={styles.content}
                   keyboardShouldPersistTaps="handled"
                 >
-                  <Text style={styles.sectionTitle}>2. NumÃ©risation du document</Text>
+                  <Text style={styles.sectionTitle}>2. Numérisation du document</Text>
                   <Text style={styles.sectionSubtitle}>
-                    Appuyez sur chaque bouton pour capturer votre document. Suivez les instructions Ã  l'Ã©cran.
+                    Appuyez sur chaque bouton pour capturer votre document. Suivez les instructions à l'écran.
                   </Text>
 
                   <ScanCard
-                    title="Face Recto (Photo & NumÃ©ro)"
+                    title="Face Recto (Photo & Numéro)"
                     subtitle="Placez la face avant dans le cadre de lecture et lancez la capture."
                     status={rectoStatus}
                     onPress={handleScanRecto}
@@ -488,7 +488,7 @@ export default function KycVerificationModal({
                   {docType !== 'PASS_CI' && (
                     <ScanCard
                       title="Face Verso (Bande MRZ / Signature)"
-                      subtitle="Retournez votre document et capturez la face arriÃ¨re (MRZ)."
+                      subtitle="Retournez votre document et capturez la face arrière (MRZ)."
                       status={versoStatus}
                       onPress={handleScanVerso}
                       icon={<Scan color="#2C3E6B" size={18} />}
@@ -508,32 +508,32 @@ export default function KycVerificationModal({
                       ]}
                       onPress={() => {
                         if (!rectoCaptured) {
-                          Alert.alert('Scan requis', 'Veuillez numÃ©riser le recto de votre piÃ¨ce.');
+                          Alert.alert('Scan requis', 'Veuillez numériser le recto de votre pièce.');
                           return;
                         }
                         if (docType !== 'PASS_CI' && !versoCaptured) {
-                          Alert.alert('Scan requis', 'Veuillez numÃ©riser le verso de votre CNI.');
+                          Alert.alert('Scan requis', 'Veuillez numériser le verso de votre CNI.');
                           return;
                         }
                         setStep('liveness');
                       }}
                     >
-                      <Text style={styles.primaryBtnText}>Passer Ã  la biomÃ©trie</Text>
+                      <Text style={styles.primaryBtnText}>Passer à la biométrie</Text>
                       <ArrowRight color="#FFFFFF" size={18} />
                     </Pressable>
                   </View>
                 </ScrollView>
               )}
 
-              {/* Ã‰tape 3 : CONTRÃ”LE DE VIVACITÃ‰ BIOMÃ‰TRIQUE */}
+              {/* Étape 3 : CONTRÔLE DE VIVACITÉ BIOMÉTRIQUE */}
               {step === 'liveness' && (
                 <ScrollView
                   contentContainerStyle={styles.content}
                   keyboardShouldPersistTaps="handled"
                 >
-                  <Text style={styles.sectionTitle}>3. ContrÃ´le de VivacitÃ© BiomÃ©trique</Text>
+                  <Text style={styles.sectionTitle}>3. Contrôle de Vivacité Biométrique</Text>
                   <Text style={styles.sectionSubtitle}>
-                    Standard bancaire anti-usurpation. Appuyez sur Â« DÃ©marrer Â» puis suivez chaque instruction.
+                    Standard bancaire anti-usurpation. Appuyez sur « Démarrer » puis suivez chaque instruction.
                   </Text>
 
                   <View style={styles.livenessContainer}>
@@ -556,7 +556,7 @@ export default function KycVerificationModal({
                     {livenessState === 'idle' && (
                       <Pressable style={styles.livenessActionBtn} onPress={handleStartLiveness}>
                         <Camera color="#FFFFFF" size={18} />
-                        <Text style={styles.livenessActionBtnText}>DÃ©marrer le contrÃ´le facial</Text>
+                        <Text style={styles.livenessActionBtnText}>Démarrer le contrôle facial</Text>
                       </Pressable>
                     )}
 
@@ -573,7 +573,7 @@ export default function KycVerificationModal({
                       <View style={styles.livenessBadgeSuccess}>
                         <ShieldCheck color="#1B4D3E" size={18} />
                         <Text style={styles.livenessBadgeSuccessText}>
-                          VivacitÃ© certifiÃ©e conforme aux exigences BCEAO
+                          Vivacité certifiée conforme aux exigences BCEAO
                         </Text>
                       </View>
                     )}
@@ -583,7 +583,7 @@ export default function KycVerificationModal({
                     <View style={styles.infoBox}>
                       <AlertCircle color="#2C3E6B" size={16} />
                       <Text style={styles.infoBoxText}>
-                        Assurez-vous d'Ãªtre dans un endroit bien Ã©clairÃ©, sans contre-jour. Le contrÃ´le prend environ 5 secondes.
+                        Assurez-vous d'être dans un endroit bien éclairé, sans contre-jour. Le contrôle prend environ 5 secondes.
                       </Text>
                     </View>
                   )}
@@ -597,7 +597,7 @@ export default function KycVerificationModal({
                       style={[styles.primaryBtn, { flex: 1 }, livenessState !== 'passed' && { opacity: 0.5 }]}
                       onPress={() => {
                         if (livenessState !== 'passed') {
-                          Alert.alert('ContrÃ´le requis', 'Veuillez dÃ©marrer et complÃ©ter le contrÃ´le biomÃ©trique de vivacitÃ©.');
+                          Alert.alert('Contrôle requis', 'Veuillez démarrer et compléter le contrôle biométrique de vivacité.');
                           return;
                         }
                         setStep('bank');
@@ -610,7 +610,7 @@ export default function KycVerificationModal({
                 </ScrollView>
               )}
 
-              {/* Ã‰tape 4 : RAPPROCHEMENT BANCAIRE / MOBILE MONEY */}
+              {/* Étape 4 : RAPPROCHEMENT BANCAIRE / MOBILE MONEY */}
               {step === 'bank' && (
                 <ScrollView
                   contentContainerStyle={styles.content}
@@ -618,10 +618,10 @@ export default function KycVerificationModal({
                 >
                   <Text style={styles.sectionTitle}>4. Rapprochement Bancaire & Mobile Money</Text>
                   <Text style={styles.sectionSubtitle}>
-                    Associez le compte de paiement Ã©mis au mÃªme nom officiel pour valider la solvabilitÃ© lÃ©gale.
+                    Associez le compte de paiement émis au même nom officiel pour valider la solvabilité légale.
                   </Text>
 
-                  <Text style={styles.inputLabel}>OpÃ©rateur de compte *</Text>
+                  <Text style={styles.inputLabel}>Opérateur de compte *</Text>
                   <View style={styles.operatorGrid}>
                     {(['Wave', 'Orange Money', 'MTN MoMo', 'Moov Money'] as const).map((op) => (
                       <Pressable
@@ -642,7 +642,7 @@ export default function KycVerificationModal({
                     ))}
                   </View>
 
-                  <Text style={[styles.inputLabel, { marginTop: 14 }]}>NumÃ©ro du compte / Mobile Money *</Text>
+                  <Text style={[styles.inputLabel, { marginTop: 14 }]}>Numéro du compte / Mobile Money *</Text>
                   <TextInput
                     style={styles.input}
                     value={mobileNumber}
@@ -657,13 +657,13 @@ export default function KycVerificationModal({
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                       <ShieldCheck color="#2C3E6B" size={18} />
                       <Text style={{ fontSize: 13, fontWeight: '700', color: '#1E293B' }}>
-                        SynthÃ¨se de Certification Bancaire
+                        Synthèse de Certification Bancaire
                       </Text>
                     </View>
-                    <Text style={styles.recapItem}>â€¢ Document : {docType} ({docNumber})</Text>
-                    <Text style={styles.recapItem}>â€¢ Titulaire : {fullName}</Text>
-                    <Text style={styles.recapItem}>â€¢ ContrÃ´le biomÃ©trique : VivacitÃ© 99.8% validÃ©e âœ“</Text>
-                    <Text style={styles.recapItem}>â€¢ Rapprochement : {mobileOperator} ({mobileNumber})</Text>
+                    <Text style={styles.recapItem}>• Document : {docType} ({docNumber})</Text>
+                    <Text style={styles.recapItem}>• Titulaire : {fullName}</Text>
+                    <Text style={styles.recapItem}>• Contrôle biométrique : Vivacité 99.8% validée ✓</Text>
+                    <Text style={styles.recapItem}>• Rapprochement : {mobileOperator} ({mobileNumber})</Text>
                   </View>
 
                   <View style={styles.navRow}>
@@ -672,7 +672,7 @@ export default function KycVerificationModal({
                       <Text style={styles.backBtnText}>Retour</Text>
                     </Pressable>
                     <Pressable
-                      style={[styles.primaryBtn, { flex: 1, backgroundcolor: '#1B4D3E' }]}
+                      style={[styles.primaryBtn, { flex: 1, backgroundColor: '#1B4D3E' }]}
                       onPress={() => { Keyboard.dismiss(); handleSubmitKyc(); }}
                       disabled={submitting}
                     >
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   typeOptionActive: {
-    bordercolor: '#1B4D3E',
+    borderColor: '#1B4D3E',
     backgroundColor: '#F0FDF4',
   },
   typeOptionTitle: {
@@ -958,7 +958,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
   },
   livenessCirclePassed: {
-    bordercolor: '#1B4D3E',
+    borderColor: '#1B4D3E',
     borderStyle: 'solid',
     backgroundColor: '#F0FDF4',
   },
@@ -1035,7 +1035,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   operatorCardActive: {
-    bordercolor: '#1B4D3E',
+    borderColor: '#1B4D3E',
     backgroundColor: '#F0FDF4',
   },
   operatorCardText: {
@@ -1062,4 +1062,3 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
-

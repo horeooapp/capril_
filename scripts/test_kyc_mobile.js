@@ -75,3 +75,4 @@ console.log(`RÉSULTAT: ${passed} PASS, ${failed} FAIL`);
 console.log('========================================\n');
 
 process.exit(failed > 0 ? 1 : 0);
+

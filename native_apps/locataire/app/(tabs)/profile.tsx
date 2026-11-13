@@ -273,45 +273,47 @@ export default function ProfileScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
-            <Text style={styles.modalSubtitle}>Entrez votre adresse e-mail pour vos notifications, alertes et quittances.</Text>
-            
-            <TextInput
-              style={styles.modalInput}
-              value={newEmail}
-              onChangeText={setNewEmail}
-              placeholder="nom@exemple.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoFocus
-            />
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalBox}>
+                <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
+                <Text style={styles.modalSubtitle}>Entrez votre adresse e-mail pour vos notifications, alertes et quittances.</Text>
+                
+                <TextInput
+                  style={styles.modalInput}
+                  value={newEmail}
+                  onChangeText={setNewEmail}
+                  placeholder="nom@exemple.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoFocus
+                  returnKeyType="done"
+                  onSubmitEditing={Keyboard.dismiss}
+                />
 
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
-              <Pressable 
-                style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} 
-                onPress={() => setEditEmailVisible(false)}
-                disabled={isSavingEmail}
-              >
-                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
-              </Pressable>
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+                  <Pressable 
+                    style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} 
+                    onPress={() => setEditEmailVisible(false)}
+                    disabled={isSavingEmail}
+                  >
+                    <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
+                  </Pressable>
 
-              <Pressable 
-                style={[styles.modalBtn, { backgroundColor: '#2C3E6B' }]} 
-                onPress={handleSaveEmail}
-                disabled={isSavingEmail}
-              >
-                {isSavingEmail ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
-                )}
-              </Pressable>
+                  <Pressable 
+                    style={[styles.modalBtn, { backgroundColor: '#2C3E6B' }]} 
+                    onPress={handleSaveEmail}
+                    disabled={isSavingEmail}
+                  >
+                    {isSavingEmail ? (
+                      <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                      <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </Modal>
@@ -339,8 +341,6 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
         </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
       </Modal>
 
       {/* Modal Processus KYC Niveau Bancaire */}
