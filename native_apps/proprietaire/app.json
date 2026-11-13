@@ -37,7 +37,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE"
       ],
-      "versionCode": 17
+      "versionCode": 19
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -53,7 +53,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Autoriser $(PRODUCT_NAME) \u00e0 utiliser Face ID ou Touch ID pour une connexion s\u00e9curis\u00e9e."
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
         }
       ],
       "expo-font",
