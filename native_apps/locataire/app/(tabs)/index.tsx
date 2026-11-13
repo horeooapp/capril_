@@ -534,6 +534,26 @@ export default function LocatairePrototypeScreen() {
   }, [menuOpen, screen]);
 
 
+  // S-09 — Chargement et persistance des préférences du Passeport Locatif
+  const savePasseportPref = async (prefs: {
+    shareTranche?: boolean;
+    shareBadges?: boolean;
+    shareFoyer?: boolean;
+    shareDureeBail?: boolean;
+  }) => {
+    try {
+      const token = await getStoredToken();
+      if (!token) return;
+      await fetchWithAuth('/tenant/passport', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action: 'UPDATE_PREFS', ...prefs }),
+      });
+    } catch (e) {
+      console.warn('[S-09] savePasseportPref error:', e);
+    }
+  };
+
   useEffect(() => {
     const loadDashboard = async () => {
       try {
@@ -577,6 +597,29 @@ export default function LocatairePrototypeScreen() {
           if (uJson.utilities && Array.isArray(uJson.utilities)) {
             setFactureHistory(uJson.utilities);
           }
+        }
+        // S-09 — Charger les préférences du Passeport (en arrière-plan, non bloquant)
+        try {
+          const token = await getStoredToken();
+          if (token) {
+            const prefsRes = await fetchWithAuth('/tenant/passport', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token, action: 'GET_PREFS' }),
+            });
+            if (prefsRes.ok) {
+              const prefsJson = await prefsRes.json();
+              if (prefsJson.success && prefsJson.prefs) {
+                const p = prefsJson.prefs;
+                if (typeof p.shareTranche   === 'boolean') setShareTranche(p.shareTranche);
+                if (typeof p.shareBadges    === 'boolean') setShareRev(p.shareBadges);
+                if (typeof p.shareFoyer     === 'boolean') setShareFoyer(p.shareFoyer);
+                if (typeof p.shareDureeBail === 'boolean') setShareDuree(p.shareDureeBail);
+              }
+            }
+          }
+        } catch (prefsErr) {
+          console.warn('[S-09] Chargement prefs passeport échoué (non bloquant):', prefsErr);
         }
       } catch (e) {
         console.error('Erreur chargement dashboard locataire', e);
@@ -2133,7 +2176,7 @@ export default function LocatairePrototypeScreen() {
             <View style={styles.card}>
               <Text style={styles.label}>CE QUE J’AUTORISE À VOIR LORS D’UNE CANDIDATURE</Text>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareTranche(!shareTranche)}>
+              <Pressable style={styles.toggleRow} onPress={() => { const v = !shareTranche; setShareTranche(v); savePasseportPref({ shareTranche: v }); }}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.boldText}>Ma tranche de confiance (A, B, C ou D)</Text>
                   <Text style={styles.subMuted}>Jamais le détail du calcul</Text>
@@ -2145,7 +2188,7 @@ export default function LocatairePrototypeScreen() {
                 </View>
               </Pressable>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareRev(!shareRev)}>
+              <Pressable style={styles.toggleRow} onPress={() => { const v = !shareRev; setShareRev(v); savePasseportPref({ shareBadges: v }); }}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.boldText}>Mes badges (Ponctuel, Revenus ≥ 3× loyer, Garant)</Text>
                   <Text style={styles.subMuted}>Sans jamais révéler le montant de votre salaire</Text>
@@ -2157,7 +2200,7 @@ export default function LocatairePrototypeScreen() {
                 </View>
               </Pressable>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareFoyer(!shareFoyer)}>
+              <Pressable style={styles.toggleRow} onPress={() => { const v = !shareFoyer; setShareFoyer(v); savePasseportPref({ shareFoyer: v }); }}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.boldText}>Composition de mon foyer</Text>
                   <Text style={styles.subMuted}>Nombre d’occupants prévus dans le logement</Text>
@@ -2169,7 +2212,7 @@ export default function LocatairePrototypeScreen() {
                 </View>
               </Pressable>
 
-              <Pressable style={styles.toggleRow} onPress={() => setShareDuree(!shareDuree)}>
+              <Pressable style={styles.toggleRow} onPress={() => { const v = !shareDuree; setShareDuree(v); savePasseportPref({ shareDureeBail: v }); }}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.boldText}>Durée de mon bail actuel</Text>
                   <Text style={styles.subMuted}>Ancienneté dans votre logement actuel</Text>

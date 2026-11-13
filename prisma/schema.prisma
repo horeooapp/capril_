@@ -2272,6 +2272,11 @@ model LocataireProfile {
   alerteJ1Active    Boolean   @default(true) @map("alerte_j1_active")
   canalAlertePref   String    @default("SMS") @map("canal_alerte_pref")
   passeportGenereAt DateTime? @map("passeport_genere_at")
+  /// S-09 — Interrupteurs du Passeport persistés
+  shareTranche      Boolean   @default(true) @map("share_tranche")
+  shareBadges       Boolean   @default(true) @map("share_badges")
+  shareFoyer        Boolean   @default(true) @map("share_foyer")
+  shareDureeBail    Boolean   @default(true) @map("share_duree_bail")
   createdAt         DateTime  @default(now()) @map("created_at")
   user              User      @relation(fields: [userId], references: [id])
 
