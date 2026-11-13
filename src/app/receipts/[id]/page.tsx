@@ -69,13 +69,13 @@ export default function ReceiptVerificationPage({ params }: { params: Promise<{ 
                         <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6">Bailleur / Landlord</h3>
                         <div className="space-y-1">
                             <p className="text-xl font-black text-gray-900 leading-tight">
-                                {viewerRole === 'TENANT' && (lease?.bailleurMasque || lease?.typeGestion === 'AGREE')
-                                    ? "Bailleur QAPRIL"
+                                {(lease?.bailleurMasque || lease?.typeGestion === 'AGREE') && viewerRole !== 'LANDLORD' && viewerRole !== 'AGENCY' && viewerRole !== 'ADMIN'
+                                    ? "Bailleur (identité protégée)"
                                     : (landlord ? ((landlord.firstName ? landlord.firstName + " " : "") + (landlord.lastName || "")) : "Identification en cours") || "Identification en cours"
                                 }
                             </p>
                             <p className="text-sm font-bold text-[#FF8200]">
-                                {viewerRole === 'TENANT' && (lease?.bailleurMasque || lease?.typeGestion === 'AGREE')
+                                {(lease?.bailleurMasque || lease?.typeGestion === 'AGREE') && viewerRole !== 'LANDLORD' && viewerRole !== 'AGENCY' && viewerRole !== 'ADMIN'
                                     ? "Protégé"
                                     : landlord?.phone || "N/A"
                                 }

@@ -144,6 +144,8 @@ async function issueSingleReceipt(params: {
     if (params.lease.tenantId) {
         try {
             const { generateReceiptPDF } = await import('./pdf-generator');
+            const { formatQuittanceEmiseSMS } = await import('./sms-templates');
+            const tenantDisplayName = (params.lease.tenant?.firstName ? params.lease.tenant.firstName + " " : "") + (params.lease.tenant?.lastName || "") || 'Locataire';
             const pdfBuffer = await generateReceiptPDF({
                 receiptRef: receipt.receiptRef,
                 leaseRef: params.lease.leaseReference,
@@ -153,12 +155,16 @@ async function issueSingleReceipt(params: {
                 totalAmount: receipt.totalAmount,
                 paymentMethod: params.paymentChannel,
                 paidAt: receipt.paidAt || new Date(),
-                tenantName: (params.lease.tenant?.firstName ? params.lease.tenant.firstName + " " : "") + (params.lease.tenant?.lastName || "") || 'Locataire',
+                tenantName: tenantDisplayName,
                 propertyAddress: params.lease.property?.address || "Adresse non spécifiée",
-                landlordName: params.creatorName || (params.lease.landlord?.firstName ? params.lease.landlord.firstName + " " : "") + (params.lease.landlord?.lastName || "") || 'Propriétaire QAPRIL',
+                landlordName: params.creatorName || (params.lease.landlord?.firstName ? params.lease.landlord.firstName + " " : "") + (params.lease.landlord?.lastName || "") || 'Bailleur QAPRIL',
                 receiptHash: receipt.receiptHash || undefined,
                 qrToken: receipt.qrToken || undefined,
-                declarative: params.receiptType === 'DECLARATIVE'
+                declarative: params.receiptType === 'DECLARATIVE',
+                bailleurMasque: Boolean(params.lease.bailleurMasque || params.lease.typeGestion === 'AGREE'),
+                agencyName: (params.lease as any).agency?.name || (params.lease.typeGestion === 'AGREE' ? 'Agence de gestion agréée' : undefined),
+                agencyLicense: (params.lease as any).agency?.licenseNumber || undefined,
+                mandateRef: (params.lease as any).mandatGestionId || undefined,
             });
 
             // Trigger Notification (Async - Simultaneous SMS + WA)
@@ -169,9 +175,9 @@ async function issueSingleReceipt(params: {
                     referenceId: receipt.receiptRef,
                     receiptBuffer: pdfBuffer,
                     payload: {
-                        parameters: [(params.lease.tenant?.firstName ? params.lease.tenant.firstName + " " : "") + (params.lease.tenant?.lastName || "") || "Locataire", params.lease.property?.address || "Propriété"],
-                        smsText: `[QAPRIL] Votre quittance Certifiée SHA-256 pour ${receipt.periodMonth} est disponible. Réf: ${receipt.receiptRef}.`,
-                        html: `<p>Votre quittance certifiée pour le mois de ${receipt.periodMonth} a été générée.</p>`
+                        parameters: [tenantDisplayName, params.lease.property?.address || "Propriété"],
+                        smsText: formatQuittanceEmiseSMS({ locataire: tenantDisplayName, mois: receipt.periodMonth, ref: receipt.receiptRef }),
+                        html: `<p>Votre quittance pour le mois de ${receipt.periodMonth} a été générée. Référence : ${receipt.receiptRef}.</p>`
                     }
                 }
             ).catch(err => console.error("[NOTIF_ERROR]", err));
