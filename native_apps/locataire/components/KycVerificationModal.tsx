@@ -359,10 +359,10 @@ export default function KycVerificationModal({
 
                   <View style={styles.stepsList}>
                     {[
-                      { n: '1', title: 'Document officiel d'identité', desc: 'CNI ivoirienne (ONECI), Passeport biométrique ou Carte de résident.' },
-                      { n: '2', title: 'Numérisation haute définition', desc: 'Capture nette du recto et du verso avec contrôle anti-reflets.' },
-                      { n: '3', title: 'Contrôle biométrique de vivacité', desc: 'Liveness detection anti-usurpation par vidéo faciale instantanée.' },
-                      { n: '4', title: 'Rapprochement Mobile Money / Bancaire', desc: 'Validation du compte émetteur au même nom certifié.' },
+                      { n: '1', title: "Document officiel d'identité", desc: "CNI ivoirienne (ONECI), Passeport biométrique ou Carte de résident." },
+                      { n: '2', title: "Numérisation haute définition", desc: "Capture nette du recto et du verso avec contrôle anti-reflets." },
+                      { n: '3', title: "Contrôle biométrique de vivacité", desc: "Liveness detection anti-usurpation par vidéo faciale instantanée." },
+                      { n: '4', title: "Rapprochement Mobile Money / Bancaire", desc: "Validation du compte émetteur au même nom certifié." },
                     ].map((item) => (
                       <View key={item.n} style={styles.stepItem}>
                         <View style={styles.stepNumber}>
@@ -396,9 +396,9 @@ export default function KycVerificationModal({
 
                   <View style={styles.typeSelector}>
                     {([
-                      { key: 'CNI_CI', label: 'CNI Ivoirienne (ONECI)', desc: 'Numéro National d'Identification (11 chiffres)' },
-                      { key: 'PASS_CI', label: 'Passeport Biométrique', desc: 'Passeport officiel CEDEAO / International' },
-                      { key: 'CARTE_RESIDENT', label: 'Carte de Résident', desc: 'Titre de séjour en cours de validité' },
+                      { key: 'CNI_CI', label: "CNI Ivoirienne (ONECI)", desc: "Numéro National d'Identification (11 chiffres)" },
+                      { key: 'PASS_CI', label: "Passeport Biométrique", desc: "Passeport officiel CEDEAO / International" },
+                      { key: 'CARTE_RESIDENT', label: "Carte de Résident", desc: "Titre de séjour en cours de validité" },
                     ] as const).map((opt) => (
                       <Pressable
                         key={opt.key}
