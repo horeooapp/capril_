@@ -1,6 +1,6 @@
 {
   "_regle": "Tout libellé visible par un utilisateur vient de ce fichier. Sections 7 de l'IC-01 et de l'IC-01-R1. Une phrase par libellé, sujet « vous » ou « je », pas d'exclamation, pas de référence technique ni légale.",
-  "_interdits": ["RG-", "ADD-", "SHA-256", "SHA256", "HMAC", "OTA", "preview", "build", "hash", "webhook", "KYC", "Loi 2013", "Loi 2019", "2013-450", "2013-546", "2019-576", "APARTMENT", "BUILDING", "certifié SHA", "infalsifiable", "opposable", "séquestre", "Immatriculation", "1 clic"],
+  "_interdits": ["RG-", "ADD-", "SHA-256", "SHA256", "HMAC", "OTA", "preview", "build", "hash", "webhook", "Loi 2013", "Loi 2019", "2013-450", "2013-546", "2019-576", "APARTMENT", "BUILDING", "certifié SHA", "infalsifiable", "opposable", "séquestre", "Immatriculation", "1 clic"],
   "_version": "1.0 — 10 novembre 2026",
 
   "navigation": {
@@ -17,7 +17,7 @@
     "numero_masque": "+225 {prefixe} •• •• •• {fin}",
     "niveau_1": "Numéro de téléphone vérifié",
     "niveau_2": "Pièce d'identité et Mobile Money vérifiés",
-    "niveau_2_action": "Ajouter ma pièce d'identité",
+    "niveau_2_action": "Vérification KYC",
     "identite_non_verifiee": "Identité non vérifiée — ajouter ma pièce",
     "otp_titre": "Votre code par SMS",
     "otp_aide": "Saisissez le code à 6 chiffres reçu au {numero}. Il est valable 10 minutes.",

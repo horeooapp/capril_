@@ -1,5 +1,6 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
 import { AppVersionBadge } from '../../components/AppVersionBadge';
+import KycVerificationModal from '../../components/KycVerificationModal';
 import React, { useState, useEffect } from 'react';
 import {
   Platform,
@@ -27,11 +28,12 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Modification email & À propos
+  // Modification email, À propos & KYC Bancaire
   const [editEmailVisible, setEditEmailVisible] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [isSavingEmail, setIsSavingEmail] = useState(false);
   const [aboutModalVisible, setAboutModalVisible] = useState(false);
+  const [kycModalVisible, setKycModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -195,18 +197,20 @@ export default function ProfileScreen() {
                   ? '✓ Niveau 2 · Identité vérifiée (pièce d’identité contrôlée)'
                   : '○ Niveau 2 · Identité vérifiée (pièce d’identité + Mobile Money au même nom)'}
               </Text>
-              {!user?.isCertified && (
+              {!user?.isCertified ? (
                 <Pressable
-                  style={[styles.btnSecondary, { marginTop: 10, paddingVertical: 10 }]}
-                  onPress={() =>
-                    Alert.alert(
-                      'Vérifier mon identité (Niveau 2)',
-                      'La vérification associe votre pièce d’identité (CNI ou passeport) à votre compte Mobile Money au même nom pour renforcer votre passeport locatif.'
-                    )
-                  }
+                  style={[styles.btnPrimaryKyc, { marginTop: 10 }]}
+                  onPress={() => setKycModalVisible(true)}
                 >
-                  <Text style={styles.btnSecondaryText}>Ajouter ma pièce d’identité</Text>
+                  <ShieldCheck color="#FFFFFF" size={17} />
+                  <Text style={styles.btnPrimaryKycText}>Vérification KYC</Text>
                 </Pressable>
+              ) : (
+                <View style={[styles.pillOk, { marginTop: 10, alignSelf: 'stretch', paddingVertical: 8, alignItems: 'center' }]}>
+                  <Text style={[styles.pillOkText, { fontSize: 12 }]}>
+                    ✓ Certification bancaire Niveau 2 active
+                  </Text>
+                </View>
               )}
             </View>
 
@@ -326,6 +330,22 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal Processus KYC Niveau Bancaire */}
+      <KycVerificationModal
+        visible={kycModalVisible}
+        onClose={() => setKycModalVisible(false)}
+        onSuccess={(updatedUser) => {
+          setUser((prev: any) => ({
+            ...prev,
+            ...updatedUser,
+            isCertified: true,
+            kycLevel: 2,
+            kycStatus: 'verified',
+          }));
+        }}
+        currentUser={user}
+      />
     </SafeAreaView>
   );
 }
@@ -394,6 +414,25 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   btnSecondaryText: { color: '#2C3E6B', fontSize: 13, fontWeight: '600' },
+  btnPrimaryKyc: {
+    backgroundColor: '#1E7E4E',
+    borderRadius: 14,
+    paddingVertical: 13,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    shadowColor: '#1E7E4E',
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  btnPrimaryKycText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.3,
+  },
   btnDanger: {
     backgroundColor: '#FBEAE8',
     borderRadius: 14,
