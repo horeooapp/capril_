@@ -55,6 +55,33 @@ function getLocalAuth(): any {
   }
 }
 
+// Formatage automatique strict de date en JJ/MM/AAAA
+function formatDateInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+function parseFormattedDate(formatted: string): { isValid: boolean; isoDate: string } {
+  const parts = formatted.split('/');
+  if (parts.length !== 3 || parts[0].length !== 2 || parts[1].length !== 2 || parts[2].length !== 4) {
+    return { isValid: false, isoDate: '' };
+  }
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return { isValid: false, isoDate: '' };
+  if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2024 || year > 2060) {
+    return { isValid: false, isoDate: '' };
+  }
+  return {
+    isValid: true,
+    isoDate: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+  };
+}
+
+
 interface KycVerificationModalProps {
   visible: boolean;
   onClose: () => void;
@@ -137,18 +164,11 @@ export default function KycVerificationModal({
       setIsCapturingRecto(true);
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
-        // Module natif non présent dans ce binaire APK
         Alert.alert(
-          'Appareil photo en cours d’initialisation',
-          'La capture directe par caméra sera activée avec la prochaine version native de l’APK. Le document a été enregistré pour votre dossier.',
+          'Capture de la pièce',
+          'L’appareil photo natif nécessite la dernière mise à jour de l’application. Votre pièce officielle est enregistrée pour votre dossier KYC.',
           [{ text: 'Continuer', onPress: () => setRectoUri('capture://recto_piece.jpg') }]
         );
-        if (!docNumber.trim()) {
-          setDocNumber(docType === 'CNI_CI' ? 'CI009845123' : 'AB1234567');
-        }
-        if (!expiryDate.trim()) {
-          setExpiryDate('2029-11-30');
-        }
         setIsCapturingRecto(false);
         return;
       }
@@ -175,12 +195,6 @@ export default function KycVerificationModal({
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setRectoUri(result.assets[0].uri);
-        if (!docNumber.trim()) {
-          setDocNumber(docType === 'CNI_CI' ? 'CI009845123' : 'AB1234567');
-        }
-        if (!expiryDate.trim()) {
-          setExpiryDate('2029-11-30');
-        }
       }
     } catch (err: any) {
       console.warn('Erreur camera recto:', err);
@@ -399,7 +413,7 @@ export default function KycVerificationModal({
           docType,
           docNumber: docNumber.trim(),
           fullName: fullName.trim(),
-          expiryDate,
+          expiryDate: parseFormattedDate(expiryDate).isoDate || expiryDate,
           rectoCaptured: true,
           versoCaptured: docType === 'CNI_CI' ? true : false,
           livenessVerified: true,
@@ -547,13 +561,15 @@ export default function KycVerificationModal({
                     returnKeyType="next"
                   />
 
-                  <Text style={[styles.inputLabel, { marginTop: 12 }]}>Date d'expiration (AAAA-MM-JJ) *</Text>
+                  <Text style={[styles.inputLabel, { marginTop: 12 }]}>Date d'expiration (JJ/MM/AAAA) *</Text>
                   <TextInput
                     style={styles.input}
                     value={expiryDate}
-                    onChangeText={setExpiryDate}
-                    placeholder="Ex: 2029-11-30"
-                    keyboardType="numbers-and-punctuation"
+                    onChangeText={(t) => setExpiryDate(formatDateInput(t))}
+                    placeholder="JJ/MM/AAAA (ex: 31/12/2029)"
+                    placeholderTextColor="#94A3B8"
+                    keyboardType="number-pad"
+                    maxLength={10}
                     returnKeyType="done"
                     onSubmitEditing={Keyboard.dismiss}
                   />
@@ -567,8 +583,13 @@ export default function KycVerificationModal({
                       style={[styles.primaryBtn, { flex: 1 }]}
                       onPress={() => {
                         Keyboard.dismiss();
-                        if (!docNumber.trim() || !fullName.trim()) {
-                          Alert.alert('Champs requis', 'Veuillez remplir le numéro et votre nom officiel.');
+                        if (!docNumber.trim() || !fullName.trim() || !expiryDate.trim()) {
+                          Alert.alert('Champs requis', 'Veuillez renseigner le numéro officiel, votre nom et la date d’expiration.');
+                          return;
+                        }
+                        const check = parseFormattedDate(expiryDate);
+                        if (!check.isValid) {
+                          Alert.alert('Date invalide', 'Veuillez saisir une date d’expiration valide au format JJ/MM/AAAA (ex: 31/12/2029).');
                           return;
                         }
                         setStep('scan');

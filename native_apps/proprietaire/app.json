@@ -15,7 +15,9 @@
     "scheme": "qaprilproprietaire",
     "runtimeVersion": "1.0.0",
     "updates": {
-      "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959"
+      "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 5000
     },
     "ios": {
       "supportsTablet": true

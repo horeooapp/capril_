@@ -192,6 +192,7 @@ export default function LocatairePrototypeScreen() {
   const [procheModal, setProcheModal] = useState(false);
   const [attestationModal, setAttestationModal] = useState(false);
   const [vueBailleurModal, setVueBailleurModal] = useState(false);
+  const [selectedRentedProperty, setSelectedRentedProperty] = useState<any | null>(null);
   const [searchActive, setSearchActive] = useState(true);
   const [shareRev, setShareRev] = useState(true);
   const [shareGarant, setShareGarant] = useState(true);
@@ -949,6 +950,21 @@ export default function LocatairePrototypeScreen() {
   const propName = data?.propertyName || (data?.hasLease === false ? 'Aucun bail actif' : 'Votre logement');
   const propCommune = data?.propertyCommune || '';
   const bailRef = data?.lease?.leaseReference || data?.leaseReference || (data?.hasLease === false ? 'Aucun contrat' : 'BAIL EN COURS');
+  const rentedList: any[] = Array.isArray(data?.rentedProperties) && data.rentedProperties.length > 0
+    ? data.rentedProperties
+    : (data?.hasLease ? [{
+        leaseId: data?.lease?.id,
+        leaseReference: bailRef,
+        rentAmount: loyer,
+        depositAmount: depositAmount,
+        propertyName: propName,
+        commune: propCommune,
+        address: data?.propertyAddress || '',
+        landlordName: data?.landlordName || 'Bailleur',
+        landlordPhone: data?.landlordPhone,
+        mainImage: data?.propertyImage || null,
+        images: [],
+      }] : []);
   const fmt = (n?: number | string | null) => {
     const num = typeof n === 'number' ? n : Number(n);
     if (isNaN(num)) return '0 F';
@@ -1274,6 +1290,109 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.subMuted}>{propName}</Text>
               </View>
             </View>
+
+            {/* CARTE(S) DU BIEN EN LOCATION AVEC PHOTO, NOM ET LOYER */}
+            {data?.hasLease && rentedList.length > 0 && (
+              <View style={{ gap: 8, marginTop: 4 }}>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.label}>
+                    {rentedList.length > 1 ? `MES BIENS EN LOCATION (${rentedList.length})` : 'MON BIEN EN LOCATION'}
+                  </Text>
+                  {rentedList.length > 1 && (
+                    <Text style={{ fontSize: 11, color: '#64748B' }}>Faites défiler ›</Text>
+                  )}
+                </View>
+
+                {rentedList.length === 1 ? (
+                  (() => {
+                    const rProp = rentedList[0];
+                    const rImg = formatImageUrl(rProp.mainImage);
+                    return (
+                      <Pressable
+                        style={[styles.card, { padding: 0, overflow: 'hidden', borderColor: '#CBD5E1' }]}
+                        onPress={() => setSelectedRentedProperty(rProp)}
+                      >
+                        {rImg ? (
+                          <View style={{ width: '100%', height: 160, backgroundColor: '#E2E8F0', position: 'relative' }}>
+                            <Image source={{ uri: rImg }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                            <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: '#1E7E4E', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                              <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '700' }}>Bail actif</Text>
+                            </View>
+                          </View>
+                        ) : (
+                          <View style={{ width: '100%', height: 120, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', gap: 6, position: 'relative' }}>
+                            <Building2 color="#94A3B8" size={32} />
+                            <Text style={{ fontSize: 11, color: '#94A3B8', fontWeight: '500' }}>Logement certifié QAPRIL</Text>
+                            <View style={{ position: 'absolute', top: 10, right: 10, backgroundColor: '#1E7E4E', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                              <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '700' }}>Bail actif</Text>
+                            </View>
+                          </View>
+                        )}
+
+                        <View style={{ padding: 14, gap: 4 }}>
+                          <View style={styles.rowBetween}>
+                            <Text style={[styles.boldText, { fontSize: 16, flex: 1, marginRight: 8 }]} numberOfLines={1}>
+                              {rProp.propertyName}
+                            </Text>
+                            <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E7E4E' }}>
+                              {fmt(rProp.rentAmount)} / mois
+                            </Text>
+                          </View>
+                          <Text style={styles.subMuted} numberOfLines={1}>
+                            {rProp.address ? `${rProp.address} · ` : ''}{rProp.commune || 'Abidjan'}
+                            {rProp.rooms ? ` · ${rProp.rooms} pièce${rProp.rooms > 1 ? 's' : ''}` : ''}
+                          </Text>
+
+                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, marginTop: 4, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: '#2C3E6B' }}>Voir les détails du bien ›</Text>
+                            <ChevronRight color="#2C3E6B" size={14} />
+                          </View>
+                        </View>
+                      </Pressable>
+                    );
+                  })()
+                ) : (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingVertical: 2 }}>
+                    {rentedList.map((rProp: any, idx: number) => {
+                      const rImg = formatImageUrl(rProp.mainImage);
+                      return (
+                        <Pressable
+                          key={rProp.leaseId || idx}
+                          style={[styles.card, { width: 280, padding: 0, overflow: 'hidden', borderColor: '#CBD5E1' }]}
+                          onPress={() => setSelectedRentedProperty(rProp)}
+                        >
+                          {rImg ? (
+                            <View style={{ width: '100%', height: 130, backgroundColor: '#E2E8F0', position: 'relative' }}>
+                              <Image source={{ uri: rImg }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                              <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#1E7E4E', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5 }}>
+                                <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>Bail actif</Text>
+                              </View>
+                            </View>
+                          ) : (
+                            <View style={{ width: '100%', height: 100, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                              <Building2 color="#94A3B8" size={28} />
+                              <View style={{ position: 'absolute', top: 8, right: 8, backgroundColor: '#1E7E4E', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5 }}>
+                                <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>Bail actif</Text>
+                              </View>
+                            </View>
+                          )}
+
+                          <View style={{ padding: 12, gap: 2 }}>
+                            <Text style={[styles.boldText, { fontSize: 14 }]} numberOfLines={1}>{rProp.propertyName}</Text>
+                            <Text style={{ fontSize: 13, fontWeight: '800', color: '#1E7E4E' }}>{fmt(rProp.rentAmount)} / mois</Text>
+                            <Text style={[styles.subMuted, { fontSize: 11 }]} numberOfLines={1}>{rProp.commune || 'Abidjan'}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, marginTop: 4, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                              <Text style={{ fontSize: 11, fontWeight: '700', color: '#2C3E6B' }}>Détails ›</Text>
+                              <ChevronRight color="#2C3E6B" size={12} />
+                            </View>
+                          </View>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                )}
+              </View>
+            )}
 
             {/* HERO LOYER OU ÉTAT SANS BAIL (P0-02 & P0-04) */}
             {data?.hasLease && loyer > 0 ? (
@@ -4509,6 +4628,152 @@ export default function LocatairePrototypeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* MODAL DÉTAILS DU BIEN EN LOCATION */}
+      {selectedRentedProperty && (
+        <Modal
+          visible={Boolean(selectedRentedProperty)}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setSelectedRentedProperty(null)}
+        >
+          <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.55)', justifyContent: 'flex-end' }}>
+            <View style={{ backgroundColor: '#FFFFFF', borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: '90%', paddingBottom: 24 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 17, fontWeight: '700', color: '#1A1D26' }} numberOfLines={1}>
+                    {selectedRentedProperty.propertyName || 'Détails du bien en location'}
+                  </Text>
+                  <Text style={{ fontSize: 12, color: '#64748B', marginTop: 1 }}>
+                    Bail {selectedRentedProperty.leaseReference || bailRef}
+                  </Text>
+                </View>
+                <Pressable
+                  style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}
+                  onPress={() => setSelectedRentedProperty(null)}
+                >
+                  <X color="#1A1D26" size={18} />
+                </Pressable>
+              </View>
+
+              <ScrollView contentContainerStyle={{ padding: 16, gap: 14 }}>
+                {/* GALERIE OU IMAGE DU BIEN */}
+                {Array.isArray(selectedRentedProperty.images) && selectedRentedProperty.images.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16, paddingHorizontal: 16 }}>
+                    {selectedRentedProperty.images.map((img: string, idx: number) => {
+                      const u = formatImageUrl(img);
+                      if (!u) return null;
+                      return (
+                        <Image
+                          key={idx}
+                          source={{ uri: u }}
+                          style={{ width: 280, height: 180, marginRight: 10, borderRadius: 12 }}
+                          resizeMode="cover"
+                        />
+                      );
+                    })}
+                  </ScrollView>
+                ) : selectedRentedProperty.mainImage ? (
+                  <Image
+                    source={{ uri: formatImageUrl(selectedRentedProperty.mainImage) || '' }}
+                    style={{ width: '100%', height: 180, borderRadius: 12 }}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={{ width: '100%', height: 140, borderRadius: 12, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                    <Building2 color="#94A3B8" size={36} />
+                    <Text style={{ fontSize: 12, color: '#94A3B8', marginTop: 4 }}>Photo en attente</Text>
+                  </View>
+                )}
+
+                {/* FINANCES & BAIL */}
+                <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', gap: 10 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' }}>
+                    Conditions du Bail
+                  </Text>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Loyer mensuel</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '800', color: '#1E7E4E' }}>
+                      {fmt(selectedRentedProperty.rentAmount)} / mois
+                    </Text>
+                  </View>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Dépôt de garantie</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26' }}>
+                      {fmt(selectedRentedProperty.depositAmount)}
+                    </Text>
+                  </View>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Échéance de paiement</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26' }}>
+                      Le {selectedRentedProperty.paymentDay || 5} de chaque mois
+                    </Text>
+                  </View>
+                </View>
+
+                {/* ADRESSE & LOCALISATION */}
+                <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', gap: 10 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' }}>
+                    Adresse & Localisation
+                  </Text>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Adresse</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26', maxWidth: '65%', textAlign: 'right' }}>
+                      {selectedRentedProperty.address || 'Non précisée'}
+                    </Text>
+                  </View>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Commune</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26' }}>
+                      {selectedRentedProperty.commune || 'Abidjan'}
+                    </Text>
+                  </View>
+                  {selectedRentedProperty.quartier ? (
+                    <View style={styles.rowBetween}>
+                      <Text style={{ fontSize: 13, color: '#64748B' }}>Quartier</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26' }}>
+                        {selectedRentedProperty.quartier}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* BAILLEUR */}
+                <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', gap: 10 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#64748B', textTransform: 'uppercase' }}>
+                    Bailleur & Contact
+                  </Text>
+                  <View style={styles.rowBetween}>
+                    <Text style={{ fontSize: 13, color: '#64748B' }}>Bailleur</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '700', color: '#1A1D26' }}>
+                      {selectedRentedProperty.landlordName || 'Bailleur certifié'}
+                    </Text>
+                  </View>
+                  {selectedRentedProperty.landlordPhone ? (
+                    <View style={styles.rowBetween}>
+                      <Text style={{ fontSize: 13, color: '#64748B' }}>Téléphone</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#2C3E6B' }}>
+                        {selectedRentedProperty.landlordPhone}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* BOUTON ACTION */}
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 4 }]}
+                  onPress={() => {
+                    setSelectedRentedProperty(null);
+                    setScreen('bail');
+                  }}
+                >
+                  <Text style={styles.btnPrimaryText}>Consulter mon contrat de bail complet</Text>
+                </Pressable>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      )}
 
       {/* Assistant Vocal QAPRIL (Assistant vocal) */}
       <VoiceAssistantFAB moduleName="LOCATAIRE" primaryColor="#1B4D3E" />

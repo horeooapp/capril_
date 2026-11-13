@@ -12,6 +12,8 @@ import {
   RefreshControl,
   ScrollView,
   Alert,
+  Image,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -27,6 +29,11 @@ import {
   FileSpreadsheet,
   MapPin,
   Navigation,
+  ChevronRight,
+  Bed,
+  Maximize2,
+  Home,
+  CheckCircle2,
 } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
@@ -37,6 +44,13 @@ try {
 } catch {
   LocationModule = null;
 }
+
+const formatImageUrl = (uri?: string | null) => {
+  if (!uri) return null;
+  if (uri.startsWith('http://') || uri.startsWith('https://')) return uri;
+  if (uri.startsWith('/')) return `https://qapril.net${uri}`;
+  return `https://qapril.net/${uri}`;
+};
 
 const fmtFcfa = (n?: number | string | null) => {
   const num = typeof n === 'number' ? n : Number(n);
@@ -53,6 +67,7 @@ export default function PropertiesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState<'default' | 'rent_asc' | 'rent_desc' | 'name'>('default');
   const [capturingPropertyId, setCapturingPropertyId] = useState<string | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<any | null>(null);
 
   const handleCaptureGpsForProperty = async (propertyId: string) => {
     if (!LocationModule || !LocationModule.requestForegroundPermissionsAsync) {
@@ -343,28 +358,78 @@ export default function PropertiesScreen() {
           if (!item) return null;
           const rented = isRentedProperty(item);
           const hasGps = item.gpsLatitude != null && item.gpsLongitude != null && !isNaN(Number(item.gpsLatitude)) && !isNaN(Number(item.gpsLongitude));
+          const imgUri = formatImageUrl(item.imageUrl);
+          const allImgs = Array.isArray(item.images) && item.images.length > 0
+            ? item.images
+            : (item.imageUrl ? [item.imageUrl] : []);
+
           return (
-            <View style={styles.card}>
-              <View style={styles.rowBetween}>
-                <View style={styles.rowLeft}>
-                  <View style={[styles.iconBox, rented && { backgroundColor: '#E3F5EC' }]}>
-                    <Building2 color={rented ? '#1E7E4E' : '#1B4D3E'} size={20} />
+            <Pressable style={styles.card} onPress={() => setSelectedProperty(item)}>
+              {/* IMAGE PRINCIPALE DU BIEN */}
+              {imgUri ? (
+                <View style={styles.cardImageContainer}>
+                  <Image source={{ uri: imgUri }} style={styles.cardImage} resizeMode="cover" />
+                  <View style={[styles.statusBadgeOverlay, rented ? styles.statusOccupied : styles.statusVacant]}>
+                    <Text style={[styles.statusText, rented ? styles.statusTextOccupied : styles.statusTextVacant]}>
+                      {rented ? 'Loué' : 'Vacant'}
+                    </Text>
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.propertyName} numberOfLines={1}>{item.name || 'Bien sans nom'}</Text>
-                    <Text style={styles.propertyAddress} numberOfLines={1}>
-                      {item.address ? `${item.address} · ` : ''}{item.commune || 'Abidjan'}{item.city && item.city !== item.commune ? ` (${item.city})` : ''}
+                  {allImgs.length > 1 && (
+                    <View style={styles.photosCountBadge}>
+                      <Text style={styles.photosCountText}>📷 {allImgs.length} photos</Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View style={styles.cardImagePlaceholder}>
+                  <Building2 color="#94A3B8" size={30} />
+                  <Text style={styles.cardImagePlaceholderText}>Photo du bien en attente</Text>
+                  <View style={[styles.statusBadgeOverlay, rented ? styles.statusOccupied : styles.statusVacant]}>
+                    <Text style={[styles.statusText, rented ? styles.statusTextOccupied : styles.statusTextVacant]}>
+                      {rented ? 'Loué' : 'Vacant'}
                     </Text>
                   </View>
                 </View>
+              )}
 
-                {/* BADGE STATUT : LOUÉ / VACANT */}
-                <View style={[styles.statusBadge, rented ? styles.statusOccupied : styles.statusVacant]}>
-                  <Text style={[styles.statusText, rented ? styles.statusTextOccupied : styles.statusTextVacant]}>
-                    {rented ? 'Loué' : 'Vacant'}
+              <View style={styles.rowBetween}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.propertyName} numberOfLines={1}>{item.name || 'Bien sans nom'}</Text>
+                  <Text style={styles.propertyAddress} numberOfLines={1}>
+                    {item.address ? `${item.address} · ` : ''}{item.commune || 'Abidjan'}{item.city && item.city !== item.commune ? ` (${item.city})` : ''}
                   </Text>
                 </View>
               </View>
+
+              {/* CARACTÉRISTIQUES CLÉS (PIÈCES, SURFACE) */}
+              {(item.rooms || item.bedrooms || item.superficieM2 || item.propertyType) && (
+                <View style={styles.specsRow}>
+                  {item.propertyType ? (
+                    <View style={styles.specItem}>
+                      <Home color="#64748B" size={12} />
+                      <Text style={styles.specText}>{item.propertyType}</Text>
+                    </View>
+                  ) : null}
+                  {item.rooms ? (
+                    <View style={styles.specItem}>
+                      <Building2 color="#64748B" size={12} />
+                      <Text style={styles.specText}>{item.rooms} pce{item.rooms > 1 ? 's' : ''}</Text>
+                    </View>
+                  ) : null}
+                  {item.bedrooms ? (
+                    <View style={styles.specItem}>
+                      <Bed color="#64748B" size={12} />
+                      <Text style={styles.specText}>{item.bedrooms} ch.</Text>
+                    </View>
+                  ) : null}
+                  {item.superficieM2 ? (
+                    <View style={styles.specItem}>
+                      <Maximize2 color="#64748B" size={12} />
+                      <Text style={styles.specText}>{item.superficieM2} m²</Text>
+                    </View>
+                  ) : null}
+                </View>
+              )}
 
               {/* LOCATAIRE ACTIF SI LE BIEN EST LOUÉ */}
               {rented && item.tenantName && (
@@ -378,7 +443,8 @@ export default function PropertiesScreen() {
               {!rented && (
                 <Pressable
                   style={styles.createLeaseBtn}
-                  onPress={() =>
+                  onPress={(e) => {
+                    e.stopPropagation();
                     router.push({
                       pathname: '/create-lease',
                       params: {
@@ -386,8 +452,8 @@ export default function PropertiesScreen() {
                         propertyName: item.name,
                         rent: String(item.currentRent || item.declaredRentFcfa || 0),
                       },
-                    } as any)
-                  }
+                    } as any);
+                  }}
                 >
                   <FileSpreadsheet color="#1B4D3E" size={14} />
                   <Text style={styles.createLeaseBtnText}>Rédiger un bail pour ce bien</Text>
@@ -407,7 +473,10 @@ export default function PropertiesScreen() {
 
                 <Pressable
                   style={[styles.geoCaptureBtn, capturingPropertyId === item.id && { opacity: 0.6 }]}
-                  onPress={() => handleCaptureGpsForProperty(item.id)}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleCaptureGpsForProperty(item.id);
+                  }}
                   disabled={capturingPropertyId === item.id}
                 >
                   {capturingPropertyId === item.id ? (
@@ -446,10 +515,187 @@ export default function PropertiesScreen() {
                   )}
                 </View>
               </View>
-            </View>
+
+              {/* BOUTON DÉTAIL DU BIEN */}
+              <View style={styles.cardDetailLink}>
+                <Text style={styles.cardDetailLinkText}>Voir les détails complets</Text>
+                <ChevronRight color="#1B4D3E" size={14} />
+              </View>
+            </Pressable>
           );
         }}
       />
+
+      {/* MODAL DÉTAILS DU BIEN */}
+      {selectedProperty && (
+        <Modal
+          visible={Boolean(selectedProperty)}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setSelectedProperty(null)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalHeader}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.modalTitle} numberOfLines={1}>{selectedProperty.name || 'Détails du bien'}</Text>
+                  <Text style={styles.modalSub}>{selectedProperty.propertyCode || 'Code certifié QAPRIL'}</Text>
+                </View>
+                <Pressable style={styles.modalCloseBtn} onPress={() => setSelectedProperty(null)}>
+                  <X color="#1C1C1E" size={18} />
+                </Pressable>
+              </View>
+
+              <ScrollView contentContainerStyle={styles.modalScroll}>
+                {/* GALERIE D'IMAGES DU BIEN */}
+                {Array.isArray(selectedProperty.images) && selectedProperty.images.length > 0 ? (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16, paddingHorizontal: 16 }}>
+                    {selectedProperty.images.map((img: string, idx: number) => {
+                      const u = formatImageUrl(img);
+                      if (!u) return null;
+                      return (
+                        <Image
+                          key={idx}
+                          source={{ uri: u }}
+                          style={styles.detailGalleryImg}
+                          resizeMode="cover"
+                        />
+                      );
+                    })}
+                  </ScrollView>
+                ) : selectedProperty.imageUrl ? (
+                  <Image
+                    source={{ uri: formatImageUrl(selectedProperty.imageUrl) || '' }}
+                    style={[styles.detailGalleryImg, { width: '100%', marginRight: 0 }]}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.detailImagePlaceholder}>
+                    <Building2 color="#94A3B8" size={40} />
+                    <Text style={{ fontSize: 12, color: '#94A3B8', marginTop: 4 }}>Aucune photo enregistrée</Text>
+                  </View>
+                )}
+
+                {/* STATUT & FINANCES */}
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailSectionTitle}>Statut & Finances</Text>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Occupation</Text>
+                    <View style={[styles.statusBadge, isRentedProperty(selectedProperty) ? styles.statusOccupied : styles.statusVacant]}>
+                      <Text style={[styles.statusText, isRentedProperty(selectedProperty) ? styles.statusTextOccupied : styles.statusTextVacant]}>
+                        {isRentedProperty(selectedProperty) ? 'Loué' : 'Vacant'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {isRentedProperty(selectedProperty) && selectedProperty.tenantName && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Locataire actuel</Text>
+                      <Text style={[styles.detailValue, { color: '#166534' }]}>{selectedProperty.tenantName}</Text>
+                    </View>
+                  )}
+
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Loyer mensuel</Text>
+                    <Text style={[styles.detailValue, { color: '#1B4D3E', fontSize: 15 }]}>
+                      {fmtFcfa(selectedProperty.currentRent || selectedProperty.declaredRentFcfa)} / mois
+                    </Text>
+                  </View>
+
+                  {selectedProperty.declaredRentFcfa ? (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Loyer de référence déclaré</Text>
+                      <Text style={styles.detailValue}>{fmtFcfa(selectedProperty.declaredRentFcfa)}</Text>
+                    </View>
+                  ) : null}
+                </View>
+
+                {/* LOCALISATION */}
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailSectionTitle}>Localisation</Text>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Adresse</Text>
+                    <Text style={styles.detailValue}>{selectedProperty.address || 'Non précisée'}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Commune</Text>
+                    <Text style={styles.detailValue}>{selectedProperty.commune || 'Abidjan'}</Text>
+                  </View>
+                  {selectedProperty.city && selectedProperty.city !== selectedProperty.commune && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Ville</Text>
+                      <Text style={styles.detailValue}>{selectedProperty.city}</Text>
+                    </View>
+                  )}
+                  {selectedProperty.gpsLatitude != null && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Coordonnées GPS</Text>
+                      <Text style={styles.detailValue}>
+                        {Number(selectedProperty.gpsLatitude).toFixed(4)}°, {Number(selectedProperty.gpsLongitude).toFixed(4)}°
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* CARACTÉRISTIQUES DU LOGEMENT */}
+                <View style={styles.detailSection}>
+                  <Text style={styles.detailSectionTitle}>Caractéristiques</Text>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Type de bien</Text>
+                    <Text style={styles.detailValue}>{selectedProperty.propertyType || 'Résidentiel'}</Text>
+                  </View>
+                  {selectedProperty.typeStructure && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Structure</Text>
+                      <Text style={styles.detailValue}>{selectedProperty.typeStructure}</Text>
+                    </View>
+                  )}
+                  {selectedProperty.rooms != null && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Nombre de pièces</Text>
+                      <Text style={styles.detailValue}>{selectedProperty.rooms} pièce(s)</Text>
+                    </View>
+                  )}
+                  {selectedProperty.bedrooms != null && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Chambres</Text>
+                      <Text style={styles.detailValue}>{selectedProperty.bedrooms} chambre(s)</Text>
+                    </View>
+                  )}
+                  {selectedProperty.superficieM2 != null && (
+                    <View style={styles.detailRow}>
+                      <Text style={styles.detailLabel}>Superficie</Text>
+                      <Text style={styles.detailValue}>{selectedProperty.superficieM2} m²</Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* ACTION CRÉER UN BAIL SI VACANT */}
+                {!isRentedProperty(selectedProperty) && (
+                  <Pressable
+                    style={styles.modalPrimaryBtn}
+                    onPress={() => {
+                      const p = selectedProperty;
+                      setSelectedProperty(null);
+                      router.push({
+                        pathname: '/create-lease',
+                        params: {
+                          propertyId: p.id,
+                          propertyName: p.name,
+                          rent: String(p.currentRent || p.declaredRentFcfa || 0),
+                        },
+                      } as any);
+                    }}
+                  >
+                    <FileSpreadsheet color="#FFFFFF" size={16} />
+                    <Text style={styles.modalPrimaryBtnText}>Rédiger un contrat de bail</Text>
+                  </Pressable>
+                )}
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -698,5 +944,198 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     color: '#1B4D3E',
+  },
+  // Styles cartes et images du bien
+  cardImageContainer: {
+    width: '100%',
+    height: 160,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#E2E8F0',
+    position: 'relative',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  cardImagePlaceholder: {
+    width: '100%',
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    position: 'relative',
+    gap: 4,
+  },
+  cardImagePlaceholderText: {
+    fontSize: 11,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  statusBadgeOverlay: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  photosCountBadge: {
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  photosCountText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  specsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 2,
+  },
+  specItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  specText: {
+    fontSize: 11,
+    color: '#64748B',
+    fontWeight: '600',
+  },
+  cardDetailLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
+  },
+  cardDetailLinkText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1B4D3E',
+  },
+  // Modal de détail du bien
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    maxHeight: '90%',
+    paddingBottom: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#1C1C1E',
+  },
+  modalSub: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 1,
+  },
+  modalCloseBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalScroll: {
+    padding: 16,
+    gap: 14,
+  },
+  detailGalleryImg: {
+    width: 280,
+    height: 190,
+    marginRight: 10,
+    borderRadius: 12,
+  },
+  detailImagePlaceholder: {
+    width: '100%',
+    height: 150,
+    borderRadius: 12,
+    backgroundColor: '#F1F5F9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  detailSection: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    gap: 10,
+  },
+  detailSectionTitle: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#64748B',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  detailLabel: {
+    fontSize: 13,
+    color: '#64748B',
+  },
+  detailValue: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1C1C1E',
+    maxWidth: '65%',
+    textAlign: 'right',
+  },
+  modalPrimaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1B4D3E',
+    borderRadius: 10,
+    paddingVertical: 13,
+    marginTop: 6,
+  },
+  modalPrimaryBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });

@@ -18,6 +18,7 @@ export async function GET(request: Request) {
                 lastName: true,
                 email: true,
                 phone: true,
+                avatarUrl: true,
                 kycLevel: true,
                 kycStatus: true,
             }

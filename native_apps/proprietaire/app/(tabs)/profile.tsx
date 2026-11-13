@@ -17,6 +17,7 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -25,12 +26,20 @@ import { ShieldCheck, Globe, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalL
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { BUILD_NUMBER, APP_VERSION, BUILD_TIMESTAMP } from '../../lib/version';
 
+const formatImageUrl = (uri?: string | null) => {
+  if (!uri) return null;
+  if (uri.startsWith('http://') || uri.startsWith('https://')) return uri;
+  if (uri.startsWith('/')) return `https://qapril.net${uri}`;
+  return `https://qapril.net/${uri}`;
+};
+
 export default function ProfileScreen() {
   const router = useRouter();
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [diaspora, setDiaspora] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [avatarError, setAvatarError] = useState(false);
 
   // Modification email, Diaspora, À propos & KYC Bancaire
   const [editEmailVisible, setEditEmailVisible] = useState(false);
@@ -151,6 +160,8 @@ export default function ProfileScreen() {
     ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
     : (user?.email?.[0] || 'B').toUpperCase();
 
+  const avatarUri = !avatarError && user?.avatarUrl ? formatImageUrl(user.avatarUrl) : null;
+
   return (
     <SafeAreaView style={styles.container}>
       <TopNavHeader title="Mon Compte" subtitle="Espace Bailleur Propriétaire" />
@@ -164,7 +175,16 @@ export default function ProfileScreen() {
           <>
             <View style={styles.heroCard}>
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{avatarInitials}</Text>
+                {avatarUri ? (
+                  <Image
+                    source={{ uri: avatarUri }}
+                    style={styles.avatarImage}
+                    resizeMode="cover"
+                    onError={() => setAvatarError(true)}
+                  />
+                ) : (
+                  <Text style={styles.avatarText}>{avatarInitials}</Text>
+                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
@@ -432,6 +452,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B4D3E',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   avatarText: { color: '#FFFFFF', fontSize: 20, fontWeight: '700' },
   name: { fontSize: 16, fontWeight: '700', color: '#1C1C1E' },

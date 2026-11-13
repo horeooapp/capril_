@@ -63,15 +63,15 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function checkAppUpdates() {
-      if (__DEV__) return;
+      if (__DEV__ || !Updates.isEnabled) return;
       try {
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
-          // Télécharge la mise à jour en arrière-plan pour le prochain démarrage
           await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
         }
-      } catch {
-        // En cas d'erreur réseau ou hors-ligne, continuer normalement
+      } catch (e) {
+        // En cas d'absence de réseau ou d'erreur, continuer normalement
       }
     }
     checkAppUpdates();

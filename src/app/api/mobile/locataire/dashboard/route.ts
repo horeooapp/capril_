@@ -19,22 +19,33 @@ export async function GET(request: Request) {
                 lastName: true,
                 email: true,
                 phone: true,
+                avatarUrl: true,
                 kycLevel: true,
                 kycStatus: true,
             }
         });
 
-        // Récupérer le bail (Lease) actif du locataire
-        const lease = await prisma.lease.findFirst({
+        // Récupérer TOUS les baux (Leases) actifs du locataire pour multi-biens
+        const allActiveLeases = await prisma.lease.findMany({
             where: {
                 tenantId: user.userId,
-                status: 'ACTIVE'
+                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] }
             },
             include: {
-                property: true
+                property: {
+                    include: {
+                        images: {
+                            orderBy: [{ isMain: 'desc' }, { createdAt: 'desc' }],
+                            take: 5
+                        }
+                    }
+                }
             },
             orderBy: { createdAt: 'desc' }
         });
+
+        // Bail actif principal (le plus récent)
+        const lease = allActiveLeases[0] ?? null;
 
         // Fetch pending lease (BailDeclaratif) for the tenant
         const pendingLease = await prisma.bailDeclaratif.findFirst({
@@ -58,6 +69,7 @@ export async function GET(request: Request) {
             return NextResponse.json({
                 hasLease: false,
                 user: userRecord,
+                rentedProperties: [],
                 pendingDeclaration: pendingLease ? {
                     id: pendingLease.id,
                     landlordName: `${pendingLease.bailleur?.firstName || ''} ${pendingLease.bailleur?.lastName || ''}`.trim() || 'Bailleur',
@@ -194,9 +206,58 @@ export async function GET(request: Request) {
             where: { leaseId: lease.id }
         }).catch(() => null);
 
+        // Construction des biens en location (multi-biens) avec images complètes
+        const rentedProperties = await Promise.all(allActiveLeases.map(async (l) => {
+            let lName = 'Bailleur certifié';
+            let lPhone: string | null = null;
+            const landlordId = l.landlordId || l.property?.ownerUserId;
+            if (landlordId && !l.bailleurMasque) {
+                const landlord = await prisma.user.findUnique({
+                    where: { id: landlordId },
+                    select: { firstName: true, lastName: true, phone: true }
+                });
+                if (landlord) {
+                    lName = `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+                    lPhone = landlord.phone;
+                }
+            }
+
+            const mainImg = l.property?.images?.find(i => i.isMain)?.s3Key || l.property?.images?.[0]?.s3Key || null;
+            const allImages = l.property?.images?.map(i => i.s3Key).filter(Boolean) || [];
+
+            return {
+                leaseId: l.id,
+                leaseReference: l.leaseReference,
+                rentAmount: Number(l.rentAmount || 0),
+                depositAmount: Number(l.depositAmount || (l.rentAmount ? l.rentAmount * 2 : 0)),
+                paymentDay: l.paymentDay || 5,
+                startDate: l.startDate,
+                endDate: l.endDate,
+                durationMonths: l.durationMonths,
+                status: l.status,
+                propertyId: l.property?.id,
+                propertyName: l.property?.name || 'Logement certifié QAPRIL',
+                propertyCode: l.property?.propertyCode,
+                propertyType: l.property?.propertyType || 'Résidentiel',
+                leaseType: l.property?.leaseType || 'residential',
+                commune: l.property?.commune || 'Abidjan',
+                quartier: l.property?.quartier || '',
+                address: l.property?.address || '',
+                city: l.property?.city || '',
+                rooms: l.property?.rooms || null,
+                bedrooms: l.property?.bedrooms || null,
+                superficieM2: l.property?.superficieM2 ? Number(l.property.superficieM2) : null,
+                mainImage: mainImg,
+                images: allImages,
+                landlordName: lName,
+                landlordPhone: lPhone,
+            };
+        }));
+
         return NextResponse.json({
             hasLease: true,
             user: userRecord,
+            rentedProperties,
             lease: {
                 id: lease.id,
                 leaseReference: lease.leaseReference,

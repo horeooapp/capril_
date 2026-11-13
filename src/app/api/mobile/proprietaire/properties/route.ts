@@ -30,7 +30,10 @@ export async function GET(request: Request) {
         const properties = await prisma.property.findMany({
             where,
             include: {
-                images: { where: { isMain: true }, take: 1 },
+                images: {
+                    orderBy: [{ isMain: 'desc' }, { createdAt: 'desc' }],
+                    take: 5
+                },
                 leases: {
                     where: { status: { in: ['ACTIVE', 'LOYER_IMPAYE', 'ACTIVE_DECLARATIF', 'PENDING_CONFIRMATION', 'PENDING_SIGNATURE', 'PENDING_DEPOSIT', 'MISE_EN_DEMEURE', 'CLEMENCE_EN_COURS'] } },
                     include: { tenant: { select: { firstName: true, lastName: true } } },
@@ -63,6 +66,7 @@ export async function GET(request: Request) {
                 rooms:            p.rooms ? Number(p.rooms) : null,
                 bedrooms:         p.bedrooms ? Number(p.bedrooms) : null,
                 imageUrl:         p.images[0]?.s3Key ?? null,
+                images:           p.images.map(img => img.s3Key).filter(Boolean),
                 occupancyStatus:  isRented ? 'Loué' : 'Vacant',
                 isRented:         isRented,
                 tenantName:       activeLease?.tenant

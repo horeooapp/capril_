@@ -25,6 +25,7 @@ export async function GET(request: Request) {
                 lastName:   true,
                 email:      true,
                 phone:      true,
+                avatarUrl:  true,
                 role:       true,
                 status:     true,
                 kycLevel:   true,

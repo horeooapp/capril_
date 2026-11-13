@@ -15,7 +15,9 @@
     "scheme": "qaprillocataire",
     "runtimeVersion": "1.0.0",
     "updates": {
-      "url": "https://u.expo.dev/380035ec-a5b8-429b-9864-f4fc6646a77c"
+      "url": "https://u.expo.dev/380035ec-a5b8-429b-9864-f4fc6646a77c",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 5000
     },
     "ios": {
       "supportsTablet": true
