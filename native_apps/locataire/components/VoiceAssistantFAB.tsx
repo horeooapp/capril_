@@ -141,7 +141,6 @@ export function VoiceAssistantFAB({
           <Mic color="#FFFFFF" size={24} />
         </Pressable>
       )}
-      </Pressable>
 
       {/* Modal interactif du pilote vocal */}
       <Modal
