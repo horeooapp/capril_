@@ -44,12 +44,33 @@ export async function POST(
             dateNaissance,
             mineur = false,
             lien = 'AUTRE_FAMILLE',
+            typeLien,
             dateEntree,
-            nni
+            dateSortie,
+            sexe,
+            typeSejour,
+            dureeMois,
+            motifArrivee,
+            motifPrecision,
+            espaceOccupe,
+            priseEnCharge,
+            contactUrgenceNom,
+            contactUrgenceTel,
+            pieceIdentiteType,
+            typePiece,
+            nni,
+            numeroPiece,
+            observations
         } = body;
 
-        if (!nom || !prenoms) {
-            return NextResponse.json({ error: "Le nom et les prénoms de l'occupant sont obligatoires." }, { status: 400 });
+        const effectiveNom = String(nom || '').trim().toUpperCase();
+        const effectivePrenoms = String(prenoms || '').trim();
+        const effectiveLien = String(lien || typeLien || 'AUTRE_FAMILLE').toUpperCase();
+        const effectiveNni = nni || numeroPiece || null;
+        const effectivePieceType = pieceIdentiteType || typePiece || 'CNI';
+
+        if (!effectiveNom || !effectivePrenoms) {
+            return NextResponse.json({ error: "Le nom et les prénoms de l'occupant ou invité sont obligatoires." }, { status: 400 });
         }
 
         // 1. Contrôle du plafond légal : max 10 occupants simultanés (RG-OCC-04)
@@ -67,10 +88,10 @@ export async function POST(
             }, { status: 400 });
         }
 
-        const cleanNom = String(nom).trim().toUpperCase();
-        const cleanPrenoms = String(prenoms).trim();
+        const cleanNom = effectiveNom;
+        const cleanPrenoms = effectivePrenoms;
         const cleanPhone = telephone ? String(telephone).trim() : null;
-        const nniHash = nni ? crypto.createHash('sha256').update(String(nni).trim().toUpperCase()).digest('hex') : null;
+        const nniHash = effectiveNni ? crypto.createHash('sha256').update(String(effectiveNni).trim().toUpperCase()).digest('hex') : null;
         const isMinorBool = Boolean(mineur);
 
         // 2. Unicité stricte d'adresse pour les personnes majeures (RG-OCC-05)
@@ -99,10 +120,27 @@ export async function POST(
 
         // 3. Empreinte SHA-256 de la déclaration signée (RG-OCC-07)
         const dateEntreeObj = dateEntree ? new Date(dateEntree) : new Date();
+        const dateSortieObj = dateSortie ? new Date(dateSortie) : null;
         const payloadToSign = `${leaseId}:${user.userId}:${cleanNom}:${cleanPrenoms}:${dateEntreeObj.toISOString()}`;
         const declarationSha256 = crypto.createHash('sha256').update(payloadToSign).digest('hex');
 
-        // Création de l'occupant
+        // Métadonnées enrichies d'hébergement ADD-29
+        const detailsMetadata = {
+            sexe: sexe || null,
+            typeSejour: typeSejour || (dateSortie ? 'TEMPORAIRE' : 'PERMANENT'),
+            dureeMois: dureeMois || null,
+            motifArrivee: motifArrivee || (effectiveLien === 'HEBERGE' ? 'VACANCES_VISITE' : 'REGROUPEMENT_FAMILIAL'),
+            motifPrecision: motifPrecision || '',
+            espaceOccupe: espaceOccupe || 'CHAMBRE_INDIVIDUELLE',
+            priseEnCharge: priseEnCharge || 'CHARGE_TITULAIRE',
+            contactUrgenceNom: contactUrgenceNom || '',
+            contactUrgenceTel: contactUrgenceTel || '',
+            pieceIdentiteType: effectivePieceType,
+            observations: observations || '',
+            dateSortiePrevue: dateSortie || null,
+        };
+
+        // Création de l'occupant / invité
         const declareRole = isTitulaire ? 'TITULAIRE' : isBailleur ? 'BAILLEUR' : 'MANDATAIRE';
         const occupant = await prisma.occupant.create({
             data: {
@@ -113,24 +151,30 @@ export async function POST(
                 telephone: cleanPhone,
                 dateNaissance: dateNaissance ? new Date(dateNaissance) : null,
                 mineur: isMinorBool,
-                lien: String(lien).toUpperCase(),
+                lien: effectiveLien,
                 declareParUserId: user.userId,
                 declareRole,
                 declarationSha256,
                 dateEntree: dateEntreeObj,
+                dateSortie: dateSortieObj,
                 nniHash,
-                // Si mineur déclaré par le titulaire : pas de confirmation demandée
-                statut: isMinorBool ? 'CONFIRME' : 'DECLARE',
-                confirmeAt: isMinorBool ? new Date() : null,
-                niveau: 'C'
+                statut: 'CONFIRME',
+                confirmeAt: new Date(),
+                niveau: 'C',
+                motifDesaccord: JSON.stringify(detailsMetadata)
             }
         });
 
+        const isInvite = effectiveLien === 'HEBERGE' || typeSejour === 'TEMPORAIRE';
+        const messageSuccess = isInvite
+            ? `Invité(e) ${cleanNom} ${cleanPrenoms} hébergé(e) et enregistré(e) avec succès avec scellé SHA-256.`
+            : isMinorBool
+                ? "Occupant mineur rattaché avec succès au foyer du titulaire."
+                : "Occupant déclaré et rattaché au foyer avec succès.";
+
         return NextResponse.json({
             success: true,
-            message: isMinorBool 
-                ? "Occupant mineur rattaché avec succès au foyer du titulaire." 
-                : "Occupant déclaré. Une demande de confirmation lui a été transmise.",
+            message: messageSuccess,
             occupant
         }, { status: 201 });
 
@@ -188,6 +232,7 @@ export async function GET(
                 niveau: true,
                 confirmeAt: true,
                 declareRole: true,
+                motifDesaccord: true,
                 createdAt: true,
             }
         });

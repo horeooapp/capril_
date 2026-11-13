@@ -12,6 +12,7 @@ import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } 
 import { isUserKycSufficient } from "@/lib/kyc-config";
 import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence, confirmerPositionParConcordance } from "@/lib/geo-maposte";
 import { reverseGeocodeCoordinates } from "@/lib/reverse-geocoding";
+import { validerLieu } from "@/lib/lieux";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
@@ -131,6 +132,7 @@ export async function creerBien(formData: FormData) {
         unitLabel: formData.get("unitLabel") as string,
         parentPropertyId: formData.get("parentPropertyId") as string,
         commune: formData.get("commune") as string,
+        quartier: (formData.get("quartier") as string) || undefined,
         address: formData.get("addressLine1") as string || formData.get("address") as string,
         city: (formData.get("city") as string) || "Abidjan",
         propertyType: (formData.get("propertyType") as string) || "BUILDING",
@@ -197,8 +199,22 @@ export async function creerBien(formData: FormData) {
         };
       }
 
-      // 4. Génération du code
-      const effectiveCommune = data.commune || inheritedData.commune || "Abidjan";
+      // 4. Validation S-08 contre le référentiel officiel config/lieux.json (refus de toute saisie libre)
+      let effectiveCommune = inheritedData.commune || "Cocody";
+      let effectiveQuartier: string | null = data.quartier || inheritedData.quartier || null;
+      let effectiveCity = inheritedData.city || "Abidjan";
+
+      if (!parentPropertyId) {
+        const validationLieu = validerLieu(data.commune, data.quartier);
+        if (!validationLieu.ok) {
+          throw new Error(validationLieu.error || "Commune ou quartier non conforme au référentiel QAPRIL.");
+        }
+        effectiveCommune = validationLieu.commune!;
+        effectiveQuartier = validationLieu.quartier || null;
+        effectiveCity = validationLieu.ville || "Abidjan";
+      }
+
+      // Génération du code
       const seq = await tx.property.count({ where: { commune: effectiveCommune } });
       const propertyCode = generatePropertyCode((data.leaseType || inheritedData.leaseType || 'residential') as any, effectiveCommune, seq + 1);
 
@@ -230,8 +246,9 @@ export async function creerBien(formData: FormData) {
           unitLabel:        unitLabel ? unitLabel.trim() : undefined,
           parentPropertyId: data.parentPropertyId,
           commune:          effectiveCommune,
+          quartier:         effectiveQuartier,
           address:          data.address || inheritedData.address,
-          city:             data.city || inheritedData.city || "Abidjan",
+          city:             effectiveCity,
           leaseType:        data.leaseType || inheritedData.leaseType || "residential",
           propertyType:     data.propertyType,
           declaredRentFcfa: data.declaredRentFcfa,

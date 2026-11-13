@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { generatePropertyCode } from '@/lib/property';
+import { validerLieu } from '@/lib/lieux';
 
 interface Property {
     id: string;
@@ -74,6 +75,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 });
         }
 
+        const validationLieu = validerLieu(commune, data.quartier);
+        if (!validationLieu.ok) {
+            return NextResponse.json({ error: validationLieu.error, code: validationLieu.code }, { status: 422 });
+        }
+
         const propertyCode = await generatePropertyCode(category);
 
         const property = await prisma.property.create({
@@ -82,7 +88,9 @@ export async function POST(req: NextRequest) {
                 leaseType: category.toUpperCase() as 'RESIDENTIAL' | 'COMMERCIAL',
                 ownerUserId: session.user.id,
                 address: addressLine1,
-                commune,
+                commune: validationLieu.commune!,
+                quartier: validationLieu.quartier || null,
+                city: validationLieu.ville || "Abidjan",
                 declaredRentFcfa: declaredRentFcfa,
                 propertyType: data.propertyType,
                 rooms: data.totalRooms ? parseInt(data.totalRooms) : null,

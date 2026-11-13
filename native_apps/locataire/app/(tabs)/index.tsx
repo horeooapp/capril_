@@ -70,12 +70,57 @@ const formatImageUrl = (uri?: string | null) => {
 };
 
 const OCCUPANT_LABELS: Record<string, string> = {
-  CONJOINT: 'Conjoint',
+  HEBERGE: 'Invité / Hébergé',
+  CONJOINT: 'Conjoint(e)',
+  ENFANT: 'Enfant',
   ENFANT_MAJEUR: 'Enfant majeur',
   ENFANT_MINEUR: 'Enfant mineur',
+  PARENT: 'Parent / Ascendant',
+  AUTRE_FAMILLE: 'Famille proche',
   COLOCATAIRE: 'Colocataire',
+  EMPLOYE_DOMESTIQUE: 'Personnel résident',
   AUTRE: 'Autre',
 };
+
+const LIENS_GUEST = [
+  { value: 'HEBERGE', label: 'Invité / Personne hébergée', desc: 'Accueil temporaire ou à titre gracieux' },
+  { value: 'AUTRE_FAMILLE', label: 'Famille proche (Frère, Sœur, Cousin...)', desc: 'Parenté élargie' },
+  { value: 'CONJOINT', label: 'Conjoint(e) / Époux(se)', desc: 'Vie maritale ou union' },
+  { value: 'ENFANT', label: 'Enfant du titulaire', desc: 'Filiation ou enfant à charge' },
+  { value: 'PARENT', label: 'Parent / Ascendant', desc: 'Père, mère, grand-parent' },
+  { value: 'COLOCATAIRE', label: 'Colocataire déclaré', desc: 'Partage officiel du logement' },
+  { value: 'EMPLOYE_DOMESTIQUE', label: 'Personnel résident', desc: 'Aide ménagère, gardiennage' },
+];
+
+const MOTIFS_GUEST = [
+  { value: 'VACANCES_VISITE', label: 'Vacances / Visite temporaire' },
+  { value: 'ETUDES_FORMATION', label: 'Études supérieures / Scolarité / Stage' },
+  { value: 'STAGE_EMPLOI', label: 'Mission pro / Nouvel emploi' },
+  { value: 'SANTE_CONVALESCENCE', label: 'Soins médicaux / Convalescence' },
+  { value: 'ASSISTANCE_FAMILIALE', label: 'Assistance parentale / Garde enfants' },
+  { value: 'REGROUPEMENT_FAMILIAL', label: 'Regroupement familial / Vie commune' },
+  { value: 'AUTRE', label: 'Autre situation personnelle' },
+];
+
+const ESPACES_GUEST = [
+  { value: 'CHAMBRE_INDIVIDUELLE', label: 'Chambre individuelle' },
+  { value: 'ESPACE_PARTAGE', label: 'Chambre / Espace partagé' },
+  { value: 'LOGEMENT_ENTIER', label: 'Ensemble du logement' },
+];
+
+const PRISES_EN_CHARGE_GUEST = [
+  { value: 'CHARGE_TITULAIRE', label: 'À la charge du titulaire' },
+  { value: 'AUTONOME', label: 'Autonome financièrement' },
+  { value: 'PARTICIPATION', label: 'Participation aux charges' },
+];
+
+const PIECES_GUEST = [
+  { value: 'CNI', label: 'Carte Nationale d’Identité (CNI)' },
+  { value: 'PASSEPORT', label: 'Passeport biométrique' },
+  { value: 'EXTRAIT_NAISSANCE', label: 'Extrait de naissance (Mineurs)' },
+  { value: 'CARTE_CONSULAIRE', label: 'Carte consulaire / Séjour' },
+  { value: 'ATTESTATION_IDENTITE', label: 'Attestation d’identité' },
+];
 
 function safeFormatDate(dateVal?: string | Date | null, fallback = 'Date non précisée'): string {
   if (!dateVal) return fallback;
@@ -235,10 +280,34 @@ export default function LocatairePrototypeScreen() {
   const [planMonths, setPlanMonths] = useState(3);
   const [rightsModal, setRightsModal] = useState(false);
   const [edlModal, setEdlModal] = useState(false);
+  // Nouveau Formulaire d'Hébergement & Déclaration d'Invité ADD-29
   const [guestModal, setGuestModal] = useState(false);
   const [guestNom, setGuestNom] = useState('');
-  const [guestLien, setGuestLien] = useState('Famille');
-  const [guestDays, setGuestDays] = useState<15 | 30 | 60 | 90>(30);
+  const [guestPrenoms, setGuestPrenoms] = useState('');
+  const [guestSexe, setGuestSexe] = useState<'M' | 'F'>('M');
+  const [guestTel, setGuestTel] = useState('');
+  const [guestBirth, setGuestBirth] = useState('');
+  const [guestPieceType, setGuestPieceType] = useState('CNI');
+  const [guestNni, setGuestNni] = useState('');
+  const [guestMineur, setGuestMineur] = useState(false);
+  const [guestLien, setGuestLien] = useState('HEBERGE');
+  const [guestTypeSejour, setGuestTypeSejour] = useState<'TEMPORAIRE' | 'PERMANENT'>('TEMPORAIRE');
+  const [guestDateEntree, setGuestDateEntree] = useState(() => new Date().toISOString().split('T')[0]);
+  const [guestDureePreset, setGuestDureePreset] = useState<'15j' | '30j' | '90j' | '180j' | '1an' | 'custom'>('90j');
+  const [guestDateSortie, setGuestDateSortie] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 90);
+    return d.toISOString().split('T')[0];
+  });
+  const [guestMotifArrivee, setGuestMotifArrivee] = useState('VACANCES_VISITE');
+  const [guestMotifPrecision, setGuestMotifPrecision] = useState('');
+  const [guestEspaceOccupe, setGuestEspaceOccupe] = useState('CHAMBRE_INDIVIDUELLE');
+  const [guestPriseEnCharge, setGuestPriseEnCharge] = useState('CHARGE_TITULAIRE');
+  const [guestContactUrgenceNom, setGuestContactUrgenceNom] = useState('');
+  const [guestContactUrgenceTel, setGuestContactUrgenceTel] = useState('');
+  const [guestHonneur, setGuestHonneur] = useState(false);
+  const [submittingGuest, setSubmittingGuest] = useState(false);
+  const [guestSuccessModal, setGuestSuccessModal] = useState<any | null>(null);
   const [whoViewedModal, setWhoViewedModal] = useState(false);
   const [shareTranche, setShareTranche] = useState(true);
   const [shareFoyer, setShareFoyer] = useState(true);
@@ -720,6 +789,114 @@ export default function LocatairePrototypeScreen() {
       Alert.alert('Erreur', e.message || 'Erreur réseau');
     } finally {
       setSubmittingOcc(false);
+    }
+  };
+
+  const applyGuestPreset = (days: number | null, key: '15j' | '30j' | '90j' | '180j' | '1an' | 'custom') => {
+    setGuestDureePreset(key);
+    if (days === null) {
+      setGuestTypeSejour('PERMANENT');
+      setGuestDateSortie('');
+      return;
+    }
+    setGuestTypeSejour('TEMPORAIRE');
+    const base = guestDateEntree ? new Date(guestDateEntree) : new Date();
+    const future = new Date(base.getTime() + days * 24 * 3600 * 1000);
+    const y = future.getFullYear();
+    const m = String(future.getMonth() + 1).padStart(2, '0');
+    const d = String(future.getDate()).padStart(2, '0');
+    setGuestDateSortie(`${y}-${m}-${d}`);
+  };
+
+  const openGuestForm = (defaultLien: string = 'HEBERGE', isPermanent: boolean = false) => {
+    setGuestLien(defaultLien);
+    setGuestTypeSejour(isPermanent ? 'PERMANENT' : 'TEMPORAIRE');
+    setGuestDureePreset(isPermanent ? 'custom' : '90j');
+    const today = new Date().toISOString().split('T')[0];
+    setGuestDateEntree(today);
+    if (isPermanent) {
+      setGuestDateSortie('');
+      setGuestMotifArrivee('REGROUPEMENT_FAMILIAL');
+    } else {
+      const d = new Date();
+      d.setDate(d.getDate() + 90);
+      setGuestDateSortie(d.toISOString().split('T')[0]);
+      setGuestMotifArrivee('VACANCES_VISITE');
+    }
+    setGuestHonneur(false);
+    setGuestModal(true);
+  };
+
+  const handleSubmitGuest = async () => {
+    if (!data?.lease?.id) {
+      Alert.alert('Bail introuvable', 'Aucun contrat de bail actif n’est rattaché pour héberger un invité.');
+      return;
+    }
+    if (!guestNom.trim() || !guestPrenoms.trim()) {
+      Alert.alert('Champs obligatoires', 'Veuillez renseigner le nom et les prénoms de votre invité.');
+      return;
+    }
+    if (!guestHonneur) {
+      Alert.alert('Engagement requis', 'Veuillez certifier sur l’honneur l’exactitude des informations fournies.');
+      return;
+    }
+
+    setSubmittingGuest(true);
+    try {
+      const res = await fetchWithAuth(`/api/v1/bails/${data.lease.id}/occupants`, {
+        method: 'POST',
+        body: JSON.stringify({
+          nom: guestNom.trim().toUpperCase(),
+          prenoms: guestPrenoms.trim(),
+          sexe: guestSexe,
+          telephone: guestTel.trim() || undefined,
+          dateNaissance: guestBirth.trim() || undefined,
+          mineur: guestMineur,
+          lien: guestLien,
+          dateEntree: guestDateEntree,
+          dateSortie: guestTypeSejour === 'TEMPORAIRE' && guestDateSortie ? guestDateSortie : undefined,
+          typeSejour: guestTypeSejour,
+          motifArrivee: guestMotifArrivee,
+          motifPrecision: guestMotifPrecision.trim() || undefined,
+          espaceOccupe: guestEspaceOccupe,
+          priseEnCharge: guestPriseEnCharge,
+          contactUrgenceNom: guestContactUrgenceNom.trim() || undefined,
+          contactUrgenceTel: guestContactUrgenceTel.trim() || undefined,
+          pieceIdentiteType: guestPieceType,
+          nni: guestNni.trim() || undefined,
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setGuestModal(false);
+        setGuestSuccessModal({
+          nom: `${guestNom.trim().toUpperCase()} ${guestPrenoms.trim()}`,
+          lien: guestLien,
+          typeSejour: guestTypeSejour,
+          dateEntree: guestDateEntree,
+          dateSortie: guestDateSortie,
+          motif: guestMotifArrivee,
+          sha256: json.occupant?.declarationSha256 || 'SHA-256 certifié ADD-29',
+        });
+        // Réinitialisation des saisies
+        setGuestNom('');
+        setGuestPrenoms('');
+        setGuestTel('');
+        setGuestNni('');
+        setGuestBirth('');
+        setGuestMotifPrecision('');
+        setGuestContactUrgenceNom('');
+        setGuestContactUrgenceTel('');
+        setGuestHonneur(false);
+        loadOccupants();
+      } else {
+        Alert.alert('Erreur', json.error || 'Impossible d’enregistrer la déclaration d’hébergement.');
+      }
+    } catch (e: any) {
+      Alert.alert('Erreur réseau', e.message || 'Une erreur est survenue lors de l’envoi.');
+    } finally {
+      setSubmittingGuest(false);
     }
   };
 
@@ -1808,7 +1985,7 @@ export default function LocatairePrototypeScreen() {
               <ChevronRight color="#6B7280" size={18} />
             </Pressable>
 
-            <Pressable style={styles.cardRow} onPress={() => setGuestModal(true)}>
+            <Pressable style={styles.cardRow} onPress={() => openGuestForm('HEBERGE', false)}>
               <UserCheck color="#D97706" size={20} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.boldText}>Héberger un invité</Text>
@@ -3235,9 +3412,12 @@ export default function LocatairePrototypeScreen() {
 
             <Pressable
               style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', width: '100%' }]}
-              onPress={() => setNewOccupantModal(true)}
+              onPress={() => {
+                setOccupantsModal(false);
+                openGuestForm('CONJOINT', true);
+              }}
             >
-              <Text style={styles.btnPrimaryText}>+ Déclarer un nouvel occupant</Text>
+              <Text style={styles.btnPrimaryText}>+ Déclarer un nouvel occupant ou invité</Text>
             </Pressable>
 
             <Pressable style={styles.btnGhost} onPress={() => setOccupantsModal(false)}>
@@ -3533,51 +3713,440 @@ export default function LocatairePrototypeScreen() {
         </View>
       </Modal>
 
-      {/* MODALE : HÉBERGER UN INVITÉ (IC-01 V.guest) */}
+      {/* MODALE : HÉBERGER UN INVITÉ / DÉCLARATION D'OCCUPANT (ADD-29 ENRICHI) */}
       <Modal visible={guestModal} transparent animationType="slide" onRequestClose={() => setGuestModal(false)}>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
-            <Text style={styles.h2}>Héberger un invité</Text>
-            <Text style={[styles.subMuted, { marginTop: 4 }]}>
-              Générez une attestation d’hébergement temporaire (jusqu’à 5 invités simultanés, valable 15 à 90 jours).
-            </Text>
-            <TextInput
-              style={[styles.input, { marginTop: 8 }]}
-              placeholder="Nom et prénoms de l’invité"
-              value={guestNom}
-              onChangeText={setGuestNom}
-            />
-            <Text style={[styles.label, { marginTop: 8 }]}>DURÉE DE L’HÉBERGEMENT</Text>
-            <View style={styles.segRow}>
-              {([15, 30, 60, 90] as const).map((d) => (
-                <Pressable
-                  key={d}
-                  onPress={() => setGuestDays(d)}
-                  style={[styles.segBtn, guestDays === d && styles.segBtnOn]}
-                >
-                  <Text style={[styles.segText, guestDays === d && styles.segTextOn]}>{d} jours</Text>
-                </Pressable>
-              ))}
+          <View style={[styles.modalSheet, { maxHeight: '92%', paddingBottom: 16 }]}>
+            <View style={styles.rowBetween}>
+              <View style={{ flex: 1, paddingRight: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, borderWidth: 1, borderColor: '#FDE68A' }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#92400E', textTransform: 'uppercase' }}>
+                      Norme ADD-29 · Scellé Numérique
+                    </Text>
+                  </View>
+                </View>
+                <Text style={[styles.h2, { fontSize: 19 }]}>Héberger un invité</Text>
+                <Text style={[styles.subMuted, { fontSize: 11, marginTop: 2 }]}>
+                  Bail réf. {bailRef} · Accueil temporaire certifié au sein du logement
+                </Text>
+              </View>
+              <Pressable onPress={() => setGuestModal(false)} style={{ padding: 6 }}>
+                <X color="#64748B" size={22} />
+              </Pressable>
             </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingBottom: 20 }}>
+              {/* BANNIÈRE D'INFORMATION */}
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#E2E8F0', flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
+                <ShieldCheck color="#1E7E4E" size={20} style={{ marginTop: 2 }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#0F172A' }}>
+                    Déclaration officielle d'accueil
+                  </Text>
+                  <Text style={{ fontSize: 11, color: '#64748B', lineHeight: 16, marginTop: 2 }}>
+                    Plafond légal : jusqu’à 10 occupants simultanés. Un scellé SHA-256 sera généré et permettra d'émettre l'attestation d'hébergement.
+                  </Text>
+                </View>
+              </View>
+
+              {/* SECTION 1 : IDENTITÉ CIVILE */}
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.label, { color: '#0F172A', fontSize: 12 }]}>1. IDENTITÉ CIVILE DE L’INVITÉ</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nom de famille de l’invité *"
+                  placeholderTextColor="#94A3B8"
+                  value={guestNom}
+                  onChangeText={setGuestNom}
+                  autoCapitalize="characters"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Prénoms complets de l’invité *"
+                  placeholderTextColor="#94A3B8"
+                  value={guestPrenoms}
+                  onChangeText={setGuestPrenoms}
+                />
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginTop: 2 }}>Sexe</Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    onPress={() => setGuestSexe('M')}
+                    style={[styles.segBtn, { flex: 1, alignItems: 'center' }, guestSexe === 'M' && styles.segBtnOn]}
+                  >
+                    <Text style={[styles.segText, guestSexe === 'M' && styles.segTextOn]}>Masculin (M)</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => setGuestSexe('F')}
+                    style={[styles.segBtn, { flex: 1, alignItems: 'center' }, guestSexe === 'F' && styles.segBtnOn]}
+                  >
+                    <Text style={[styles.segText, guestSexe === 'F' && styles.segTextOn]}>Féminin (F)</Text>
+                  </Pressable>
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Téléphone personnel (Ex: +225 07...)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestTel}
+                  onChangeText={setGuestTel}
+                  keyboardType="phone-pad"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Date de naissance (Ex: 1995-04-12)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestBirth}
+                  onChangeText={setGuestBirth}
+                />
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginTop: 2 }}>Pièce d'identité</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {PIECES_GUEST.map((p) => (
+                    <Pressable
+                      key={p.value}
+                      onPress={() => setGuestPieceType(p.value)}
+                      style={[styles.segBtn, guestPieceType === p.value && styles.segBtnOn]}
+                    >
+                      <Text style={[styles.segText, guestPieceType === p.value && styles.segTextOn]}>{p.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Numéro de pièce (CNI ou Passeport)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestNni}
+                  onChangeText={setGuestNni}
+                  autoCapitalize="characters"
+                />
+
+                <Pressable
+                  onPress={() => setGuestMineur(!guestMineur)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}
+                >
+                  <View style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 4,
+                    borderWidth: 1.5,
+                    borderColor: guestMineur ? '#1B4D3E' : '#94A3B8',
+                    backgroundColor: guestMineur ? '#1B4D3E' : 'transparent',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {guestMineur && <Check color="#fff" size={14} />}
+                  </View>
+                  <Text style={{ fontSize: 11, color: '#475569', flex: 1 }}>
+                    Cet invité est un enfant mineur à charge (sans obligation de téléphone)
+                  </Text>
+                </Pressable>
+              </View>
+
+              {/* SECTION 2 : LIEN AVEC LE TITULAIRE */}
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.label, { color: '#0F172A', fontSize: 12 }]}>2. QUALITÉ & LIEN AVEC LE TITULAIRE *</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {LIENS_GUEST.map((l) => (
+                    <Pressable
+                      key={l.value}
+                      onPress={() => setGuestLien(l.value)}
+                      style={[
+                        styles.segBtn,
+                        guestLien === l.value && { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' }
+                      ]}
+                    >
+                      <Text style={[styles.segText, guestLien === l.value && { color: '#FFFFFF' }]}>
+                        {l.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+
+              {/* SECTION 3 : CONDITIONS D'ARRIVÉE & DURÉE DU SÉJOUR */}
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.label, { color: '#0F172A', fontSize: 12 }]}>3. CONDITIONS D’ARRIVÉE & DURÉE DU SÉJOUR</Text>
+
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    onPress={() => applyGuestPreset(90, '90j')}
+                    style={[
+                      styles.segBtn,
+                      { flex: 1, alignItems: 'center' },
+                      guestTypeSejour === 'TEMPORAIRE' && { backgroundColor: '#D97706', borderColor: '#D97706' }
+                    ]}
+                  >
+                    <Text style={[styles.segText, guestTypeSejour === 'TEMPORAIRE' && { color: '#FFFFFF' }]}>
+                      Séjour temporaire / Invité
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => applyGuestPreset(null, 'custom')}
+                    style={[
+                      styles.segBtn,
+                      { flex: 1, alignItems: 'center' },
+                      guestTypeSejour === 'PERMANENT' && styles.segBtnOn
+                    ]}
+                  >
+                    <Text style={[styles.segText, guestTypeSejour === 'PERMANENT' && styles.segTextOn]}>
+                      Résidence continue
+                    </Text>
+                  </Pressable>
+                </View>
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginTop: 4 }}>Date d'arrivée effective</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Date d'arrivée (AAAA-MM-JJ)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestDateEntree}
+                  onChangeText={setGuestDateEntree}
+                />
+
+                {guestTypeSejour === 'TEMPORAIRE' && (
+                  <View style={{ backgroundColor: '#FFFBEB', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#FDE68A', gap: 8 }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#92400E' }}>
+                      DURÉE DE L'HÉBERGEMENT TEMPORAIRE :
+                    </Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {[
+                        { key: '15j' as const, label: '15 jours', days: 15 },
+                        { key: '30j' as const, label: '1 mois (30j)', days: 30 },
+                        { key: '90j' as const, label: '3 mois (90j)', days: 90 },
+                        { key: '180j' as const, label: '6 mois', days: 180 },
+                        { key: '1an' as const, label: '1 an', days: 365 },
+                      ].map((p) => (
+                        <Pressable
+                          key={p.key}
+                          onPress={() => applyGuestPreset(p.days, p.key)}
+                          style={[
+                            styles.segBtn,
+                            guestDureePreset === p.key && { backgroundColor: '#B45309', borderColor: '#B45309' }
+                          ]}
+                        >
+                          <Text style={[styles.segText, guestDureePreset === p.key && { color: '#FFFFFF' }]}>
+                            {p.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#92400E', marginTop: 4 }}>
+                      Date de fin de séjour prévue :
+                    </Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#FCD34D' }]}
+                      placeholder="Date de départ (AAAA-MM-JJ)"
+                      placeholderTextColor="#94A3B8"
+                      value={guestDateSortie}
+                      onChangeText={(t) => {
+                        setGuestDateSortie(t);
+                        setGuestDureePreset('custom');
+                      }}
+                    />
+                  </View>
+                )}
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginTop: 4 }}>Motif officiel du séjour</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {MOTIFS_GUEST.map((m) => (
+                    <Pressable
+                      key={m.value}
+                      onPress={() => setGuestMotifArrivee(m.value)}
+                      style={[
+                        styles.segBtn,
+                        guestMotifArrivee === m.value && styles.segBtnOn
+                      ]}
+                    >
+                      <Text style={[styles.segText, guestMotifArrivee === m.value && styles.segTextOn]}>
+                        {m.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Précisions sur les conditions d'accueil (optionnel)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestMotifPrecision}
+                  onChangeText={setGuestMotifPrecision}
+                />
+              </View>
+
+              {/* SECTION 4 : ESPACE OCCUPÉ & CONTACT D'URGENCE */}
+              <View style={{ gap: 8 }}>
+                <Text style={[styles.label, { color: '#0F172A', fontSize: 12 }]}>4. ESPACE OCCUPÉ & CONTACT D'URGENCE</Text>
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>Espace occupé dans le logement</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {ESPACES_GUEST.map((e) => (
+                    <Pressable
+                      key={e.value}
+                      onPress={() => setGuestEspaceOccupe(e.value)}
+                      style={[styles.segBtn, guestEspaceOccupe === e.value && styles.segBtnOn]}
+                    >
+                      <Text style={[styles.segText, guestEspaceOccupe === e.value && styles.segTextOn]}>{e.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginTop: 2 }}>Prise en charge financière</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                  {PRISES_EN_CHARGE_GUEST.map((p) => (
+                    <Pressable
+                      key={p.value}
+                      onPress={() => setGuestPriseEnCharge(p.value)}
+                      style={[styles.segBtn, guestPriseEnCharge === p.value && styles.segBtnOn]}
+                    >
+                      <Text style={[styles.segText, guestPriseEnCharge === p.value && styles.segTextOn]}>{p.label}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Contact d’urgence : Nom complet (Ex: M. KOUASSI Jean)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestContactUrgenceNom}
+                  onChangeText={setGuestContactUrgenceNom}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Téléphone d’urgence (Ex: +225 01...)"
+                  placeholderTextColor="#94A3B8"
+                  value={guestContactUrgenceTel}
+                  onChangeText={setGuestContactUrgenceTel}
+                  keyboardType="phone-pad"
+                />
+              </View>
+
+              {/* ENGAGEMENT SUR L'HONNEUR & SUBMIT */}
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#E2E8F0', gap: 10 }}>
+                <Pressable
+                  onPress={() => setGuestHonneur(!guestHonneur)}
+                  style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}
+                >
+                  <View style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 5,
+                    borderWidth: 2,
+                    borderColor: guestHonneur ? '#1E7E4E' : '#94A3B8',
+                    backgroundColor: guestHonneur ? '#1E7E4E' : 'transparent',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 2
+                  }}>
+                    {guestHonneur && <Check color="#fff" size={16} />}
+                  </View>
+                  <Text style={{ fontSize: 11, color: '#334155', lineHeight: 17, flex: 1, fontWeight: '500' }}>
+                    Je certifie sur l’honneur l’exactitude des informations fournies sur cet invité/occupant. Un scellé cryptographique SHA-256 certifié sera généré et rattaché au contrat de bail.
+                  </Text>
+                </Pressable>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', height: 50 }]}
+                disabled={submittingGuest}
+                onPress={handleSubmitGuest}
+              >
+                {submittingGuest ? (
+                  <>
+                    <ActivityIndicator color="#fff" size="small" />
+                    <Text style={styles.btnPrimaryText}>Enregistrement certifié en cours...</Text>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck color="#FFFFFF" size={18} />
+                    <Text style={styles.btnPrimaryText}>Valider l’Hébergement & Enregistrer</Text>
+                  </>
+                )}
+              </Pressable>
+
+              <Pressable style={styles.btnGhost} onPress={() => setGuestModal(false)}>
+                <Text style={styles.btnGhostText}>Annuler</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODALE DE SUCCÈS : CONFIRMATION D'HÉBERGEMENT */}
+      <Modal visible={!!guestSuccessModal} transparent animationType="fade" onRequestClose={() => setGuestSuccessModal(null)}>
+        <View style={styles.modalBackdrop}>
+          <View style={[styles.modalSheet, { gap: 14 }]}>
+            <View style={{ alignItems: 'center', marginVertical: 8 }}>
+              <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#DCFCE7', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                <CheckCircle2 color="#166534" size={32} />
+              </View>
+              <Text style={[styles.h2, { textAlign: 'center', fontSize: 18 }]}>
+                Hébergement Enregistré & Scellé
+              </Text>
+              <Text style={[styles.subMuted, { textAlign: 'center', fontSize: 12, marginTop: 4 }]}>
+                L'invité a été rattaché à votre contrat de bail avec succès.
+              </Text>
+            </View>
+
+            {guestSuccessModal && (
+              <View style={{ backgroundColor: '#F8FAFC', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E2E8F0', gap: 8 }}>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Invité(e)</Text>
+                  <Text style={[styles.boldText, { color: '#0F172A' }]}>{guestSuccessModal.nom}</Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Qualité</Text>
+                  <Text style={styles.boldText}>{OCCUPANT_LABELS[guestSuccessModal.lien] || guestSuccessModal.lien}</Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Période</Text>
+                  <Text style={[styles.boldText, { fontSize: 11 }]}>
+                    {guestSuccessModal.typeSejour === 'PERMANENT'
+                      ? `Depuis le ${guestSuccessModal.dateEntree}`
+                      : `Du ${guestSuccessModal.dateEntree} au ${guestSuccessModal.dateSortie}`}
+                  </Text>
+                </View>
+                <View style={styles.rowBetween}>
+                  <Text style={styles.subMuted}>Scellé SHA-256</Text>
+                  <Text style={{ fontSize: 10, fontFamily: 'monospace', color: '#1E7E4E', maxWidth: 160 }} numberOfLines={1}>
+                    {guestSuccessModal.sha256}
+                  </Text>
+                </View>
+              </View>
+            )}
+
             <Pressable
-              style={[styles.btnPrimary, { marginTop: 10 }]}
+              style={[styles.btnPrimary, { backgroundColor: '#1E7E4E' }]}
               onPress={() => {
-                if (!guestNom.trim()) {
-                  Alert.alert('Nom requis', 'Veuillez indiquer le nom et le prénom de votre invité.');
-                  return;
+                if (guestSuccessModal) {
+                  const text = `Attestation d'hébergement temporaire QAPRIL pour ${guestSuccessModal.nom} rattachée au bail ${bailRef}. Scellé SHA-256 : ${guestSuccessModal.sha256}`;
+                  Linking.openURL(`whatsapp://send?text=${encodeURIComponent(text)}`).catch(() => {
+                    Alert.alert('Attestation prête', text);
+                  });
                 }
-                setGuestModal(false);
-                Alert.alert(
-                  'Attestation générée',
-                  `L’attestation d’hébergement temporaire (${guestDays} jours) pour ${guestNom.trim()} a été générée avec son QR code de vérification.`
-                );
-                setGuestNom('');
               }}
             >
-              <Text style={styles.btnPrimaryText}>Générer l’attestation d’hébergement</Text>
+              <Share2 color="#fff" size={16} />
+              <Text style={styles.btnPrimaryText}>Partager l’attestation sur WhatsApp</Text>
             </Pressable>
-            <Pressable style={styles.btnGhost} onPress={() => setGuestModal(false)}>
-              <Text style={styles.btnGhostText}>Annuler</Text>
+
+            <Pressable
+              style={styles.btnSecondary}
+              onPress={() => {
+                setGuestSuccessModal(null);
+                loadOccupants();
+                setOccupantsModal(true);
+              }}
+            >
+              <Users color="#0F172A" size={16} />
+              <Text style={styles.btnSecondaryText}>Voir les occupants de mon foyer</Text>
+            </Pressable>
+
+            <Pressable style={styles.btnGhost} onPress={() => setGuestSuccessModal(null)}>
+              <Text style={styles.btnGhostText}>Fermer</Text>
             </Pressable>
           </View>
         </View>

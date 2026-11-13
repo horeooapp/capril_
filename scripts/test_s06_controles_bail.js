@@ -245,3 +245,4 @@ assert(dgiCasB.droitsEnregistrement === 75000, 'Droits 2.5% doivent être 75 000
 assert(dgiCasB.totalDroitsDgi === 76000, 'Total DGI doit être 76 000 FCFA');
 
 console.log('\n🎉 TOUS LES TESTS S-06 SONT VALIDÉS AVEC SUCCÈS (DoD CONFORME).');
+

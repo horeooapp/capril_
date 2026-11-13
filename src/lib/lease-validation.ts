@@ -176,3 +176,4 @@ export function validateLeaseInput(input: LeaseValidationInput): LeaseValidation
         recapitulatifDroitsEnregistrement,
     };
 }
+

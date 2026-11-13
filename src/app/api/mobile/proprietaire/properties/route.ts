@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { formatUserFriendlyError } from '@/lib/friendly-error';
 import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence } from '@/lib/geo-maposte';
+import { validerLieu } from '@/lib/lieux';
 
 /**
  * GET  /api/mobile/proprietaire/properties
@@ -127,12 +128,20 @@ export async function POST(request: Request) {
             precisionM
         } = body;
 
-        if (!address || !commune) {
-            return NextResponse.json({ error: "L'adresse et la commune sont obligatoires. Veuillez renseigner la localisation exacte du bien." }, { status: 400 });
+        // S-08 : Validation stricte contre le référentiel officiel config/lieux.json (refus de toute saisie libre -> 422)
+        const quartierInput = body.quartier || body.quartierNom;
+        const validationLieu = validerLieu(commune, quartierInput);
+        if (!validationLieu.ok) {
+            return NextResponse.json({
+                error: validationLieu.error,
+                code: validationLieu.code
+            }, { status: 422 });
         }
 
-        const cleanCommune = String(commune).trim();
-        const cleanAddress = String(address).trim();
+        const cleanCommune = validationLieu.commune!;
+        const cleanQuartier = validationLieu.quartier || null;
+        const cleanCity = validationLieu.ville || 'Abidjan';
+        const cleanAddress = String(address || '').trim() || `${cleanQuartier ? cleanQuartier + ', ' : ''}${cleanCommune}`;
 
         // Génération d'un code propriété garanti unique (Format QAPRIL HAB-ABJ-XXX-NNNNN)
         const count = await prisma.property.count({ where: { commune: cleanCommune } });
@@ -209,7 +218,8 @@ export async function POST(request: Request) {
                 name:             name ? String(name).trim() : cleanAddress,
                 address:          cleanAddress,
                 commune:          cleanCommune,
-                city:             city ? String(city).trim() : cleanCommune,
+                quartier:         cleanQuartier,
+                city:             cleanCity,
                 propertyType:     propertyType ?? 'APARTMENT',
                 typeStructure:    typeStructure ?? 'INDEPENDANT',
                 leaseType:        leaseType ?? 'residential',

@@ -1,0 +1,226 @@
+{
+  "version": "2026-11-13",
+  "description": "Référentiel QAPRIL des lieux (S-08) : ville → commune → quartiers, avec centres géographiques et points d'intérêt. Toute commune ou quartier saisi doit appartenir à ce référentiel.",
+  "villes": [
+    {
+      "nom": "Abidjan",
+      "communes": [
+        {
+          "nom": "Cocody", "centre": [5.3599, -3.9850], "rayon_km": 7.5,
+          "quartiers": [
+            { "nom": "Angré 8ème Tranche", "centre": [5.4050, -3.9880], "alias": ["Angré 8e Tranche", "Angre 8eme", "8ème Tranche", "8e Tranche"] },
+            { "nom": "Angré Château", "centre": [5.4180, -3.9820] },
+            { "nom": "Angré Mahou", "centre": [5.3950, -3.9900] },
+            { "nom": "Deux-Plateaux Vallons", "centre": [5.3620, -3.9990], "alias": ["Vallons", "II Plateaux Vallons"] },
+            { "nom": "Deux-Plateaux Aghien", "centre": [5.3780, -3.9870], "alias": ["Aghien"] },
+            { "nom": "Riviera 2", "centre": [5.3480, -3.9780] },
+            { "nom": "Riviera 3", "centre": [5.3520, -3.9610] },
+            { "nom": "Riviera 4", "centre": [5.3440, -3.9560], "alias": ["Riviera4"] },
+            { "nom": "Riviera Golf", "centre": [5.3350, -3.9800], "alias": ["Golf"] },
+            { "nom": "Riviera Palmeraie", "centre": [5.3680, -3.9450], "alias": ["Palmeraie"] },
+            { "nom": "Riviera Bonoumin", "centre": [5.3660, -3.9680], "alias": ["Bonoumin"] },
+            { "nom": "Riviera Faya", "centre": [5.3640, -3.9180], "alias": ["Faya"] },
+            { "nom": "M'Pouto", "centre": [5.3350, -3.9480], "alias": ["Mpouto", "Riviera M'Pouto"] },
+            { "nom": "Danga", "centre": [5.3390, -3.9990] },
+            { "nom": "Ambassades", "centre": [5.3360, -3.9930], "alias": ["Quartier des Ambassades", "Quartier Ambassades"] },
+            { "nom": "Blockhauss", "centre": [5.3280, -4.0010] },
+            { "nom": "Abatta", "centre": [5.3580, -3.9020] },
+            { "nom": "Attoban", "centre": [5.3720, -3.9620] }
+          ]
+        },
+        {
+          "nom": "Marcory", "centre": [5.3020, -3.9830], "rayon_km": 4.5,
+          "quartiers": [
+            { "nom": "Zone 4", "centre": [5.2890, -3.9780], "alias": ["Zone 4C", "Zone IV"] },
+            { "nom": "Biétry", "centre": [5.2850, -3.9900] },
+            { "nom": "Marcory Résidentiel", "centre": [5.3050, -3.9870], "alias": ["Résidentiel"] },
+            { "nom": "Remblais", "centre": [5.3080, -3.9750] },
+            { "nom": "Anoumabo", "centre": [5.3080, -3.9620] },
+            { "nom": "Champroux", "centre": [5.3040, -3.9950], "alias": ["Hibiscus"] }
+          ]
+        },
+        {
+          "nom": "Plateau", "centre": [5.3240, -4.0190], "rayon_km": 3.0,
+          "quartiers": [
+            { "nom": "Centre des Affaires", "centre": [5.3240, -4.0190] },
+            { "nom": "Cité Administrative", "centre": [5.3310, -4.0180] },
+            { "nom": "Indénié", "centre": [5.3360, -4.0140] }
+          ]
+        },
+        {
+          "nom": "Treichville", "centre": [5.3050, -4.0080], "rayon_km": 3.5,
+          "quartiers": [
+            { "nom": "Avenue 16", "centre": [5.3080, -4.0060] },
+            { "nom": "Arras", "centre": [5.3010, -4.0110] },
+            { "nom": "Bellegarde", "centre": [5.3120, -4.0040] },
+            { "nom": "Grand Marché", "centre": [5.3060, -4.0090] },
+            { "nom": "Zone Portuaire", "centre": [5.2950, -4.0180] }
+          ]
+        },
+        {
+          "nom": "Yopougon", "centre": [5.3450, -4.0780], "rayon_km": 8.0,
+          "quartiers": [
+            { "nom": "Niangon Lokoa", "centre": [5.3390, -4.1120] },
+            { "nom": "Niangon Sud", "centre": [5.3250, -4.1080] },
+            { "nom": "Maroc", "centre": [5.3620, -4.0880] },
+            { "nom": "Bel Air", "centre": [5.3520, -4.0720] },
+            { "nom": "Toits Rouges", "centre": [5.3380, -4.0880] },
+            { "nom": "Selmer", "centre": [5.3420, -4.0680] },
+            { "nom": "Siporex", "centre": [5.3500, -4.0580] },
+            { "nom": "Gesco", "centre": [5.3850, -4.1120] },
+            { "nom": "Kouté", "centre": [5.3480, -4.0920] },
+            { "nom": "Sideci", "centre": [5.3540, -4.0820] }
+          ]
+        },
+        {
+          "nom": "Koumassi", "centre": [5.3010, -3.9510], "rayon_km": 4.5,
+          "quartiers": [
+            { "nom": "Remblais", "centre": [5.3050, -3.9620] },
+            { "nom": "Prodomo", "centre": [5.2980, -3.9550] },
+            { "nom": "Campement", "centre": [5.2890, -3.9480] },
+            { "nom": "Sopim", "centre": [5.3040, -3.9520] },
+            { "nom": "Zone Industrielle", "centre": [5.2920, -3.9650] }
+          ]
+        },
+        {
+          "nom": "Port-Bouët", "centre": [5.2580, -3.9480], "rayon_km": 7.0,
+          "quartiers": [
+            { "nom": "Vridi", "centre": [5.2650, -4.0050] },
+            { "nom": "Gonzagueville", "centre": [5.2480, -3.8950] },
+            { "nom": "Derrière-Wharf", "centre": [5.2490, -3.9620] },
+            { "nom": "Jean Folly", "centre": [5.2450, -3.8750] },
+            { "nom": "Adjouffou", "centre": [5.2520, -3.9180] }
+          ]
+        },
+        {
+          "nom": "Adjamé", "centre": [5.3620, -4.0260], "rayon_km": 4.0,
+          "quartiers": [
+            { "nom": "220 Logements", "centre": [5.3550, -4.0190] },
+            { "nom": "Liberté", "centre": [5.3620, -4.0250] },
+            { "nom": "Bracodi", "centre": [5.3680, -4.0220] },
+            { "nom": "Williamsville", "centre": [5.3780, -4.0280] },
+            { "nom": "Mirador", "centre": [5.3580, -4.0320] },
+            { "nom": "Paillet", "centre": [5.3750, -4.0380] }
+          ]
+        },
+        {
+          "nom": "Attécoubé", "centre": [5.3420, -4.0410], "rayon_km": 4.0,
+          "quartiers": [
+            { "nom": "Locodjro", "centre": [5.3280, -4.0480] },
+            { "nom": "Abobo-Doumé", "centre": [5.3220, -4.0550] },
+            { "nom": "Agban", "centre": [5.3520, -4.0350] },
+            { "nom": "Santé", "centre": [5.3410, -4.0450] }
+          ]
+        },
+        {
+          "nom": "Abobo", "centre": [5.4180, -4.0180], "rayon_km": 7.5,
+          "quartiers": [
+            { "nom": "Samaké", "centre": [5.4150, -4.0180] },
+            { "nom": "Avocatier", "centre": [5.4280, -4.0120] },
+            { "nom": "Clouetcha", "centre": [5.4050, -4.0220] },
+            { "nom": "Abobo Baoulé", "centre": [5.4220, -3.9980] },
+            { "nom": "Plateau Dokui", "centre": [5.3980, -4.0050], "alias": ["Dokui"] },
+            { "nom": "PK18", "centre": [5.4450, -4.0280], "alias": ["PK 18"] },
+            { "nom": "N'Dotré", "centre": [5.4650, -4.0380], "alias": ["Ndotre"] },
+            { "nom": "Sagbé", "centre": [5.4120, -4.0320] },
+            { "nom": "Kennedy", "centre": [5.4190, -4.0250] },
+            { "nom": "Anador", "centre": [5.4090, -4.0150] }
+          ]
+        },
+        {
+          "nom": "Bingerville", "centre": [5.3580, -3.8920], "rayon_km": 6.0,
+          "quartiers": [
+            { "nom": "Feh Kessé", "centre": [5.3620, -3.9180], "alias": ["Feh Kesse"] },
+            { "nom": "Akandjé", "centre": [5.3700, -3.9300], "alias": ["Akandje"] },
+            { "nom": "Blanchon", "centre": [5.3540, -3.8950] },
+            { "nom": "Gbagba", "centre": [5.3680, -3.8820] },
+            { "nom": "Savane", "centre": [5.3520, -3.8750] }
+          ]
+        },
+        {
+          "nom": "Songon", "centre": [5.3210, -4.2480], "rayon_km": 9.0,
+          "quartiers": [
+            { "nom": "Songon Agban", "centre": [5.3210, -4.2480] },
+            { "nom": "Songon Kassemblé", "centre": [5.3280, -4.2250] },
+            { "nom": "Bimbresso", "centre": [5.3450, -4.1850] }
+          ]
+        },
+        {
+          "nom": "Anyama", "centre": [5.4950, -4.0520], "rayon_km": 7.0,
+          "quartiers": [
+            { "nom": "Belle-Ville", "centre": [5.4920, -4.0480] },
+            { "nom": "Schneider", "centre": [5.4980, -4.0550] },
+            { "nom": "Zossonkoi", "centre": [5.5050, -4.0420] }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Grand-Bassam",
+      "communes": [
+        {
+          "nom": "Grand-Bassam", "centre": [5.2120, -3.7380], "rayon_km": 6.5,
+          "quartiers": [
+            { "nom": "Quartier France", "centre": [5.1980, -3.7350] },
+            { "nom": "Mockeyville", "centre": [5.2150, -3.7420] },
+            { "nom": "Impérial", "centre": [5.2050, -3.7250] }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Yamoussoukro",
+      "communes": [
+        {
+          "nom": "Yamoussoukro", "centre": [6.8210, -5.2760], "rayon_km": 9.0,
+          "quartiers": [
+            { "nom": "Habitat", "centre": [6.8150, -5.2680] },
+            { "nom": "Dioulakro", "centre": [6.8220, -5.2750] },
+            { "nom": "Morofé", "centre": [6.8350, -5.2580] },
+            { "nom": "Basilique", "centre": [6.8110, -5.2950] }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Bouaké",
+      "communes": [
+        {
+          "nom": "Bouaké", "centre": [7.6910, -5.0310], "rayon_km": 10.0,
+          "quartiers": [
+            { "nom": "Commerce", "centre": [7.6890, -5.0280] },
+            { "nom": "Air France", "centre": [7.7020, -5.0180] },
+            { "nom": "Nimbo", "centre": [7.6820, -5.0420] },
+            { "nom": "Koko", "centre": [7.6950, -5.0350] },
+            { "nom": "Kennedy", "centre": [7.6780, -5.0220] }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "San Pedro",
+      "communes": [
+        {
+          "nom": "San Pedro", "centre": [4.7520, -6.6420], "rayon_km": 8.0,
+          "quartiers": [
+            { "nom": "Cité", "centre": [4.7480, -6.6450] },
+            { "nom": "Bardot", "centre": [4.7580, -6.6380] },
+            { "nom": "Séwéké", "centre": [4.7620, -6.6510] },
+            { "nom": "Balmer", "centre": [4.7380, -6.6280] }
+          ]
+        }
+      ]
+    }
+  ],
+  "points_interet": [
+    { "nom": "Université Félix Houphouët-Boigny", "commune": "Cocody", "centre": [5.3449, -3.9871] },
+    { "nom": "CHU de Cocody", "commune": "Cocody", "centre": [5.3456, -4.0006] },
+    { "nom": "Plateau (centre des affaires)", "commune": "Plateau", "centre": [5.3240, -4.0190] },
+    { "nom": "Aéroport Félix Houphouët-Boigny", "commune": "Port-Bouët", "centre": [5.2580, -3.9320] },
+    { "nom": "Gare routière d'Adjamé", "commune": "Adjamé", "centre": [5.3600, -4.0230] },
+    { "nom": "Port autonome d'Abidjan", "commune": "Treichville", "centre": [5.2950, -4.0180] },
+    { "nom": "Zone industrielle de Yopougon", "commune": "Yopougon", "centre": [5.3600, -4.1000] },
+    { "nom": "Carrefour de la Vie", "commune": "Cocody", "centre": [5.3720, -3.9870] }
+  ]
+}
+

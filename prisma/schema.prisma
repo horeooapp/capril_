@@ -279,6 +279,7 @@ model Property {
   propertyType               String                @map("property_type")
   leaseType                  String                @default("residential") @map("lease_type")
   commune                    String
+  quartier                   String?               @map("quartier")
   address                    String
   rooms                      Int?
   bedrooms                   Int?
@@ -377,6 +378,7 @@ model Property {
 
   @@index([ownerUserId])
   @@index([commune])
+  @@index([commune, quartier])
   @@index([status])
   @@index([parentPropertyId])
   @@index([managedByUserId])
