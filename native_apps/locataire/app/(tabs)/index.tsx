@@ -3113,12 +3113,16 @@ export default function LocatairePrototypeScreen() {
                   }
                   setSubmittingPayAutrement(true);
                   try {
+                    // S-14 — Clé d'idempotence : moyen+montant+mois pour éviter les doubles soumissions
+                    const moisActuel = new Date().toISOString().substring(0, 7);
+                    const iKey = `${data?.lease?.id ?? 'unknown'}-${moisActuel}-${finalMontant}-${autreMoyen}`;
                     const res = await fetchWithAuth('/locataire/declarer-paiement', {
                       method: 'POST',
                       body: JSON.stringify({
                         moyen: autreMoyen,
                         montant: finalMontant,
                         datePaiement: new Date().toISOString(),
+                        idempotencyKey: iKey,
                       }),
                     });
                     const json = await res.json();
