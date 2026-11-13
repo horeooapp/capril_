@@ -25,6 +25,7 @@ import {
   Bell,
   CheckCircle2,
   ShieldCheck,
+  Shield,
   FileText,
   CalendarClock,
   Lock,
@@ -173,7 +174,7 @@ const MENU_ITEMS = [
   { id: 'caution' as LocScreen, label: 'Ma caution', desc: 'Ma caution, bloquée jusqu’aux clés', icon: ShieldCheck },
   { id: 'bail' as LocScreen, label: 'Mon contrat de bail', desc: 'Clauses, reconduction et état des lieux', icon: FileSpreadsheet },
   { id: 'documents' as LocScreen, label: 'Mes documents', desc: 'Attestations, pièces et quittances', icon: Folder },
-  { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Tranche de confiance et ponctualité', icon: UserCheck },
+  { id: 'passeport' as LocScreen, label: 'Passeport locatif', desc: 'Tranche de confiance et ponctualité', icon: Shield },
   { id: 'recherche' as LocScreen, label: 'Trouver un logement', desc: 'Offres vérifiées et compatibles', icon: Search },
   { id: 'manuel' as LocScreen, label: 'Manuel d\'utilisation', desc: 'Guide officiel complet v2.0 certifié', icon: BookOpen },
 ];
@@ -1178,6 +1179,11 @@ export default function LocatairePrototypeScreen() {
                       if (item.id === 'manuel') {
                         setMenuOpen(false);
                         Linking.openURL('https://qapril.net/manuel');
+                        return;
+                      }
+                      if (item.id === 'passeport') {
+                        setMenuOpen(false);
+                        router.push('/(tabs)/passeport' as any);
                         return;
                       }
                       setScreen(item.id);

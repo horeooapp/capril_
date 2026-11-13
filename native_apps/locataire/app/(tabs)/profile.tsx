@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
-import { ShieldCheck, Lock, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download, ChevronRight } from 'lucide-react-native';
+import { ShieldCheck, Shield, Lock, LogOut, RefreshCw, Mail, Edit2, BookOpen, ExternalLink, Download, ChevronRight } from 'lucide-react-native';
 import { fetchWithAuth, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { BUILD_NUMBER, APP_VERSION, BUILD_TIMESTAMP } from '../../lib/version';
 
@@ -225,9 +225,9 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <Pressable style={styles.card} onPress={() => router.push('/passeport')}>
+            <Pressable style={styles.card} onPress={() => router.push('/(tabs)/passeport' as any)}>
               <View style={styles.row}>
-                <ShieldCheck color="#2C3E6B" size={20} />
+                <Shield color="#2C3E6B" size={20} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.cardTitle}>Passeport locataire</Text>
                   <Text style={styles.cardSub}>

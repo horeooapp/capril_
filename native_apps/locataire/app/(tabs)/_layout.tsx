@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import { Home, ShieldCheck, CreditCard, Search, User, FileText, Wrench, MessageCircle } from 'lucide-react-native';
+import { Home, ShieldCheck, Shield, CreditCard, Search, User, FileText, Wrench, MessageCircle } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
@@ -94,6 +94,16 @@ export default function TabLayout() {
           title: 'Moi',
           tabBarAccessibilityLabel: 'Moi',
           tabBarIcon: ({ color, focused }) => <User color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
+        }}
+      />
+
+      {/* Passeport avec Logotype Shield officiel */}
+      <Tabs.Screen
+        name="passeport"
+        options={{
+          title: 'Passeport',
+          tabBarAccessibilityLabel: 'Passeport locataire',
+          tabBarIcon: ({ color, focused }) => <Shield color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
         }}
       />
 
