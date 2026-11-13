@@ -263,7 +263,7 @@ export default function KycVerificationModal({
               </View>
 
               <Pressable style={styles.primaryBtn} onPress={() => setStep('document')}>
-                <Text style={styles.primaryBtnText}>Commencer la vérification bancaire</Text>
+                <Text style={styles.primaryBtnText}>Commencer la vérification</Text>
                 <ArrowRight color="#FFFFFF" size={18} />
               </Pressable>
             </ScrollView>
@@ -955,3 +955,4 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 });
+
