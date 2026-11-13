@@ -31,7 +31,9 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "USE_BIOMETRIC",
-        "USE_FINGERPRINT"
+        "USE_FINGERPRINT",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
       ],
       "versionCode": 17
     },
@@ -39,6 +41,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autoriser $(PRODUCT_NAME) à accéder à vos photos pour la numérisation de vos documents d'identité.",
+          "cameraPermission": "Autoriser $(PRODUCT_NAME) à utiliser l'appareil photo pour la numérisation de votre pièce d'identité et le contrôle facial KYC."
+        }
+      ],
       [
         "expo-local-authentication",
         {
