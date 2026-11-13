@@ -156,20 +156,22 @@ export default function KycVerificationModal({
     onClose();
   };
 
-  // ─────────────────────────────────────────────────────────────
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   // CAPTURE CAMERA RECTO
-  // ─────────────────────────────────────────────────────────────
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const handleLaunchCameraRecto = async () => {
+    setIsCapturingRecto(true);
     try {
-      setIsCapturingRecto(true);
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
         Alert.alert(
-          'Capture de la pièce',
-          'L’appareil photo natif nécessite la dernière mise à jour de l’application. Votre pièce officielle est enregistrée pour votre dossier KYC.',
-          [{ text: 'Continuer', onPress: () => setRectoUri('capture://recto_piece.jpg') }]
+          'Mise \u00e0 jour requise',
+          "L'appareil photo n\u00e9cessite la derni\u00e8re version de l'application. Veuillez mettre \u00e0 jour et r\u00e9essayer, ou s\u00e9lectionner depuis la galerie.",
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Depuis la galerie', onPress: handlePickFromGalleryRecto },
+          ]
         );
-        setIsCapturingRecto(false);
         return;
       }
 
@@ -177,13 +179,12 @@ export default function KycVerificationModal({
       if (!perm.granted) {
         Alert.alert(
           'Permission requise',
-          'Veuillez autoriser l’accès à l’appareil photo dans les paramètres de votre téléphone.',
+          "Veuillez autoriser l'acc\u00e8s \u00e0 l'appareil photo dans les param\u00e8tres de votre t\u00e9l\u00e9phone.",
           [
             { text: 'Annuler', style: 'cancel' },
-            { text: 'Choisir depuis la galerie', onPress: handlePickFromGalleryRecto },
+            { text: 'Depuis la galerie', onPress: handlePickFromGalleryRecto },
           ]
         );
-        setIsCapturingRecto(false);
         return;
       }
 
@@ -198,7 +199,14 @@ export default function KycVerificationModal({
       }
     } catch (err: any) {
       console.warn('Erreur camera recto:', err);
-      setRectoUri('capture://recto_piece.jpg');
+      Alert.alert(
+        'Erreur appareil photo',
+        'Impossible d\'ouvrir l\'appareil photo. Veuillez r\u00e9essayer ou choisir depuis la galerie.',
+        [
+          { text: 'OK', style: 'cancel' },
+          { text: 'Depuis la galerie', onPress: handlePickFromGalleryRecto },
+        ]
+      );
     } finally {
       setIsCapturingRecto(false);
     }
@@ -208,7 +216,7 @@ export default function KycVerificationModal({
     try {
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
-        setRectoUri('capture://recto_piece.jpg');
+        Alert.alert('Erreur', "Impossible d'acc\u00e9der \u00e0 la galerie. Veuillez mettre \u00e0 jour l'application.");
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -220,34 +228,39 @@ export default function KycVerificationModal({
       }
     } catch (err) {
       console.warn('Erreur galerie recto:', err);
-      setRectoUri('capture://recto_piece.jpg');
+      Alert.alert('Erreur', "Impossible d'acc\u00e9der \u00e0 la galerie photo.");
     }
   };
 
-  // ─────────────────────────────────────────────────────────────
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   // CAPTURE CAMERA VERSO
-  // ─────────────────────────────────────────────────────────────
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const handleLaunchCameraVerso = async () => {
+    setIsCapturingVerso(true);
     try {
-      setIsCapturingVerso(true);
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
         Alert.alert(
-          'Enregistrement verso',
-          'Le verso a été enregistré pour votre dossier de vérification.',
-          [{ text: 'Continuer', onPress: () => setVersoUri('capture://verso_piece.jpg') }]
+          'Mise \u00e0 jour requise',
+          "L'appareil photo n\u00e9cessite la derni\u00e8re version de l'application. Veuillez mettre \u00e0 jour et r\u00e9essayer, ou s\u00e9lectionner depuis la galerie.",
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Depuis la galerie', onPress: handlePickFromGalleryVerso },
+          ]
         );
-        setIsCapturingVerso(false);
         return;
       }
 
       const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (!perm.granted) {
-        Alert.alert('Permission requise', 'Veuillez autoriser l’appareil photo.', [
-          { text: 'Annuler', style: 'cancel' },
-          { text: 'Choisir depuis la galerie', onPress: handlePickFromGalleryVerso },
-        ]);
-        setIsCapturingVerso(false);
+        Alert.alert(
+          'Permission requise',
+          "Veuillez autoriser l'appareil photo dans les param\u00e8tres.",
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Depuis la galerie', onPress: handlePickFromGalleryVerso },
+          ]
+        );
         return;
       }
 
@@ -262,7 +275,14 @@ export default function KycVerificationModal({
       }
     } catch (err: any) {
       console.warn('Erreur camera verso:', err);
-      setVersoUri('capture://verso_piece.jpg');
+      Alert.alert(
+        'Erreur appareil photo',
+        'Impossible d\'ouvrir l\'appareil photo. Veuillez r\u00e9essayer ou choisir depuis la galerie.',
+        [
+          { text: 'OK', style: 'cancel' },
+          { text: 'Depuis la galerie', onPress: handlePickFromGalleryVerso },
+        ]
+      );
     } finally {
       setIsCapturingVerso(false);
     }
@@ -272,7 +292,7 @@ export default function KycVerificationModal({
     try {
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
-        setVersoUri('capture://verso_piece.jpg');
+        Alert.alert('Erreur', "Impossible d'acc\u00e9der \u00e0 la galerie. Veuillez mettre \u00e0 jour l'application.");
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -284,30 +304,36 @@ export default function KycVerificationModal({
       }
     } catch (err) {
       console.warn('Erreur galerie verso:', err);
-      setVersoUri('capture://verso_piece.jpg');
+      Alert.alert('Erreur', "Impossible d'acc\u00e9der \u00e0 la galerie photo.");
     }
   };
 
-  // ─────────────────────────────────────────────────────────────
-  // CAPTURE CONTRÔLE FACIAL (SELFIE CAMÉRA FRONTALE)
-  // ─────────────────────────────────────────────────────────────
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // CAPTURE CONTR\u00d4LE FACIAL (SELFIE CAM\u00c9RA FRONTALE)
+  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
   const handleLaunchSelfieCamera = async () => {
+    setIsCapturingSelfie(true);
     try {
-      setIsCapturingSelfie(true);
       const ImagePicker = getImagePicker();
       if (!ImagePicker) {
-        // Si caméra directe pas dans ce binaire, passer directement à la biométrie matérielle
-        await triggerNativeBiometrics();
-        setSelfieUri('capture://selfie_visage.jpg');
-        setIsCapturingSelfie(false);
+        Alert.alert(
+          'Selfie non disponible',
+          "L'appareil photo n\u00e9cessite une mise \u00e0 jour. Utilisez le capteur biom\u00e9trique pour valider votre identit\u00e9.",
+          [{ text: 'Capteur biom\u00e9trique', onPress: () => triggerNativeBiometrics() }]
+        );
         return;
       }
 
       const perm = await ImagePicker.requestCameraPermissionsAsync();
       if (!perm.granted) {
-        await triggerNativeBiometrics();
-        setSelfieUri('capture://selfie_visage.jpg');
-        setIsCapturingSelfie(false);
+        Alert.alert(
+          'Permission requise',
+          "Veuillez autoriser l'acc\u00e8s \u00e0 l'appareil photo, ou utilisez le capteur biom\u00e9trique.",
+          [
+            { text: 'Annuler', style: 'cancel' },
+            { text: 'Capteur biom\u00e9trique', onPress: () => triggerNativeBiometrics() },
+          ]
+        );
         return;
       }
 
@@ -322,13 +348,18 @@ export default function KycVerificationModal({
       if (!result.canceled && result.assets && result.assets.length > 0) {
         setSelfieUri(result.assets[0].uri);
         triggerNativeBiometrics();
-      } else {
-        triggerNativeBiometrics();
       }
+      // Si annul\u00e9 \u2192 ne rien faire, l'utilisateur peut r\u00e9essayer ou utiliser le capteur
     } catch (err: any) {
       console.warn('Erreur selfie camera:', err);
-      setSelfieUri('capture://selfie_visage.jpg');
-      triggerNativeBiometrics();
+      Alert.alert(
+        'Erreur appareil photo',
+        "Impossible d'ouvrir la cam\u00e9ra frontale. Utilisez le capteur biom\u00e9trique.",
+        [
+          { text: 'OK', style: 'cancel' },
+          { text: 'Capteur biom\u00e9trique', onPress: () => triggerNativeBiometrics() },
+        ]
+      );
     } finally {
       setIsCapturingSelfie(false);
     }
@@ -454,8 +485,8 @@ export default function KycVerificationModal({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 80}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.overlay}>
@@ -476,7 +507,7 @@ export default function KycVerificationModal({
 
               {/* Étape : INTRODUCTION */}
               {step === 'intro' && (
-                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 32 }]} keyboardShouldPersistTaps="handled">
                   <View style={styles.badgeBanner}>
                     <Lock color="#1B4D3E" size={16} />
                     <Text style={styles.badgeBannerText}>Certification d'identité souveraine et bancaire</Text>
@@ -517,7 +548,7 @@ export default function KycVerificationModal({
 
               {/* Étape 1 : SÉLECTION DU DOCUMENT */}
               {step === 'document' && (
-                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 32 }]} keyboardShouldPersistTaps="handled">
                   <Text style={styles.sectionTitle}>1. Type de pièce d'identité</Text>
                   <Text style={styles.sectionSubtitle}>
                     Sélectionnez votre pièce officielle en cours de validité.
@@ -604,7 +635,7 @@ export default function KycVerificationModal({
 
               {/* Étape 2 : PRISE DE PHOTO RECTO / VERSO */}
               {step === 'scan' && (
-                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 32 }]} keyboardShouldPersistTaps="handled">
                   <Text style={styles.sectionTitle}>2. Capture de votre document</Text>
                   <Text style={styles.sectionSubtitle}>
                     Prenez une vraie photo nette de votre document avec l'appareil photo de votre smartphone.
@@ -782,7 +813,7 @@ export default function KycVerificationModal({
 
               {/* Étape 3 : CONTRÔLE DU VISAGE & BIOMÉTRIE */}
               {step === 'liveness' && (
-                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 32 }]} keyboardShouldPersistTaps="handled">
                   <Text style={styles.sectionTitle}>3. Contrôle du visage & Vivacité</Text>
                   <Text style={styles.sectionSubtitle}>
                     Standard bancaire anti-usurpation. Prenez un selfie net de face pour certifier votre identité.
@@ -904,7 +935,7 @@ export default function KycVerificationModal({
 
               {/* Étape 4 : RAPPROCHEMENT BANCAIRE / MOBILE MONEY */}
               {step === 'bank' && (
-                <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+                <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 32 }]} keyboardShouldPersistTaps="handled">
                   <Text style={styles.sectionTitle}>4. Rapprochement Bancaire & Mobile Money</Text>
                   <Text style={styles.sectionSubtitle}>
                     Associez le compte de paiement émis au même nom officiel pour valider la solvabilité légale.
