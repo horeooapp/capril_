@@ -16,6 +16,6 @@ def run(cmd):
         print("[ERR]", err)
     return out
 
-run("cd /opt/qapril && git pull origin main && docker compose build app && docker compose up -d app")
+run("cd /opt/qapril && git pull origin main && docker compose build migrate app && docker compose up -d")
 ssh.close()
 
