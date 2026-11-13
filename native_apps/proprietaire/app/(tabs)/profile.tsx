@@ -14,6 +14,9 @@ import {
   Modal,
   TextInput,
   Linking,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -265,6 +268,11 @@ export default function ProfileScreen() {
 
       {/* Modal Modification Adresse Mail */}
       <Modal visible={editEmailVisible} transparent animationType="fade">
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
@@ -304,6 +312,8 @@ export default function ProfileScreen() {
             </View>
           </View>
         </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Modal Option Diaspora (IC-01 V.diaspora) */}
