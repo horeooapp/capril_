@@ -283,7 +283,7 @@ export default function ProfileScreen() {
               <Text style={styles.btnDangerText}>Se déconnecter</Text>
             </Pressable>
 
-            {/* Badge officiel de Version & Mise à jour OTA */}
+            {/* Badge officiel de Version & Mise à jour */}
             <AppVersionBadge />
           </>
         )}
