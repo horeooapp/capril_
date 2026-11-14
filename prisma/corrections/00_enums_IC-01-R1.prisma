@@ -1,0 +1,148 @@
+// ============================================================================
+// QAPRIL — AUD-01 / Correctif schéma — Énumérations (IC-M3)
+// Règle : aucune valeur de statut en String libre. Chaque enum ci-dessous
+// remplace un champ `String @default("...")` du schéma du 14/11.
+// Les libellés affichés viennent de enums.json (kit IC-01-R1), jamais d'ici.
+// ============================================================================
+
+enum CandidatureStatut {
+  ENVOYEE
+  VUE
+  VISITE_PROPOSEE
+  RETENUE
+  NON_RETENUE
+  RETIREE
+  EXPIREE
+}
+
+enum AnnonceStatut {
+  BROUILLON
+  PUBLIEE
+  SUSPENDUE
+  LOUEE
+  EXPIREE
+  RETIREE
+}
+
+enum StatutPosition {
+  MANQUANTE
+  PROVISOIRE
+  CONFIRMEE
+  GELEE
+}
+
+enum NiveauCertification {
+  NON_CERTIFIE
+  DECLARE
+  CERTIFIE_QAPRIL
+  ENREGISTRE_DGI
+}
+
+enum PropertyStatus {
+  BROUILLON
+  DISPONIBLE
+  LOUE
+  INDISPONIBLE
+  ARCHIVE
+}
+
+enum ReceiptStatus {
+  EMISE
+  ACOMPTE
+  IMPAYEE
+  ANNULEE
+}
+
+enum KycStatus {
+  PENDING
+  ACTIF
+  SUSPENDU
+  CLOS
+}
+
+enum NiveauVerificationBien {
+  N1_DECLARE
+  N2_POSITION_CONFIRMEE
+  N3_TITRE_CONTROLE
+  N4_VISITE_AGENCE
+}
+
+enum RecouvrementStatut {
+  A_JOUR
+  RETARD
+  IMPAYE
+  MISE_EN_DEMEURE
+  PLAN_APUREMENT
+  CLEMENCE
+  PROCEDURE
+}
+
+enum MandatStatut {
+  PROPOSE
+  SIGNE_MANDANT
+  ACTIF
+  SUSPENDU
+  TERMINE
+}
+
+enum OccupantStatut {
+  DECLARE
+  EN_ATTENTE_BAILLEUR
+  CONFIRME
+  REFUSE
+  CADUC
+  CLOS
+}
+
+enum LienOccupant {
+  CONJOINT
+  ENFANT_MAJEUR
+  ENFANT_MINEUR
+  PARENT
+  AUTRE_FAMILLE
+  HEBERGE
+  COLOCATAIRE
+  EMPLOYE_DOMESTIQUE
+}
+
+enum NiveauAttestation {
+  A
+  B
+  C
+}
+
+enum AttestationStatut {
+  VALIDE
+  EXPIREE
+  REVOQUEE
+}
+
+enum MaPosteStatut {
+  NON_DEMANDEE
+  A_CREER
+  EN_LOT
+  CREEE
+  EXISTANTE_RATTACHEE
+  REFUSEE
+  REVOQUEE
+}
+
+enum CapturePositionResultat {
+  ACCEPTEE
+  REFUSEE
+}
+
+enum CapturePositionMotifRefus {
+  PRECISION
+  HORS_COMMUNE
+  ZONE
+  SIMULEE
+}
+
+enum RoleContexte {
+  LOCATAIRE
+  BAILLEUR
+  AGENCE
+  INTERMEDIAIRE
+  ADMIN
+}

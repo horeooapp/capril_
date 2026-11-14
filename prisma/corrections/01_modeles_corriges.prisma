@@ -1,0 +1,214 @@
+// ============================================================================
+// QAPRIL — AUD-01 / Correctif schéma — Modèles corrigés
+// Convention : seules les lignes marquées  // [M-xx]  changent par rapport au
+// schéma du 14/11. Les autres lignes sont rappelées pour le contexte.
+// Les champs marqués  // [SUPPRIMER]  sont retirés par migration.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// B5 — Identité : numéro d'abord
+// ----------------------------------------------------------------------------
+model User {
+  id              String     @id @default(uuid()) @map("user_id")
+  phone           String     @unique                                   // [M-05] obligatoire
+  email           String?                                              // [M-05] optionnel, non unique
+  emailVerifieAt  DateTime?  @map("email_verifie_at")                  // [M-05]
+  kycStatus       KycStatus  @default(PENDING) @map("kyc_status")      // [M-04]
+  kycLevel        Int        @default(0) @map("kyc_level")
+  capaciteActive  RoleContexte? @map("capacite_active")                // [M-09] plus de PROPRIETAIRE par défaut
+  // salary        Float?                                              // [SUPPRIMER] [M-10] ADD-21 : le revenu vit dans LocataireProfile, chiffré
+  // ... autres champs inchangés
+  @@unique([email, emailVerifieAt])                                    // [M-05] unicité seulement si vérifié (index partiel en SQL)
+  @@map("users")
+}
+
+// ----------------------------------------------------------------------------
+// B1 — Candidature : une candidature vivante par (candidat, annonce)
+// ----------------------------------------------------------------------------
+model Candidature {
+  id               String            @id @default(uuid()) @map("cand_id")
+  annonceId        String            @map("annonce_id")                // [M-01] obligatoire
+  logementId       String            @map("logement_id")
+  candidatId       String            @map("candidat_id")               // [M-01] obligatoire
+  statut           CandidatureStatut @default(ENVOYEE)                 // [M-04]
+  trancheConfiance String?           @map("tranche_confiance")         // [M-10] A/B/C/D — ce que le bailleur voit
+  // revenuMensuel  Float?                                             // [SUPPRIMER] [M-10] ADD-21 : jamais exposé au bailleur
+  // scoreQapril    Int?                                               // [SUPPRIMER] [M-10]
+  // tauxEffort     Float?                                             // [SUPPRIMER] [M-10]
+  // docsJsonb      Json?                                              // [SUPPRIMER] [M-10] pièces jamais transmises
+  noteAgence       String?           @map("note_agence")
+  envoyeeAt        DateTime          @default(now()) @map("envoyee_at")
+  vueAt            DateTime?         @map("vue_at")
+  visiteProposeeAt DateTime?         @map("visite_proposee_at")
+  statueeAt        DateTime?         @map("statuee_at")
+  retireeAt        DateTime?         @map("retiree_at")
+  expireeAt        DateTime?         @map("expiree_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  candidat         User              @relation("UserCandidatures", fields: [candidatId], references: [id])
+  logement         Property          @relation(fields: [logementId], references: [id])
+  annonce          Annonce           @relation(fields: [annonceId], references: [id])
+
+  // [M-01] L'unicité « une seule candidature NON (RETIREE|EXPIREE) » est un
+  // index unique partiel, posé en SQL (migration M-01) : Prisma ne le décrit pas.
+  @@index([annonceId, statut])
+  @@index([candidatId, statut])
+  @@map("candidatures")
+}
+
+// ----------------------------------------------------------------------------
+// B6 — Annonce : publiable par un bailleur OU une agence ; champs du spec R1
+// ----------------------------------------------------------------------------
+model Annonce {
+  id                 String        @id @default(uuid()) @map("annonce_id")
+  propertyId         String        @map("property_id")
+  publieParId        String        @map("publie_par_id")               // [M-06] bailleur ou agence
+  publieParRole      RoleContexte  @map("publie_par_role")             // [M-06] BAILLEUR | AGENCE
+  mandatGestionId    String?       @map("mandat_gestion_id")           // [M-06] obligatoire si AGENCE (CHECK SQL)
+  statut             AnnonceStatut @default(BROUILLON)                 // [M-04]
+  loyerMensuel       Int           @map("loyer_mensuel")               // [M-06]
+  chargesMensuelles  Int           @default(0) @map("charges_mensuelles")
+  depotGarantieMois  Int           @default(0) @map("depot_garantie_mois")   // [M-06] CHECK <= 2
+  avanceLoyerMois    Int           @default(0) @map("avance_loyer_mois")     // [M-06] CHECK <= 2
+  negociable         Boolean       @default(false)
+  disponibleLe       DateTime?     @map("disponible_le")
+  descriptionLongue  String?       @map("description_longue") @db.Text   // [M-06] fiche détaillée
+  photosUrls         String[]      @map("photos_urls")
+  // Le niveau de vérification, le quartier, la commune et le type de structure
+  // sont lus sur Property : pas de copie ici (une seule source de vérité).
+  // L'adresse exacte et le bailleur ne sont JAMAIS projetés dans l'API annonce
+  // (RG-CONF) : seuls commune + quartier sont exposés.
+  publieeAt          DateTime?     @map("publiee_at")
+  expireAt           DateTime?     @map("expire_at")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  property           Property      @relation(fields: [propertyId], references: [id])
+  publiePar          User          @relation("AnnoncesPubliees", fields: [publieParId], references: [id])
+  mandatGestion      MandatGestion? @relation(fields: [mandatGestionId], references: [id])
+  candidatures       Candidature[]
+
+  @@index([statut, publieeAt])
+  @@index([propertyId])
+  @@map("annonces")
+}
+
+// ----------------------------------------------------------------------------
+// B3, B4, C — Bail
+// ----------------------------------------------------------------------------
+model Lease {
+  id                     String               @id @default(uuid()) @map("lease_id")
+  // ...
+  rentAmount             Int                  @map("rent_amount")
+  depositAmount          Int                  @default(0) @map("deposit_amount")    // CHECK <= 2 * rent_amount  [M-07]
+  avanceLoyer            Int                  @default(0) @map("avance_loyer")      // CHECK <= 2 * rent_amount  [M-07]
+  durationMonths         Int?                 @map("duration_months")               // [M-08] null = durée indéterminée
+  typeBail               TypeBail             @default(ECRIT) @map("type_bail")
+  status                 LeaseStatus          @default(DRAFT)                        // [M-08] réduit aux états du bail (voir enum)
+  statutRecouvrement     RecouvrementStatut   @default(A_JOUR) @map("statut_recouvrement")  // [M-08] axe séparé
+  bailleurMasque         Boolean              @default(false) @map("bailleur_masque") // forcé à true par trigger si mandat actif [M-07]
+  mandatGestionId        String?              @map("mandat_gestion_id")
+  niveauCertification    NiveauCertification  @default(NON_CERTIFIE) @map("niveau_certification") // [M-03]
+  certifieAt             DateTime?            @map("certifie_at")                   // [M-03] événement tracé
+  // signingOtp          String?                                                    // [SUPPRIMER] [M-02] OTP en clair
+  signingOtpHash         String?              @map("signing_otp_hash")
+  signingOtpExpiresAt    DateTime?            @map("signing_otp_expires_at")
+  signingOtpAttempts     Int                  @default(0) @map("signing_otp_attempts")
+  // ...
+  @@map("leases")
+}
+
+// [M-08] LeaseStatus recentré sur le cycle de vie du contrat.
+// Les anciens états LOYER_IMPAYE, MISE_EN_DEMEURE, CLEMENCE_EN_COURS,
+// REPRISE_PROCEDURE migrent vers Lease.statutRecouvrement.
+enum LeaseStatus {
+  DRAFT
+  PENDING_SIGNATURE
+  PENDING_CONFIRMATION
+  ACTIVE
+  ACTIVE_DECLARATIF
+  PREAVIS
+  DEMANDE_RESILIATION
+  TERMINATED
+  CANCELLED
+  ARCHIVED
+}
+
+// ----------------------------------------------------------------------------
+// B3 — Quittance
+// ----------------------------------------------------------------------------
+model Receipt {
+  id                   String               @id @default(uuid()) @map("receipt_id")
+  leaseId              String               @map("lease_id")
+  periodMonth          String               @map("period_month")
+  status               ReceiptStatus        @default(EMISE)                          // [M-04]
+  niveauCertification  NiveauCertification  @default(NON_CERTIFIE) @map("niveau_certification") // [M-03]
+  // ...
+  @@unique([leaseId, periodMonth])
+  @@map("receipts")
+}
+
+// ----------------------------------------------------------------------------
+// ADD-28 — Bien
+// ----------------------------------------------------------------------------
+model Property {
+  id                 String                  @id @default(uuid()) @map("property_id")
+  status             PropertyStatus          @default(BROUILLON)                      // [M-04]
+  statutPosition     StatutPosition          @default(MANQUANTE) @map("statut_position") // [M-04]
+  niveauVerification NiveauVerificationBien  @default(N1_DECLARE) @map("niveau_verification") // [M-04]
+  // ...
+  @@map("properties")
+}
+
+// ----------------------------------------------------------------------------
+// Mandat : un seul mandat actif par bien, masquage forcé
+// ----------------------------------------------------------------------------
+model MandatGestion {
+  id               String        @id @default(uuid()) @map("mandat_id")
+  proprietaireId   String        @map("proprietaire_id")
+  intermediaireId  String        @map("intermediaire_id")
+  statut           MandatStatut  @default(PROPOSE)                                    // [M-04]
+  dateDebut        DateTime      @default(now()) @map("date_debut")
+  dateFin          DateTime?     @map("date_fin")
+  // ...
+  @@map("mandats_gestion")
+}
+// [M-07] Unicité « un mandat ACTIF par bien » : index unique partiel SQL sur
+// mandats_gestion_biens joint au statut du mandat (voir migration).
+
+// ----------------------------------------------------------------------------
+// ADD-29 — Preuves : plus de cascade
+// ----------------------------------------------------------------------------
+model Occupant {
+  // ...
+  lien       LienOccupant    @map("lien")                                            // [M-04]
+  statut     OccupantStatut  @default(DECLARE) @map("statut")                        // [M-04]
+  niveau     NiveauAttestation @default(C) @map("niveau")                            // [M-04]
+  lease      Lease           @relation(fields: [leaseId], references: [id], onDelete: Restrict)  // [M-11]
+  // ...
+}
+model AttestationResidence {
+  // ...
+  niveau     NiveauAttestation  @map("niveau")                                       // [M-04]
+  statut     AttestationStatut  @default(VALIDE) @map("statut")                      // [M-04]
+  lease      Lease              @relation(fields: [leaseId], references: [id], onDelete: Restrict) // [M-11]
+  // ...
+}
+model DeclarationPaiement {
+  // ...
+  montant    Int                                                                     // [M-12] FCFA entier
+  bail       Lease  @relation(fields: [bailId], references: [id], onDelete: Restrict) // [M-11]
+  // ...
+}
+model TransmissionAdressage {
+  // ...
+  lease      Lease  @relation(fields: [leaseId], references: [id], onDelete: Restrict) // [M-11]
+}
+
+// ----------------------------------------------------------------------------
+// Sécurité
+// ----------------------------------------------------------------------------
+model AutomationSettings {
+  // customScripts  Json?                                                            // [SUPPRIMER] [M-13] exécution de code stocké en base
+}
