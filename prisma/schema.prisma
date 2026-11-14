@@ -17,12 +17,11 @@ model User {
   birthPlace                  String?                  @map("birth_place")
   neighborhood                String?                  @map("neighborhood")
   avatarUrl                   String?                  @map("avatar_url")
-  email                       String?
-  emailVerifieAt              DateTime?                @map("email_verifie_at")
+  email                       String?                  @unique
   role                        Role                     @default(TENANT)
   profileType                 ProfileType?             @map("profile_type")
   kycLevel                    Int                      @default(0) @map("kyc_level")
-  kycStatus                   KycStatus                @default(PENDING) @map("kyc_status")
+  kycStatus                   String                   @default("pending") @map("kyc_status")
   /// SECURITE: uniquement un hash argon2id/bcrypt. Ne jamais le charger par défaut (omit: { password: true }).
   password                    String?
   failedLoginAttempts Int @default(0) @map("failed_login_attempts")
@@ -33,7 +32,7 @@ model User {
   tokenVersion Int @default(0) @map("token_version")
   isCertified                 Boolean                  @default(false) @map("is_certified")
   onboardingComplete          Boolean                  @default(false) @map("onboarding_complete")
-  capaciteActive              RoleContexte?            @map("capacite_active")
+  capaciteActive              String?                  @default("PROPRIETAIRE") @map("capacite_active")
   legalEntityId               String?                  @map("legal_entity_id")
   preferredLang               String?                  @default("fr") @map("preferred_lang")
   notificationPrefs           Json?                    @map("notification_prefs")
@@ -196,7 +195,6 @@ model User {
 
   @@index([phone])
   @@index([role])
-  @@unique([email, emailVerifieAt])
   @@map("users")
 }
 
@@ -228,7 +226,7 @@ model LegalEntity {
   bankAccount       String?                @map("bank_account")
   /// Chiffré au niveau applicatif
   bankAccountEnc    String?                @map("bank_account_enc")
-  status             ReceiptStatus    @default(EMISE)
+  status            String                 @default("pending")
   createdAt         DateTime               @default(now()) @map("created_at")
   updatedAt         DateTime               @updatedAt @map("updated_at")
   bdqConversations  BdqConversationState[] @relation("BdqConvLegalEntity")
@@ -260,7 +258,7 @@ model IdentityDocument {
   /// Chiffré au niveau applicatif
   mrzRawDataEnc    String?      @map("mrz_raw_data_enc")
   scanS3Key        String?      @map("scan_s3_key")
-  status             ReceiptStatus    @default(EMISE)
+  status           String       @default("pending")
   verifiedAt       DateTime?    @map("verified_at")
   verifiedByUserId String?      @map("verified_by")
   rejectionReason  String?      @map("rejection_reason")
@@ -295,7 +293,7 @@ model Property {
   gpsLatitude                Float?                @map("gps_latitude")
   gpsLongitude               Float?                @map("gps_longitude")
   amenities                  String[]
-  status                     PropertyStatus        @default(BROUILLON)
+  status                     String                @default("draft")
   documents                  Json?
   verifiedAt                 DateTime?             @map("verified_at")
   verifiedByUserId           String?               @map("verified_by")
@@ -334,7 +332,6 @@ model Property {
   // ADD-28: Géolocalisation certifiée & Adresse MaPoste
   precisionM                 Int?                  @map("precision_m")
   statutPosition             StatutPosition        @default(MANQUANTE) @map("statut_position")
-  niveauVerification         NiveauVerificationBien @default(N1_DECLARE) @map("niveau_verification")
   positionGeleeAt            DateTime?             @map("position_gelee_at")
   w3w                        String?               @map("w3w")
   codeLocalisation           String?               @map("code_localisation")
@@ -477,9 +474,8 @@ model Lease {
   dgiReference              String?                 @map("dgi_reference")
   fraisEnregMontant         Int?                    @map("frais_enreg_montant")
   fraisEnregPalier          Int?                    @map("frais_enreg_palier")
-  niveauCertification       NiveauCertification     @default(NON_CERTIFIE) @map("niveau_certification")
+  niveauCertification       String                  @default("NON_CERTIFIE") @map("niveau_certification")
   certifieAt                 DateTime?               @map("certifie_at")
-  statutRecouvrement         RecouvrementStatut      @default(A_JOUR) @map("statut_recouvrement")
   origineBail               String                  @default("GENERE") @map("origine_bail")
   scanFichierSha256         String?                 @map("scan_fichier_sha256")
   statutDgi                 String                  @default("NON_SOUMIS") @map("statut_dgi")
@@ -563,7 +559,7 @@ model PaymentIntent {
   operator       String
   operatorRef    String?  @map("operator_ref")
   payerPhone     String   @map("payer_phone")
-  status             ReceiptStatus    @default(EMISE)
+  status         String   @default("pending")
   metadata       Json?
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -589,7 +585,7 @@ model Receipt {
   pdfUrl             String?          @map("pdf_url")
   qrToken            String?          @unique @map("qr_token")
   receiptHash        String?          @map("receipt_hash")
-  status             ReceiptStatus    @default(EMISE)
+  status             String           @default("pending")
   declarative        Boolean          @default(false) @map("declarative")
   digitalDeliveryId  String?          @map("digital_delivery_id")
   createdAt          DateTime         @default(now()) @map("created_at")
@@ -604,9 +600,8 @@ model Receipt {
   qrCodeUrl          String?          @map("qr_code_url")
   sha256CalculeLe    DateTime?        @map("sha256_calcule_le")
   sha256Hash         String?          @map("sha256_hash")
-  niveauCertification       NiveauCertification     @default(NON_CERTIFIE) @map("niveau_certification")
+  niveauCertification       String                  @default("NON_CERTIFIE") @map("niveau_certification")
   certifieAt                 DateTime?               @map("certifie_at")
-  statutRecouvrement         RecouvrementStatut      @default(A_JOUR) @map("statut_recouvrement")
   ColocPayment       ColocPayment[]
   pgwPayments        PaymentPgw[]
   delivery           DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
@@ -649,7 +644,7 @@ model LeaseOpeningState {
   clausesDerogatoires   Json?     @map("clauses_derogatoires")
   confirmeBailleurAt    DateTime? @map("confirme_bailleur_at")
   confirmeLocataireAt   DateTime? @map("confirme_locataire_at")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   motifContestation     String?   @map("motif_contestation")
   hashSha256            String?   @map("hash_sha256")
   version               Int       @default(1)
@@ -963,7 +958,7 @@ model Notification {
   content    String
   type       String   @default("INFO")
   link       String?
-  status             ReceiptStatus    @default(EMISE)
+  status     String   @default("pending")
   read       Boolean  @default(false)
   retryCount Int      @default(0) @map("retry_count")
   createdAt  DateTime @default(now()) @map("created_at")
@@ -1094,7 +1089,7 @@ model PropositionLoyer {
   nouveauMontant      Int                @map("nouveau_montant")
   dateEffet           DateTime           @map("date_effet")
   raison              String?
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   createdAt           DateTime           @default(now()) @map("created_at")
   updatedAt           DateTime           @updatedAt @map("updated_at")
   dateEffetDemandee   DateTime?          @map("date_effet_demandee")
@@ -1478,7 +1473,7 @@ model SignatureElectronique {
   documentType String    @map("document_type")
   documentId   String    @map("document_id")
   signataireId String    @map("signataire_id")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   methode      String?
   otpUtilise   String?   @map("otp_utilise")
   otpHash      String?   @map("otp_hash")
@@ -2075,7 +2070,7 @@ model PropertyAccess {
   userId                String         @map("user_id")
   role                  BienRole
   profil                String?        @map("profil_intermediaire")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   justificatifType         String?        @map("justificatif_type")
   justificatifNumero       String?        @map("justificatif_numero")
   justificatifNumeroEnc    String?        @map("justificatif_numero_enc")
@@ -2108,7 +2103,7 @@ model MandatGestion {
   dateFin          DateTime?           @map("date_fin")
   remuneration     String?             @default("GRATUIT")
   permissions      Json                @map("permissions")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   signatureProprio DateTime?           @map("signature_proprio")
   signatureInterm  DateTime?           @map("signature_interm")
   hashSha256       String?             @map("hash_sha256")
@@ -3065,7 +3060,7 @@ model SyndicFacture {
   nbLots        Int       @map("nb_lots")
   montantParLot Float     @map("montant_par_lot")
   montantTotal  Float     @map("montant_total")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   paymentPgwId  String?   @map("payment_pgw_id")
   createdAt     DateTime  @default(now())
   syndicate     Syndicate @relation(fields: [syndicateId], references: [id])
@@ -3970,7 +3965,7 @@ model ChampionCommission {
   typeAction   CommType        @map("type_action")
   referenceId  String?         @map("reference_id")
   montantFcfa  Float           @map("montant_fcfa")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   valideAt     DateTime?       @map("valide_at")
   payeAt       DateTime?       @map("paye_at")
   modePaiement String?         @map("mode_paiement")
@@ -4146,7 +4141,7 @@ model OffreAchat {
   conditionsSuspensives         String?          @map("conditions_suspensives")
   validiteJours                 Int              @default(7) @map("validite_jours")
   dateExpiration                DateTime         @map("date_expiration")
-  statut           MandatStatut        @default(PROPOSE)
+  statut           String              @default("EN_ATTENTE")
   montantContrePropositionFcfa  Float?           @map("montant_contre_proposition_fcfa")
   motifRefus                    String?          @map("motif_refus")
   horodatageCreation            DateTime         @default(now()) @map("horodatage_creation")
@@ -4636,16 +4631,16 @@ model Occupant {
   prenoms           String                 @map("prenoms")
   dateNaissance     DateTime?              @map("date_naissance")
   mineur            Boolean                @default(false) @map("mineur")
-  lien              LienOccupant           @map("lien")
+  lien              String                 @map("lien")
   declareParUserId  String                 @map("declare_par")
   declareRole       String                 @default("TITULAIRE") @map("declare_role") // TITULAIRE | BAILLEUR | MANDATAIRE
   declarationSha256 String                 @map("declaration_sha256")
   dateEntree        DateTime               @map("date_entree")
   dateSortie        DateTime?              @map("date_sortie")
-  statut            OccupantStatut         @default(DECLARE) @map("statut")
+  statut            String                 @default("DECLARE") @map("statut")
   confirmeAt        DateTime?              @map("confirme_at")
   presenceCaptureId String?                @map("presence_capture_id")
-  niveau            NiveauAttestation      @default(C) @map("niveau")
+  niveau            String                 @default("C") @map("niveau")
   motifDesaccord    String?                @map("motif_desaccord")
   createdAt         DateTime               @default(now()) @map("created_at")
 
@@ -4667,11 +4662,11 @@ model AttestationResidence {
   qualite         String                    @map("qualite") // TITULAIRE | OCCUPANT
   leaseId         String                    @map("bail_id")
   occupantId      String?                   @map("occupant_id")
-  niveau          NiveauAttestation         @map("niveau")
+  niveau          String                    @map("niveau")
   numero          String                    @unique @map("numero") // ATT-AAAA-MM-NNNNNN
   emiseAt         DateTime                  @default(now()) @map("emise_at")
   valideJusque    DateTime                  @map("valide_jusque")
-  statut          AttestationStatut         @default(VALIDE) @map("statut")
+  statut          String                    @default("VALIDE") @map("statut")
   revoqueeAt      DateTime?                 @map("revoquee_at")
   motifRevocation String?                   @map("motif_revocation")
   sha256          String                    @map("sha256")
@@ -4789,114 +4784,6 @@ enum StatutPosition {
   PROVISOIRE
   CONFIRMEE
   GELEE
-}
-
-enum NiveauCertification {
-  NON_CERTIFIE
-  DECLARE
-  CERTIFIE_QAPRIL
-  ENREGISTRE_DGI
-}
-
-enum PropertyStatus {
-  BROUILLON
-  DISPONIBLE
-  LOUE
-  INDISPONIBLE
-  ARCHIVE
-}
-
-enum ReceiptStatus {
-  EMISE
-  ACOMPTE
-  IMPAYEE
-  ANNULEE
-}
-
-enum KycStatus {
-  PENDING
-  ACTIF
-  SUSPENDU
-  CLOS
-}
-
-enum NiveauVerificationBien {
-  N1_DECLARE
-  N2_POSITION_CONFIRMEE
-  N3_TITRE_CONTROLE
-  N4_VISITE_AGENCE
-}
-
-enum RecouvrementStatut {
-  A_JOUR
-  RETARD
-  IMPAYE
-  MISE_EN_DEMEURE
-  PLAN_APUREMENT
-  CLEMENCE
-  PROCEDURE
-}
-
-enum MandatStatut {
-  PROPOSE
-  SIGNE_MANDANT
-  ACTIF
-  SUSPENDU
-  TERMINE
-}
-
-enum OccupantStatut {
-  DECLARE
-  EN_ATTENTE_BAILLEUR
-  CONFIRME
-  REFUSE
-  CADUC
-  CLOS
-}
-
-enum LienOccupant {
-  CONJOINT
-  ENFANT_MAJEUR
-  ENFANT_MINEUR
-  PARENT
-  AUTRE_FAMILLE
-  HEBERGE
-  COLOCATAIRE
-  EMPLOYE_DOMESTIQUE
-}
-
-enum NiveauAttestation {
-  A
-  B
-  C
-}
-
-enum AttestationStatut {
-  VALIDE
-  EXPIREE
-  REVOQUEE
-}
-
-enum MaPosteStatut {
-  NON_DEMANDEE
-  A_CREER
-  EN_LOT
-  CREEE
-  EXISTANTE_RATTACHEE
-  REFUSEE
-  REVOQUEE
-}
-
-enum CapturePositionResultat {
-  ACCEPTEE
-  REFUSEE
-}
-
-enum CapturePositionMotifRefus {
-  PRECISION
-  HORS_COMMUNE
-  ZONE
-  SIMULEE
 }
 
 enum RoleContexte {

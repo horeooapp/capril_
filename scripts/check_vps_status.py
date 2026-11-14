@@ -1,29 +1,21 @@
 import paramiko
 
-ssh = paramiko.SSHClient()
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-ssh.connect('187.77.182.168', port=22, username='root', password='Qap@vpserv2026', disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']}, timeout=30)
+host = '187.77.182.168'
+user = 'root'
+pwd = 'Qap@vpserv2026'
+
+c = paramiko.SSHClient()
+c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+c.connect(host, username=user, password=pwd, timeout=30)
 
 def run(cmd):
-    stdin, stdout, stderr = ssh.exec_command(cmd)
-    out = stdout.read().decode('utf-8', errors='ignore').strip()
-    err = stderr.read().decode('utf-8', errors='ignore').strip()
-    return out, err
+    print(f'\n--- {cmd} ---')
+    stdin, stdout, stderr = c.exec_command(cmd)
+    out = stdout.read().decode()
+    err = stderr.read().decode()
+    if out: print(out.strip())
+    if err: print('ERR:', err.strip())
 
-print("--- VPS GIT LOG ---")
-out, _ = run("cd /opt/capril_ && git log -n 1 --oneline")
-print(out)
+run('docker exec qapril_postgres psql -U postgres -d qapril -c "SELECT typname FROM pg_type WHERE typtype = \'e\' ORDER BY typname;"')
 
-print("\n--- VPS GIT STATUS ---")
-out, _ = run("cd /opt/capril_ && git status -s")
-print(out if out else "Clean working directory")
-
-print("\n--- VPS DOCKER CONTAINERS ---")
-out, _ = run("docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'")
-print(out)
-
-print("\n--- VPS PRISMA STATUS ---")
-out, _ = run("cd /opt/capril_ && npx prisma status || true")
-print(out)
-
-ssh.close()
+c.close()
