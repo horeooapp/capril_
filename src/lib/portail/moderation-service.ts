@@ -20,7 +20,7 @@ const SEUIL_SIGNALEMENTS_AUTO_SUSPENSION = 3;
 export async function signalerAnnonce(input: SignalementInput) {
   const annonce = await prisma.annonce.findUnique({
     where: { id: input.annonceId },
-    select: { id: true, statut: true, diffusions: true, agenceId: true, titre: true }
+    select: { id: true, statut: true, diffusions: true, publieParId: true, titre: true }
   });
 
   if (!annonce) {
@@ -61,7 +61,7 @@ export async function signalerAnnonce(input: SignalementInput) {
           declencheur: "SOLDE_BAS" as any, // Utilisation d'un enum existant en fallback
           resultatAction: `SUSPENSION_PORTAIL_ANNONCE_${annonce.id}`,
           soldeAvant: Number(newCount),
-          userId: annonce.agenceId,
+          userId: annonce.publieParId,
           details: {
             action: "AUTO_SUSPENSION_RG_MOD_01",
             annonceId: annonce.id,

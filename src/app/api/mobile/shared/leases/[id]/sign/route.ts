@@ -5,6 +5,7 @@ import { sendSMS } from '@/lib/sms';
 import { LoyerService } from '@/lib/loyer-service';
 import { FiscalService } from '@/lib/fiscal-service';
 import { TypeBail } from '@prisma/client';
+import crypto from 'crypto';
 
 export async function POST(
     request: Request,
@@ -53,17 +54,20 @@ export async function POST(
         }
 
         // [SEC-FIX F-04] Compteur d'échecs - bloquer après 5 tentatives
-        const failedAttempts = (leaseWithOtp.signingOtpFailedAttempts || 0);
+        const failedAttempts = (leaseWithOtp.signingOtpAttempts || leaseWithOtp.signingOtpFailedAttempts || 0);
         if (failedAttempts >= 5) {
             return NextResponse.json({ error: "Trop de tentatives échouées. Veuillez demander un nouveau code." }, { status: 429 });
         }
 
-        // Verify OTP
-        if (leaseWithOtp.signingOtp !== otp) {
+        // Verify OTP via hash
+        const hashedInput = crypto.createHash('sha256').update(String(otp).trim()).digest('hex');
+        const isOtpValid = leaseWithOtp.signingOtpHash === hashedInput || leaseWithOtp.signingOtp === otp;
+
+        if (!isOtpValid) {
             // Incrémenter le compteur d'échecs
             await prisma.lease.update({
                 where: { id: leaseId },
-                data: { signingOtpFailedAttempts: failedAttempts + 1 } as any
+                data: { signingOtpAttempts: failedAttempts + 1 }
             });
             return NextResponse.json({ error: "Code OTP invalide." }, { status: 400 });
         }
@@ -74,11 +78,11 @@ export async function POST(
             data: {
                 isSignedElectronically: true,
                 signedAt: new Date(),
-                signingOtp: null,
-                signingOtpExpiresAt: null,    // [SEC-FIX F-04] Effacer l'expiration
-                signingOtpFailedAttempts: 0,  // [SEC-FIX F-04] Réinitialiser le compteur
+                signingOtpHash: null,
+                signingOtpExpiresAt: null,
+                signingOtpAttempts: 0,
                 status: "ACTIVE"
-            } as any
+            }
         });
         
         await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });

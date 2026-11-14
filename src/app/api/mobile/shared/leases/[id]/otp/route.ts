@@ -45,9 +45,10 @@ export async function POST(
         await prisma.lease.update({ 
             where: { id: leaseId }, 
             data: { 
-                signingOtp: otp,
-                signingOtpExpiresAt: otpExpiresAt
-            } as any
+                signingOtpHash: crypto.createHash('sha256').update(otp).digest('hex'),
+                signingOtpExpiresAt: otpExpiresAt,
+                signingOtpAttempts: 0
+            }
         });
 
         if (lease.tenant.phone) {
