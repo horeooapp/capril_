@@ -476,7 +476,7 @@ model Lease {
   fraisEnregPalier          Int?                    @map("frais_enreg_palier")
   niveauCertification       String                  @default("NON_CERTIFIE") @map("niveau_certification")
   certifieAt                 DateTime?               @map("certifie_at")
-  origineBail               String                  @default("GENERE") @map("origine_bail")
+
   scanFichierSha256         String?                 @map("scan_fichier_sha256")
   statutDgi                 String                  @default("NON_SOUMIS") @map("statut_dgi")
   dateReprise               DateTime?               @map("date_reprise")
@@ -601,7 +601,6 @@ model Receipt {
   sha256CalculeLe    DateTime?        @map("sha256_calcule_le")
   sha256Hash         String?          @map("sha256_hash")
   niveauCertification       String                  @default("NON_CERTIFIE") @map("niveau_certification")
-  certifieAt                 DateTime?               @map("certifie_at")
   ColocPayment       ColocPayment[]
   pgwPayments        PaymentPgw[]
   delivery           DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
@@ -1564,7 +1563,6 @@ model Candidature {
   tauxEffort       Float?            @map("taux_effort")
   docsJsonb        Json?             @map("docs_jsonb")
   statut           CandidatureStatut @default(ENVOYEE)
-  trancheConfiance String?           @map("tranche_confiance")
   noteAgence       String?           @map("note_agence")
   envoyeeAt        DateTime?         @default(now()) @map("envoyee_at")
   vueAt            DateTime?         @map("vue_at")
