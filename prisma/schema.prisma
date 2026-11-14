@@ -10,18 +10,19 @@ datasource db {
 
 model User {
   id                          String                   @id @default(uuid()) @map("user_id")
-  phone                       String?                  @unique
+  phone                       String                   @unique
   firstName                   String?                  @map("first_name")
   lastName                    String?                  @map("last_name")
   birthDate                   DateTime?                @map("birth_date")
   birthPlace                  String?                  @map("birth_place")
   neighborhood                String?                  @map("neighborhood")
   avatarUrl                   String?                  @map("avatar_url")
-  email                       String?                  @unique
+  email                       String?
+  emailVerifieAt              DateTime?                @map("email_verifie_at")
   role                        Role                     @default(TENANT)
   profileType                 ProfileType?             @map("profile_type")
   kycLevel                    Int                      @default(0) @map("kyc_level")
-  kycStatus                   String                   @default("pending") @map("kyc_status")
+  kycStatus                   KycStatus                @default(PENDING) @map("kyc_status")
   /// SECURITE: uniquement un hash argon2id/bcrypt. Ne jamais le charger par défaut (omit: { password: true }).
   password                    String?
   failedLoginAttempts Int @default(0) @map("failed_login_attempts")
@@ -32,7 +33,7 @@ model User {
   tokenVersion Int @default(0) @map("token_version")
   isCertified                 Boolean                  @default(false) @map("is_certified")
   onboardingComplete          Boolean                  @default(false) @map("onboarding_complete")
-  capaciteActive              String?                  @default("PROPRIETAIRE") @map("capacite_active")
+  capaciteActive              RoleContexte?            @map("capacite_active")
   legalEntityId               String?                  @map("legal_entity_id")
   preferredLang               String?                  @default("fr") @map("preferred_lang")
   notificationPrefs           Json?                    @map("notification_prefs")
@@ -83,7 +84,7 @@ model User {
   agentEvents                 AgendaEvenement[]        @relation("AgentEvents")
   eventContact                AgendaEvenement[]        @relation("EventContact")
   alertesLoyer                AlerteLoyer[]            @relation("UserAlertesLoyer")
-  agenceAnnonces              Annonce[]                @relation("AgenceAnnonces")
+  annoncesPubliees            Annonce[]                @relation("AnnoncesPubliees")
   annoncesVoisinage           AnnonceVoisinage[]
   auditLogs                   AuditLog[]
   automationSettings          AutomationSettings?
@@ -195,6 +196,7 @@ model User {
 
   @@index([phone])
   @@index([role])
+  @@unique([email, emailVerifieAt])
   @@map("users")
 }
 
@@ -226,7 +228,7 @@ model LegalEntity {
   bankAccount       String?                @map("bank_account")
   /// Chiffré au niveau applicatif
   bankAccountEnc    String?                @map("bank_account_enc")
-  status            String                 @default("pending")
+  status             ReceiptStatus    @default(EMISE)
   createdAt         DateTime               @default(now()) @map("created_at")
   updatedAt         DateTime               @updatedAt @map("updated_at")
   bdqConversations  BdqConversationState[] @relation("BdqConvLegalEntity")
@@ -258,7 +260,7 @@ model IdentityDocument {
   /// Chiffré au niveau applicatif
   mrzRawDataEnc    String?      @map("mrz_raw_data_enc")
   scanS3Key        String?      @map("scan_s3_key")
-  status           String       @default("pending")
+  status             ReceiptStatus    @default(EMISE)
   verifiedAt       DateTime?    @map("verified_at")
   verifiedByUserId String?      @map("verified_by")
   rejectionReason  String?      @map("rejection_reason")
@@ -293,7 +295,7 @@ model Property {
   gpsLatitude                Float?                @map("gps_latitude")
   gpsLongitude               Float?                @map("gps_longitude")
   amenities                  String[]
-  status                     String                @default("draft")
+  status                     PropertyStatus        @default(BROUILLON)
   documents                  Json?
   verifiedAt                 DateTime?             @map("verified_at")
   verifiedByUserId           String?               @map("verified_by")
@@ -331,7 +333,8 @@ model Property {
   titreSecuriteJuridique     String?               @map("titre_securite_juridique")
   // ADD-28: Géolocalisation certifiée & Adresse MaPoste
   precisionM                 Int?                  @map("precision_m")
-  statutPosition             String                @default("MANQUANTE") @map("statut_position")
+  statutPosition             StatutPosition        @default(MANQUANTE) @map("statut_position")
+  niveauVerification         NiveauVerificationBien @default(N1_DECLARE) @map("niveau_verification")
   positionGeleeAt            DateTime?             @map("position_gelee_at")
   w3w                        String?               @map("w3w")
   codeLocalisation           String?               @map("code_localisation")
@@ -408,7 +411,7 @@ model Lease {
   leaseType                 String                  @default("residential") @map("lease_type")
   startDate                 DateTime                @map("start_date")
   endDate                   DateTime?               @map("end_date")
-  durationMonths            Int                     @map("duration_months")
+  durationMonths            Int?                    @map("duration_months")
   rentAmount                Int                     @map("rent_amount")
   chargesAmount             Int                     @default(0) @map("charges_amount")
   paymentDay                Int                     @default(5) @map("payment_day")
@@ -427,7 +430,6 @@ model Lease {
   terminationReason         String?                 @map("termination_reason")
   commercialData            Json?                   @map("commercial_data")
   isSignedElectronically    Boolean                 @default(false) @map("is_signed_electronically")
-  signingOtp                String?                 @map("signing_otp")
   signingOtpHash            String?                 @map("signing_otp_hash")
   signingOtpExpiresAt       DateTime?               @map("signing_otp_expires_at")
   signingOtpAttempts        Int                     @default(0) @map("signing_otp_attempts")
@@ -475,7 +477,9 @@ model Lease {
   dgiReference              String?                 @map("dgi_reference")
   fraisEnregMontant         Int?                    @map("frais_enreg_montant")
   fraisEnregPalier          Int?                    @map("frais_enreg_palier")
-  niveauCertification       String                  @default("CERTIFIE_QAPRIL") @map("niveau_certification")
+  niveauCertification       NiveauCertification     @default(NON_CERTIFIE) @map("niveau_certification")
+  certifieAt                 DateTime?               @map("certifie_at")
+  statutRecouvrement         RecouvrementStatut      @default(A_JOUR) @map("statut_recouvrement")
   origineBail               String                  @default("GENERE") @map("origine_bail")
   scanFichierSha256         String?                 @map("scan_fichier_sha256")
   statutDgi                 String                  @default("NON_SOUMIS") @map("statut_dgi")
@@ -559,7 +563,7 @@ model PaymentIntent {
   operator       String
   operatorRef    String?  @map("operator_ref")
   payerPhone     String   @map("payer_phone")
-  status         String   @default("pending")
+  status             ReceiptStatus    @default(EMISE)
   metadata       Json?
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -585,7 +589,7 @@ model Receipt {
   pdfUrl             String?          @map("pdf_url")
   qrToken            String?          @unique @map("qr_token")
   receiptHash        String?          @map("receipt_hash")
-  status             String           @default("pending")
+  status             ReceiptStatus    @default(EMISE)
   declarative        Boolean          @default(false) @map("declarative")
   digitalDeliveryId  String?          @map("digital_delivery_id")
   createdAt          DateTime         @default(now()) @map("created_at")
@@ -600,7 +604,9 @@ model Receipt {
   qrCodeUrl          String?          @map("qr_code_url")
   sha256CalculeLe    DateTime?        @map("sha256_calcule_le")
   sha256Hash         String?          @map("sha256_hash")
-  niveauCertification String          @default("CERTIFIE_QAPRIL") @map("niveau_certification")
+  niveauCertification       NiveauCertification     @default(NON_CERTIFIE) @map("niveau_certification")
+  certifieAt                 DateTime?               @map("certifie_at")
+  statutRecouvrement         RecouvrementStatut      @default(A_JOUR) @map("statut_recouvrement")
   ColocPayment       ColocPayment[]
   pgwPayments        PaymentPgw[]
   delivery           DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
@@ -643,7 +649,7 @@ model LeaseOpeningState {
   clausesDerogatoires   Json?     @map("clauses_derogatoires")
   confirmeBailleurAt    DateTime? @map("confirme_bailleur_at")
   confirmeLocataireAt   DateTime? @map("confirme_locataire_at")
-  statut                String    @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   motifContestation     String?   @map("motif_contestation")
   hashSha256            String?   @map("hash_sha256")
   version               Int       @default(1)
@@ -957,7 +963,7 @@ model Notification {
   content    String
   type       String   @default("INFO")
   link       String?
-  status     String   @default("pending")
+  status             ReceiptStatus    @default(EMISE)
   read       Boolean  @default(false)
   retryCount Int      @default(0) @map("retry_count")
   createdAt  DateTime @default(now()) @map("created_at")
@@ -1088,7 +1094,7 @@ model PropositionLoyer {
   nouveauMontant      Int                @map("nouveau_montant")
   dateEffet           DateTime           @map("date_effet")
   raison              String?
-  statut              String             @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   createdAt           DateTime           @default(now()) @map("created_at")
   updatedAt           DateTime           @updatedAt @map("updated_at")
   dateEffetDemandee   DateTime?          @map("date_effet_demandee")
@@ -1472,7 +1478,7 @@ model SignatureElectronique {
   documentType String    @map("document_type")
   documentId   String    @map("document_id")
   signataireId String    @map("signataire_id")
-  statut       String    @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   methode      String?
   otpUtilise   String?   @map("otp_utilise")
   otpHash      String?   @map("otp_hash")
@@ -1550,36 +1556,38 @@ model Prestataire {
 }
 
 model Candidature {
-  id               String    @id @default(uuid()) @map("cand_id")
-  logementId       String    @map("logement_id")
-  annonceId        String?   @map("annonce_id")
-  candidatId       String?   @map("candidat_id")
+  id               String            @id @default(uuid()) @map("cand_id")
+  logementId       String            @map("logement_id")
+  annonceId        String            @map("annonce_id")
+  candidatId       String            @map("candidat_id")
   nom              String
   prenom           String
   telephone        String
-  revenuMensuel    Float?    @map("revenu_mensuel")
+  revenuMensuel    Float?            @map("revenu_mensuel")
   employeur        String?
-  scoreQapril      Int?      @map("score_qapril")
-  tauxEffort       Float?    @map("taux_effort")
-  docsJsonb        Json?     @map("docs_jsonb")
-  statut           String    @default("ENVOYEE")
-  noteAgence       String?   @map("note_agence")
-  envoyeeAt        DateTime? @default(now()) @map("envoyee_at")
-  vueAt            DateTime? @map("vue_at")
-  visiteProposeeAt DateTime? @map("visite_proposee_at")
-  statueeAt        DateTime? @map("statuee_at")
-  retireeAt        DateTime? @map("retiree_at")
-  expireeAt        DateTime? @map("expiree_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime? @updatedAt @map("updated_at")
+  scoreQapril      Int?              @map("score_qapril")
+  tauxEffort       Float?            @map("taux_effort")
+  docsJsonb        Json?             @map("docs_jsonb")
+  statut           CandidatureStatut @default(ENVOYEE)
+  trancheConfiance String?           @map("tranche_confiance")
+  noteAgence       String?           @map("note_agence")
+  envoyeeAt        DateTime?         @default(now()) @map("envoyee_at")
+  vueAt            DateTime?         @map("vue_at")
+  visiteProposeeAt DateTime?         @map("visite_proposee_at")
+  statueeAt        DateTime?         @map("statuee_at")
+  retireeAt        DateTime?         @map("retiree_at")
+  expireeAt        DateTime?         @map("expiree_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime?         @updatedAt @map("updated_at")
 
-  candidat         User?     @relation("UserCandidatures", fields: [candidatId], references: [id])
-  logement         Property  @relation(fields: [logementId], references: [id])
-  annonce          Annonce?  @relation(fields: [annonceId], references: [id])
+  candidat         User              @relation("UserCandidatures", fields: [candidatId], references: [id])
+  logement         Property          @relation(fields: [logementId], references: [id])
+  annonce          Annonce           @relation(fields: [annonceId], references: [id])
 
   @@index([logementId])
   @@index([candidatId])
   @@index([annonceId])
+  @@index([annonceId, statut])
   @@map("candidatures")
 }
 
@@ -1613,29 +1621,42 @@ model RegularisationCharges {
 }
 
 model Annonce {
-  id             String    @id @default(uuid()) @map("annonce_id")
-  logementId     String    @map("logement_id")
-  agenceId       String    @map("agence_id")
-  titre          String
-  description    String
-  loyerDemande   Float     @map("loyer_demande")
-  charges        Float     @default(0)
-  photosUrls     String[]  @map("photos_urls")
-  criteres       Json?
-  statut         String    @default("ACTIVE")
-  diffusions     Json?
-  nbContacts     Int       @default(0) @map("nb_contacts")
-  nbVisites      Int       @default(0) @map("nb_visites")
-  nbCandidatures Int       @default(0) @map("nb_candidatures")
-  coutVacance    Float?    @map("cout_vacance")
-  publieeAt      DateTime? @map("publiee_at")
-  archiveeAt     DateTime? @map("archivee_at")
-  agence         User      @relation("AgenceAnnonces", fields: [agenceId], references: [id])
-  logement       Property  @relation(fields: [logementId], references: [id])
-  candidatures   Candidature[]
+  id                String        @id @default(uuid()) @map("annonce_id")
+  logementId        String        @map("logement_id")
+  publieParId       String        @map("publie_par_id")
+  publieParRole     RoleContexte  @default(AGENCE) @map("publie_par_role")
+  mandatGestionId   String?       @map("mandat_gestion_id")
+  titre             String
+  description       String
+  loyerDemande      Float         @map("loyer_demande")
+  charges           Float         @default(0)
+  loyerMensuel      Int?          @map("loyer_mensuel")
+  chargesMensuelles Int           @default(0) @map("charges_mensuelles")
+  depotGarantieMois Int           @default(0) @map("depot_garantie_mois")
+  avanceLoyerMois   Int           @default(0) @map("avance_loyer_mois")
+  negociable        Boolean       @default(false)
+  disponibleLe      DateTime?     @map("disponible_le")
+  descriptionLongue String?       @map("description_longue") @db.Text
+  photosUrls        String[]      @map("photos_urls")
+  criteres          Json?
+  statut            AnnonceStatut @default(BROUILLON)
+  diffusions        Json?
+  nbContacts        Int           @default(0) @map("nb_contacts")
+  nbVisites         Int           @default(0) @map("nb_visites")
+  nbCandidatures    Int           @default(0) @map("nb_candidatures")
+  coutVacance       Float?        @map("cout_vacance")
+  publieeAt         DateTime?     @map("publiee_at")
+  expireAt          DateTime?     @map("expire_at")
+  archiveeAt        DateTime?     @map("archivee_at")
+
+  publiePar         User          @relation("AnnoncesPubliees", fields: [publieParId], references: [id])
+  mandatGestion     MandatGestion? @relation(fields: [mandatGestionId], references: [id])
+  logement          Property      @relation(fields: [logementId], references: [id])
+  candidatures      Candidature[]
 
   @@index([logementId])
-  @@index([agenceId])
+  @@index([publieParId])
+  @@index([statut, publieeAt])
   @@map("annonces")
 }
 
@@ -2054,7 +2075,7 @@ model PropertyAccess {
   userId                String         @map("user_id")
   role                  BienRole
   profil                String?        @map("profil_intermediaire")
-  statut                String         @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   justificatifType         String?        @map("justificatif_type")
   justificatifNumero       String?        @map("justificatif_numero")
   justificatifNumeroEnc    String?        @map("justificatif_numero_enc")
@@ -2087,13 +2108,14 @@ model MandatGestion {
   dateFin          DateTime?           @map("date_fin")
   remuneration     String?             @default("GRATUIT")
   permissions      Json                @map("permissions")
-  statut           String              @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   signatureProprio DateTime?           @map("signature_proprio")
   signatureInterm  DateTime?           @map("signature_interm")
   hashSha256       String?             @map("hash_sha256")
   createdAt        DateTime            @default(now()) @map("created_at")
   propertyAccesses PropertyAccess[]
   leases           Lease[]
+  annonces         Annonce[]
   intermediaire    User                @relation("MandatsRecus", fields: [intermediaireId], references: [id])
   proprietaire     User                @relation("MandatsDonnes", fields: [proprietaireId], references: [id])
   biens            MandatGestionBien[]
@@ -2736,8 +2758,6 @@ model AutomationSettings {
   autoRelance   Boolean  @default(true) @map("auto_relance")
   autoQuittance Boolean  @default(true) @map("auto_quittance")
   autoAssurance Boolean  @default(false) @map("auto_assurance")
-  /// DANGER: ne JAMAIS eval()/exécuter ce contenu. Remplacer par des règles déclaratives validées (Zod).
-  customScripts Json?    @map("custom_scripts")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -3045,7 +3065,7 @@ model SyndicFacture {
   nbLots        Int       @map("nb_lots")
   montantParLot Float     @map("montant_par_lot")
   montantTotal  Float     @map("montant_total")
-  statut        String    @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   paymentPgwId  String?   @map("payment_pgw_id")
   createdAt     DateTime  @default(now())
   syndicate     Syndicate @relation(fields: [syndicateId], references: [id])
@@ -3950,7 +3970,7 @@ model ChampionCommission {
   typeAction   CommType        @map("type_action")
   referenceId  String?         @map("reference_id")
   montantFcfa  Float           @map("montant_fcfa")
-  statut       String          @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   valideAt     DateTime?       @map("valide_at")
   payeAt       DateTime?       @map("paye_at")
   modePaiement String?         @map("mode_paiement")
@@ -4126,7 +4146,7 @@ model OffreAchat {
   conditionsSuspensives         String?          @map("conditions_suspensives")
   validiteJours                 Int              @default(7) @map("validite_jours")
   dateExpiration                DateTime         @map("date_expiration")
-  statut                        String           @default("EN_ATTENTE")
+  statut           MandatStatut        @default(PROPOSE)
   montantContrePropositionFcfa  Float?           @map("montant_contre_proposition_fcfa")
   motifRefus                    String?          @map("motif_refus")
   horodatageCreation            DateTime         @default(now()) @map("horodatage_creation")
@@ -4404,7 +4424,7 @@ model DeclarationPaiement {
   id                    String                    @id @default(uuid()) @map("declaration_id")
   bailId                String                    @map("bail_id")
   locataireId           String                    @map("locataire_id")
-  montant               Float                     @map("montant")
+  montant               Int                       @map("montant")
   mois                  String                    @map("mois")
   termeDate             DateTime?                 @map("terme_date")
   moyen                 String                    @default("MOBILE_MONEY") @map("moyen")
@@ -4421,7 +4441,7 @@ model DeclarationPaiement {
   createdAt             DateTime                  @default(now()) @map("created_at")
   updatedAt             DateTime                  @updatedAt @map("updated_at")
 
-  bail                  Lease                     @relation(fields: [bailId], references: [id], onDelete: Cascade)
+  bail                  Lease                     @relation(fields: [bailId], references: [id], onDelete: Restrict)
   locataire             User                      @relation("LocataireDeclarationsPaiement", fields: [locataireId], references: [id], onDelete: Cascade)
 
   @@index([bailId])
@@ -4437,7 +4457,7 @@ model CodeBailCourt {
   codeCourt     String   @map("code_court")
   createdAt     DateTime @default(now()) @map("created_at")
 
-  bail          Lease    @relation(fields: [bailId], references: [id], onDelete: Cascade)
+  bail                  Lease                     @relation(fields: [bailId], references: [id], onDelete: Restrict)
 
   @@unique([bailleurPhone, codeCourt])
   @@index([bailleurPhone])
@@ -4596,7 +4616,7 @@ model TransmissionAdressage {
 
   adresse       AdresseMaPoste @relation(fields: [adresseId], references: [id], onDelete: Cascade)
   property      Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  lease         Lease          @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  lease           Lease                     @relation(fields: [leaseId], references: [id], onDelete: Restrict)
 
   @@map("transmissions_adressage")
 }
@@ -4616,20 +4636,20 @@ model Occupant {
   prenoms           String                 @map("prenoms")
   dateNaissance     DateTime?              @map("date_naissance")
   mineur            Boolean                @default(false) @map("mineur")
-  lien              String                 @map("lien") // CONJOINT | ENFANT | PARENT | AUTRE_FAMILLE | HEBERGE | COLOCATAIRE | EMPLOYE_DOMESTIQUE
+  lien              LienOccupant           @map("lien")
   declareParUserId  String                 @map("declare_par")
   declareRole       String                 @default("TITULAIRE") @map("declare_role") // TITULAIRE | BAILLEUR | MANDATAIRE
   declarationSha256 String                 @map("declaration_sha256")
   dateEntree        DateTime               @map("date_entree")
   dateSortie        DateTime?              @map("date_sortie")
-  statut            String                 @default("DECLARE") @map("statut") // DECLARE | CONFIRME | REFUSE | CADUC | CLOS
+  statut            OccupantStatut         @default(DECLARE) @map("statut")
   confirmeAt        DateTime?              @map("confirme_at")
   presenceCaptureId String?                @map("presence_capture_id")
-  niveau            String                 @default("C") @map("niveau") // A | B | C
+  niveau            NiveauAttestation      @default(C) @map("niveau")
   motifDesaccord    String?                @map("motif_desaccord")
   createdAt         DateTime               @default(now()) @map("created_at")
 
-  lease             Lease                  @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  lease             Lease                  @relation(fields: [leaseId], references: [id], onDelete: Restrict)
   property          Property               @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   user              User?                  @relation("OccupantUser", fields: [userId], references: [id])
   declarePar        User                   @relation("TitulaireDeclarant", fields: [declareParUserId], references: [id])
@@ -4647,11 +4667,11 @@ model AttestationResidence {
   qualite         String                    @map("qualite") // TITULAIRE | OCCUPANT
   leaseId         String                    @map("bail_id")
   occupantId      String?                   @map("occupant_id")
-  niveau          String                    @map("niveau") // A | B | C
+  niveau          NiveauAttestation         @map("niveau")
   numero          String                    @unique @map("numero") // ATT-AAAA-MM-NNNNNN
   emiseAt         DateTime                  @default(now()) @map("emise_at")
   valideJusque    DateTime                  @map("valide_jusque")
-  statut          String                    @default("VALIDE") @map("statut") // VALIDE | EXPIREE | REVOQUEE
+  statut          AttestationStatut         @default(VALIDE) @map("statut")
   revoqueeAt      DateTime?                 @map("revoquee_at")
   motifRevocation String?                   @map("motif_revocation")
   sha256          String                    @map("sha256")
@@ -4662,7 +4682,7 @@ model AttestationResidence {
   createdAt       DateTime                  @default(now()) @map("created_at")
 
   beneficiaire    User                      @relation("BeneficiaireAttestation", fields: [beneficiaireId], references: [id])
-  lease           Lease                     @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  lease           Lease                     @relation(fields: [leaseId], references: [id], onDelete: Restrict)
   occupant        Occupant?                 @relation(fields: [occupantId], references: [id], onDelete: SetNull)
   verifications   VerificationAttestation[]
 
@@ -4731,4 +4751,158 @@ model EvenementPiloteVocal {
 
   @@index([sessionId, horodatage])
   @@map("evenements_pilote_vocal")
+}
+
+
+// ============================================================================
+// ÉNUMÉRATIONS AUD-01 / IC-01-R1 (18 ÉNUMÉRATIONS NORMALISÉES)
+// ============================================================================
+
+// ============================================================================
+// QAPRIL — AUD-01 / Correctif schéma — Énumérations (IC-M3)
+// Règle : aucune valeur de statut en String libre. Chaque enum ci-dessous
+// remplace un champ `String @default("...")` du schéma du 14/11.
+// Les libellés affichés viennent de enums.json (kit IC-01-R1), jamais d'ici.
+// ============================================================================
+
+enum CandidatureStatut {
+  ENVOYEE
+  VUE
+  VISITE_PROPOSEE
+  RETENUE
+  NON_RETENUE
+  RETIREE
+  EXPIREE
+}
+
+enum AnnonceStatut {
+  BROUILLON
+  PUBLIEE
+  SUSPENDUE
+  LOUEE
+  EXPIREE
+  RETIREE
+}
+
+enum StatutPosition {
+  MANQUANTE
+  PROVISOIRE
+  CONFIRMEE
+  GELEE
+}
+
+enum NiveauCertification {
+  NON_CERTIFIE
+  DECLARE
+  CERTIFIE_QAPRIL
+  ENREGISTRE_DGI
+}
+
+enum PropertyStatus {
+  BROUILLON
+  DISPONIBLE
+  LOUE
+  INDISPONIBLE
+  ARCHIVE
+}
+
+enum ReceiptStatus {
+  EMISE
+  ACOMPTE
+  IMPAYEE
+  ANNULEE
+}
+
+enum KycStatus {
+  PENDING
+  ACTIF
+  SUSPENDU
+  CLOS
+}
+
+enum NiveauVerificationBien {
+  N1_DECLARE
+  N2_POSITION_CONFIRMEE
+  N3_TITRE_CONTROLE
+  N4_VISITE_AGENCE
+}
+
+enum RecouvrementStatut {
+  A_JOUR
+  RETARD
+  IMPAYE
+  MISE_EN_DEMEURE
+  PLAN_APUREMENT
+  CLEMENCE
+  PROCEDURE
+}
+
+enum MandatStatut {
+  PROPOSE
+  SIGNE_MANDANT
+  ACTIF
+  SUSPENDU
+  TERMINE
+}
+
+enum OccupantStatut {
+  DECLARE
+  EN_ATTENTE_BAILLEUR
+  CONFIRME
+  REFUSE
+  CADUC
+  CLOS
+}
+
+enum LienOccupant {
+  CONJOINT
+  ENFANT_MAJEUR
+  ENFANT_MINEUR
+  PARENT
+  AUTRE_FAMILLE
+  HEBERGE
+  COLOCATAIRE
+  EMPLOYE_DOMESTIQUE
+}
+
+enum NiveauAttestation {
+  A
+  B
+  C
+}
+
+enum AttestationStatut {
+  VALIDE
+  EXPIREE
+  REVOQUEE
+}
+
+enum MaPosteStatut {
+  NON_DEMANDEE
+  A_CREER
+  EN_LOT
+  CREEE
+  EXISTANTE_RATTACHEE
+  REFUSEE
+  REVOQUEE
+}
+
+enum CapturePositionResultat {
+  ACCEPTEE
+  REFUSEE
+}
+
+enum CapturePositionMotifRefus {
+  PRECISION
+  HORS_COMMUNE
+  ZONE
+  SIMULEE
+}
+
+enum RoleContexte {
+  LOCATAIRE
+  BAILLEUR
+  AGENCE
+  INTERMEDIAIRE
+  ADMIN
 }

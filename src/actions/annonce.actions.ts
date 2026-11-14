@@ -14,18 +14,31 @@ export async function creerAnnonce(data: {
   charges?:    number;
   photosUrls?: string[];
   diffusions?: { jumia?: boolean; whatsapp?: boolean; expat?: boolean };
+  publieParRole?: "AGENCE" | "BAILLEUR";
+  mandatGestionId?: string;
+  loyerMensuel?: number;
+  depotGarantieMois?: number;
+  avanceLoyerMois?: number;
+  descriptionLongue?: string;
 }) {
   return prisma.annonce.create({
     data: {
       logementId:   data.logementId,
-      agenceId:     data.agenceId,
+      publieParId:  data.agenceId,
+      publieParRole: data.publieParRole || "AGENCE",
+      mandatGestionId: data.mandatGestionId || null,
       titre:        data.titre,
       description:  data.description,
       loyerDemande: data.loyerDemande,
+      loyerMensuel: data.loyerMensuel ?? Math.round(data.loyerDemande),
       charges:      data.charges ?? 0,
+      chargesMensuelles: Math.round(data.charges ?? 0),
+      depotGarantieMois: data.depotGarantieMois ?? 0,
+      avanceLoyerMois: data.avanceLoyerMois ?? 0,
+      descriptionLongue: data.descriptionLongue || data.description,
       photosUrls:   data.photosUrls ?? [],
       diffusions:   data.diffusions ?? {},
-      statut:       "ACTIVE",
+      statut:       "PUBLIEE",
       publieeAt:    new Date(),
     }
   });
@@ -35,7 +48,7 @@ export async function creerAnnonce(data: {
 export async function getAnnoncesActives(commune?: string) {
   return prisma.annonce.findMany({
     where: {
-      statut: "ACTIVE",
+      statut: "PUBLIEE",
       ...(commune ? { logement: { commune } } : {})
     },
     include: { logement: { select: { commune: true, address: true, propertyType: true, superficieM2: true } } },
@@ -62,8 +75,8 @@ export async function soumettreCandidat(data: {
       id: true,
       loyerDemande: true, 
       titre: true,
-      agenceId: true,
-      agence: {
+      publieParId: true,
+      publiePar: {
         select: { id: true, firstName: true, lastName: true, email: true, phone: true }
       }
     },
@@ -105,10 +118,23 @@ export async function soumettreCandidat(data: {
     }
   }
 
+  let annonceId = annonce?.id;
+  if (!annonceId) {
+    const existing = await prisma.annonce.findFirst({
+      where: { logementId: data.logementId }
+    });
+    annonceId = existing?.id;
+  }
+
+  if (!annonceId) {
+    throw new Error("Aucune annonce active trouvée pour ce logement.");
+  }
+
   const candidature = await prisma.candidature.create({
     data: { 
       logementId: data.logementId,
-      candidatId: data.candidatId || null,
+      annonceId,
+      candidatId: data.candidatId || "",
       nom: data.nom,
       prenom: data.prenom,
       telephone: data.telephone,
@@ -116,7 +142,7 @@ export async function soumettreCandidat(data: {
       employeur: data.employeur ?? null,
       tauxEffort, 
       docsJsonb: docsJsonb ?? undefined,
-      statut: "SOUMISE" 
+      statut: "ENVOYEE" 
     }
   });
 
@@ -171,15 +197,16 @@ export async function soumettreCandidat(data: {
         });
       }
 
-      // 3. L'Agence ayant publié l'annonce (si différente)
-      if (annonce?.agence && !destinataires.some(d => d.id === annonce.agence.id)) {
-        const agenceName = [annonce.agence.firstName, annonce.agence.lastName].filter(Boolean).join(" ") || "Agence Partenaire";
+      // 3. L'Entité ayant publié l'annonce (si différente)
+      const publisher = (annonce as any)?.publiePar;
+      if (publisher && !destinataires.some(d => d.id === publisher.id)) {
+        const pubName = [publisher.firstName, publisher.lastName].filter(Boolean).join(" ") || "Émetteur de l'annonce";
         destinataires.push({
-          id: annonce.agence.id,
-          name: agenceName,
-          email: annonce.agence.email,
-          phone: annonce.agence.phone,
-          role: "Agence"
+          id: publisher.id,
+          name: pubName,
+          email: publisher.email,
+          phone: publisher.phone,
+          role: "Annonceur"
         });
       }
 

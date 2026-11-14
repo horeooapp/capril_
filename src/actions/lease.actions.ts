@@ -7,6 +7,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { createHash, randomInt } from "crypto"; // [SEC-FIX F-03] randomInt importé pour OTP sécurisé
+
+const hashOtp = (otp: string) => createHash("sha256").update(otp.trim()).digest("hex");
 import { revalidatePath } from "next/cache";
 import { Role, TypeBail, LeaseStatus, Prisma, BdqStatut } from "@prisma/client";
 import { ensureAuthenticated, ensureLeaseAccess, ensurePropertyAccess } from "./auth-helpers";
@@ -209,7 +211,7 @@ export async function createLease(data: {
                 commercialData: data.commercialData as Prisma.InputJsonValue,
                 sha256Hash: sha256,
                 sha256CalculeLe: new Date(),
-                signingOtp: signingOtp,
+                signingOtpHash: hashOtp(signingOtp),
                 signingOtpExpiresAt: otpExpiresAt,
                 status: data.typeBail === TypeBail.DECLARATIF_BDQ ? LeaseStatus.PENDING_CONFIRMATION : LeaseStatus.PENDING_SIGNATURE,
                 deadlineEnregistrement: new Date(new Date(data.startDate).getTime() + (30 * 24 * 60 * 60 * 1000)),
@@ -883,7 +885,7 @@ export async function requestSignatureOTP(leaseId: string) {
         await prisma.lease.update({ 
             where: { id: leaseId }, 
             data: { 
-                signingOtp: otp,
+                signingOtpHash: hashOtp(otp),
                 signingOtpExpiresAt: otpExpiresAt 
             } as any
         });
@@ -960,8 +962,9 @@ export async function signLease(leaseId: string, otp: string) {
             throw new Error("Vous n'êtes pas autorisé à signer ce contrat de bail.");
         }
 
-        // Verify OTP
-        if ((lease as any).signingOtp !== cleanOtp) {
+        // Verify OTP via secure sha256 hash (M-02)
+        const isOtpValid = lease.signingOtpHash === hashOtp(cleanOtp) || (lease as any).signingOtp === cleanOtp;
+        if (!isOtpValid) {
             throw new Error("Code de validation incorrect ou expiré. Veuillez vérifier le code reçu par WhatsApp / Email.");
         }
 
@@ -972,7 +975,7 @@ export async function signLease(leaseId: string, otp: string) {
                 tenantId: userId,
                 isSignedElectronically: true,
                 signedAt: new Date(),
-                signingOtp: null,
+                signingOtpHash: null,
                 signingOtpExpiresAt: null,
                 status: LeaseStatus.ACTIVE
             } as any
@@ -1029,12 +1032,19 @@ export async function validateLeaseWithCode(otp: string, leaseId?: string) {
 
             lease = await prisma.lease.findFirst({
                 where: {
-                    signingOtp: cleanOtp,
-                    status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] },
                     OR: [
-                        { tenantId: userId },
-                        ...(phoneNorm ? [{ tenant: { phone: phoneNorm } }] : []),
-                        ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+                        { signingOtpHash: hashOtp(cleanOtp) },
+                        { signingOtp: cleanOtp } as any,
+                    ],
+                    status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] },
+                    AND: [
+                        {
+                            OR: [
+                                { tenantId: userId },
+                                ...(phoneNorm ? [{ tenant: { phone: phoneNorm } }] : []),
+                                ...(user?.email ? [{ tenant: { email: user.email } }] : [])
+                            ]
+                        }
                     ]
                 },
                 include: { tenant: true, property: true }
@@ -1044,7 +1054,10 @@ export async function validateLeaseWithCode(otp: string, leaseId?: string) {
             if (!lease) {
                 lease = await prisma.lease.findFirst({
                     where: {
-                        signingOtp: cleanOtp,
+                        OR: [
+                            { signingOtpHash: hashOtp(cleanOtp) },
+                            { signingOtp: cleanOtp } as any,
+                        ],
                         status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] }
                     },
                     include: { tenant: true, property: true }

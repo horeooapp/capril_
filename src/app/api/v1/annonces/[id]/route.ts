@@ -32,10 +32,9 @@ export async function GET(
     const annonce = await prisma.annonce.findUnique({
       where: { id },
       include: {
-        agence: {
+        publiePar: {
           select: {
             id: true,
-            name: true,
             firstName: true,
             lastName: true,
             role: true,
@@ -50,7 +49,7 @@ export async function GET(
         },
         logement: {
           include: {
-            ownerUser: {
+            owner: {
               select: {
                 id: true,
                 role: true,
@@ -66,9 +65,10 @@ export async function GET(
     }
 
     const logement = annonce.logement;
+    const publisher = (annonce as any).publiePar;
     const isOwnerOrAgency =
       currentUserId &&
-      (currentUserId === annonce.agenceId ||
+      (currentUserId === (annonce as any).publieParId ||
         currentUserId === logement?.ownerUserId ||
         currentUserId === logement?.managedByUserId);
 
@@ -76,14 +76,14 @@ export async function GET(
     let publiantLibelle = "Bailleur particulier";
     let agenceDetails: any = null;
 
-    if (annonce.agence?.agencyProfile?.companyName) {
-      publiantLibelle = annonce.agence.agencyProfile.companyName;
+    if (publisher?.agencyProfile?.companyName) {
+      publiantLibelle = publisher.agencyProfile.companyName;
       agenceDetails = {
-        nom: annonce.agence.agencyProfile.companyName,
-        agrement: annonce.agence.agencyProfile.numeroAgrement || "Agréée",
+        nom: publisher.agencyProfile.companyName,
+        agrement: publisher.agencyProfile.numeroAgrement || "Agréée",
       };
-    } else if (annonce.agence?.role === "AGENCY" || annonce.agence?.role === "AGENCE_AGREE") {
-      publiantLibelle = annonce.agence.name || "Agence Immobilière Agréée";
+    } else if (publisher?.role === "AGENCY" || publisher?.role === "AGENCE_AGREE") {
+      publiantLibelle = [publisher.firstName, publisher.lastName].filter(Boolean).join(" ") || "Agence Immobilière Agréée";
       agenceDetails = {
         nom: publiantLibelle,
       };
@@ -132,8 +132,8 @@ export async function GET(
         nomAffiche: publiantLibelle,
         details: agenceDetails,
       },
-      disponibilite: annonce.statut === "ACTIVE" ? "IMMEDIATE" : "NON_DISPONIBLE",
-      negociable: criteres.negociable ?? false,
+      disponibilite: (annonce.statut === "PUBLIEE" || (annonce.statut as string) === "ACTIVE") ? "IMMEDIATE" : "NON_DISPONIBLE",
+      negociable: (annonce as any).negociable ?? criteres.negociable ?? false,
       equipements: (logement as any)?.equipements || criteres.equipements || [],
       localisation: {
         commune: logement?.commune || "Abidjan",

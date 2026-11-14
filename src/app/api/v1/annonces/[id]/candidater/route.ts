@@ -64,7 +64,7 @@ export async function POST(
       return NextResponse.json({ error: "Annonce introuvable." }, { status: 404 });
     }
 
-    if (annonce.statut !== "ACTIVE") {
+    if (annonce.statut !== "PUBLIEE" && (annonce.statut as string) !== "ACTIVE") {
       return NextResponse.json(
         { error: "Cette annonce n'est plus disponible." },
         { status: 400 }
@@ -149,6 +149,15 @@ export async function POST(
       { status: 201 }
     );
   } catch (error: any) {
+    if (error?.code === "P2002" || error?.message?.includes("ux_candidature_vivante")) {
+      return NextResponse.json(
+        {
+          error: "Une candidature est déjà active pour cette annonce.",
+          code: "CANDIDATURE_EXISTANTE",
+        },
+        { status: 409 }
+      );
+    }
     console.error("[Candidater Error]", error);
     return NextResponse.json({ error: error?.message || "Erreur serveur" }, { status: 500 });
   }

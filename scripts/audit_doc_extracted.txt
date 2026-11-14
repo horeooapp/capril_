@@ -1,0 +1,253 @@
+QAPRIL TECHNOLOGIES SA
+Réf. QAPRIL/CDC/003/2026 — AUD-01
+AUD-01
+Revue du schéma de données
+et correctif associé
+Analyse du fichier schema.prisma transmis par le CTO le 14 novembre 2026 (185 modèles, 73 énumérations, PostgreSQL)
+Champ
+Valeur
+Version
+1.0 — 14 novembre 2026
+Émetteur
+Direction Générale — S. A. B. A. Frédéric
+Destinataire
+Achille M., CTO
+Pièce jointe
+QAPRIL_AUD-01_Correctif_Schema.zip (2 fichiers Prisma, 13 migrations SQL, périmètre extensions, README)
+Textes de référence
+CDC QAPRIL ; ADD-13, 21, 24, 26, 27, 28, 29 ; IC-01 et IC-01-R1 ; loi 2019-576 ; CCH art. 415-416-420 ; loi 2013-450
+Statut
+Instruction — applicable immédiatement
+1. Verdict
+Le modèle de données est plus avancé que l'application ne le laisse voir. Les ADD-26, 27, 28 et 29, le mandat, la candidature, le passeport locatif et les interrupteurs S-09 du kit sont déjà modélisés. Le retard du produit est dans les écrans et les services, pas dans la base. C'est favorable au calendrier P0/P1.
+Trois défauts de fond compromettent cependant la recevabilité au sens des règles IC-M3 et IC-M4 :
+112 statuts métier en texte libre (`String @default("...")`), là où le schéma dispose pourtant de 73 énumérations ;
+aucune contrainte d'unicité sur la candidature : le défaut « candidature répétable 20 fois » est garanti par la base, pas seulement par l'écran ;
+des valeurs « certifié » posées par défaut à la création (`niveauCertification = CERTIFIE_QAPRIL` sur un bail en brouillon).
+Enfin, le schéma porte un périmètre que le cahier des charges n'a jamais demandé et qui change la qualification juridique de QAPRIL : portefeuille à solde, placement des cautions avec taux de rendement, vente de prospects, commissions d'assurance, licences de données, exécution de scripts stockés en base. Ce point relève d'une décision de direction, pas d'un correctif technique (section 6).
+1.1 Chiffres de la revue
+Indicateur
+Valeur
+Modèles / énumérations
+185 / 73
+Statuts en String libre
+112 colonnes
+Modèles hors CDC / ADD
+≈ 30 (section 6)
+Points bloquants (B)
+6
+Points majeurs (C)
+10
+Migrations livrées
+13 (M-01 à M-13)
+Migrations exigées avant le jalon P0 du 17/11
+M-01, M-02, M-03, M-04 (partie P0), M-06, M-13
+2. Ce qui est conforme
+Ces éléments sont reconnus et ne font l'objet d'aucune reprise, sauf la remarque de la dernière colonne.
+Exigence
+Dans le schéma
+Remarque
+RG-CONF / RG-MAN-02
+Lease.bailleurMasque
+Rien ne force true quand mandatGestionId est renseigné → M-07
+ADD-24 déclaratif, partiels
+DeclarationPaiement, enum à 5 états, idempotencyKey, tentativesNon
+Conforme au ticket S-14 du kit
+ADD-28 position
+CapturePosition (motif SIMULEE), ModificationPosition, positionGeleeAt, w3w
+statutPosition en texte libre → M-04
+ADD-28 MaPoste
+AdresseMaPoste, lots, dépôts avec accusé, TransmissionAdressage
+L'écran de saisie manuelle vu en v2.0.0 contourne ce modèle
+ADD-29 occupants
+Occupant, AttestationResidence (numéro, tokenVerif, révocation), VerificationAttestation
+Cascade sur suppression du bail → M-11
+ADD-26 conversationnel
+CnvContact, CnvPin haché, CodeBailCourt, modèles approuvés, STOP / STOP_SAUF_BAIL
+Conforme
+Idempotence paiements
+PaymentIntent.idempotencyKey, PgwWebhook (canal, eventId), Receipt (leaseId, periodMonth)
+Solide
+Intégrité / preuve (ADD-13)
+sha256 sur bail, quittance, messages, déclarations, attestations
+Cohérent
+S-09 interrupteurs passeport
+LocataireProfile.share*
+Kit pris en compte
+Agrément agence
+numeroAgrement @unique, agrementDate
+L'app affiche « agréée » sans le vérifier
+3. Défauts bloquants (B) — à corriger pour la recevabilité
+B1 — Candidature répétable — inscrit dans la base
+Candidature ne porte que des @@index ; aucun @@unique([candidatId, annonceId]) ; candidatId et annonceId sont nullables. Vingt candidatures sur la même annonce sont donc acceptées par la base elle-même.
+Correctif : M-01 : candidat et annonce obligatoires, index unique partiel « une candidature non RETIRÉE/EXPIRÉE par couple », réponse API 409.
+B2 — 112 statuts en texte libre
+Candidature.statut, Annonce.statut, Property.status, Property.statutPosition, Receipt.status "pending", LegalEntity.status, IdentityDocument.status, User.kycStatus, Occupant.statut, AttestationResidence.statut, Lease.statutFiscal, statutDgi, CnvConversation.etat, et tous les champs ADD-28/29 commentés // A | B | C.
+Quand la base ne connaît pas le domaine d'un champ, le front ne peut pas le traduire : c'est la racine du défaut IC-M3 (énumérations brutes à l'écran). La discipline est inégale : les sections anciennes sont typées, les ADD récentes ne le sont pas.
+Correctif : M-04 : 18 énumérations livrées (`00_enums_IC-01-R1.prisma`), conversion P0 pour candidature, annonce et position ; reste en P1.
+B3 — « Certifié » par défaut
+Lease.niveauCertification @default("CERTIFIE_QAPRIL"), idem sur Receipt. Un bail en DRAFT naît certifié. Même logique que la mention « Partagé » figée relevée dans l'application : une fonction simulée par une valeur par défaut (IC-M2).
+Correctif : M-03 : défaut `NON_CERTIFIE`, colonne `certifieAt`, reprise des baux non signés.
+B4 — OTP de signature stocké en clair
+Lease.signingOtp String? coexiste avec signingOtpHash. Le premier est de trop.
+Correctif : M-02 : suppression de la colonne ; vérification qu'aucun log ne porte l'OTP.
+B5 — Identité du compte inversée
+User.phone String? @unique : le téléphone est optionnel alors que QAPRIL est un produit « numéro d'abord » (ADD-26 ne fonctionne pas sans). email @unique interdit à deux membres d'un foyer de partager une adresse, cas fréquent.
+Correctif : M-05 : téléphone obligatoire ; email optionnel, unique seulement s'il est vérifié.
+B6 — Annonce publiable uniquement par une agence
+Annonce.agenceId String obligatoire. Un bailleur particulier (cas Koffi N'Guessan, villa en direct) ne peut pas publier. Il manque les champs de la fiche détaillée exigée par IC-01-R1 : dépôt, avance, négociable, description longue, disponibilité ; et rien n'interdit de projeter l'adresse exacte du bien.
+Correctif : M-06 : `publieParId` + `publieParRole`, mandat obligatoire si agence (CHECK), champs de la fiche, plafonds 2 mois en CHECK, projection publique sans adresse ni bailleur.
+4. Points majeurs (C) — jalon P1
+N°
+Constat
+Référence
+Correctif
+C1
+Dépôt et avance (depositAmount, avanceLoyer) sans plafond ; avanceLoyerConformeAt n'est qu'un horodatage
+CCH 415-416-420
+M-07 : CHECK ≤ 2 × loyer
+C2
+Aucune règle liant mandat et masquage ; aucune unicité « un mandat actif par bien »
+RG-MAN-02
+M-07 : trigger de masquage + trigger d'unicité
+C3
+durationMonths Int obligatoire : le bail à durée indéterminée est impossible ; BailDeclaratif double Lease
+Loi 2019-576
+M-08 : durée nullable ; fusion à planifier
+C4
+LeaseStatus mélange cycle de vie et recouvrement (LOYER_IMPAYE, MISE_EN_DEMEURE, CLEMENCE_EN_COURS…) : un bail peut être actif ET en impayé
+Lexique §7
+M-08 : axe statutRecouvrement séparé
+C5
+Scoring exposé : Candidature.scoreQapril, revenuMensuel, docsJsonb ; User.salary
+ADD-21
+M-10 : tranche seule dans la candidature ; suppression des colonnes
+C6
+User.capaciteActive @default("PROPRIETAIRE") : tout inscrit est propriétaire par défaut ; UserCapacite n'est pas la source de vérité
+IC-P1
+M-09
+C7
+Montants en Float (DeclarationPaiement.montant, Lead.prixLead, CnvMessage.cout) alors que Lease/Receipt sont en Int
+FCFA
+M-12
+C8
+onDelete: Cascade sur Occupant, AttestationResidence, DeclarationPaiement, TransmissionAdressage : supprimer un bail efface des attestations qu'une mairie a pu vérifier
+ADD-29
+M-11 : RESTRICT + archivage logique
+C9
+Doublons de concepts : Mandate et MandatGestion ; Candidature.logementId et annonceId ; User.maposteId et AdresseMaPoste.identifiantBoite
+Qualité
+Fusion à planifier après P1
+C10
+Occupant.lien sans distinction majeur/mineur ; EMPLOYE_DOMESTIQUE absent du lexique
+Lexique §7
+M-04 (enum LienOccupant) + mise à jour du lexique
+5. Plan de migrations
+Chaque migration est un fichier SQL autonome, transactionnel, livré dans l'archive jointe. L'ordre est impératif. Aucun `prisma db push` en production ; `prisma migrate diff` avant/après est joint au PV.
+Réf.
+Objet
+Jalon
+Test de recette
+M-01
+Unicité candidature ; candidat et annonce obligatoires
+P0 — 17/11
+2e candidature → 409 ; nouvelle acceptée après RETIRÉE
+M-02
+Suppression signing_otp en clair
+P0 — 17/11
+Colonne absente ; signature fonctionne
+M-03
+Défaut NON_CERTIFIE, certifie_at
+P0 — 17/11
+Bail DRAFT non certifié
+M-04
+Statuts → énumérations (candidature, annonce, position en P0 ; reste en P1)
+P0 / P1
+Valeur hors domaine refusée ; aucun code brut à l'écran
+M-05
+Téléphone obligatoire ; email optionnel
+P1 — 28/11
+Inscription sans email ; deux comptes, un même email non vérifié
+M-06
+Annonce par bailleur ou agence ; champs fiche ; plafonds ; RG-CONF
+P0 — 17/11
+Bailleur publie ; agence sans mandat refusée ; API publique sans adresse
+M-07
+Plafonds dépôt/avance ; un mandat actif par bien ; masquage forcé
+P1 — 28/11
+Dépôt 3 mois refusé ; bailleur_masque forcé
+M-08
+Durée indéterminée ; axe recouvrement
+P1 — 28/11
+Bail sans durée ; ACTIVE + IMPAYÉ
+M-09
+Plus de PROPRIÉTAIRE par défaut
+P1 — 28/11
+Nouvel inscrit sans rôle présumé
+M-10
+ADD-21 : tranche seule, suppression score/revenu/pièces de la candidature
+P1 — 28/11
+Payload bailleur sans score
+M-11
+Preuves sans cascade
+P1 — 28/11
+DELETE bail avec attestation → 23503
+M-12
+Montants entiers
+P1 — 28/11
+Aucune colonne monétaire en double precision
+M-13
+Suppression custom_scripts
+P0 — 17/11
+Aucun eval alimenté par la base
+6. Périmètre hors cahier des charges — décision de direction
+Ce bloc n'est pas un défaut de code : c'est un désaccord de produit, et il est lourd. Les modèles ci-dessous n'apparaissent dans aucun document contractuel. Chacun change la nature juridique de la plateforme.
+Modèles
+Ce que cela implique
+Risque
+UserWalletConfig.walletBalance, WalletTransaction, WalletRecharge*
+QAPRIL détient des fonds (la « tirelire » de l'app, ancrée en base)
+Contredit ADD-13 ; agrément établissement de paiement BCEAO
+VaultCaution, FloatPool (tauxRendement 4,5, partenaireBanque, soldeTotal), FloatMovement
+Placement des dépôts de garantie et captation du rendement
+CautionBail + récépissé CDC-CI modélisent déjà la voie légale ; les deux coexistent
+Lead, LeadTransaction (prixLead, acheteurId)
+Vente de prospects locataires
+Loi 2013-450 : finalité non consentie
+InsuranceProduct, InsuranceSouscription.commissionPlateforme
+Intermédiation d'assurance
+Agrément CIMA
+DataLicenseContract
+Licence de données
+Aucune position juridique établie
+AutomationSettings.customScripts (commentaire « DANGER eval »)
+Exécution de code stocké en base
+Faille de sécurité : suppression (M-13), pas déplacement
+UserDiasporaProfile (Stripe), Syndicate.iban, ChampionProfile, vente ADD-25
+Extensions commerciales
+Légitimes, non prioritaires ; alourdissent migrations et audit
+6.1 Décision demandée
+Il est demandé à la direction de trancher, avant le go/no-go du 1er décembre, entre :
+Option 1 — Séparation (recommandée) : noyau « QAPRIL CDC/ADD » audité et gelé ; schéma `extensions.prisma` distinct, désactivé en production, exclu de l'audit. Le travail du CTO est conservé, la recevabilité est protégée.
+Option 2 — Suppression des modèles de détention de fonds, de placement, de vente de leads et de licence de données ; conservation des autres extensions dans le noyau.
+Option 3 — Maintien en l'état, avec saisine d'un conseil juridique sur les agréments BCEAO et CIMA avant toute mise en production. Cette option décale le 1er décembre.
+Dans les trois cas, `customScripts` est supprimé.
+7. Conséquences sur le calendrier IC-01-R1
+Les P0 écran (fiche annonce, cycle de candidature, énumérations traduites, MaPoste automatique) n'exigent aucune refonte de base : les tables existent. Le prérequis du 13/11 est atteint sur le fond.
+Six migrations sont exigées avant le jalon P0 du lundi 17/11 à 8 h : M-01, M-02, M-03, M-04 (partie P0), M-06, M-13.
+Les autres migrations entrent dans le jalon P1 du 28/11 et dans la recette du volet A/B.
+La séparation du périmètre « extensions » suit la décision de direction et précède le go/no-go du 1er décembre.
+Le dossier d'audit AUD-00 est complété d'un répertoire `03_migrations/` contenant chaque script et sa sortie d'exécution sur la préprod.
+Annexe — Contenu de l'archive jointe
+Fichier
+Contenu
+README.md
+Ordre d'exécution, méthode IC-M4, tests de recette
+prisma/corrections/00_enums_IC-01-R1.prisma
+18 énumérations à ajouter au schéma
+prisma/corrections/01_modeles_corriges.prisma
+Modèles User, Candidature, Annonce, Lease, Receipt, Property, MandatGestion, Occupant, AttestationResidence, DeclarationPaiement, TransmissionAdressage, AutomationSettings ; lignes marquées [M-xx]
+prisma/migrations/M-01 … M-13.sql
+Treize migrations PostgreSQL transactionnelles, commentées, avec requêtes de contrôle
+extensions/PERIMETRE_EXTENSIONS.md
+Liste des modèles à sortir du noyau et liste du noyau conservé
