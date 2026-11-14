@@ -67,7 +67,15 @@ Toute modification de libellé, d'énumération, de navigation, d'identité ou d
 6. Tu ne déploies pas. Le déploiement OTA est déclenché par un humain après recette.
 7. Si le ticket est ambigu, tu poses la question dans la demande de fusion et tu t'arrêtes. Tu ne choisis pas l'interprétation « la plus complète ».
 
-## 7. Ce que tu ne fais jamais
+## 7. Règle absolue des déploiements et mises à jour mobiles (OTA / APK)
+
+À chaque upload ou publication d'une mise à jour (OTA via EAS Update ou génération d'APK) :
+1. **Incrémenter le numéro de build** (`BUILD_NUMBER` dans `lib/version.ts` pour Locataire et Propriétaire).
+2. **Mettre à jour la date et l'heure de build** (`BUILD_DATE`, `BUILD_TIME`, `BUILD_TIMESTAMP` dans `lib/version.ts`).
+3. **Visibilité sur l'écran utilisateur** : L'écran Profil de chaque application mobile doit impérativement afficher de manière visible et claire le numéro de build, la version et la date/heure de mise à jour (via `AppVersionBadge`), avec le bouton de vérification interactive des mises à jour.
+4. **Déploiement bi-canal** : Toute mise à jour OTA doit systématiquement être publiée sur les deux branches (`preview` et `production`) pour que tous les profils d'APK installés la reçoivent immédiatement.
+
+## 8. Ce que tu ne fais jamais
 
 - Ajouter une fonction, un écran ou un champ « pendant que j'y suis ».
 - Afficher un état calculé localement pour « que ça marche en démo ».

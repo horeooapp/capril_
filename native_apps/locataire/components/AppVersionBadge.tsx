@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert, ActivityIndicator } from 'react-native';
 import * as Updates from 'expo-updates';
-import { APP_NAME, APP_VERSION, BUILD_NUMBER, BUILD_DATE, BUILD_TIME, getFullVersionString } from '../lib/version';
+import { RefreshCw, CheckCircle2, Smartphone } from 'lucide-react-native';
+import { APP_NAME, APP_VERSION, BUILD_NUMBER, BUILD_DATE, BUILD_TIME, BUILD_TIMESTAMP, getFullVersionString } from '../lib/version';
 
 export function AppVersionBadge() {
   const [checking, setChecking] = useState(false);
@@ -14,7 +15,7 @@ export function AppVersionBadge() {
       if (__DEV__ || !Updates.isEnabled) {
         Alert.alert(
           APP_NAME,
-          `${getFullVersionString()}\n\nDernière mise à jour : ${BUILD_DATE} à ${BUILD_TIME}\nMode développement actif.`
+          `Version : v${APP_VERSION}\nNuméro de build : Build ${BUILD_NUMBER}\nDate de mise à jour : ${BUILD_TIMESTAMP}\n\nMode développement actif.`
         );
         return;
       }
@@ -23,7 +24,7 @@ export function AppVersionBadge() {
       if (check.isAvailable) {
         Alert.alert(
           'Mise à jour détectée',
-          'Une nouvelle mise à jour est en cours de téléchargement...',
+          'Une nouvelle mise à jour est disponible et en cours de téléchargement...',
           [{ text: 'Patienter' }]
         );
         await Updates.fetchUpdateAsync();
@@ -32,13 +33,13 @@ export function AppVersionBadge() {
         const updateIdStr = Updates.updateId ? Updates.updateId.substring(0, 8) : 'Base';
         Alert.alert(
           'Application à jour',
-          `${APP_NAME} v${APP_VERSION} (Build ${BUILD_NUMBER})\n\nDernière mise à jour appliquée : ${BUILD_DATE} à ${BUILD_TIME}\nCanal OTA : ${Updates.channel || 'production'} (${updateIdStr})\n\nVotre application dispose de la version certifiée la plus récente.`
+          `${APP_NAME} v${APP_VERSION} · Build ${BUILD_NUMBER}\n\nDate de mise à jour : ${BUILD_TIMESTAMP}\nCanal OTA : ${Updates.channel || 'production'} (${updateIdStr})\n\nVotre application est synchronisée avec la dernière version.`
         );
       }
     } catch (e: any) {
       Alert.alert(
         APP_NAME,
-        `${getFullVersionString()}\n\nErreur de vérification : ${e?.message || 'Problème de connexion réseau'}`
+        `Version : v${APP_VERSION} (Build ${BUILD_NUMBER})\nDate : ${BUILD_TIMESTAMP}\n\nInfo réseau : ${e?.message || 'Connexion au serveur'}`
       );
     } finally {
       setChecking(false);
@@ -46,47 +47,92 @@ export function AppVersionBadge() {
   };
 
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
-      <View style={styles.row}>
+    <Pressable style={styles.card} onPress={handlePress}>
+      <View style={styles.headerRow}>
+        <View style={styles.statusPill}>
+          <View style={styles.dotActive} />
+          <Text style={styles.statusPillText}>Application à jour · Build {BUILD_NUMBER}</Text>
+        </View>
         {checking ? (
-          <ActivityIndicator size="small" color="#10B981" style={{ marginRight: 6 }} />
+          <ActivityIndicator size="small" color="#1E7E4E" />
         ) : (
-          <View style={styles.dot} />
+          <RefreshCw color="#64748B" size={14} />
         )}
-        <Text style={styles.text}>{getFullVersionString()}</Text>
       </View>
-      <Text style={styles.subtext}>Mis à jour le {BUILD_DATE} à {BUILD_TIME} · Vérifier</Text>
+
+      <View style={styles.bodyRow}>
+        <Smartphone color="#2C3E6B" size={16} />
+        <Text style={styles.versionTitle}>
+          {APP_NAME} v{APP_VERSION}
+        </Text>
+      </View>
+
+      <Text style={styles.dateLabel}>
+        Dernière mise à jour OTA : {BUILD_DATE} à {BUILD_TIME}
+      </Text>
+      <Text style={styles.tapToVerify}>Toucher pour vérifier les mises à jour</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    gap: 3,
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    marginVertical: 10,
+    gap: 4,
   },
-  row: {
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    backgroundColor: '#F0FDF4',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
   },
-  dot: {
+  dotActive: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10B981',
+    backgroundColor: '#1E7E4E',
   },
-  text: {
+  statusPillText: {
     fontSize: 11,
-    color: '#9CA3AF',
-    fontFamily: 'monospace',
-    letterSpacing: 0.2,
+    fontWeight: '800',
+    color: '#166534',
   },
-  subtext: {
-    fontSize: 9,
-    color: '#6B7280',
-    fontStyle: 'italic',
+  bodyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  versionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  dateLabel: {
+    fontSize: 11,
+    color: '#475569',
+    marginTop: 2,
+  },
+  tapToVerify: {
+    fontSize: 10,
+    color: '#2C3E6B',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });

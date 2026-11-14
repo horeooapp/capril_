@@ -282,6 +282,9 @@ export default function ProfileScreen() {
               <LogOut color="#C0392B" size={16} />
               <Text style={styles.btnDangerText}>Se déconnecter</Text>
             </Pressable>
+
+            {/* Badge officiel de Version & Mise à jour OTA */}
+            <AppVersionBadge />
           </>
         )}
       </ScrollView>
