@@ -47,7 +47,7 @@ export default function PasseportScreen() {
   }, []);
 
   const toggle = async (key: keyof PasseportPrefs) => {
-    const next = { ...prefs, [key]: !prefs[key as string] };
+    const next = { ...prefs, [key]: !prefs[key] };
     setPrefs(next);
     setSaving(true);
     try {
