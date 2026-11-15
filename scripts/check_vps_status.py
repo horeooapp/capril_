@@ -16,6 +16,10 @@ def run(cmd):
     if out: print(out.strip())
     if err: print('ERR:', err.strip())
 
-run('docker exec qapril_postgres psql -U postgres -d qapril -c "SELECT typname FROM pg_type WHERE typtype = \'e\' ORDER BY typname;"')
+run('curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/dashboard')
+run('curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/dashboard/documents')
+run('curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/dashboard/certificates')
+run('curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3000/dashboard/succession')
+run('docker logs --tail 30 qapril_app')
 
 c.close()

@@ -63,15 +63,15 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-        {/* LOGO & TITRE */}
+        {/* LOGO & HERO ILLUSTRÉ */}
         <View style={styles.header}>
           <Pressable
             onPress={() => router.replace('/onboarding' as any)}
             style={{
               alignSelf: 'flex-start',
-              marginBottom: 10,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
+              marginBottom: 12,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
               borderRadius: 999,
               backgroundColor: 'rgba(255,255,255,0.08)',
               borderWidth: 1,
@@ -82,19 +82,41 @@ export default function LoginScreen() {
               ← Voir la présentation
             </Text>
           </Pressable>
-          <Image
-            source={{ uri: 'https://www.qapril.net/logo.png' }}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={[styles.badge, { color: accentColor }]}>
-            {isProprietaire
-              ? 'ESPACE PROPRIÉTAIRE BAILLEUR DIRECT'
-              : 'ESPACE AGENCE IMMOBILIÈRE AGRÉÉE'}
-          </Text>
-          <Text style={styles.subTitle}>
-            Plateforme certifiée de gestion immobilière · DGI & Horodatage certifié
-          </Text>
+
+          {/* BANNIÈRE VISUELLE ET ILLUSTRÉE */}
+          <View style={styles.heroCardVisual}>
+            <View style={styles.heroTopRow}>
+              <Image
+                source={{ uri: 'https://www.qapril.net/logo.png' }}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <View style={[styles.certifiedBadgePill, { borderColor: accentColor }]}>
+                <ShieldCheck size={12} color={accentColor} />
+                <Text style={[styles.certifiedBadgePillText, { color: accentColor }]}>SÉCURISÉ & AGRÉÉ</Text>
+              </View>
+            </View>
+
+            {/* COMPOSITION ILLUSTRÉE CENTRALE */}
+            <View style={styles.illustrationComposition}>
+              <View style={[styles.illustrIconBadgeLeft, { borderColor: isProprietaire ? '#E8A020' : '#3B82F6' }]}>
+                {isProprietaire ? <Home size={18} color="#E8A020" /> : <Building2 size={18} color="#3B82F6" />}
+              </View>
+              <View style={[styles.illustrMainEmblem, { backgroundColor: isProprietaire ? 'rgba(27, 77, 62, 0.4)' : 'rgba(31, 42, 68, 0.4)', borderColor: primaryColor }]}>
+                {isProprietaire ? <Building2 size={32} color="#FFFFFF" /> : <Briefcase size={32} color="#FFFFFF" />}
+              </View>
+              <View style={styles.illustrIconBadgeRight}>
+                <Sparkles size={18} color="#34D399" />
+              </View>
+            </View>
+
+            <Text style={styles.heroHeadline}>
+              {isProprietaire ? 'Espace Propriétaire & Bailleur' : 'Console Agence Immobilière Agréée'}
+            </Text>
+            <Text style={styles.subTitle}>
+              Gestion locative intégrée · Loyers, baux certifiés & horodatage officiel
+            </Text>
+          </View>
         </View>
 
         {/* ÉTAPE OBLIGATOIRE : CHOIX DU PROFIL */}
@@ -250,13 +272,93 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: 48,
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    marginTop: 18,
+    marginBottom: 16,
+    paddingHorizontal: 18,
+  },
+  heroCardVisual: {
+    width: '100%',
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderRadius: 22,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    alignItems: 'center',
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  certifiedBadgePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  certifiedBadgePillText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  illustrationComposition: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 8,
+    gap: 12,
+  },
+  illustrMainEmblem: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  illustrIconBadgeLeft: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '-8deg' }],
+  },
+  illustrIconBadgeRight: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '8deg' }],
+  },
+  heroHeadline: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginTop: 6,
+    letterSpacing: 0.3,
   },
   logo: {
-    width: 150,
-    height: 52,
+    width: 120,
+    height: 38,
     tintColor: '#ffffff',
   },
   badge: {
