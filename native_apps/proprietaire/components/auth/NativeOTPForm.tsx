@@ -35,6 +35,9 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
     const otpInputRef = useRef<TextInput>(null);
     const router = useRouter();
 
+    const isProprietaire = profile === 'proprietaire';
+    const primaryColor = isProprietaire ? '#D97706' : '#2563EB';
+
     useEffect(() => {
         checkBiometricAuth();
     }, []);
@@ -160,7 +163,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
         if (!trimmedEmail || !trimmedEmail.includes('@')) {
             setFeedback({
                 type: 'info',
-                text: "Renseignez votre e-mail dans l'onglet E-mail pour continuer avec Google."
+                text: `Renseignez votre e-mail dans l'onglet E-mail pour continuer avec ${provider === 'google' ? 'Google' : 'Facebook'}.`
             });
             setLoginType('EMAIL');
             return;
@@ -243,7 +246,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
     };
 
     return (
-        <View style={styles.container}>
+        <View style={styles.card}>
             {/* RETOUR VISUEL / ERREUR MINIMALISTE */}
             {feedback && (
                 <View style={[
@@ -299,13 +302,13 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
 
                     {/* CHAMP DE SAISIE MONO-LIGNE ÉPURÉ */}
                     {loginType === 'PHONE' ? (
-                        <View style={[styles.inputRow, isFocused && styles.inputRowFocused]}>
+                        <View style={[styles.inputRow, isFocused && [styles.inputRowFocused, { borderColor: primaryColor }]]}>
                             <Text style={styles.countryPrefix}>🇨🇮 +225</Text>
                             <View style={styles.inputSeparator} />
                             <TextInput
                                 style={styles.input}
                                 placeholder="07 00 00 00 00"
-                                placeholderTextColor="#636366"
+                                placeholderTextColor="#94A3B8"
                                 value={phoneNumber}
                                 onChangeText={handlePhoneChange}
                                 keyboardType="phone-pad"
@@ -318,11 +321,11 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                             />
                         </View>
                     ) : (
-                        <View style={[styles.inputRow, isFocused && styles.inputRowFocused]}>
+                        <View style={[styles.inputRow, isFocused && [styles.inputRowFocused, { borderColor: primaryColor }]]}>
                             <TextInput
                                 style={styles.input}
                                 placeholder="nom@exemple.ci"
-                                placeholderTextColor="#636366"
+                                placeholderTextColor="#94A3B8"
                                 value={emailAddress}
                                 onChangeText={setEmailAddress}
                                 keyboardType="email-address"
@@ -337,14 +340,14 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                         </View>
                     )}
 
-                    {/* BOUTON CONTINUER (STYLE BOUTON PRINCIPAL APPLE) */}
+                    {/* BOUTON CONTINUER (STYLE BOUTON PRINCIPAL CHALEUREUX ET GAI) */}
                     <Pressable 
-                        style={[styles.primaryButton, isPending && styles.buttonDisabled]}
+                        style={[styles.primaryButton, { backgroundColor: primaryColor }, isPending && styles.buttonDisabled]}
                         onPress={handleRequestOTP}
                         disabled={isPending}
                     >
                         {isPending ? (
-                            <ActivityIndicator color="#000000" />
+                            <ActivityIndicator color="#FFFFFF" />
                         ) : (
                             <Text style={styles.primaryButtonText}>Continuer</Text>
                         )}
@@ -357,18 +360,29 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                         <View style={styles.dividerLine} />
                     </View>
 
-                    {/* AUTHENTIFICATION GOOGLE ÉPURÉE */}
-                    <Pressable
-                        style={styles.socialButton}
-                        onPress={() => handleSocialAuth('google')}
-                        disabled={isPending}
-                    >
-                        <Text style={styles.socialGoogleIcon}>G</Text>
-                        <Text style={styles.socialButtonText}>Continuer avec Google</Text>
-                    </Pressable>
+                    {/* BOUTONS SOCIAUX : GOOGLE & FACEBOOK */}
+                    <View style={styles.socialButtonsColumn}>
+                        <Pressable
+                            style={styles.googleButton}
+                            onPress={() => handleSocialAuth('google')}
+                            disabled={isPending}
+                        >
+                            <Text style={styles.googleIconText}>G</Text>
+                            <Text style={styles.googleButtonText}>Continuer avec Google</Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={styles.facebookButton}
+                            onPress={() => handleSocialAuth('facebook')}
+                            disabled={isPending}
+                        >
+                            <Text style={styles.facebookIconText}>f</Text>
+                            <Text style={styles.facebookButtonText}>Continuer avec Facebook</Text>
+                        </Pressable>
+                    </View>
                 </Animated.View>
             ) : (
-                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE */
+                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE LIGHT */
                 <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutUp.duration(150)}>
                     <View style={styles.otpHeader}>
                         <Text style={styles.otpTitle}>Code de vérification</Text>
@@ -377,7 +391,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                         </Text>
                     </View>
 
-                    {/* 6 CASES NUMÉRIQUES DISCRÈTES ET VISIBLES */}
+                    {/* 6 CASES NUMÉRIQUES CLAIRES, DISCRÈTES ET VISIBLES */}
                     <Pressable 
                         style={styles.otpBoxesRow}
                         onPress={() => otpInputRef.current?.focus()}
@@ -392,7 +406,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                                     key={index} 
                                     style={[
                                         styles.otpCell,
-                                        isCurrent && styles.otpCellActive,
+                                        isCurrent && [styles.otpCellActive, { borderColor: primaryColor }],
                                         isFilled && styles.otpCellFilled,
                                     ]}
                                 >
@@ -421,6 +435,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                     <Pressable 
                         style={[
                             styles.primaryButton, 
+                            { backgroundColor: primaryColor },
                             (isPending || otp.length < 6) && styles.buttonDisabled,
                             { marginTop: 24 }
                         ]}
@@ -428,7 +443,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                         disabled={isPending || otp.length < 6}
                     >
                         {isPending ? (
-                            <ActivityIndicator color="#000000" />
+                            <ActivityIndicator color="#FFFFFF" />
                         ) : (
                             <Text style={styles.primaryButtonText}>Valider</Text>
                         )}
@@ -452,137 +467,174 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
 }
 
 const styles = StyleSheet.create({
-    container: {
+    card: {
         width: '100%',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 22,
+        padding: 20,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.05,
+        shadowRadius: 16,
+        elevation: 4,
     },
     segmentedControl: {
         flexDirection: 'row',
-        backgroundColor: '#1C1C1E',
-        borderRadius: 10,
+        backgroundColor: '#F1F5F9',
+        borderRadius: 12,
         padding: 3,
-        marginBottom: 20,
+        marginBottom: 18,
     },
     segment: {
         flex: 1,
-        paddingVertical: 8,
+        paddingVertical: 9,
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 7,
+        borderRadius: 9,
     },
     segmentActive: {
-        backgroundColor: '#2C2C2E',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.25,
-        shadowRadius: 2,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
         elevation: 2,
     },
     segmentText: {
         fontSize: 13,
         fontWeight: '500',
-        color: '#8E8E93',
+        color: '#64748B',
     },
     segmentTextActive: {
-        color: '#FFFFFF',
-        fontWeight: '600',
+        color: '#0F172A',
+        fontWeight: '700',
     },
     inputRow: {
         height: 52,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#F8FAFC',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#2C2C2E',
+        borderColor: '#E2E8F0',
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 14,
         marginBottom: 16,
     },
     inputRowFocused: {
-        borderColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF',
     },
     countryPrefix: {
         fontSize: 15,
-        color: '#8E8E93',
-        fontWeight: '500',
+        color: '#334155',
+        fontWeight: '600',
     },
     inputSeparator: {
         width: 1,
         height: 18,
-        backgroundColor: '#2C2C2E',
+        backgroundColor: '#CBD5E1',
         marginHorizontal: 12,
     },
     input: {
         flex: 1,
         height: '100%',
-        color: '#FFFFFF',
+        color: '#0F172A',
         fontSize: 16,
-        fontWeight: '400',
+        fontWeight: '500',
     },
     primaryButton: {
         height: 50,
-        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 2,
     },
     buttonDisabled: {
-        opacity: 0.4,
+        opacity: 0.5,
     },
     primaryButtonText: {
-        color: '#000000',
+        color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '700',
         letterSpacing: -0.2,
     },
     dividerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 20,
+        marginVertical: 18,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#E2E8F0',
     },
     dividerText: {
         marginHorizontal: 12,
-        color: '#636366',
+        color: '#94A3B8',
         fontSize: 12,
+        fontWeight: '500',
     },
-    socialButton: {
+    socialButtonsColumn: {
+        gap: 10,
+    },
+    googleButton: {
         height: 48,
-        backgroundColor: '#1C1C1E',
+        backgroundColor: '#FFFFFF',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#2C2C2E',
+        borderColor: '#E2E8F0',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 10,
     },
-    socialGoogleIcon: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
+    googleIconText: {
+        color: '#EA4335',
+        fontSize: 17,
+        fontWeight: '800',
     },
-    socialButtonText: {
+    googleButtonText: {
+        color: '#1E293B',
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    facebookButton: {
+        height: 48,
+        backgroundColor: '#1877F2',
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+    },
+    facebookIconText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: '900',
+    },
+    facebookButtonText: {
         color: '#FFFFFF',
         fontSize: 15,
-        fontWeight: '500',
+        fontWeight: '600',
     },
     otpHeader: {
         alignItems: 'center',
-        marginBottom: 24,
+        marginBottom: 20,
     },
     otpTitle: {
         fontSize: 20,
-        fontWeight: '600',
-        color: '#FFFFFF',
-        marginBottom: 6,
+        fontWeight: '700',
+        color: '#0F172A',
+        marginBottom: 4,
     },
     otpSubtitle: {
         fontSize: 14,
-        color: '#8E8E93',
+        color: '#64748B',
         textAlign: 'center',
     },
     otpBoxesRow: {
@@ -593,23 +645,24 @@ const styles = StyleSheet.create({
     otpCell: {
         width: 48,
         height: 54,
-        borderRadius: 10,
-        backgroundColor: '#1C1C1E',
-        borderWidth: 1,
-        borderColor: '#2C2C2E',
+        borderRadius: 12,
+        backgroundColor: '#F8FAFC',
+        borderWidth: 1.5,
+        borderColor: '#E2E8F0',
         alignItems: 'center',
         justifyContent: 'center',
     },
     otpCellActive: {
-        borderColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF',
     },
     otpCellFilled: {
-        borderColor: '#3A3A3C',
+        borderColor: '#94A3B8',
+        backgroundColor: '#FFFFFF',
     },
     otpCellText: {
         fontSize: 24,
-        fontWeight: '600',
-        color: '#FFFFFF',
+        fontWeight: '700',
+        color: '#0F172A',
     },
     hiddenInput: {
         position: 'absolute',
@@ -618,14 +671,14 @@ const styles = StyleSheet.create({
         opacity: 0.01,
     },
     backRow: {
-        marginTop: 20,
+        marginTop: 18,
         alignItems: 'center',
         paddingVertical: 8,
     },
     backLinkMuted: {
-        color: '#8E8E93',
+        color: '#64748B',
         fontSize: 14,
-        fontWeight: '400',
+        fontWeight: '500',
     },
     feedbackBanner: {
         paddingVertical: 10,
@@ -634,17 +687,24 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     feedbackError: {
-        backgroundColor: 'rgba(255, 69, 58, 0.15)',
+        backgroundColor: '#FEF2F2',
+        borderWidth: 1,
+        borderColor: '#FECACA',
     },
     feedbackSuccess: {
-        backgroundColor: 'rgba(48, 209, 88, 0.15)',
+        backgroundColor: '#F0FDF4',
+        borderWidth: 1,
+        borderColor: '#BBF7D0',
     },
     feedbackInfo: {
-        backgroundColor: 'rgba(10, 132, 255, 0.15)',
+        backgroundColor: '#EFF6FF',
+        borderWidth: 1,
+        borderColor: '#BFDBFE',
     },
     feedbackText: {
-        color: '#FFFFFF',
+        color: '#1E293B',
         fontSize: 13,
         textAlign: 'center',
+        fontWeight: '500',
     },
 });

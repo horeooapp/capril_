@@ -14,67 +14,75 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import NativeOTPForm from '../components/auth/NativeOTPForm';
 
 export default function LoginScreen() {
     const router = useRouter();
 
     return (
-        <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
-            <StatusBar barStyle="light-content" backgroundColor="#000000" />
-            <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={{ flex: 1 }}
-            >
-                <ScrollView 
-                    contentContainerStyle={styles.scrollContent}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
+        <LinearGradient 
+            colors={['#ECFDF5', '#F8FAFC', '#FFFFFF']} 
+            style={styles.gradientContainer}
+        >
+            <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
+                <StatusBar barStyle="dark-content" backgroundColor="#ECFDF5" />
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
                 >
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={styles.content}>
-                            
-                            {/* BOUTON PRÉSENTATION DISCRET (STYLE NAVIGATION APPLE) */}
-                            <View style={styles.topBar}>
-                                <Pressable
-                                    onPress={() => router.replace('/onboarding' as any)}
-                                    style={styles.backLink}
-                                    hitSlop={10}
-                                >
-                                    <Text style={styles.backLinkText}>‹ Présentation</Text>
-                                </Pressable>
-                            </View>
-
-                            {/* EN-TÊTE ÉPURÉ STYLE APPLE */}
-                            <View style={styles.header}>
-                                <View style={styles.logoWrap}>
-                                    <Image 
-                                        source={{ uri: 'https://www.qapril.net/logo.png' }} 
-                                        style={styles.logo}
-                                        resizeMode="contain"
-                                    />
+                    <ScrollView 
+                        contentContainerStyle={styles.scrollContent}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.content}>
+                                
+                                {/* NAVIGATION PRÉSENTATION DISCRÈTE */}
+                                <View style={styles.topBar}>
+                                    <Pressable
+                                        onPress={() => router.replace('/onboarding' as any)}
+                                        style={styles.backLink}
+                                        hitSlop={10}
+                                    >
+                                        <Text style={styles.backLinkText}>‹ Présentation</Text>
+                                    </Pressable>
                                 </View>
-                                <Text style={styles.title}>QAPRIL</Text>
-                                <Text style={styles.subtitle}>Espace Locataire</Text>
-                            </View>
 
-                            {/* FORMULAIRE AUTHENTIFICATION DIRECT ET ÉPURÉ */}
-                            <NativeOTPForm 
-                                role="TENANT" 
-                            />
-                            
-                        </View>
-                    </TouchableWithoutFeedback>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                                {/* EN-TÊTE ÉPURÉ ET LUMINEUX (STYLE APPLE LIGHT) */}
+                                <View style={styles.header}>
+                                    <View style={styles.logoWrap}>
+                                        <Image 
+                                            source={{ uri: 'https://www.qapril.net/logo.png' }} 
+                                            style={styles.logo}
+                                            resizeMode="contain"
+                                        />
+                                    </View>
+                                    <Text style={styles.title}>QAPRIL</Text>
+                                    <Text style={styles.subtitle}>Espace Locataire</Text>
+                                </View>
+
+                                {/* FORMULAIRE ÉPURÉ, CLAIR ET ACCUEILLANT */}
+                                <NativeOTPForm 
+                                    role="TENANT" 
+                                />
+                                
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+        </LinearGradient>
     );
 }
 
 const styles = StyleSheet.create({
+    gradientContainer: {
+        flex: 1,
+    },
     container: {
         flex: 1,
-        backgroundColor: '#000000',
     },
     scrollContent: {
         flexGrow: 1,
@@ -96,24 +104,29 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     backLinkText: {
-        color: '#8E8E93',
+        color: '#64748B',
         fontSize: 15,
-        fontWeight: '400',
+        fontWeight: '500',
     },
     header: {
         alignItems: 'center',
-        marginBottom: 32,
+        marginBottom: 28,
     },
     logoWrap: {
         width: 68,
         height: 68,
-        borderRadius: 16,
-        backgroundColor: '#1C1C1E',
+        borderRadius: 18,
+        backgroundColor: '#FFFFFF',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 16,
+        marginBottom: 14,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.08)',
+        borderColor: '#E2E8F0',
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 10,
+        elevation: 3,
     },
     logo: {
         width: 44,
@@ -122,13 +135,13 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: '700',
-        color: '#FFFFFF',
+        color: '#0F172A',
         letterSpacing: -0.5,
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 15,
-        color: '#8E8E93',
-        fontWeight: '400',
+        color: '#64748B',
+        fontWeight: '500',
     },
 });
