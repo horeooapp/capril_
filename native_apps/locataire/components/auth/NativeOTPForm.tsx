@@ -12,6 +12,8 @@ import {
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as Notifications from 'expo-notifications';
+import { Sparkles } from 'lucide-react-native';
 import { API_URL, getStoredToken, setStoredToken } from '../../lib/api';
 import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
@@ -37,6 +39,32 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
     useEffect(() => {
         checkBiometricAuth();
     }, []);
+
+    // ÉCOUTE AUTOMATIQUE DES NOTIFICATIONS ET SMS OTP EN PREMIER PLAN
+    useEffect(() => {
+        if (step !== 'OTP') return;
+
+        let notificationSub: Notifications.Subscription | null = null;
+        try {
+            notificationSub = Notifications.addNotificationReceivedListener(notification => {
+                const title = notification.request.content.title || '';
+                const body = notification.request.content.body || '';
+                const fullText = `${title} ${body}`;
+                // Recherche d'un code à 6 chiffres
+                const match = fullText.match(/\b\d{6}\b/);
+                if (match && match[0]) {
+                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté depuis notification:', match[0]);
+                    handleOtpChange(match[0]);
+                }
+            });
+        } catch (e) {
+            console.log('[OTP] Notifications listener exception:', e);
+        }
+
+        return () => {
+            notificationSub?.remove();
+        };
+    }, [step, isPending]);
 
     const checkBiometricAuth = async () => {
         try {
@@ -201,9 +229,20 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
         }
     };
 
-    const handleVerifyOTP = async () => {
+    // RÉCEPTION ET AUTO-SOUMISSION INSTANTANÉE DU CODE (0-TAP)
+    const handleOtpChange = (txt: string) => {
+        const cleaned = txt.replace(/[^0-9]/g, '').slice(0, 6);
+        setOtp(cleaned);
+        if (cleaned.length === 6 && !isPending) {
+            console.log('[OTP AUTO-VERIFY] 6 chiffres reçus, déclenchement immédiat de la validation...');
+            handleVerifyOTP(cleaned);
+        }
+    };
+
+    const handleVerifyOTP = async (customOtp?: string) => {
+        const codeToVerify = typeof customOtp === 'string' ? customOtp : otp;
         setFeedback(null);
-        if (!otp || otp.length < 6) {
+        if (!codeToVerify || codeToVerify.length < 6) {
             setFeedback({ type: 'error', text: "Saisissez les 6 chiffres du code." });
             return;
         }
@@ -217,7 +256,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
             const response = await fetch(`${API_URL}/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier, email: identifier, phone: identifier, otp, role }),
+                body: JSON.stringify({ identifier, email: identifier, phone: identifier, otp: codeToVerify, role }),
                 signal: controller.signal,
             });
 
@@ -376,7 +415,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                     </View>
                 </Animated.View>
             ) : (
-                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE LIGHT */
+                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE AVEC AUTOFILL */
                 <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutUp.duration(150)}>
                     <View style={styles.otpHeader}>
                         <Text style={styles.otpTitle}>Code de vérification</Text>
@@ -385,54 +424,66 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                         </Text>
                     </View>
 
-                    {/* 6 CASES NUMÉRIQUES CLAIRES, DISCRÈTES ET VISIBLES */}
-                    <Pressable 
-                        style={styles.otpBoxesRow}
-                        onPress={() => otpInputRef.current?.focus()}
-                    >
-                        {[0, 1, 2, 3, 4, 5].map((index) => {
-                            const char = otp[index] || '';
-                            const isCurrent = otp.length === index;
-                            const isFilled = Boolean(char);
+                    {/* CONTENEUR DES 6 CASES AVEC INPUT NATIVE DE RECOUVREMENT COMPLET */}
+                    <View style={styles.otpWrapper}>
+                        <View style={styles.otpBoxesRow} pointerEvents="none">
+                            {[0, 1, 2, 3, 4, 5].map((index) => {
+                                const char = otp[index] || '';
+                                const isCurrent = otp.length === index;
+                                const isFilled = Boolean(char);
 
-                            return (
-                                <View 
-                                    key={index} 
-                                    style={[
-                                        styles.otpCell,
-                                        isCurrent && styles.otpCellActive,
-                                        isFilled && styles.otpCellFilled,
-                                    ]}
-                                >
-                                    <Text style={styles.otpCellText}>
-                                        {char || (isCurrent ? '|' : '')}
-                                    </Text>
-                                </View>
-                            );
-                        })}
-                    </Pressable>
+                                return (
+                                    <View 
+                                        key={index} 
+                                        style={[
+                                            styles.otpCell,
+                                            isCurrent && styles.otpCellActive,
+                                            isFilled && styles.otpCellFilled,
+                                        ]}
+                                    >
+                                        <Text style={styles.otpCellText}>
+                                            {char || (isCurrent ? '|' : '')}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
+                        </View>
 
-                    {/* INPUT RÉEL TRANSPARENT */}
-                    <TextInput
-                        ref={otpInputRef}
-                        style={styles.hiddenInput}
-                        value={otp}
-                        onChangeText={(txt) => setOtp(txt.replace(/[^0-9]/g, '').slice(0, 6))}
-                        keyboardType="number-pad"
-                        maxLength={6}
-                        editable={!isPending}
-                        onSubmitEditing={handleVerifyOTP}
-                        autoFocus
-                    />
+                        {/* INPUT NATIVE COUVRANT TOUTE LA SURFACE (iOS oneTimeCode & Android sms-otp) */}
+                        <TextInput
+                            ref={otpInputRef}
+                            style={styles.realOtpInput}
+                            value={otp}
+                            onChangeText={handleOtpChange}
+                            keyboardType="number-pad"
+                            textContentType="oneTimeCode"
+                            autoComplete="sms-otp"
+                            importantForAutofill="yes"
+                            maxLength={6}
+                            editable={!isPending}
+                            autoFocus={true}
+                            caretHidden={true}
+                            contextMenuHidden={false}
+                            selectTextOnFocus={true}
+                        />
+                    </View>
 
-                    {/* BOUTON DE VALIDATION */}
+                    {/* PASTILLE D'INDICATION DE RÉCUPÉRATION AUTOMATIQUE */}
+                    <View style={styles.autoDetectPill}>
+                        <Sparkles size={13} color="#10B981" />
+                        <Text style={styles.autoDetectPillText}>
+                            Récupération automatique du code activée
+                        </Text>
+                    </View>
+
+                    {/* BOUTON DE VALIDATION (OU AUTOMATIQUE À RÉCEPTION) */}
                     <Pressable 
                         style={[
                             styles.primaryButton, 
                             (isPending || otp.length < 6) && styles.buttonDisabled,
-                            { marginTop: 24 }
+                            { marginTop: 16 }
                         ]}
-                        onPress={handleVerifyOTP}
+                        onPress={() => handleVerifyOTP()}
                         disabled={isPending || otp.length < 6}
                     >
                         {isPending ? (
@@ -632,10 +683,17 @@ const styles = StyleSheet.create({
         color: '#64748B',
         textAlign: 'center',
     },
+    otpWrapper: {
+        position: 'relative',
+        width: '100%',
+        height: 56,
+        marginBottom: 10,
+    },
     otpBoxesRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        width: '100%',
+        height: '100%',
     },
     otpCell: {
         width: 48,
@@ -660,11 +718,33 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#0F172A',
     },
-    hiddenInput: {
+    realOtpInput: {
         position: 'absolute',
-        width: 1,
-        height: 1,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: 56,
         opacity: 0.01,
+        color: 'transparent',
+    },
+    autoDetectPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 999,
+        backgroundColor: '#ECFDF5',
+        alignSelf: 'center',
+        marginTop: 4,
+    },
+    autoDetectPillText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#059669',
     },
     backRow: {
         marginTop: 18,
