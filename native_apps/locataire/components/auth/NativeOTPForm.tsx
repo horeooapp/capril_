@@ -50,15 +50,14 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                 const title = notification.request.content.title || '';
                 const body = notification.request.content.body || '';
                 const fullText = `${title} ${body}`;
-                // Recherche d'un code à 6 chiffres
-                const match = fullText.match(/\b\d{6}\b/);
+                const match = fullText.match(/\b\d{6}\b/) || fullText.match(/\d{6}/);
                 if (match && match[0]) {
                     console.log('[OTP AUTO-RETRIEVAL] Code intercepté depuis notification:', match[0]);
                     handleOtpChange(match[0]);
                 }
             });
         } catch (e) {
-            console.log('[OTP] Notifications listener exception:', e);
+            console.log('[OTP] Notifications listener non disponible:', e);
         }
 
         return () => {
@@ -170,7 +169,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                 setStep('OTP');
                 setTimeout(() => {
                     otpInputRef.current?.focus();
-                }, 400);
+                }, 300);
             } else {
                 setFeedback({ type: 'error', text: result.error || "Impossible d'envoyer le code. Vérifiez votre saisie." });
             }
@@ -231,10 +230,24 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
 
     // RÉCEPTION ET AUTO-SOUMISSION INSTANTANÉE DU CODE (0-TAP)
     const handleOtpChange = (txt: string) => {
+        if (!txt) {
+            setOtp('');
+            return;
+        }
+
+        // 1. Chercher d'abord 6 chiffres consécutifs dans le texte (format SMS autofill ou message complet)
+        const match = txt.match(/\b\d{6}\b/) || txt.match(/\d{6}/);
+        if (match) {
+            const foundOtp = match[0];
+            setOtp(foundOtp);
+            handleVerifyOTP(foundOtp);
+            return;
+        }
+
+        // 2. Filtrer tous les chiffres saisis
         const cleaned = txt.replace(/[^0-9]/g, '').slice(0, 6);
         setOtp(cleaned);
         if (cleaned.length === 6 && !isPending) {
-            console.log('[OTP AUTO-VERIFY] 6 chiffres reçus, déclenchement immédiat de la validation...');
             handleVerifyOTP(cleaned);
         }
     };
@@ -415,7 +428,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                     </View>
                 </Animated.View>
             ) : (
-                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE AVEC AUTOFILL */
+                /* ÉTAPE OTP : STYLE TWO-FACTOR AUTHENTICATION APPLE AVEC AUTOFILL TOTAL */
                 <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutUp.duration(150)}>
                     <View style={styles.otpHeader}>
                         <Text style={styles.otpTitle}>Code de vérification</Text>
@@ -424,7 +437,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                         </Text>
                     </View>
 
-                    {/* CONTENEUR DES 6 CASES AVEC INPUT NATIVE DE RECOUVREMENT COMPLET */}
+                    {/* CONTENEUR DES 6 CASES AVEC INPUT NATIVE DE RECOUVREMENT COMPLET OPAQUE */}
                     <View style={styles.otpWrapper}>
                         <View style={styles.otpBoxesRow} pointerEvents="none">
                             {[0, 1, 2, 3, 4, 5].map((index) => {
@@ -442,39 +455,44 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                                         ]}
                                     >
                                         <Text style={styles.otpCellText}>
-                                            {char || (isCurrent ? '|' : '')}
+                                            {char || (isCurrent ? '|' : '·')}
                                         </Text>
                                     </View>
                                 );
                             })}
                         </View>
 
-                        {/* INPUT NATIVE COUVRANT TOUTE LA SURFACE (iOS oneTimeCode & Android sms-otp) */}
+                        {/* INPUT NATIVE COUVRANT TOUTE LA SURFACE (OPACITY: 1 POUR ÉVITER LES BLOCAGES ANDROID AUTOFILL) */}
                         <TextInput
                             ref={otpInputRef}
                             style={styles.realOtpInput}
                             value={otp}
                             onChangeText={handleOtpChange}
-                            keyboardType="number-pad"
+                            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
                             textContentType="oneTimeCode"
                             autoComplete="sms-otp"
                             importantForAutofill="yes"
-                            maxLength={6}
+                            maxLength={100}
                             editable={!isPending}
                             autoFocus={true}
                             caretHidden={true}
-                            contextMenuHidden={false}
+                            cursorColor="transparent"
+                            selectionColor="transparent"
                             selectTextOnFocus={true}
                         />
                     </View>
 
-                    {/* PASTILLE D'INDICATION DE RÉCUPÉRATION AUTOMATIQUE */}
-                    <View style={styles.autoDetectPill}>
-                        <Sparkles size={13} color="#10B981" />
+                    {/* PASTILLE D'INDICATION INTERACTIVE DE RÉCUPÉRATION */}
+                    <TouchableOpacity 
+                        style={styles.autoDetectPill}
+                        onPress={() => otpInputRef.current?.focus()}
+                        activeOpacity={0.8}
+                    >
+                        <Sparkles size={13} color="#059669" />
                         <Text style={styles.autoDetectPillText}>
-                            Récupération automatique du code activée
+                            {otp.length === 6 ? 'Code récupéré ! Validation...' : 'Récupération automatique du code activée'}
                         </Text>
-                    </View>
+                    </TouchableOpacity>
 
                     {/* BOUTON DE VALIDATION (OU AUTOMATIQUE À RÉCEPTION) */}
                     <Pressable 
@@ -726,8 +744,10 @@ const styles = StyleSheet.create({
         bottom: 0,
         width: '100%',
         height: 56,
-        opacity: 0.01,
+        opacity: 1,
+        backgroundColor: 'transparent',
         color: 'transparent',
+        zIndex: 10,
     },
     autoDetectPill: {
         flexDirection: 'row',
