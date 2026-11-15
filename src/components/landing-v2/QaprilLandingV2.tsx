@@ -1109,7 +1109,7 @@ export default function QaprilLandingV2({
               Outils Pratiques
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Six outils indispensables pour tout gérer facilement.
+              Neuf outils indispensables pour tout gérer facilement.
             </h2>
             <p className="text-base text-slate-600 mt-3 leading-relaxed">
               Chaque fonctionnalité a été conçue pour résoudre les vrais soucis quotidiens des propriétaires et locataires en Côte d'Ivoire.

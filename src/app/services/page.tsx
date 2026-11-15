@@ -24,7 +24,9 @@ import {
   History,
   FileText,
   BadgeCheck,
-  Users
+  Users,
+  Mic,
+  MapPin
 } from "lucide-react";
 
 export default function ServicesPage() {
@@ -138,6 +140,60 @@ export default function ServicesPage() {
       ],
       legalNote: "Conserve vos preuves locatives pendant toute la durée légale requise.",
       image: "/images/passport_visual_fcfa.png"
+    },
+    {
+      id: "m-vocal",
+      code: "PILOTAGE VOCAL",
+      title: "Assistant Intelligent & Pilotage Vocal",
+      subtitle: "Guidez l'application à la voix pour créer un bien ou consulter vos loyers",
+      icon: <Mic className="w-6 h-6 text-[#059669]" />,
+      badge: "Assistant Intelligent",
+      accent: "#059669",
+      desc: "Guidez l'application au son de votre voix en français ou expressions ivoiriennes courantes. Créez un bien, consultez un solde de loyer ou générez un document sans naviguer manuellement dans les menus.",
+      details: [
+        "Compréhension fluide du langage naturel et des spécificités ivoiriennes",
+        "Contrôle strict : validation tactile obligatoire avant toute action engageante",
+        "Création d'un logement ou enregistrement d'un paiement en moins de 90 secondes",
+        "Assistance audio pas-à-pas pour les utilisateurs moins familiers du numérique"
+      ],
+      legalNote: "Conforme à la règle RG-AST-01 : aucune transaction financière ni signature n'est validée sans confirmation manuelle.",
+      image: "/images/feature_dashboard.jpg"
+    },
+    {
+      id: "m-maposte",
+      code: "ADRESSAGE MAPOSTE",
+      title: "Géolocalisation & Adresse Numérique MaPoste",
+      subtitle: "Coordonnées GPS certifiées et boîte postale numérique rattachée au bail",
+      icon: <MapPin className="w-6 h-6 text-[#D97706]" />,
+      badge: "Partenariat La Poste CI",
+      accent: "#D97706",
+      desc: "Relevé GPS terrain certifié (précision ≤ 50 m) pour identifier sans ambiguïté l'emplacement exact de chaque bien et attribution officielle d'une boîte postale numérique MaPoste rattachée au bail.",
+      details: [
+        "Identifiant d'adressage unique républicain pour chaque logement",
+        "Boîte postale numérique MaPoste CI intégrée pour la réception des courriers",
+        "Géolocalisation certifiée anti-usurpation sur carte interactive",
+        "Facilite les interventions des services de livraison, sécurité et secours"
+      ],
+      legalNote: "Conforme au Décret n° 2019-576 sur l'adressage républicain en Côte d'Ivoire.",
+      image: "/images/hero_abidjan_modern_district_1773609699145.png"
+    },
+    {
+      id: "m-attestation",
+      code: "ATTESTATION RÉSIDENCE",
+      title: "Attestation de Résidence Certifiée (A / B / C)",
+      subtitle: "Justificatif officiel infalsifiable de domicile avec QR code et sceau SHA-256",
+      icon: <FileCheck2 className="w-6 h-6 text-[#0284C7]" />,
+      badge: "Sceau SHA-256 & QR Code",
+      accent: "#0284C7",
+      desc: "Émission instantanée d'attestations officielles de domicile scellées par empreinte cryptographique SHA-256, vérifiables publiquement par scan de QR code, pour les banques, visas, CIE, SODECI et concours d'État.",
+      details: [
+        "Trois niveaux d'attestation : Titulaire du bail (A), Résidents déclarés (B), Hébergés (C)",
+        "QR Code de vérification publique en temps réel sans divulgation des données sensibles du bailleur",
+        "Validité légale de 3 mois renouvelable avec horodatage certifié",
+        "Reconnue et opposable auprès des banques, ambassades, concours et administrations"
+      ],
+      legalNote: "Justificatif de domicile opposable avec intégrité garantie par sceau cryptographique.",
+      image: "/images/qr_visual_fcfa.png"
     }
   ];
 
@@ -187,7 +243,7 @@ export default function ServicesPage() {
                 style={{ background: "rgba(245,158,11,0.08)" }}
               >
                 <Layers className="w-3.5 h-3.5" />
-                6 Outils Pratiques · Simple & Efficace
+                9 Outils Pratiques · Simple & Efficace
               </span>
 
               <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white leading-[1.05] tracking-tight mb-8 uppercase">
