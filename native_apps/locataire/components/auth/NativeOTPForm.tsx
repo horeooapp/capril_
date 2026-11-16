@@ -7,13 +7,15 @@ import {
     ActivityIndicator, 
     Platform, 
     StyleSheet, 
-    TouchableOpacity 
+    TouchableOpacity,
+    AppState
 } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Notifications from 'expo-notifications';
-import { Sparkles } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
+import { Sparkles, ClipboardCheck } from 'lucide-react-native';
 import { API_URL, getStoredToken, setStoredToken } from '../../lib/api';
 import { registerForPushNotificationsAsync } from '../../lib/notifications';
 
@@ -29,6 +31,7 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [emailAddress, setEmailAddress] = useState('');
     const [otp, setOtp] = useState('');
+    const [detectedClipboardCode, setDetectedClipboardCode] = useState<string | null>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [feedback, setFeedback] = useState<{ type: 'error' | 'info' | 'success'; text: string } | null>(null);
@@ -40,11 +43,56 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
         checkBiometricAuth();
     }, []);
 
-    // ÉCOUTE AUTOMATIQUE DES NOTIFICATIONS ET SMS OTP EN PREMIER PLAN
+    // INSPECTION DU PRESSE-PAPIERS ET AUTO-REMPLISSAGE (0-TAP & RETOUR D'APP)
+    const checkClipboardForOTP = async (autoSubmit = true) => {
+        try {
+            const hasString = await Clipboard.hasStringAsync();
+            if (!hasString) return null;
+
+            const text = await Clipboard.getStringAsync();
+            if (text) {
+                const match = text.match(/\b\d{6}\b/) || text.match(/\d{6}/);
+                if (match && match[0]) {
+                    const foundCode = match[0];
+                    setDetectedClipboardCode(foundCode);
+
+                    // Si le champ n'a pas encore ce code et qu'on n'est pas en train de valider
+                    if (autoSubmit && (!otp || otp !== foundCode) && !isPending) {
+                        console.log('[OTP AUTO-FILL] Code détecté depuis le presse-papiers:', foundCode);
+                        setOtp(foundCode);
+                        handleVerifyOTP(foundCode);
+                    }
+                    return foundCode;
+                }
+            }
+        } catch (e) {
+            console.log('[OTP] Erreur lecture presse-papiers:', e);
+        }
+        return null;
+    };
+
+    // ÉCOUTE AUTOMATIQUE : NOTIFICATIONS, RETOUR AU PREMIER PLAN ET PRESSE-PAPIERS
     useEffect(() => {
         if (step !== 'OTP') return;
 
+        // 1. Détection immédiate à l'entrée sur l'écran OTP
+        checkClipboardForOTP(true);
+
+        // 2. Scrutation périodique légère (toutes les 1,5s pendant l'attente du code)
+        const pollInterval = setInterval(() => {
+            checkClipboardForOTP(true);
+        }, 1500);
+
+        // 3. Détection au retour au premier plan (quand l'utilisateur revient de WhatsApp ou SMS)
+        const appStateSub = AppState.addEventListener('change', (nextState) => {
+            if (nextState === 'active') {
+                checkClipboardForOTP(true);
+            }
+        });
+
+        // 4. Écouteurs de notifications (réception directe + clic sur notification)
         let notificationSub: Notifications.Subscription | null = null;
+        let responseSub: Notifications.Subscription | null = null;
         try {
             notificationSub = Notifications.addNotificationReceivedListener(notification => {
                 const title = notification.request.content.title || '';
@@ -53,7 +101,20 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                 const match = fullText.match(/\b\d{6}\b/) || fullText.match(/\d{6}/);
                 if (match && match[0]) {
                     console.log('[OTP AUTO-RETRIEVAL] Code intercepté depuis notification:', match[0]);
-                    handleOtpChange(match[0]);
+                    setOtp(match[0]);
+                    handleVerifyOTP(match[0]);
+                }
+            });
+
+            responseSub = Notifications.addNotificationResponseReceivedListener(response => {
+                const title = response.notification.request.content.title || '';
+                const body = response.notification.request.content.body || '';
+                const fullText = `${title} ${body}`;
+                const match = fullText.match(/\b\d{6}\b/) || fullText.match(/\d{6}/);
+                if (match && match[0]) {
+                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté au clic notification:', match[0]);
+                    setOtp(match[0]);
+                    handleVerifyOTP(match[0]);
                 }
             });
         } catch (e) {
@@ -61,9 +122,34 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
         }
 
         return () => {
+            clearInterval(pollInterval);
+            appStateSub.remove();
             notificationSub?.remove();
+            responseSub?.remove();
         };
-    }, [step, isPending]);
+    }, [step, isPending, otp]);
+
+    const handlePillPress = async () => {
+        // 1. Lire le presse-papiers
+        const found = await checkClipboardForOTP(true);
+        if (found) {
+            setFeedback({ type: 'success', text: `Code ${found} récupéré et validé !` });
+            return;
+        }
+
+        // 2. Si le code est déjà saisi à 6 chiffres
+        if (otp && otp.length === 6) {
+            handleVerifyOTP(otp);
+            return;
+        }
+
+        // 3. Sinon, focaliser le champ et afficher une indication claire
+        otpInputRef.current?.focus();
+        setFeedback({ 
+            type: 'info', 
+            text: "En attente du SMS ou WhatsApp. Dès réception, touchez ici pour insérer le code." 
+        });
+    };
 
     const checkBiometricAuth = async () => {
         try {
@@ -438,7 +524,14 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                     </View>
 
                     {/* CONTENEUR DES 6 CASES AVEC INPUT NATIVE DE RECOUVREMENT COMPLET OPAQUE */}
-                    <View style={styles.otpWrapper}>
+                    <TouchableOpacity 
+                        style={styles.otpWrapper}
+                        activeOpacity={1}
+                        onPress={() => {
+                            otpInputRef.current?.focus();
+                            checkClipboardForOTP(true);
+                        }}
+                    >
                         <View style={styles.otpBoxesRow} pointerEvents="none">
                             {[0, 1, 2, 3, 4, 5].map((index) => {
                                 const char = otp[index] || '';
@@ -462,13 +555,13 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                             })}
                         </View>
 
-                        {/* INPUT NATIVE COUVRANT TOUTE LA SURFACE (OPACITY: 1 POUR ÉVITER LES BLOCAGES ANDROID AUTOFILL) */}
+                        {/* INPUT NATIVE COUVRANT TOUTE LA SURFACE */}
                         <TextInput
                             ref={otpInputRef}
                             style={styles.realOtpInput}
                             value={otp}
                             onChangeText={handleOtpChange}
-                            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+                            keyboardType="numeric"
                             textContentType="oneTimeCode"
                             autoComplete="sms-otp"
                             importantForAutofill="yes"
@@ -478,19 +571,32 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                             caretHidden={true}
                             cursorColor="transparent"
                             selectionColor="transparent"
-                            selectTextOnFocus={true}
                         />
-                    </View>
+                    </TouchableOpacity>
 
                     {/* PASTILLE D'INDICATION INTERACTIVE DE RÉCUPÉRATION */}
                     <TouchableOpacity 
-                        style={styles.autoDetectPill}
-                        onPress={() => otpInputRef.current?.focus()}
-                        activeOpacity={0.8}
+                        style={[
+                            styles.autoDetectPill,
+                            detectedClipboardCode ? styles.autoDetectPillActive : undefined
+                        ]}
+                        onPress={handlePillPress}
+                        activeOpacity={0.7}
                     >
-                        <Sparkles size={13} color="#059669" />
-                        <Text style={styles.autoDetectPillText}>
-                            {otp.length === 6 ? 'Code récupéré ! Validation...' : 'Récupération automatique du code activée'}
+                        {detectedClipboardCode ? (
+                            <ClipboardCheck size={14} color="#047857" />
+                        ) : (
+                            <Sparkles size={14} color="#059669" />
+                        )}
+                        <Text style={[
+                            styles.autoDetectPillText,
+                            detectedClipboardCode ? styles.autoDetectPillTextActive : undefined
+                        ]}>
+                            {detectedClipboardCode
+                                ? `Code détecté : ${detectedClipboardCode} · Toucher pour valider`
+                                : otp.length === 6
+                                    ? 'Code complet · Validation en cours...'
+                                    : 'Toucher pour récupérer et insérer le code'}
                         </Text>
                     </TouchableOpacity>
 
@@ -754,17 +860,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingVertical: 7,
+        paddingHorizontal: 14,
         borderRadius: 999,
         backgroundColor: '#ECFDF5',
         alignSelf: 'center',
-        marginTop: 4,
+        marginTop: 6,
+    },
+    autoDetectPillActive: {
+        backgroundColor: '#DCFCE7',
+        borderWidth: 1,
+        borderColor: '#10B981',
     },
     autoDetectPillText: {
         fontSize: 12,
         fontWeight: '600',
         color: '#059669',
+    },
+    autoDetectPillTextActive: {
+        color: '#047857',
+        fontWeight: '700',
     },
     backRow: {
         marginTop: 18,
