@@ -5,7 +5,7 @@ import "./globals.css";
 import "./landing-v2.css";
 import MobileRuntimeDirector from "@/components/MobileRuntimeDirector";
 import CookieConsent from "@/components/CookieConsent";
-import PwaInstallPrompt from "@/components/pwa/PwaInstallPrompt";
+
 import SEOInit from "@/components/SEOInit";
 
 export const metadata: Metadata = {
@@ -119,7 +119,6 @@ export default function RootLayout({
           }}
         />
         <CookieConsent />
-        <PwaInstallPrompt />
       </body>
     </html>
   );

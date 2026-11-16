@@ -31,12 +31,9 @@ import {
     ArrowLeft,
     Download,
     Smartphone,
-    Share,
-    PlusSquare,
     CheckCircle2
 } from 'lucide-react'
 import { PWA_ROLES, PwaRoleId, resolvePwaRole } from './pwa/pwa-roles'
-import { usePwaInstall } from './pwa/usePwaInstall'
 import { SessionProvider } from "next-auth/react"
 import { executeLogout } from "@/lib/auth-logout"
 
@@ -82,10 +79,8 @@ export default function MobileMenu({
     activeRole
 }: MobileMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const [showIosGuide, setShowIosGuide] = useState(false)
     const pathname = usePathname()
     const router = useRouter()
-    const { isStandalone, isIos, triggerInstall } = usePwaInstall()
 
     const displayRole = activeRole || session?.user?.chosenRole || session?.user?.role || 'CLIENT';
     const currentPwaRole = resolvePwaRole(displayRole, pathname)
@@ -93,16 +88,6 @@ export default function MobileMenu({
 
     const toggleMenu = () => {
         setIsOpen(!isOpen)
-        setShowIosGuide(false)
-    }
-
-    const handleInstallClick = async () => {
-        const res = await triggerInstall(currentPwaRole)
-        if (res === 'ios') {
-            setShowIosGuide(true)
-        } else if (res === 'accepted') {
-            setIsOpen(false)
-        }
     }
 
     // Si aucun lien n'est fourni, générer les liens complets selon le rôle actif
@@ -273,22 +258,13 @@ export default function MobileMenu({
                     </Link>
                 </div>
 
-                {/* BLOC PWA : ACCÈS DIRECT PAR RÔLE & INSTALLATION */}
+                {/* ACCÈS DIRECT PAR RÔLE */}
                 <div className="p-3 bg-slate-900/60 border-b border-slate-800 shrink-0 space-y-2">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                             <Smartphone size={13} className="text-[#FF8200]" />
                             <span>Accès Direct par Rôle</span>
                         </span>
-                        {isStandalone ? (
-                            <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                                <CheckCircle2 size={11} /> App Installée
-                            </span>
-                        ) : (
-                            <span className="text-[10px] font-extrabold text-[#FF8200] uppercase tracking-wider">
-                                PWA
-                            </span>
-                        )}
                     </div>
 
                     {/* Grille 4 Rôles : Locataire, Propriétaire, Agence, Intermédiaire */}
@@ -321,36 +297,6 @@ export default function MobileMenu({
                             )
                         })}
                     </div>
-
-                    {/* Bouton d'installation de l'application pour le rôle courant */}
-                    {!isStandalone && (
-                        <div>
-                            {showIosGuide ? (
-                                <div className="bg-slate-900 rounded-xl p-2.5 text-[11px] text-slate-200 border border-slate-700 space-y-1.5">
-                                    <p className="font-bold text-amber-300 flex items-center gap-1 text-[11px]">
-                                        <PlusSquare size={13} /> iPhone/iPad :
-                                    </p>
-                                    <p className="text-[10px] text-slate-300">
-                                        Appuyez sur <Share size={11} className="inline text-sky-400" /> puis <strong>« Sur l'écran d'accueil »</strong>.
-                                    </p>
-                                    <button 
-                                        onClick={() => setShowIosGuide(false)}
-                                        className="w-full py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-[10px] font-bold text-center"
-                                    >
-                                        Fermer
-                                    </button>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={handleInstallClick}
-                                    className={`w-full py-2 px-3 rounded-xl  ${currentRoleConfig.gradient} text-slate-950 font-black text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 shadow-md hover:opacity-95 transition-all active:scale-95`}
-                                >
-                                    <Download size={14} strokeWidth={2.5} />
-                                    <span>Installer l'app {currentRoleConfig.shortLabel}</span>
-                                </button>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 {/* Liste des Liens de Navigation */}

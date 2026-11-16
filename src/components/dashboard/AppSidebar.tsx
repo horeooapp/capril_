@@ -9,10 +9,8 @@ import {
     LogOut, Home, User, BarChart3, Settings, Zap, ShieldAlert, Receipt, Wallet, BookOpen, Users,
     Shield, Scale, Store, FileSignature, LineChart, CreditCard, Landmark, Calculator, Wrench,
     MapPin, HardDriveUpload, SmartphoneNfc, MessageSquareWarning, BarChartHorizontal, Megaphone,
-    CalendarDays, MessageSquare, FileBadge, Download, Smartphone
+    CalendarDays, MessageSquare, FileBadge, Smartphone
 } from "lucide-react"
-import { usePwaInstall } from "../pwa/usePwaInstall"
-import { resolvePwaRole } from "../pwa/pwa-roles"
 import { executeLogout } from "@/lib/auth-logout"
 
 interface AppSidebarProps {
@@ -27,8 +25,6 @@ interface AppSidebarProps {
 
 export default function AppSidebar({ role, onLogout, userName, themeId = 'emerald', diasporaAbonnement, agencyConfig, eligibleRoles }: AppSidebarProps) {
     const pathname = usePathname()
-    const { isStandalone, triggerInstall } = usePwaInstall()
-    const currentPwaRole = resolvePwaRole(role, pathname)
 
     const getNavLinks = () => {
         if (role === 'TENANT') {
@@ -208,16 +204,6 @@ export default function AppSidebar({ role, onLogout, userName, themeId = 'emeral
                     <Home size={12} />
                     Retour Accueil
                 </Link>
-                {!isStandalone && (
-                    <button
-                        onClick={() => triggerInstall(currentPwaRole)}
-                        className="w-full h-8 flex items-center justify-center gap-1.5 text-[10px] uppercase font-bold tracking-wider transition-all bg-[#FF8200]/15 hover:bg-[#FF8200]/25 text-amber-300 border border-[#FF8200]/30 rounded-[6px]"
-                        title={`Installer l'application pour ${getRoleLabel()}`}
-                    >
-                        <Download size={12} />
-                        Installer l'App ({getRoleLabel()})
-                    </button>
-                )}
                 <button 
                     onClick={() => {
                         const target = role === 'TENANT' ? '/mon-espace-locataire/login' : '/dashboard/login';
