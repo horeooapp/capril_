@@ -1,5 +1,6 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
-import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard } from 'react-native';
+import { View, Text, FlatList, TextInput, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
 import { fetchWithAuth } from '../../lib/api';
@@ -12,32 +13,9 @@ export default function ProprietaireChatScreen() {
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const [interlocutorName, setInterlocutorName] = useState('Locataire');
-    const [keyboardVisible, setKeyboardVisible] = useState(false);
     const flatListRef = useRef<FlatList>(null);
     const lastMessageIdRef = useRef<string | null>(null);
     const isFirstLoadRef = useRef<boolean>(true);
-
-    useEffect(() => {
-        const showSub = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-            () => {
-                setKeyboardVisible(true);
-                setTimeout(() => {
-                    flatListRef.current?.scrollToEnd({ animated: true });
-                }, 100);
-            }
-        );
-        const hideSub = Keyboard.addListener(
-            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-            () => {
-                setKeyboardVisible(false);
-            }
-        );
-        return () => {
-            showSub.remove();
-            hideSub.remove();
-        };
-    }, []);
 
     const loadMessages = async () => {
         try {
@@ -185,8 +163,7 @@ export default function ProprietaireChatScreen() {
             )}
 
             <KeyboardAvoidingView 
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                behavior="padding"
                 style={{ flex: 1 }}
             >
                 <FlatList
@@ -213,7 +190,7 @@ export default function ProprietaireChatScreen() {
                     flexDirection: 'row', 
                     paddingHorizontal: 12, 
                     paddingTop: 10,
-                    paddingBottom: keyboardVisible ? 10 : Math.max(insets.bottom, 10), 
+                    paddingBottom: Math.max(insets.bottom, 10), 
                     backgroundColor: '#FFFFFF', 
                     borderTopWidth: 1, 
                     borderTopColor: '#E2E8F0', 

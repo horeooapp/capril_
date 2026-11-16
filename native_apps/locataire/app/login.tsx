@@ -5,16 +5,12 @@ import {
     StyleSheet, 
     StatusBar, 
     Text, 
-    ScrollView, 
-    KeyboardAvoidingView, 
-    Platform,
-    TouchableWithoutFeedback,
-    Keyboard,
     Pressable
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FormScreen } from '../components/forms/FormScreen';
 import NativeOTPForm from '../components/auth/NativeOTPForm';
 
 export default function LoginScreen() {
@@ -27,51 +23,40 @@ export default function LoginScreen() {
         >
             <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
                 <StatusBar barStyle="dark-content" backgroundColor="#ECFDF5" />
-                <KeyboardAvoidingView 
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={{ flex: 1 }}
-                >
-                    <ScrollView 
-                        contentContainerStyle={styles.scrollContent}
-                        keyboardShouldPersistTaps="handled"
-                        showsVerticalScrollIndicator={false}
-                    >
-                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                            <View style={styles.content}>
-                                
-                                {/* NAVIGATION PRÉSENTATION DISCRÈTE */}
-                                <View style={styles.topBar}>
-                                    <Pressable
-                                        onPress={() => router.replace('/onboarding' as any)}
-                                        style={styles.backLink}
-                                        hitSlop={10}
-                                    >
-                                        <Text style={styles.backLinkText}>‹ Présentation</Text>
-                                    </Pressable>
-                                </View>
+                <FormScreen contentStyle={styles.scrollContent}>
+                    <View style={styles.content}>
+                        
+                        {/* NAVIGATION PRÉSENTATION DISCRÈTE */}
+                        <View style={styles.topBar}>
+                            <Pressable
+                                onPress={() => router.replace('/onboarding' as any)}
+                                style={styles.backLink}
+                                hitSlop={10}
+                            >
+                                <Text style={styles.backLinkText}>‹ Présentation</Text>
+                            </Pressable>
+                        </View>
 
-                                {/* EN-TÊTE ÉPURÉ ET LUMINEUX (STYLE APPLE LIGHT) */}
-                                <View style={styles.header}>
-                                    <View style={styles.logoWrap}>
-                                        <Image 
-                                            source={{ uri: 'https://www.qapril.net/logo.png' }} 
-                                            style={styles.logo}
-                                            resizeMode="contain"
-                                        />
-                                    </View>
-                                    <Text style={styles.title}>QAPRIL</Text>
-                                    <Text style={styles.subtitle}>Espace Locataire</Text>
-                                </View>
-
-                                {/* FORMULAIRE ÉPURÉ, CLAIR ET ACCUEILLANT */}
-                                <NativeOTPForm 
-                                    role="TENANT" 
+                        {/* EN-TÊTE ÉPURÉ ET LUMINEUX (STYLE APPLE LIGHT) */}
+                        <View style={styles.header}>
+                            <View style={styles.logoWrap}>
+                                <Image 
+                                    source={{ uri: 'https://www.qapril.net/logo.png' }} 
+                                    style={styles.logo}
+                                    resizeMode="contain"
                                 />
-                                
                             </View>
-                        </TouchableWithoutFeedback>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                            <Text style={styles.title}>QAPRIL</Text>
+                            <Text style={styles.subtitle}>Espace Locataire</Text>
+                        </View>
+
+                        {/* FORMULAIRE ÉPURÉ, CLAIR ET ACCUEILLANT */}
+                        <NativeOTPForm 
+                            role="TENANT" 
+                        />
+                        
+                    </View>
+                </FormScreen>
             </SafeAreaView>
         </LinearGradient>
     );

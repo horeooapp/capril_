@@ -1,4 +1,5 @@
 import { TopNavHeader } from '../components/TopNavHeader';
+import { FormScreen } from '../components/forms/FormScreen';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
@@ -9,7 +10,6 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -203,18 +203,25 @@ export default function CreateLeaseScreen() {
     <SafeAreaView style={styles.container}>
       <TopNavHeader title="Nouveau Bail Certifié" subtitle="Contrat conforme à la loi" />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 20}
-        style={{ flex: 1 }}
+      <FormScreen
+        contentStyle={styles.scroll}
+        footer={
+          <Pressable
+            style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+            onPress={handleCreate}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <View style={styles.submitBtnContent}>
+                <FileSpreadsheet color="#FFFFFF" size={18} />
+                <Text style={styles.submitBtnText}>Générer le Contrat de Bail PDF</Text>
+              </View>
+            )}
+          </Pressable>
+        }
       >
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={[styles.scroll, { paddingBottom: 380 }]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        >
           {/* BANDEAU RÈGLEMENTAIRE */}
           <View style={styles.legalNotice}>
             <ShieldCheck color="#1B4D3E" size={20} />
@@ -609,24 +616,7 @@ export default function CreateLeaseScreen() {
               </View>
             </View>
           )}
-
-          {/* BOUTON D'ACTION PRINCIPAL */}
-          <Pressable
-            style={[styles.submitBtn, loading && { opacity: 0.7 }]}
-            onPress={handleCreate}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <View style={styles.submitBtnContent}>
-                <FileSpreadsheet color="#FFFFFF" size={18} />
-                <Text style={styles.submitBtnText}>Générer le Contrat de Bail PDF</Text>
-              </View>
-            )}
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </FormScreen>
     </SafeAreaView>
   );
 }

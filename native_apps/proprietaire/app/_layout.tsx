@@ -2,7 +2,8 @@ import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useState, useEffect } from "react";
 import { BackHandler, Platform, View, Text, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import * as Updates from "expo-updates";
 import "../global.css";
 import { confirmExitApp } from "../components/TopNavHeader";
@@ -100,13 +101,17 @@ export default function RootLayout() {
   }, [router]);
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ title: "Accueil" }} />
-      <Stack.Screen name="onboarding" options={{ title: "Présentation", gestureEnabled: false }} />
-      <Stack.Screen name="login" options={{ title: "Connexion", gestureEnabled: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
-      <Stack.Screen name="create-property" options={{ title: "Nouveau Bien", presentation: "modal" }} />
-      <Stack.Screen name="create-lease" options={{ title: "Nouveau Bail", presentation: "modal" }} />
-    </Stack>
+    <SafeAreaProvider>
+      <KeyboardProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ title: "Accueil" }} />
+          <Stack.Screen name="onboarding" options={{ title: "Présentation", gestureEnabled: false }} />
+          <Stack.Screen name="login" options={{ title: "Connexion", gestureEnabled: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
+          <Stack.Screen name="create-property" options={{ title: "Nouveau Bien", presentation: "modal" }} />
+          <Stack.Screen name="create-lease" options={{ title: "Nouveau Bail", presentation: "modal" }} />
+        </Stack>
+      </KeyboardProvider>
+    </SafeAreaProvider>
   );
 }

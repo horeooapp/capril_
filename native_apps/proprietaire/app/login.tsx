@@ -6,15 +6,11 @@ import {
   StatusBar,
   Pressable,
   Text,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FormScreen } from '../components/forms/FormScreen';
 import NativeOTPForm from '../components/auth/NativeOTPForm';
 import {
   getStoredProfile,
@@ -44,17 +40,8 @@ export default function LoginScreen() {
       <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
         <StatusBar barStyle="dark-content" backgroundColor={isProprietaire ? '#FEF9C3' : '#E0F2FE'} />
 
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
-        >
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-              <View style={styles.content}>
+        <FormScreen contentStyle={styles.scrollContent}>
+          <View style={styles.content}>
                 {/* TOP BAR / LIEN PRÉSENTATION DISCRET */}
                 <View style={styles.topBar}>
                   <Pressable
@@ -130,9 +117,7 @@ export default function LoginScreen() {
                   profile={selectedProfile}
                 />
               </View>
-            </TouchableWithoutFeedback>
-          </ScrollView>
-        </KeyboardAvoidingView>
+        </FormScreen>
       </SafeAreaView>
     </LinearGradient>
   );

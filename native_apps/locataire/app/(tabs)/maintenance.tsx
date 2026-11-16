@@ -6,13 +6,13 @@ import {
   StyleSheet,
   TextInput,
   Pressable,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FormScreen } from '../../components/forms/FormScreen';
 import { Camera, CheckCircle2, AlertTriangle, ShieldCheck, ArrowRight, Clock, Wrench } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 
@@ -103,11 +103,7 @@ export default function MaintenanceScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <TopNavHeader title="Signalements" subtitle="Gestion des incidents" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <FormScreen contentStyle={styles.scroll}>
           {/* BANDEAU : SIGNALER UN INCIDENT */}
           <View style={styles.roleBanner}>
             <View style={styles.roleTag}>
@@ -251,8 +247,7 @@ export default function MaintenanceScreen() {
               </View>
             )))}
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </FormScreen>
     </SafeAreaView>
   );
 }

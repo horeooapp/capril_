@@ -1,4 +1,5 @@
 import { TopNavHeader } from '../components/TopNavHeader';
+import { FormScreen } from '../components/forms/FormScreen';
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -9,7 +10,6 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -352,18 +352,25 @@ export default function CreatePropertyScreen() {
     <SafeAreaView style={styles.container}>
       <TopNavHeader title="Nouveau Bien" subtitle="Ajouter un logement à votre patrimoine" />
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 20}
-        style={{ flex: 1 }}
+      <FormScreen
+        contentStyle={styles.scroll}
+        footer={
+          <Pressable
+            style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <View style={styles.submitBtnContent}>
+                <Building2 color="#FFFFFF" size={18} />
+                <Text style={styles.submitBtnText}>Enregistrer le bien</Text>
+              </View>
+            )}
+          </Pressable>
+        }
       >
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={[styles.scroll, { paddingBottom: 380 }]}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        >
           {/* BANDEAU CONFORMITÉ SOUVERAINE */}
           <View style={styles.legalNotice}>
             <ShieldCheck color="#1B4D3E" size={20} />
@@ -749,24 +756,7 @@ export default function CreatePropertyScreen() {
               </View>
             )}
           </View>
-
-          {/* BOUTON DE SOUMISSION */}
-          <Pressable
-            style={[styles.submitBtn, loading && { opacity: 0.7 }]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <View style={styles.submitBtnContent}>
-                <Building2 color="#FFFFFF" size={18} />
-                <Text style={styles.submitBtnText}>Enregistrer le bien</Text>
-              </View>
-            )}
-          </Pressable>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </FormScreen>
     </SafeAreaView>
   );
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextInput, Alert, Platform } from 'react-native';
+import { FormScreen } from '../../components/forms/FormScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ShieldCheck, FileText, CheckCircle2 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -184,48 +185,44 @@ export default function SignatureScreen() {
       )}
 
       {step === 'OTP' && (
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
+        <FormScreen 
+          contentStyle={styles.otpContainer}
+          footer={
+            <View>
+              <Pressable 
+                style={[styles.button, { width: '100%' }, (processing || otp.length !== 6) && styles.buttonDisabled]} 
+                onPress={handleSign}
+                disabled={processing || otp.length !== 6}
+              >
+                {processing ? (
+                  <ActivityIndicator color="#FFF" />
+                ) : (
+                  <Text style={styles.buttonText}>Valider la signature</Text>
+                )}
+              </Pressable>
+              
+              <Pressable onPress={() => setStep('REVIEW')} style={{ marginTop: 12, alignItems: 'center' }}>
+                <Text style={styles.linkText}>Retour au document</Text>
+              </Pressable>
+            </View>
+          }
         >
-          <ScrollView 
-            contentContainerStyle={styles.otpContainer} 
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <FileText color="#4F46E5" size={48} style={{ marginBottom: 20 }} />
-            <Text style={styles.otpTitle}>Vérification de sécurité</Text>
-            <Text style={styles.otpSubtitle}>
-              Un code à 6 chiffres a été envoyé par SMS à votre numéro de téléphone.
-            </Text>
-            
-            <TextInput
-              style={styles.otpInput}
-              placeholder="000000"
-              keyboardType="number-pad"
-              maxLength={6}
-              value={otp}
-              onChangeText={setOtp}
-              autoFocus
-            />
-
-            <Pressable 
-              style={[styles.button, { width: '100%' }, (processing || otp.length !== 6) && styles.buttonDisabled]} 
-              onPress={handleSign}
-              disabled={processing || otp.length !== 6}
-            >
-              {processing ? (
-                <ActivityIndicator color="#FFF" />
-              ) : (
-                <Text style={styles.buttonText}>Valider la signature</Text>
-              )}
-            </Pressable>
-            
-            <Pressable onPress={() => setStep('REVIEW')} style={{ marginTop: 20 }}>
-              <Text style={styles.linkText}>Retour au document</Text>
-            </Pressable>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          <FileText color="#4F46E5" size={48} style={{ marginBottom: 20 }} />
+          <Text style={styles.otpTitle}>Vérification de sécurité</Text>
+          <Text style={styles.otpSubtitle}>
+            Un code à 6 chiffres a été envoyé par SMS à votre numéro de téléphone.
+          </Text>
+          
+          <TextInput
+            style={styles.otpInput}
+            placeholder="000000"
+            keyboardType="number-pad"
+            maxLength={6}
+            value={otp}
+            onChangeText={setOtp}
+            autoFocus
+          />
+        </FormScreen>
       )}
 
       {step === 'SUCCESS' && (

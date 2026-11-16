@@ -1,0 +1,96 @@
+native_apps/locataire/app.json:27:"softwareKeyboardLayoutMode": "resize",
+native_apps/locataire/app/login.tsx:9:KeyboardAvoidingView,
+native_apps/locataire/app/login.tsx:30:<KeyboardAvoidingView
+native_apps/locataire/app/login.tsx:74:</KeyboardAvoidingView>
+native_apps/locataire/app/onboarding.tsx:82:<Modal visible={showLegalConsent} transparent={true} animationType="fade">
+native_apps/locataire/app/(tabs)/chat.tsx:2:import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard } from 'react-native';
+native_apps/locataire/app/(tabs)/chat.tsx:187:<KeyboardAvoidingView
+native_apps/locataire/app/(tabs)/chat.tsx:255:</KeyboardAvoidingView>
+native_apps/locataire/app/(tabs)/index.tsx:1148:<Modal
+native_apps/locataire/app/(tabs)/index.tsx:2981:<Modal visible={procheModal} transparent animationType="slide" onRequestClose={() => setProcheModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3009:<Modal visible={declareModal} transparent animationType="slide" onRequestClose={() => setDeclareModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3131:<Modal visible={inviteModal} transparent animationType="slide" onRequestClose={() => setInviteModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3168:<Modal visible={payAutrementModal} transparent animationType="slide" onRequestClose={() => setPayAutrementModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3299:<Modal visible={congeModal} transparent animationType="slide" onRequestClose={() => setCongeModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3399:<Modal visible={candidatureModal} transparent animationType="slide" onRequestClose={() => setCandidatureModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3474:<Modal visible={attestationModal} transparent animationType="slide" onRequestClose={() => setAttestationModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3547:<Modal visible={occupantsModal} transparent animationType="slide" onRequestClose={() => setOccupantsModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3603:<Modal visible={newOccupantModal} transparent animationType="slide" onRequestClose={() => setNewOccupantModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3710:<Modal visible={vueBailleurModal} transparent animationType="slide" onRequestClose={() => setVueBailleurModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3734:<Modal visible={whoViewedModal} transparent animationType="slide" onRequestClose={() => setWhoViewedModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3763:<Modal visible={debtModal} transparent animationType="slide" onRequestClose={() => setDebtModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3839:<Modal visible={rightsModal} transparent animationType="slide" onRequestClose={() => setRightsModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3866:<Modal visible={edlModal} transparent animationType="slide" onRequestClose={() => setEdlModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:3889:<Modal visible={guestModal} transparent animationType="slide" onRequestClose={() => setGuestModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:4251:<Modal visible={!!guestSuccessModal} transparent animationType="fade" onRequestClose={() => setGuestSuccessModal(null)}>
+native_apps/locataire/app/(tabs)/index.tsx:4328:<Modal visible={proposeRentModal} transparent animationType="slide" onRequestClose={() => setProposeRentModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:4385:<Modal visible={visiteModal} transparent animationType="slide" onRequestClose={() => setVisiteModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:4431:<Modal visible={mesCandModal} transparent animationType="slide" onRequestClose={() => setMesCandModal(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:4457:<Modal visible={!!selectedReceiptLoc} transparent animationType="slide" onRequestClose={() => setSelectedReceiptLoc(null)}>
+native_apps/locataire/app/(tabs)/index.tsx:4541:<Modal visible={bailModalVisible} transparent animationType="slide" onRequestClose={() => setBailModalVisible(false)}>
+native_apps/locataire/app/(tabs)/index.tsx:4634:<Modal
+native_apps/locataire/app/(tabs)/maintenance.tsx:9:KeyboardAvoidingView,
+native_apps/locataire/app/(tabs)/maintenance.tsx:106:<KeyboardAvoidingView
+native_apps/locataire/app/(tabs)/maintenance.tsx:255:</KeyboardAvoidingView>
+native_apps/locataire/app/(tabs)/profile.tsx:17:KeyboardAvoidingView,
+native_apps/locataire/app/(tabs)/profile.tsx:293:<Modal visible={editEmailVisible} transparent animationType="fade">
+native_apps/locataire/app/(tabs)/profile.tsx:294:<KeyboardAvoidingView
+native_apps/locataire/app/(tabs)/profile.tsx:341:</KeyboardAvoidingView>
+native_apps/locataire/app/(tabs)/profile.tsx:347:<Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>
+native_apps/locataire/app/(tabs)/receipts.tsx:158:<Modal visible={!!selectedReceipt} transparent animationType="slide" onRequestClose={() => setSelectedReceipt(null)}>
+native_apps/locataire/app/(tabs)/recherche.tsx:267:<Modal visible={communeModalVisible} animationType="slide" transparent>
+native_apps/locataire/app/signature/[id].tsx:2:import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+native_apps/locataire/app/signature/[id].tsx:189:<KeyboardAvoidingView
+native_apps/locataire/app/signature/[id].tsx:230:</KeyboardAvoidingView>
+native_apps/locataire/components/KycVerificationModal.tsx:12:KeyboardAvoidingView,
+native_apps/locataire/components/KycVerificationModal.tsx:760:<Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
+native_apps/locataire/components/KycVerificationModal.tsx:762:<KeyboardAvoidingView
+native_apps/locataire/components/KycVerificationModal.tsx:1425:</KeyboardAvoidingView>
+native_apps/locataire/components/KycVerificationModal.tsx:1429:<Modal visible={true} transparent animationType="fade">
+native_apps/locataire/components/KycVerificationModal.tsx:1589:<Modal visible={true} transparent animationType="fade">
+native_apps/locataire/components/VersionUpdateModal.tsx:47:<Modal
+native_apps/locataire/components/VoiceAssistantFAB.tsx:146:<Modal
+native_apps/proprietaire/app.json:27:"softwareKeyboardLayoutMode": "resize",
+native_apps/proprietaire/app/create-lease.tsx:12:KeyboardAvoidingView,
+native_apps/proprietaire/app/create-lease.tsx:206:<KeyboardAvoidingView
+native_apps/proprietaire/app/create-lease.tsx:629:</KeyboardAvoidingView>
+native_apps/proprietaire/app/create-property.tsx:12:KeyboardAvoidingView,
+native_apps/proprietaire/app/create-property.tsx:355:<KeyboardAvoidingView
+native_apps/proprietaire/app/create-property.tsx:769:</KeyboardAvoidingView>
+native_apps/proprietaire/app/login.tsx:10:KeyboardAvoidingView,
+native_apps/proprietaire/app/login.tsx:47:<KeyboardAvoidingView
+native_apps/proprietaire/app/login.tsx:135:</KeyboardAvoidingView>
+native_apps/proprietaire/app/onboarding.tsx:83:<Modal visible={showLegalConsent} transparent={true} animationType="fade">
+native_apps/proprietaire/app/(tabs)/chat.tsx:2:import { View, Text, FlatList, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard } from 'react-native';
+native_apps/proprietaire/app/(tabs)/chat.tsx:187:<KeyboardAvoidingView
+native_apps/proprietaire/app/(tabs)/chat.tsx:255:</KeyboardAvoidingView>
+native_apps/proprietaire/app/(tabs)/index.tsx:504:<Modal
+native_apps/proprietaire/app/(tabs)/index.tsx:1754:<Modal visible={cashModal} transparent animationType="slide" onRequestClose={() => setCashModal(false)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1778:<Modal visible={!!dgiModalRef} transparent animationType="slide" onRequestClose={() => setDgiModalRef(null)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1805:<Modal visible={mandatModal} transparent animationType="slide" onRequestClose={() => setMandatModal(false)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1846:<Modal visible={updateRentModal} transparent animationType="slide" onRequestClose={() => setUpdateRentModal(false)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1910:<Modal visible={!!positionModalBien} transparent animationType="slide" onRequestClose={() => setPositionModalBien(null)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1943:<Modal visible={!!offreModalBien} transparent animationType="slide" onRequestClose={() => setOffreModalBien(null)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:1997:<Modal visible={partialModal} transparent animationType="slide" onRequestClose={() => setPartialModal(false)}>
+native_apps/proprietaire/app/(tabs)/index.tsx:2047:<Modal
+native_apps/proprietaire/app/(tabs)/index.tsx:2171:<Modal
+native_apps/proprietaire/app/(tabs)/maintenance.tsx:229:<Modal
+native_apps/proprietaire/app/(tabs)/profile.tsx:17:KeyboardAvoidingView,
+native_apps/proprietaire/app/(tabs)/profile.tsx:293:<Modal visible={editEmailVisible} transparent animationType="fade">
+native_apps/proprietaire/app/(tabs)/profile.tsx:294:<KeyboardAvoidingView
+native_apps/proprietaire/app/(tabs)/profile.tsx:339:</KeyboardAvoidingView>
+native_apps/proprietaire/app/(tabs)/profile.tsx:343:<Modal visible={diasporaModalVisible} transparent animationType="fade" onRequestClose={() => setDiasporaModalVisible(false)}>
+native_apps/proprietaire/app/(tabs)/profile.tsx:395:<Modal visible={aboutModalVisible} transparent animationType="fade" onRequestClose={() => setAboutModalVisible(false)}>
+native_apps/proprietaire/app/(tabs)/properties.tsx:531:<Modal
+native_apps/proprietaire/app/signature/[id].tsx:2:import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+native_apps/proprietaire/app/signature/[id].tsx:187:<KeyboardAvoidingView
+native_apps/proprietaire/app/signature/[id].tsx:228:</KeyboardAvoidingView>
+native_apps/proprietaire/components/KycVerificationModal.tsx:12:KeyboardAvoidingView,
+native_apps/proprietaire/components/KycVerificationModal.tsx:760:<Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
+native_apps/proprietaire/components/KycVerificationModal.tsx:762:<KeyboardAvoidingView
+native_apps/proprietaire/components/KycVerificationModal.tsx:1425:</KeyboardAvoidingView>
+native_apps/proprietaire/components/KycVerificationModal.tsx:1429:<Modal visible={true} transparent animationType="fade">
+native_apps/proprietaire/components/KycVerificationModal.tsx:1589:<Modal visible={true} transparent animationType="fade">
+native_apps/proprietaire/components/VersionUpdateModal.tsx:47:<Modal
+native_apps/proprietaire/components/VoiceAssistantFAB.tsx:146:<Modal
+native_apps/agence/app/onboarding.tsx:82:<Modal visible={showLegalConsent} transparent={false} animationType="fade">

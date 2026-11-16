@@ -138,16 +138,3 @@ export async function logoutAndRedirect(router: any): Promise<void> {
         } catch {}
     }
 }
-
-export async function logoutAndRedirect(router: any): Promise<void> {
-  try {
-    await removeStoredToken();
-  } catch {}
-  try {
-    router.replace('/login');
-  } catch {
-    try {
-      router.replace('/');
-    } catch {}
-  }
-}

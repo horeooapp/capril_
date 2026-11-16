@@ -1,5 +1,6 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
 import { AppVersionBadge } from '../../components/AppVersionBadge';
+import { FormModal } from '../../components/forms/FormModal';
 import KycVerificationModal from '../../components/KycVerificationModal';
 import React, { useState, useEffect } from 'react';
 import {
@@ -14,7 +15,6 @@ import {
   Modal,
   TextInput,
   Linking,
-  KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Keyboard,
   Image,
@@ -290,54 +290,47 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Modal Modification Adresse Mail */}
-      <Modal visible={editEmailVisible} transparent animationType="fade">
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalBox}>
-            <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
-            <Text style={styles.modalSubtitle}>Entrez votre adresse e-mail pour vos notifications et quittances de loyer.</Text>
-            
-            <TextInput
-              style={styles.modalInput}
-              value={newEmail}
-              onChangeText={setNewEmail}
-              placeholder="nom@exemple.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoFocus
-            />
+      <FormModal 
+        visible={editEmailVisible} 
+        onClose={() => setEditEmailVisible(false)}
+        footer={
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <Pressable 
+              style={[styles.modalBtn, { backgroundColor: '#F3F4F6', flex: 1 }]} 
+              onPress={() => setEditEmailVisible(false)}
+              disabled={isSavingEmail}
+            >
+              <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13, textAlign: 'center' }}>Annuler</Text>
+            </Pressable>
 
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
-              <Pressable 
-                style={[styles.modalBtn, { backgroundColor: '#F3F4F6' }]} 
-                onPress={() => setEditEmailVisible(false)}
-                disabled={isSavingEmail}
-              >
-                <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Annuler</Text>
-              </Pressable>
-
-              <Pressable 
-                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]} 
-                onPress={handleSaveEmail}
-                disabled={isSavingEmail}
-              >
-                {isSavingEmail ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Enregistrer</Text>
-                )}
-              </Pressable>
-            </View>
+            <Pressable 
+              style={[styles.modalBtn, { backgroundColor: '#1B4D3E', flex: 1 }]} 
+              onPress={handleSaveEmail}
+              disabled={isSavingEmail}
+            >
+              {isSavingEmail ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13, textAlign: 'center' }}>Enregistrer</Text>
+              )}
+            </Pressable>
           </View>
-        </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </Modal>
+        }
+      >
+        <Text style={styles.modalTitle}>Modifier mon adresse e-mail</Text>
+        <Text style={styles.modalSubtitle}>Entrez votre adresse e-mail pour vos notifications et quittances de loyer.</Text>
+        
+        <TextInput
+          style={styles.modalInput}
+          value={newEmail}
+          onChangeText={setNewEmail}
+          placeholder="nom@exemple.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus
+        />
+      </FormModal>
 
       {/* Modal Option Diaspora (IC-01 V.diaspora) */}
       <Modal visible={diasporaModalVisible} transparent animationType="fade" onRequestClose={() => setDiasporaModalVisible(false)}>
