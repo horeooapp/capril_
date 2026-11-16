@@ -48,6 +48,10 @@ test-smtp.js
 
 # databases
 *.db
+
+# audit deliverables directory
+audit_AUD-02/
+
 *.db-journal
 *.db-wal
 *.db-shm

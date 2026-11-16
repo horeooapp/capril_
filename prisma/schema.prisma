@@ -192,8 +192,16 @@ model User {
   attestationsResidence       AttestationResidence[]   @relation("BeneficiaireAttestation")
   // ADD-27: Pilote vocal
   sessionsPiloteVocal         SessionPiloteVocal[]     @relation("UserSessionsPilote")
+  // ADD-28: Bail Déclaré par le Locataire, Fiche de Bail & Adossement
+  declarationsInitiees        DeclarationBail[]        @relation("DeclarationsInitiees")
+  declarationsRecues          DeclarationBail[]        @relation("DeclarationsRecues")
+  declarationsLocataire       DeclarationBail[]        @relation("DeclarationsLocataire")
+  fichesSaisies               FicheBail[]              @relation("FichesSaisies")
+  fichesConfirmees            FicheBail[]              @relation("FichesConfirmees")
+  relancesAdossement          RelanceAdossement[]      @relation("RelancesAdossementBailleur")
 
   @@index([phone])
+
   @@index([role])
   @@map("users")
 }
@@ -375,6 +383,10 @@ model Property {
   transmissionsAdressage     TransmissionAdressage[]
   // ADD-29: Occupants déclarés
   occupants                  Occupant[]
+  // ADD-28: Confirmation du bien & adossement
+  confirmation               BienConfirmation        @default(CONFIRME) @map("confirmation")
+  genereDepuisBailId         String?                 @map("genere_depuis_bail_id")
+  confirmeAt                 DateTime?               @map("confirme_at")
 
   @@index([ownerUserId])
   @@index([commune])
@@ -542,6 +554,17 @@ model Lease {
   transmissionsAdressage    TransmissionAdressage[]
   occupants                 Occupant[]
   attestationsResidence     AttestationResidence[]
+  // ADD-28: Bail Déclaré & Adossement différé
+  origine                   BailOrigine             @default(QAPRIL) @map("origine")
+  declarationId             String?                 @map("declaration_id")
+  declaration               DeclarationBail?        @relation("DeclarationLease", fields: [declarationId], references: [id])
+  designationDeclaree       Json?                   @map("designation_declaree")
+  adossementStatut          AdossementStatut        @default(CONFIRME) @map("adossement_statut")
+  bienProvisoireId          String?                 @map("bien_provisoire_id")
+  adosseAt                  DateTime?               @map("adosse_at")
+  convertiDepuisId          String?                 @map("converti_depuis_id")
+  ficheBail                 FicheBail?
+  relancesAdossement        RelanceAdossement[]
 
   @@index([status, createdAt])
   @@index([propertyId])
@@ -601,6 +624,8 @@ model Receipt {
   sha256CalculeLe    DateTime?        @map("sha256_calcule_le")
   sha256Hash         String?          @map("sha256_hash")
   niveauCertification       String                  @default("NON_CERTIFIE") @map("niveau_certification")
+  // ADD-28: Quittancement sans bien confirmé (RG-DCL-35)
+  valeurProbanteActive      Boolean                 @default(true) @map("valeur_probante_active")
   ColocPayment       ColocPayment[]
   pgwPayments        PaymentPgw[]
   delivery           DigitalDelivery? @relation(fields: [digitalDeliveryId], references: [id])
@@ -4791,3 +4816,102 @@ enum RoleContexte {
   INTERMEDIAIRE
   ADMIN
 }
+
+// ============================================================================
+// ADD-28 : BAIL DÉCLARÉ PAR LE LOCATAIRE, FICHE DE BAIL & ADOSSEMENT DIFFÉRÉ
+// Règles RG-DCL-01 à RG-DCL-38
+// ============================================================================
+
+enum DeclarationStatut {
+  EN_ATTENTE
+  CONFIRMEE
+  REFUSEE
+  REORIENTEE
+  EXPIREE
+  ANNULEE
+}
+
+enum BailOrigine {
+  QAPRIL
+  PAPIER
+}
+
+enum AdossementStatut {
+  NON_ADOSSE
+  PROPOSE
+  CONFIRME
+  EN_CONFLIT
+}
+
+enum BienConfirmation {
+  PROVISOIRE
+  CONFIRME
+}
+
+model DeclarationBail {
+  id                  String            @id @default(uuid()) @map("declaration_id")
+  initiateurId        String            @map("initiateur_id")
+  initiateurRole      String            @map("initiateur_role") // LOCATAIRE | BAILLEUR | AGENCE
+  locataireId         String?           @map("locataire_id")
+  destinataireTel     String            @map("destinataire_tel")
+  destinataireId      String?           @map("destinataire_id")
+  designationDeclaree Json              @map("designation_declaree") // { commune, quartier, repere, structure_supposee, type, gps }
+  loyerDeclare        Float             @map("loyer_declare")
+  bailPapierExiste    Boolean           @default(false) @map("bail_papier_existe")
+  statut              DeclarationStatut @default(EN_ATTENTE) @map("statut")
+  reponseAt           DateTime?         @map("reponse_at")
+  reorienteVersTel    String?           @map("reoriente_vers_tel")
+  nbRelances          Int               @default(0) @map("nb_relances")
+  canalReponse        String?           @map("canal_reponse") // APP | WHATSAPP | SMS
+  createdAt           DateTime          @default(now()) @map("created_at")
+  expireAt            DateTime          @map("expire_at")
+
+  initiateur          User              @relation("DeclarationsInitiees", fields: [initiateurId], references: [id])
+  destinataire        User?             @relation("DeclarationsRecues", fields: [destinataireId], references: [id])
+  locataire           User?             @relation("DeclarationsLocataire", fields: [locataireId], references: [id])
+  bails               Lease[]           @relation("DeclarationLease")
+
+  @@index([destinataireTel, statut])
+  @@index([initiateurId, statut])
+  @@map("declarations_bail")
+}
+
+model FicheBail {
+  id                  String    @id @default(uuid()) @map("fiche_id")
+  leaseId             String    @unique @map("lease_id")
+  fichierUrl          String    @map("fichier_url")
+  fichierSha256       String    @map("fichier_sha256")
+  nbPages             Int?      @map("nb_pages")
+  dateSignaturePapier DateTime? @map("date_signature_papier")
+  mentions            Json      @map("mentions") // parties, designation, loyer, charges, date_effet, duree_mois, jour_echeance, depot_garantie, loyer_avance
+  saisieParId         String    @map("saisie_par_id")
+  saisieAt            DateTime  @default(now()) @map("saisie_at")
+  confirmeeParId      String?   @map("confirmee_par_id")
+  confirmeeAt         DateTime? @map("confirmee_at")
+  empreinteFiche      String?   @map("empreinte_fiche") // SHA-256(fichier + mentions)
+  ecartsLegaux        Json?     @map("ecarts_legaux") // information Loi 2019-576
+
+  lease               Lease     @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  saisiePar           User      @relation("FichesSaisies", fields: [saisieParId], references: [id])
+  confirmeePar        User?     @relation("FichesConfirmees", fields: [confirmeeParId], references: [id])
+
+  @@map("fiches_bail")
+}
+
+model RelanceAdossement {
+  id         String    @id @default(uuid()) @map("relance_id")
+  leaseId    String    @map("lease_id")
+  bailleurId String    @map("bailleur_id")
+  palier     String    @map("palier") // J2 | J7 | J15 | MENSUEL
+  canal      String    @map("canal") // WHATSAPP | SMS | PUSH
+  envoyeeAt  DateTime  @default(now()) @map("envoyee_at")
+  cliqueeAt  DateTime? @map("cliquee_at")
+  reponse    String?   @map("reponse") // OUI | CORRIGE | BIEN_EXISTANT | NULL
+
+  lease      Lease     @relation(fields: [leaseId], references: [id], onDelete: Cascade)
+  bailleur   User      @relation("RelancesAdossementBailleur", fields: [bailleurId], references: [id])
+
+  @@index([bailleurId, envoyeeAt])
+  @@map("relances_adossement")
+}
+

@@ -55,6 +55,13 @@ else
   docker compose logs --tail=50 app
 fi
 
+# 5. Purge automatique du cache de build et des images orphelines
+echo "🧹 Purge automatique du cache Docker et des images orphelines..."
+docker builder prune -a -f --max-used-space 2GB || true
+docker image prune -f || true
+docker container prune -f || true
+
+
 echo "=========================================="
 echo "🎉 Fin de la procédure de déploiement."
 echo "=========================================="

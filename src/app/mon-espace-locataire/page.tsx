@@ -34,7 +34,8 @@ import {
     Droplets,
     Smartphone,
     Wifi,
-    MessageSquare
+    MessageSquare,
+    FileText
 } from "lucide-react"
 import { motion, AnimatePresence, Variants } from "framer-motion"
 import NotificationCenter from "@/components/dashboard/NotificationCenter"
@@ -237,33 +238,69 @@ export default function LocataireDashboardPage() {
                         </div>
                     ) : (
                         <div className="bg-white p-10 rounded-3xl border border-slate-200/80 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)]">
-                            <div className="w-16 h-16 bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-center text-slate-700 mb-6 mx-auto">
+                            <div className="w-16 h-16 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center justify-center text-emerald-700 mb-6 mx-auto">
                                 <Home size={32} />
                             </div>
                             <h1 className="text-2xl md:text-3xl font-black text-slate-900 mb-3 tracking-tight">
                                 Bienvenue sur votre Espace Locataire
                             </h1>
                             <p className="text-sm text-slate-500 max-w-md mx-auto mb-8 font-medium leading-relaxed">
-                                Aucun bail actif n'est encore lié à votre numéro ({dashboardData.user?.phone || 'Profil non renseigné'}). 
-                                Demandez à votre bailleur de vous déclarer ou complétez votre profil.
+                                Vous n'avez pas encore de bail actif rattaché. Vous pouvez déclarer votre logement actuel ou trouver votre futur chez-vous.
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            
+                            {/* Les 2 Entrées Principales Officielles ADD-28 (Règle RG-DCL-07) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-6">
                                 <Link 
-                                    href="/mon-espace-locataire/valider-bail" 
-                                    className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                                    href="/mon-espace-locataire/declarer-bail" 
+                                    className="p-6 bg-gradient-to-br from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white rounded-2xl shadow-lg shadow-emerald-700/20 transition-all hover:-translate-y-1 text-left flex flex-col justify-between group"
                                 >
-                                    <span>Valider un code de bail reçu</span>
-                                    <Key size={14} />
+                                    <div className="space-y-2">
+                                        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white mb-2">
+                                            <FileText size={20} />
+                                        </div>
+                                        <div className="text-base font-black tracking-tight">Je déclare mon bail</div>
+                                        <p className="text-xs text-emerald-100 font-medium leading-relaxed">
+                                            Vous habitez déjà un logement ? Indiquez votre bailleur et débloquez vos quittances certifiées.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                                        <span>Déclarer en 2 min</span>
+                                        <ArrowUpRight size={14} />
+                                    </div>
                                 </Link>
+
                                 <Link 
                                     href="/mon-espace-locataire/marketplace" 
-                                    className="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs flex items-center justify-center gap-2"
+                                    className="p-6 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl shadow-lg shadow-slate-900/20 transition-all hover:-translate-y-1 text-left flex flex-col justify-between group"
                                 >
-                                    <span>Trouver un logement</span>
+                                    <div className="space-y-2">
+                                        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400 mb-2">
+                                            <Search size={20} />
+                                        </div>
+                                        <div className="text-base font-black tracking-tight">Je cherche un logement</div>
+                                        <p className="text-xs text-slate-400 font-medium leading-relaxed">
+                                            Consultez les biens certifiés disponibles, postulez avec votre Passeport et visitez.
+                                        </p>
+                                    </div>
+                                    <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                                        <span>Explorer les offres</span>
+                                        <ArrowUpRight size={14} />
+                                    </div>
                                 </Link>
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-100 flex items-center justify-center gap-4 text-xs">
+                                <Link 
+                                    href="/mon-espace-locataire/valider-bail" 
+                                    className="text-slate-500 hover:text-slate-900 font-semibold flex items-center gap-1.5"
+                                >
+                                    <Key size={13} />
+                                    <span>Valider un code d'invitation reçu</span>
+                                </Link>
+                                <span className="text-slate-300">•</span>
                                 <Link 
                                     href="/onboarding/tenant" 
-                                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 text-xs flex items-center justify-center"
+                                    className="text-slate-500 hover:text-slate-900 font-semibold"
                                 >
                                     Compléter mon profil
                                 </Link>
