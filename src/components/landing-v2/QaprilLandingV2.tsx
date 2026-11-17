@@ -43,6 +43,7 @@ import {
   FileCheck2,
   Download,
   Film,
+  Play,
 } from "lucide-react";
 
 const SLIDES = [
@@ -300,9 +301,29 @@ export default function QaprilLandingV2({
                 Gestion locative certifiée et baux d'habitation conformes en Côte d'Ivoire
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-8 max-w-3xl">
+              <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed mb-6 max-w-3xl">
                 Rédigez vos contrats de bail en toute règle, payez et encaissez vos loyers par Wave et Mobile Money avec reçu officiel immédiat, dans le respect strict du plafond légal de 2 mois de caution. Tout est clair, rapide et protégé.
               </p>
+
+              {/* Accès Direct aux Vidéos de Présentation */}
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                <a
+                  href="#videos-presentation"
+                  className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/25 to-amber-600/20 hover:from-amber-500/35 hover:to-amber-600/30 text-amber-300 border border-amber-400/50 text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95 group"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <Play size={12} className="fill-slate-950 text-slate-950 ml-0.5" />
+                  </div>
+                  <span>Voir la vidéo de présentation QAPRIL & FNUI</span>
+                </a>
+                <a
+                  href="#videos-presentation"
+                  className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-slate-200 border border-white/15 text-xs font-bold uppercase tracking-wider transition-all"
+                >
+                  <Film size={14} className="text-amber-400" />
+                  <span>Tutoriel Enregistrement du Bail</span>
+                </a>
+              </div>
 
               {/* 3 Portails Métiers Directs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
@@ -561,6 +582,11 @@ export default function QaprilLandingV2({
             </div>
           </div>
         </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            DÉMONSTRATIONS & PRÉSENTATIONS VIDÉO QAPRIL
+        ══════════════════════════════════════════════════════════════════ */}
+        <QaprilVideoShowcase />
 
         {/* ══════════════════════════════════════════════════════════════════
             4. LES 4 PILIERS RÉGLEMENTAIRES & TECHNOLOGIQUES
@@ -1106,11 +1132,6 @@ export default function QaprilLandingV2({
             )}
           </div>
         </section>
-
-        {/* ══════════════════════════════════════════════════════════════════
-            DÉMONSTRATIONS & PRÉSENTATIONS VIDÉO QAPRIL
-        ══════════════════════════════════════════════════════════════════ */}
-        <QaprilVideoShowcase />
 
         {/* ══════════════════════════════════════════════════════════════════
             6. SERVICES ET MODULES TECHNIQUES DE L'APPLICATION

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
-import { Lock, ArrowRight, ShieldAlert, Smartphone } from "lucide-react";
+import { Lock, ArrowRight, ShieldAlert, Smartphone, Film } from "lucide-react";
 import { choisirTypeConnexion, type TypeConnexion } from "@/actions/auth.actions";
 
 export default function RestrictedPortal() {
@@ -104,8 +104,15 @@ export default function RestrictedPortal() {
               </div>
             </button>
 
-            {/* Accès Téléchargement Applications Mobiles */}
-            <div className="mt-6 text-center">
+            {/* Accès Téléchargement Applications Mobiles & Vidéos */}
+            <div className="mt-6 flex flex-col items-center gap-3 text-center">
+              <Link 
+                href="/videos"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 hover:bg-amber-500/20 text-xs font-bold transition-all"
+              >
+                <Film className="w-4 h-4 text-amber-400" />
+                <span>Voir les vidéos de présentation QAPRIL & Démonstrations</span>
+              </Link>
               <Link 
                 href="/telecharger"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 text-xs font-bold transition-all"

@@ -5,7 +5,7 @@ import RestrictedPortal from "@/components/landing-v3/RestrictedPortal";
 import { isFeatureEnabled } from "@/lib/features";
 import { isPaywallActive } from "@/lib/paywall-utils";
 
-export const revalidate = 60; // Cache the landing page structure for 1 minute
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   let session = null;
@@ -25,16 +25,13 @@ export default async function Home() {
   // 3. Etat du paywall
   const paywallActif = await isPaywallActive();
 
-  // LOGIQUE DE ROUTAGE (PORTAIL RESTREINT VS MARKETING PUBLIC)
-  if (isLandingModeActif) {
-      if (adminConnected) {
-          return <QaprilLandingV2 session={session} paywallActif={paywallActif} />; // Admin passe au travers
-      } else {
-          return <RestrictedPortal />; // Public bloqué sur le Premium Portal
-      }
-  } else {
-      // Mode restreint désactivé -> Le site est public pour tout le monde
-      return <QaprilLandingV2 session={session} paywallActif={paywallActif} />;
+  // LOGIQUE DE ROUTAGE (VITRINE PUBLIQUE LANDING PAGE VS PORTAIL RESTREINT)
+  // Si LANDING_PAGE est désactivé et que l'utilisateur n'est pas admin, affichage du portail restreint.
+  // Par défaut et en mode public normal, affichage de la vitrine marketing QaprilLandingV2 pour tous.
+  if (!isLandingModeActif && !adminConnected) {
+      return <RestrictedPortal />;
   }
+
+  return <QaprilLandingV2 session={session} paywallActif={paywallActif} />;
 }
 
