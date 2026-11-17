@@ -11,7 +11,7 @@ import { generatePropertyCode as generatePropertyCodeLegacy } from "@/lib/proper
 import { generatePropertyCode, DEFAULT_CHECKLIST, PropertyValidationChecklist } from "@/lib/property-utils";
 import { isUserKycSufficient } from "@/lib/kyc-config";
 import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence, confirmerPositionParConcordance } from "@/lib/geo-maposte";
-import { reverseGeocodeCoordinates } from "@/lib/reverse-geocoding";
+import { reverseGeocode } from "@/lib/geo/reverseGeocode";
 import { validerLieu } from "@/lib/lieux";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
@@ -246,9 +246,10 @@ export async function creerBien(formData: FormData) {
           unitLabel:        unitLabel ? unitLabel.trim() : undefined,
           parentPropertyId: data.parentPropertyId,
           commune:          effectiveCommune,
-          quartier:         effectiveQuartier,
+          quartier:         data.quartier || effectiveQuartier || null,
           address:          data.address || inheritedData.address,
           city:             effectiveCity,
+          ville:            effectiveCity || (data as any).ville || "Abidjan",
           leaseType:        data.leaseType || inheritedData.leaseType || "residential",
           propertyType:     data.propertyType,
           declaredRentFcfa: data.declaredRentFcfa,
@@ -258,9 +259,14 @@ export async function creerBien(formData: FormData) {
           referenceCadastre: data.referenceCadastre,
           amenities:        data.amenities || [],
           status:           "active",
-          // ADD-28 : Géolocalisation
+          // ADD-28 : Géolocalisation certifiée & Adressage
+          latitude:         effectiveLat,
+          longitude:        effectiveLng,
           gpsLatitude:      effectiveLat,
           gpsLongitude:     effectiveLng,
+          quartierSource:   (data as any).quartierSource || (effectiveLat ? "gps" : "manuel"),
+          quartierManuel:   Boolean((data as any).quartierManuel),
+          localisationMiseAJourLe: new Date(),
           precisionM:       effectivePrecision,
           statutPosition,
           codeLocalisation,
@@ -783,15 +789,43 @@ export async function enregistrerPositionGpsBien(params: {
 
     // 2. Mise à jour du bien
     const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'PROVISOIRE';
+
+    // Résolution quartier automatique si manquant
+    let resolvedQuartier = property.quartier;
+    let resolvedCommune = property.commune;
+    let resolvedVille = property.ville;
+    let resolvedSource = property.quartierSource || "gps";
+
+    if (!property.quartierManuel) {
+      try {
+        const geoInfo = await reverseGeocode(lat, lng);
+        if (geoInfo.quartier) {
+          resolvedQuartier = geoInfo.quartier;
+          resolvedSource = geoInfo.source;
+        }
+        if (geoInfo.commune) resolvedCommune = geoInfo.commune;
+        if (geoInfo.ville) resolvedVille = geoInfo.ville;
+      } catch (err) {
+        console.warn("[ACTION-GEO] Erreur reverseGeocode non-bloquante:", err);
+      }
+    }
+
     await prisma.property.update({
       where: { id: propertyId },
       data: {
+        latitude: lat,
+        longitude: lng,
         gpsLatitude: lat,
         gpsLongitude: lng,
         precisionM: effectivePrecision,
         statutPosition: nextStatut,
         codeLocalisation,
         w3w,
+        quartier: resolvedQuartier,
+        commune: resolvedCommune,
+        ville: resolvedVille,
+        quartierSource: resolvedSource,
+        localisationMiseAJourLe: new Date(),
       }
     });
 
@@ -827,7 +861,8 @@ export interface ReverseGeocodingActionResult {
   quartier?: string;
   adresseComplete?: string;
   precisionEstimee?: string;
-  source?: "OSM_NOMINATIM" | "REFERENTIEL_LOCAL";
+  source?: string;
+  precision?: string;
   error?: string;
 }
 
@@ -839,8 +874,16 @@ export async function getReverseGeocodingAction(lat: number, lng: number): Promi
     if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
       return { success: false, error: "Coordonnées GPS invalides." };
     }
-    const result = await reverseGeocodeCoordinates(lat, lng);
-    return { success: true, ...result };
+    const result = await reverseGeocode(lat, lng);
+    return {
+      success: true,
+      ville: result.ville || undefined,
+      commune: result.commune || undefined,
+      quartier: result.quartier || undefined,
+      source: result.source,
+      precision: result.precision,
+      precisionEstimee: result.precision,
+    };
   } catch (error: any) {
     console.error("[ACTION-GEO] Erreur reverse geocoding:", error);
     return { success: false, error: error.message || "Erreur lors de la résolution géographique." };

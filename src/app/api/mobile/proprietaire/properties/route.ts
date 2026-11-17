@@ -31,7 +31,7 @@ export async function GET(request: Request) {
             where,
             include: {
                 images: {
-                    orderBy: [{ isMain: 'desc' }, { createdAt: 'desc' }],
+                    orderBy: [{ isMain: 'desc' }, { updatedAt: 'desc' }],
                     take: 5
                 },
                 leases: {
@@ -234,7 +234,13 @@ export async function POST(request: Request) {
                 parentPropertyId: parentPropertyId ?? null,
                 unitLabel:        unitLabel ? String(unitLabel).trim() : null,
                 status:           'ACTIVE',
-                // ADD-28 : Géolocalisation
+                // ADD-28 : Géolocalisation certifiée & Quartier
+                latitude:         hasGps ? rawLat : null,
+                longitude:        hasGps ? rawLng : null,
+                ville:            cleanCity,
+                quartierSource:   cleanQuartier ? (body.quartierManuel ? "manuel" : (hasGps ? "google" : "manuel")) : null,
+                quartierManuel:   Boolean(body.quartierManuel),
+                localisationMiseAJourLe: hasGps ? new Date() : null,
                 gpsLatitude:      hasGps ? rawLat : null,
                 gpsLongitude:     hasGps ? rawLng : null,
                 precisionM:       hasGps ? rawPrecision : null,

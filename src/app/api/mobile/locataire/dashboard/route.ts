@@ -35,7 +35,7 @@ export async function GET(request: Request) {
                 property: {
                     include: {
                         images: {
-                            orderBy: [{ isMain: 'desc' }, { createdAt: 'desc' }],
+                            orderBy: [{ isMain: 'desc' }, { updatedAt: 'desc' }],
                             take: 5
                         }
                     }

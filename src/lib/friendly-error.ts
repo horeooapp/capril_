@@ -69,13 +69,17 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
     }
 
     // 5. Détection des erreurs STRICTEMENT sur le loyer ou les montants
-    // IMPORTANT : Ne pas faire `lower.includes('rent')` directement car cela matche
-    // 'parentPropertyId', 'different', 'adherent', 'apparent', 'transparent', etc.
+    // IMPORTANT : Dans les erreurs Prisma, tout le payload data: { declaredRentFcfa: ... } est dumpé dans le message.
+    // Il faut donc vérifier que l'erreur porte SPÉCIFIQUEMENT sur le champ financier,
+    // et qu'elle n'est pas causée par un autre champ (ex: statutPosition, phone, code, etc.).
     const isStrictFinancial = 
-        /\b(loyer|loyers|rentamount|caution|cautions|deposit|avance|avance_loyer|loyer_mensuel)\b/i.test(rawMessage) ||
-        (/\brent\b/i.test(rawMessage) && !rawMessage.includes('parentProperty') && !rawMessage.includes('parent'));
+        /\b(loyer|loyers|caution|cautions|deposit|avance_loyer|loyer_mensuel)\b/i.test(rawMessage) ||
+        (/argument\s+[`'"]?(rent|declaredRent|rentAmount|caution|deposit)/i.test(rawMessage)) ||
+        (/(?:valeur|montant|chiffre)\s+invalide.*?(?:loyer|caution|deposit)/i.test(rawMessage));
 
-    if (isStrictFinancial && !lower.includes('parentpropertyid') && !lower.includes('parent_property_id')) {
+    const hasOtherSpecificArgError = /(?:argument|unknown argument|invalid value for argument)\s+[`'"]?(?!rent|declaredrent|rentamount|caution|deposit)[a-zA-Z0-9_]+/i.test(rawMessage);
+
+    if (isStrictFinancial && !hasOtherSpecificArgError && !lower.includes('parentpropertyid') && !lower.includes('parent_property_id')) {
         return "Montant financier invalide ou manquant. Veuillez préciser le loyer mensuel ou la caution en FCFA.";
     }
 

@@ -338,6 +338,12 @@ model Property {
   isBienVerifie              Boolean               @default(false) @map("is_bien_verifie")
   titreSecuriteJuridique     String?               @map("titre_securite_juridique")
   // ADD-28: Géolocalisation certifiée & Adresse MaPoste
+  latitude                   Float?                @map("latitude")
+  longitude                  Float?                @map("longitude")
+  ville                      String?               @map("ville")
+  quartierSource             String?               @map("quartier_source") // google | osm | manuel
+  quartierManuel             Boolean               @default(false) @map("quartier_manuel")
+  localisationMiseAJourLe    DateTime?             @map("localisation_mise_a_jour_le")
   precisionM                 Int?                  @map("precision_m")
   statutPosition             StatutPosition        @default(MANQUANTE) @map("statut_position")
   positionGeleeAt            DateTime?             @map("position_gelee_at")
@@ -391,10 +397,30 @@ model Property {
   @@index([ownerUserId])
   @@index([commune])
   @@index([commune, quartier])
+  @@index([ville, commune, quartier])
   @@index([status])
   @@index([parentPropertyId])
   @@index([managedByUserId])
   @@map("properties")
+}
+
+model ReverseGeocodeCache {
+  id         String   @id @default(uuid()) @map("id")
+  coordKey   String   @unique @map("coord_key")
+  latRounded Float    @map("lat_rounded")
+  lngRounded Float    @map("lng_rounded")
+  quartier   String?  @map("quartier")
+  commune    String?  @map("commune")
+  ville      String?  @map("ville")
+  source     String   @map("source")
+  precision  String   @map("precision")
+  raw        Json?    @map("raw")
+  createdAt  DateTime @default(now()) @map("created_at")
+  expiresAt  DateTime @map("expires_at")
+
+  @@index([coordKey])
+  @@index([expiresAt])
+  @@map("reverse_geocode_cache")
 }
 
 model PropertyImage {

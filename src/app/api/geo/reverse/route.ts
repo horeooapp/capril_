@@ -1,45 +1,161 @@
-import { NextResponse } from 'next/server';
-import { reverseGeocodeCoordinates } from '@/lib/reverse-geocoding';
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { reverseGeocode } from "@/lib/geo/reverseGeocode";
 
-/**
- * GET /api/geo/reverse?lat=5.3599&lng=-3.9850
- * Résout des coordonnées GPS en Ville, Commune et Quartier officiels ivoiriens.
- */
-export async function GET(request: Request) {
-    try {
-        const { searchParams } = new URL(request.url);
-        const latStr = searchParams.get('lat');
-        const lngStr = searchParams.get('lng');
+// Schéma de validation Zod strict
+const ReverseGeocodeSchema = z.object({
+  lat: z.number().min(-90, "Latitude invalide").max(90, "Latitude invalide"),
+  lng: z.number().min(-180, "Longitude invalide").max(180, "Longitude invalide"),
+});
 
-        if (!latStr || !lngStr) {
-            return NextResponse.json({ 
-                error: "Paramètres 'lat' et 'lng' requis.",
-                usage: "GET /api/geo/reverse?lat=<latitude>&lng=<longitude>",
-                exemples: {
-                    cocody_angre: "https://qapril.net/api/geo/reverse?lat=5.3850&lng=-3.9850",
-                    adjame: "https://qapril.net/api/geo/reverse?lat=5.3599&lng=-4.0083",
-                    plateau: "https://qapril.net/api/geo/reverse?lat=5.3236&lng=-4.0177",
-                    yopougon: "https://qapril.net/api/geo/reverse?lat=5.3400&lng=-4.0800"
-                }
-            }, { status: 400 });
-        }
+// Rate limiting mémoire simple par IP (30 requêtes par minute)
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-        const lat = parseFloat(latStr);
-        const lng = parseFloat(lngStr);
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(identifier);
 
-        if (isNaN(lat) || isNaN(lng)) {
-            return NextResponse.json({ error: "Coordonnées géographiques invalides." }, { status: 400 });
-        }
+  // Nettoyage régulier si trop grand
+  if (rateLimitMap.size > 10000) {
+    rateLimitMap.clear();
+  }
 
-        const result = await reverseGeocodeCoordinates(lat, lng);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(identifier, { count: 1, resetAt: now + 60000 });
+    return true;
+  }
 
-        return NextResponse.json({
-            success: true,
-            data: result
-        });
-    } catch (error: any) {
-        console.error("[GEO] Erreur reverse geocoding:", error);
-        return NextResponse.json({ error: "Erreur lors de la résolution géographique." }, { status: 500 });
-    }
+  if (entry.count >= 30) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
 }
 
+/**
+ * POST /api/geo/reverse
+ * Corps JSON : { lat: number, lng: number }
+ * Sortie : { quartier, commune, ville, source, precision }
+ */
+export async function POST(request: Request) {
+  try {
+    // 1. Détection IP pour limitation de débit
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "anonymous";
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        {
+          error: "Limite de requêtes atteinte. Veuillez patienter une minute avant de réessayer.",
+          code: "RATE_LIMITED",
+        },
+        { status: 429 }
+      );
+    }
+
+    // 2. Lecture et validation Zod du body
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json(
+        { error: "Corps de requête JSON manquant.", code: "INVALID_BODY" },
+        { status: 400 }
+      );
+    }
+
+    const validation = ReverseGeocodeSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: "Coordonnées géographiques invalides.",
+          details: validation.error.format(),
+          code: "VALIDATION_ERROR",
+        },
+        { status: 400 }
+      );
+    }
+
+    const { lat, lng } = validation.data;
+
+    // 3. Appel du service de géocodage inverse
+    const result = await reverseGeocode(lat, lng);
+
+    return NextResponse.json({
+      success: true,
+      quartier: result.quartier,
+      commune: result.commune,
+      ville: result.ville,
+      source: result.source,
+      precision: result.precision,
+      // Compatibilité ascendante
+      data: {
+        quartier: result.quartier,
+        commune: result.commune,
+        ville: result.ville,
+        source: result.source,
+        precision: result.precision,
+      },
+    });
+  } catch (error: any) {
+    console.error("[GEO API POST Error]:", error);
+    return NextResponse.json(
+      { error: "Erreur serveur lors de la résolution géographique.", code: "INTERNAL_ERROR" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/geo/reverse?lat=...&lng=... (Compatibilité avec les clients existants)
+ */
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const latStr = searchParams.get("lat");
+    const lngStr = searchParams.get("lng");
+
+    if (!latStr || !lngStr) {
+      return NextResponse.json(
+        { error: "Paramètres 'lat' et 'lng' requis.", code: "MISSING_PARAMS" },
+        { status: 400 }
+      );
+    }
+
+    const lat = parseFloat(latStr);
+    const lng = parseFloat(lngStr);
+
+    const validation = ReverseGeocodeSchema.safeParse({ lat, lng });
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "Coordonnées géographiques invalides.", code: "VALIDATION_ERROR" },
+        { status: 400 }
+      );
+    }
+
+    const result = await reverseGeocode(lat, lng);
+
+    return NextResponse.json({
+      success: true,
+      quartier: result.quartier,
+      commune: result.commune,
+      ville: result.ville,
+      source: result.source,
+      precision: result.precision,
+      data: {
+        quartier: result.quartier,
+        commune: result.commune,
+        ville: result.ville,
+        source: result.source,
+        precision: result.precision,
+      },
+    });
+  } catch (error: any) {
+    console.error("[GEO API GET Error]:", error);
+    return NextResponse.json(
+      { error: "Erreur serveur lors de la résolution géographique." },
+      { status: 500 }
+    );
+  }
+}
