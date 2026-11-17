@@ -11,13 +11,13 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
         const session = await auth()
         
         // 1. Authentification & Autorisation fine-grained
-        if (!session?.user?.id) {
+        if (!session?.user?.id && !session?.user?.email) {
             return serializeObject({ success: false, error: "Session expirée. Veuillez vous reconnecter." })
         }
 
-        const userRoles = (session.user as any).eligibleRoles || [session.user.role];
-        const currentRole = (session.user as any)?.chosenRole || (session.user as any)?.capaciteActive || session.user.role || 'TENANT';
-        const isTenant = ['TENANT', 'LOCATAIRE', 'USER'].includes(currentRole) || 
+        const userRoles = (session?.user as any)?.eligibleRoles || [session?.user?.role];
+        const currentRole = (session?.user as any)?.chosenRole || (session?.user as any)?.capaciteActive || session?.user?.role || 'TENANT';
+        const isTenant = ['TENANT', 'LOCATAIRE', 'USER', 'LANDLORD', 'PROPRIETAIRE'].includes(currentRole) || 
             userRoles.includes('TENANT') || 
             userRoles.includes('LOCATAIRE') ||
             userRoles.includes('USER');
@@ -26,17 +26,64 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
             return serializeObject({ success: false, error: "Accès refusé. Réservé aux locataires." })
         }
 
-        const userId = session.user.id
+        const sessionUserId = session?.user?.id;
+        const sessionUserEmail = session?.user?.email;
+        const sessionUserPhone = session?.user?.phone;
 
         // 2. Récupérer le Locataire
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
+        let user = sessionUserId ? await prisma.user.findUnique({
+            where: { id: sessionUserId },
             select: { id: true, lastName: true, firstName: true, email: true, phone: true }
-        })
+        }) : null;
+
+        // Fallback 1 : Recherche par email si l'ID dans le token ne correspond pas
+        if (!user && sessionUserEmail) {
+            user = await prisma.user.findUnique({
+                where: { email: sessionUserEmail },
+                select: { id: true, lastName: true, firstName: true, email: true, phone: true }
+            });
+        }
+
+        // Fallback 2 : Recherche par téléphone
+        if (!user && sessionUserPhone) {
+            user = await prisma.user.findFirst({
+                where: { phone: sessionUserPhone },
+                select: { id: true, lastName: true, firstName: true, email: true, phone: true }
+            });
+        }
+
+        // Fallback 3 : Auto-guérison si l'utilisateur a une session valide mais sans profil en base
+        if (!user && sessionUserEmail) {
+            const rawName = session?.user?.name || sessionUserEmail.split('@')[0] || "Locataire";
+            const parts = rawName.trim().split(/\s+/);
+            const firstName = parts[0] || 'Locataire';
+            const lastName = parts.slice(1).join(' ') || '';
+            const defaultPhone = `PENDING_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+
+            try {
+                user = await prisma.user.create({
+                    data: {
+                        email: sessionUserEmail,
+                        phone: defaultPhone,
+                        firstName,
+                        lastName,
+                        role: "TENANT",
+                        status: "ACTIVE",
+                        capaciteActive: "LOCATAIRE",
+                        onboardingComplete: true
+                    },
+                    select: { id: true, lastName: true, firstName: true, email: true, phone: true }
+                });
+            } catch (createErr) {
+                console.error("[AUTO-HEAL User Error]:", createErr);
+            }
+        }
 
         if (!user) {
-            return serializeObject({ success: false, error: "Profil utilisateur introuvable." })
+            return serializeObject({ success: false, error: "Profil utilisateur introuvable. Veuillez vous reconnecter." })
         }
+
+        const userId = user.id;
 
         const normalized = user.phone ? normalizePhone(user.phone) : null;
 

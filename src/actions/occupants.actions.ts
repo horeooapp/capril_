@@ -12,10 +12,16 @@ export async function getTenantOccupantsAndAttestations() {
         const session = await ensureAuthenticated();
         const userId = session.user.id;
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: { id: userId },
             include: { adresseMaPoste: true }
         });
+        if (!user && session.user.email) {
+            user = await prisma.user.findUnique({
+                where: { email: session.user.email },
+                include: { adresseMaPoste: true }
+            });
+        }
         if (!user) return { success: false, error: "Utilisateur introuvable." };
 
         const normalized = user.phone ? normalizePhone(user.phone) : null;
@@ -273,10 +279,16 @@ export async function genererAttestationResidenceWeb(leaseId: string) {
             return { success: false, error: "Contrat de bail introuvable." };
         }
 
-        const dbUser = await prisma.user.findUnique({
+        let dbUser = await prisma.user.findUnique({
             where: { id: userId },
             include: { adresseMaPoste: true }
         });
+        if (!dbUser && session.user.email) {
+            dbUser = await prisma.user.findUnique({
+                where: { email: session.user.email },
+                include: { adresseMaPoste: true }
+            });
+        }
         if (!dbUser) {
             return { success: false, error: "Profil utilisateur introuvable." };
         }

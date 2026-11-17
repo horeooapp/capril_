@@ -482,16 +482,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             || (profile as any)?.avatar_url 
                             || null;
 
+                        const defaultPhone = `PENDING_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+                        const targetRole = "TENANT";
+
                         dbUser = await prisma.user.create({
                             data: {
                                 email,
+                                phone: defaultPhone,
                                 firstName,
                                 lastName,
                                 avatarUrl,
                                 emailVerified: true,
-                                role: "LANDLORD",
+                                role: targetRole,
                                 status: "ACTIVE",
-                                capaciteActive: "PROPRIETAIRE",
+                                capaciteActive: "LOCATAIRE",
+                                onboardingComplete: true,
                             }
                         });
                     }

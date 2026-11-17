@@ -19,6 +19,7 @@ def run(cmd):
 run("cd /opt/qapril && git pull origin main")
 # Rebuild & restart nextjs container if necessary or restart
 run("docker ps --format '{{.Names}}'")
-run("docker restart qapril-web || docker restart qapril_web_1 || docker restart capril_web_1 || echo 'restarting'")
+run("docker restart qapril_app")
+run("sleep 3 && docker ps --filter name=qapril_app")
 ssh.close()
 
