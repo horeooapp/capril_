@@ -19,7 +19,9 @@ import {
   ShieldCheck,
   AlertCircle,
   FileText,
-  UserCheck
+  UserCheck,
+  Play,
+  Film
 } from "lucide-react"
 import { toast } from "sonner"
 import { togglePropertyMarketplaceStatus } from "@/actions/marketplace-actions"
@@ -139,6 +141,61 @@ export function OwnerPortalDashboardV2({
           >
             <Receipt size={15} className="text-slate-500" />
             <span>Quittances</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── BANNIÈRE VIDÉOS OFFICIELLES & DÉMONSTRATIONS QAPRIL ── */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-white shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <Play size={18} className="text-amber-400 fill-amber-400 ml-0.5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">Vidéos Officielles QAPRIL & FNUI</span>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Officiel</span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">Démonstrations complètes : infrastructure numérique de confiance et enregistrement du bail</p>
+            </div>
+          </div>
+          <Link
+            href="/videos"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-colors whitespace-nowrap self-start sm:self-auto"
+          >
+            <span>Voir l'espace vidéos</span>
+            <ChevronRight size={14} />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+          <Link
+            href="/videos"
+            className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-amber-500/40 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-amber-400/20 flex items-center justify-center shrink-0 text-amber-400 group-hover:scale-110 transition-transform">
+              <Play size={14} className="fill-amber-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-bold text-slate-100 group-hover:text-amber-300 transition-colors truncate">1. Présentation QAPRIL & FNUI</div>
+              <div className="text-[11px] text-slate-400 truncate">Sécurisation légale, CDC, quittance instantanée (2m 14s)</div>
+            </div>
+            <ArrowUpRight size={14} className="text-slate-500 group-hover:text-amber-400 shrink-0" />
+          </Link>
+
+          <Link
+            href="/videos"
+            className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-emerald-500/40 transition-all group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400 group-hover:scale-110 transition-transform">
+              <Play size={14} className="fill-emerald-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-bold text-slate-100 group-hover:text-emerald-300 transition-colors truncate">2. Tutoriel Enregistrement du Bail</div>
+              <div className="text-[11px] text-slate-400 truncate">Guide pas-à-pas enregistrement et fiscalité DGI (2m 16s)</div>
+            </div>
+            <ArrowUpRight size={14} className="text-slate-500 group-hover:text-emerald-400 shrink-0" />
           </Link>
         </div>
       </div>

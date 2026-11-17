@@ -61,6 +61,8 @@ import {
   ExternalLink,
   BookOpen,
   Download,
+  Play,
+  Film,
 } from 'lucide-react-native';
 
 const formatImageUrl = (uri?: string | null) => {
@@ -1288,6 +1290,51 @@ export default function LocatairePrototypeScreen() {
                 <Text style={styles.subMuted}>QAPRIL · Espace locataire</Text>
                 <Text style={styles.h1}>{userName}</Text>
                 <Text style={styles.subMuted}>{propName}</Text>
+              </View>
+            </View>
+
+            {/* ── BANNIÈRE VIDÉOS OFFICIELLES & DÉMONSTRATIONS QAPRIL ── */}
+            <View style={[styles.card, { backgroundColor: '#0F172A', borderColor: '#334155', padding: 14, gap: 10 }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: '#D97706', alignItems: 'center', justifyContent: 'center' }}>
+                    <Play size={14} color="#0F172A" fill="#0F172A" />
+                  </View>
+                  <View>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#FFFFFF' }}>Vidéos Officielles QAPRIL</Text>
+                    <Text style={{ fontSize: 10, color: '#94A3B8' }}>Démonstrations & Guide FNUI certifié</Text>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={() => Linking.openURL('https://qapril.net/videos')}
+                  style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                >
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#FCD34D' }}>Voir tout ›</Text>
+                </Pressable>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable
+                  onPress={() => Linking.openURL('https://qapril.net/videos/QAPRIL_Presentation_FNUI.mp4')}
+                  style={{ flex: 1, backgroundColor: '#1E293B', padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#334155', gap: 4 }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Play size={12} color="#F59E0B" fill="#F59E0B" />
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFFFFF' }} numberOfLines={1}>Présentation FNUI</Text>
+                  </View>
+                  <Text style={{ fontSize: 9, color: '#94A3B8' }}>Infrastructure de confiance (2m 14s)</Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => Linking.openURL('https://qapril.net/videos/QAPRIL_Enregistrement_du_Bail.mp4')}
+                  style={{ flex: 1, backgroundColor: '#1E293B', padding: 10, borderRadius: 10, borderWidth: 1, borderColor: '#334155', gap: 4 }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Play size={12} color="#10B981" fill="#10B981" />
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#FFFFFF' }} numberOfLines={1}>Enregistrement Bail</Text>
+                  </View>
+                  <Text style={{ fontSize: 9, color: '#94A3B8' }}>Tutoriel pas-à-pas DGI (2m 16s)</Text>
+                </Pressable>
               </View>
             </View>
 

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { StatCard } from "@/components/dashboard/ui/StatCard"
 import { SectionCard } from "@/components/dashboard/ui/SectionCard"
 import { Badge } from "@/components/dashboard/ui/Badge"
-import { Building2, Users, FileText, Settings2, BarChart3, Receipt, ClipboardList, ShieldCheck, Calculator, TrendingUp, Compass } from "lucide-react"
+import { Building2, Users, FileText, Settings2, BarChart3, Receipt, ClipboardList, ShieldCheck, Calculator, TrendingUp, Compass, Play, ChevronRight } from "lucide-react"
 
 
 
@@ -79,6 +79,59 @@ export function AgencyPortalDashboardV2({
           >
             <Users size={15} className="text-slate-400" />
             <span>Candidatures</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ── BANNIÈRE VIDÉOS OFFICIELLES & DÉMONSTRATIONS QAPRIL ── */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-white shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0">
+              <Play size={16} className="text-amber-400 fill-amber-400 ml-0.5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white">Vidéos Officielles QAPRIL & FNUI</span>
+                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Officiel</span>
+              </div>
+              <p className="text-[11px] text-slate-400">Démonstrations de la plateforme et de l'enregistrement officiel de bail</p>
+            </div>
+          </div>
+          <Link
+            href="/videos"
+            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-bold transition-colors whitespace-nowrap self-start sm:self-auto"
+          >
+            <span>Voir l'espace vidéos</span>
+            <ChevronRight size={13} />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+          <Link
+            href="/videos"
+            className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all group"
+          >
+            <div className="w-7 h-7 rounded-md bg-amber-400/20 flex items-center justify-center shrink-0 text-amber-400 group-hover:scale-110 transition-transform">
+              <Play size={12} className="fill-amber-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-bold text-slate-100 group-hover:text-amber-300 transition-colors truncate">1. Présentation QAPRIL & FNUI</div>
+              <div className="text-[10px] text-slate-400 truncate">Sécurisation légale & quittance (2m 14s)</div>
+            </div>
+          </Link>
+
+          <Link
+            href="/videos"
+            className="flex items-center gap-2.5 p-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition-all group"
+          >
+            <div className="w-7 h-7 rounded-md bg-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400 group-hover:scale-110 transition-transform">
+              <Play size={12} className="fill-emerald-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-xs font-bold text-slate-100 group-hover:text-emerald-300 transition-colors truncate">2. Tutoriel Enregistrement du Bail</div>
+              <div className="text-[10px] text-slate-400 truncate">Procédure DGI pas-à-pas (2m 16s)</div>
+            </div>
           </Link>
         </div>
       </div>

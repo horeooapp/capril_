@@ -244,6 +244,26 @@ export default function QAPRILLocataire({ loc, bail, quittances = [], abos = [],
           {/* ══ ACCUEIL ══ */}
           {tab === "dash" && (
         <div>
+          {/* Vidéos officielles */}
+          <div style={{margin:"12px 16px 0",background:"#0F172A",borderRadius:13,padding:"12px 14px",color:"#FFFFFF"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:14}}>▶️</span>
+                <span style={{fontSize:11,fontWeight:800,color:"#FFFFFF"}}>Vidéos Officielles QAPRIL & FNUI</span>
+              </div>
+              <a href="/videos" style={{fontSize:10,fontWeight:700,color:"#FCD34D",textDecoration:"none"}}>Voir tout ›</a>
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <a href="/videos" style={{flex:1,background:"#1E293B",border:"1px solid #334155",borderRadius:9,padding:"8px 10px",color:"#FFFFFF",textDecoration:"none"}}>
+                <div style={{fontSize:10,fontWeight:800,color:"#F59E0B"}}>1. Présentation FNUI</div>
+                <div style={{fontSize:9,color:"#94A3B8"}}>Infrastructure de confiance (2m 14s)</div>
+              </a>
+              <a href="/videos" style={{flex:1,background:"#1E293B",border:"1px solid #334155",borderRadius:9,padding:"8px 10px",color:"#FFFFFF",textDecoration:"none"}}>
+                <div style={{fontSize:10,fontWeight:800,color:"#10B981"}}>2. Enregistrement Bail</div>
+                <div style={{fontSize:9,color:"#94A3B8"}}>Tutoriel pas-à-pas DGI (2m 16s)</div>
+              </a>
+            </div>
+          </div>
           {/* alerte impayé */}
           {bail.statut==="Impayé"&&(
             <div style={{margin:"14px 16px 0",background:T.redPale,border:`1px solid ${T.red}25`,borderRadius:13,padding:"12px 14px"}}>
