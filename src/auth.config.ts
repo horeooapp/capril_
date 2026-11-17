@@ -105,6 +105,8 @@ export const authConfig = {
                 pathname.startsWith("/auth/") ||
                 pathname.startsWith("/setup") ||
                 pathname.startsWith("/uploads/") ||
+                pathname.startsWith("/videos") ||
+                pathname.endsWith(".mp4") ||
                 pathname.startsWith("/verif") ||
                 pathname.startsWith("/v/") ||
                 pathname.startsWith("/receipts/") ||
@@ -112,7 +114,7 @@ export const authConfig = {
                 pathname.startsWith("/manuel") ||
                 pathname.startsWith("/downloads") ||
                 pathname.startsWith("/telecharger") ||
-                ["/impact", "/expertise", "/a-propos", "/faq", "/manuel", "/telecharger", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif"].includes(pathname);
+                ["/impact", "/expertise", "/a-propos", "/faq", "/manuel", "/telecharger", "/cgu", "/confidentialite", "/contact", "/mentions-legales", "/blog", "/presse", "/carriere", "/cookies", "/fonctionnalites", "/comment-ca-marche", "/temoignages", "/tarifs", "/piliers", "/solutions", "/services", "/modules", "/comparatif", "/videos"].includes(pathname);
 
             // Redirection intelligente si déjà connecté sur /login générique
             if (isLoggedIn && pathname === "/login") {

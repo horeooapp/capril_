@@ -31,7 +31,7 @@ def run_cmd(cmd):
     return exit_status
 
 # 1. Mise à jour du code via git pull dans /opt/qapril
-run_cmd("cd /opt/qapril && git fetch origin main && git reset --hard origin/main")
+run_cmd("cd /opt/qapril && git fetch origin main && git reset --hard origin/main && rm -rf prisma/migrations/aud01")
 
 # 2. Rebuild et relance du conteneur Docker app
 run_cmd("cd /opt/qapril && docker compose build app && docker compose up -d app")
