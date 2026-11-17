@@ -1170,13 +1170,16 @@ export default function QaprilLandingV2({
             7. TABLEAU COMPARATIF : MÉTHODE TRADITIONNELLE VS QAPRIL
         ══════════════════════════════════════════════════════════════════ */}
         <section id="comparatif" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-slate-200">
-          <div className="mb-14 max-w-3xl">
+          <div className="mb-10 max-w-3xl">
             <div className="inline-block px-3 py-1 rounded bg-amber-50 border border-amber-200 text-[#B45309] text-xs font-bold uppercase tracking-wider mb-3">
               Comparatif Clair
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
               Pourquoi choisir QAPRIL pour votre logement ?
             </h2>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+              Visionnez la vidéo explicative ci-dessous ou parcourez le tableau comparatif pour comprendre en quoi QAPRIL révolutionne la gestion locative.
+            </p>
             <div className="mt-3">
               <Link href="/comparatif" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D97706] hover:text-[#B45309] transition-colors">
                 Voir la comparaison détaillée et les avantages <ArrowRight className="w-3.5 h-3.5" />
@@ -1184,7 +1187,103 @@ export default function QaprilLandingV2({
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Module Vidéo Explicative Intégré : Pourquoi choisir QAPRIL */}
+          <div className="mb-14 rounded-3xl bg-slate-950 border border-slate-800 p-6 sm:p-8 shadow-xl text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Colonne Lecteur Vidéo (7 cols) */}
+              <div className="lg:col-span-7 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                    <Film size={13} />
+                    <span>Vidéo Explicative Officielle</span>
+                  </div>
+                  {/* Badge rappel son */}
+                  <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-slate-300 text-xs font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Activez le son de votre appareil</span>
+                  </div>
+                </div>
+
+                <div className="relative rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-2xl aspect-video flex items-center justify-center">
+                  <video
+                    src="/videos/QAPRIL-video.mp4"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-contain"
+                  >
+                    Votre navigateur ne supporte pas la lecture de vidéos HTML5.
+                  </video>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                  <span className="sm:hidden flex items-center gap-1.5 text-amber-300 font-medium">
+                    🔊 Activez le son de votre appareil
+                  </span>
+                  <span className="hidden sm:inline text-slate-400">
+                    Format MP4 HD · Durée optimisée
+                  </span>
+                  <a
+                    href="/videos/QAPRIL-video.mp4"
+                    download
+                    className="inline-flex items-center gap-1 text-slate-300 hover:text-white font-bold transition-colors ml-auto"
+                  >
+                    <Download size={13} />
+                    <span>Télécharger la vidéo</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Colonne Explications & Points Forts (5 cols) */}
+              <div className="lg:col-span-5 space-y-5">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    9 raisons concrètes qui changent tout
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-300 mt-2 leading-relaxed">
+                    Découvrez comment QAPRIL supprime les litiges, protège vos cautions et automatise chaque quittance de loyer selon la loi ivoirienne.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  {[
+                    "Caution plafonnée à 2 mois maximum garantie par la loi n° 2019-576",
+                    "Bail d'habitation certifié et signé par code SMS en 15 minutes",
+                    "Paiement facile par Wave, Orange, MTN ou Moov avec preuve instantanée",
+                    "Quittances officielles avec QR code infalsifiable pour banques et visas",
+                    "Gestion pacifiée et historique de paiement probatoire opposable"
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check size={13} />
+                      </div>
+                      <span className="leading-snug">{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Link
+                    href="/login"
+                    className="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                  >
+                    <span>Démarrer maintenant</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                  <a
+                    href="#comparatif-tableau"
+                    className="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>Voir le tableau comparatif</span>
+                    <ChevronDown size={14} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="comparatif-tableau" className="overflow-x-auto">
             <table className="w-full text-left border-collapse border border-slate-200 bg-white rounded-lg shadow-sm">
               <thead>
                 <tr className="bg-slate-100 border-b border-slate-200">

@@ -22,7 +22,9 @@ import {
   FileText,
   CreditCard,
   Building2,
-  HelpCircle
+  HelpCircle,
+  Film,
+  Download
 } from "lucide-react";
 
 export default function ComparatifPage() {
@@ -259,8 +261,96 @@ export default function ComparatifPage() {
           </div>
         </section>
 
-        {/* ─── TABLEAU COMPARATIF ANALYTIQUE COMPLET ─── */}
+        {/* ─── TABLEAU COMPARATIF ANALYTIQUE COMPLET & VIDÉO EXPLICATIVE ─── */}
         <section className="py-20 px-6 max-w-7xl mx-auto">
+          {/* Module Vidéo Explicative Intégré */}
+          <div className="mb-16 rounded-3xl bg-slate-950 border border-slate-800 p-6 sm:p-10 shadow-2xl text-white overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* Colonne Lecteur Vidéo (7 cols) */}
+              <div className="lg:col-span-7 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-wider">
+                    <Film size={14} />
+                    <span>Démonstration Vidéo · Pourquoi Choisir QAPRIL</span>
+                  </div>
+                  <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-slate-300 text-xs font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Activez le son de votre appareil</span>
+                  </div>
+                </div>
+
+                <div className="relative rounded-2xl overflow-hidden bg-black border border-slate-800 shadow-2xl aspect-video flex items-center justify-center">
+                  <video
+                    src="/videos/QAPRIL-video.mp4"
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-full object-contain"
+                  >
+                    Votre navigateur ne supporte pas la lecture de vidéos HTML5.
+                  </video>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                  <span className="sm:hidden flex items-center gap-1.5 text-amber-300 font-medium">
+                    🔊 Activez le son de votre appareil
+                  </span>
+                  <span className="hidden sm:inline text-slate-400">
+                    Format MP4 HD · Durée optimisée
+                  </span>
+                  <a
+                    href="/videos/QAPRIL-video.mp4"
+                    download
+                    className="inline-flex items-center gap-1 text-slate-300 hover:text-white font-bold transition-colors ml-auto"
+                  >
+                    <Download size={13} />
+                    <span>Télécharger la vidéo</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Colonne Synthèse (5 cols) */}
+              <div className="lg:col-span-5 space-y-5">
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                    9 raisons concrètes qui font la différence
+                  </h3>
+                  <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+                    Visualisez en vidéo les innovations de la plateforme QAPRIL : sécurité des fonds, zéro paperasse et sérénité contractuelle.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {[
+                    "Plafonnement strict de la caution à 2 mois maximum (loi n° 2019-576)",
+                    "Contrat de bail certifié et signé par code SMS OTP en 15 minutes",
+                    "Paiements simplifiés Wave, Orange, MTN et Moov avec quittance immédiate",
+                    "Quittances officielles infalsifiables avec QR code probatoire",
+                    "Protection juridique opposable et résolution pacifiée des litiges"
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <Check size={13} />
+                      </div>
+                      <span className="leading-snug">{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href="/login"
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-all inline-flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                  >
+                    <span>Créer mon compte maintenant</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs font-black uppercase tracking-widest text-[#B45309] mb-3 inline-block">
               Grille Comparative 12 Critères

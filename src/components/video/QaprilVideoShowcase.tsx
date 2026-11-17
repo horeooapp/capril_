@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 
 interface VideoData {
-    id: "fnui" | "bail"
+    id: "fnui" | "bail" | "choisir"
     tag: string
     title: string
     subtitle: string
@@ -29,7 +29,7 @@ interface VideoData {
     actionLabel: string
 }
 
-const VIDEOS: Record<"fnui" | "bail", VideoData> = {
+const VIDEOS: Record<"fnui" | "bail" | "choisir", VideoData> = {
     fnui: {
         id: "fnui",
         tag: "PRÉSENTATION INSTITUTIONNELLE",
@@ -65,16 +65,34 @@ const VIDEOS: Record<"fnui" | "bail", VideoData> = {
         ],
         actionUrl: "/login",
         actionLabel: "Créer un contrat de bail"
+    },
+    choisir: {
+        id: "choisir",
+        tag: "POURQUOI CHOISIR QAPRIL",
+        title: "Pourquoi choisir QAPRIL pour votre logement ?",
+        subtitle: "Les raisons concrètes qui changent tout pour locataires et bailleurs",
+        videoSrc: "/videos/QAPRIL-video.mp4",
+        badgeColor: "bg-sky-500/10 text-sky-400 border-sky-500/30",
+        duration: "Vidéo explicative",
+        description: "Comprenez en vidéo pourquoi QAPRIL modernise l'expérience locative en Côte d'Ivoire : fin des abus de caution, quittances certifiées avec QR code, baux conformes en 15 minutes et paiements simplifiés.",
+        highlights: [
+            "Plafonnement strict de la caution à 2 mois maximum (loi n° 2019-576)",
+            "Quittances de loyer avec QR code certifié immédiates sur mobile",
+            "Paiements directs Wave, Orange Money, MTN MoMo et Moov Money",
+            "Protection juridique probatoire et gestion pacifiée des litiges"
+        ],
+        actionUrl: "/comparatif",
+        actionLabel: "Voir le comparatif détaillé"
     }
 }
 
 export default function QaprilVideoShowcase() {
-    const [activeVideoKey, setActiveVideoKey] = useState<"fnui" | "bail">("fnui")
+    const [activeVideoKey, setActiveVideoKey] = useState<"fnui" | "bail" | "choisir">("fnui")
     const videoRef = useRef<HTMLVideoElement>(null)
 
     const activeVideo = VIDEOS[activeVideoKey]
 
-    const handleSelectVideo = (key: "fnui" | "bail") => {
+    const handleSelectVideo = (key: "fnui" | "bail" | "choisir") => {
         setActiveVideoKey(key)
         if (videoRef.current) {
             videoRef.current.load()
@@ -96,7 +114,7 @@ export default function QaprilVideoShowcase() {
                     Visionnez nos vidéos de présentation institutionnelle et nos guides pratiques pour comprendre comment QAPRIL sécurise chaque étape du bail en Côte d&apos;Ivoire.
                 </p>
 
-                {/* Sélecteur des 2 Vidéos */}
+                {/* Sélecteur des Vidéos */}
                 <div className="pt-4 flex justify-center">
                     <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 gap-1.5 max-w-full overflow-x-auto">
                         <button
@@ -123,6 +141,19 @@ export default function QaprilVideoShowcase() {
                         >
                             <FileText size={15} className={activeVideoKey === "bail" ? "text-amber-400" : "text-slate-500"} />
                             <span>2. Enregistrement du Bail</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => handleSelectVideo("choisir")}
+                            className={`px-4 sm:px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap ${
+                                activeVideoKey === "choisir"
+                                    ? "bg-slate-950 text-white shadow-md ring-1 ring-white/10"
+                                    : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/60"
+                            }`}
+                        >
+                            <Sparkles size={15} className={activeVideoKey === "choisir" ? "text-sky-400" : "text-slate-500"} />
+                            <span>3. Pourquoi choisir QAPRIL ?</span>
                         </button>
                     </div>
                 </div>
