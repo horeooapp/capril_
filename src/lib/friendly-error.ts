@@ -71,15 +71,24 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
     // 5. Détection des erreurs STRICTEMENT sur le loyer ou les montants
     // IMPORTANT : Dans les erreurs Prisma, tout le payload data: { declaredRentFcfa: ... } est dumpé dans le message.
     // Il faut donc vérifier que l'erreur porte SPÉCIFIQUEMENT sur le champ financier,
-    // et qu'elle n'est pas causée par un autre champ (ex: statutPosition, phone, code, etc.).
+    // et qu'elle n'est pas causée par un autre champ (ex: statutPosition, phone, code, etc.)
+    // ou par un dump d'énumération comme LOYER_IMPAYE.
     const isStrictFinancial = 
-        /\b(loyer|loyers|caution|cautions|deposit|avance_loyer|loyer_mensuel)\b/i.test(rawMessage) ||
-        (/argument\s+[`'"]?(rent|declaredRent|rentAmount|caution|deposit)/i.test(rawMessage)) ||
-        (/(?:valeur|montant|chiffre)\s+invalide.*?(?:loyer|caution|deposit)/i.test(rawMessage));
+        (/argument\s+[`'"]?(rent|declaredRent|rentAmount|caution|deposit|montant)/i.test(rawMessage)) ||
+        (/(?:valeur|montant|chiffre)\s+invalide.*?(?:loyer|caution|deposit|montant)/i.test(rawMessage)) ||
+        (/(?:loyer|caution|deposit)\s+(?:invalide|manquant|requis|négatif)/i.test(rawMessage));
 
     const hasOtherSpecificArgError = /(?:argument|unknown argument|invalid value for argument)\s+[`'"]?(?!rent|declaredrent|rentamount|caution|deposit)[a-zA-Z0-9_]+/i.test(rawMessage);
 
-    if (isStrictFinancial && !hasOtherSpecificArgError && !lower.includes('parentpropertyid') && !lower.includes('parent_property_id')) {
+    const isFalsePositiveFinancial = 
+        lower.includes('statutposition') ||
+        lower.includes('statut_position') ||
+        lower.includes('loyer_impaye') || 
+        lower.includes('alertes_loyer') ||
+        lower.includes('parentpropertyid') ||
+        lower.includes('parent_property_id');
+
+    if (isStrictFinancial && !hasOtherSpecificArgError && !isFalsePositiveFinancial) {
         return "Montant financier invalide ou manquant. Veuillez préciser le loyer mensuel ou la caution en FCFA.";
     }
 
