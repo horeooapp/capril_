@@ -6,6 +6,7 @@ import { choisirTypeConnexion } from "@/actions/auth.actions";
 import InteractiveShowcase from "./InteractiveShowcase";
 import InteractiveModulesGrid from "./InteractiveModulesGrid";
 import InteractiveMarketChart from "./InteractiveMarketChart";
+import QaprilVideoShowcase from "@/components/video/QaprilVideoShowcase";
 import { SessionProvider } from "next-auth/react";
 import { executeLogout } from "@/lib/auth-logout";
 import MobileMenu from "@/components/MobileMenu";
@@ -41,6 +42,7 @@ import {
   MapPin,
   FileCheck2,
   Download,
+  Film,
 } from "lucide-react";
 
 const SLIDES = [
@@ -96,6 +98,7 @@ export default function QaprilLandingV2({
     { href: "/telecharger", label: "Applications Mobiles", icon: <Smartphone size={18} /> },
     { href: "/verifier", label: "Vérifier une Quittance", icon: <ShieldCheck size={18} /> },
     { href: "/piliers", label: "Piliers QAPRIL", icon: <ShieldCheck size={18} /> },
+    { href: "/#videos-presentation", label: "Vidéos de Démonstration", icon: <Film size={18} /> },
     { href: "/solutions", label: "Nos Solutions", icon: <LayoutDashboard size={18} /> },
     { href: "/services", label: "Services & Garanties", icon: <Building2 size={18} /> },
     { href: "/comparatif", label: "Comparatif", icon: <Scale size={18} /> },
@@ -191,6 +194,10 @@ export default function QaprilLandingV2({
             </Link>
             <Link href="/solutions" className="hover:text-[#D97706] transition-colors">
               Solutions
+            </Link>
+            <Link href="#videos-presentation" className="hover:text-[#D97706] transition-colors flex items-center gap-1">
+              <Film size={13} className="text-[#FF8200]" />
+              <span>Vidéos</span>
             </Link>
             <Link href="/services" className="hover:text-[#D97706] transition-colors">
               Services
@@ -1099,6 +1106,11 @@ export default function QaprilLandingV2({
             )}
           </div>
         </section>
+
+        {/* ══════════════════════════════════════════════════════════════════
+            DÉMONSTRATIONS & PRÉSENTATIONS VIDÉO QAPRIL
+        ══════════════════════════════════════════════════════════════════ */}
+        <QaprilVideoShowcase />
 
         {/* ══════════════════════════════════════════════════════════════════
             6. SERVICES ET MODULES TECHNIQUES DE L'APPLICATION

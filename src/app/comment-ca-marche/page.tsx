@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import QaprilVideoShowcase from "@/components/video/QaprilVideoShowcase";
 import { motion } from "framer-motion";
 import {
   Users, Building2, Briefcase, CheckCircle2, ArrowRight,
@@ -300,6 +301,11 @@ export default function CommentCaMarchePage() {
               ))}
             </div>
           </motion.div>
+
+          {/* ─── DÉMONSTRATION VIDÉO ─── */}
+          <div className="py-6">
+            <QaprilVideoShowcase />
+          </div>
 
           {/* ─── CTA ─── */}
           <motion.div

@@ -19,6 +19,7 @@ export interface TutorialItem {
     }[]
     actionUrl?: string
     actionLabel?: string
+    videoUrl?: string
 }
 
 interface TutorialModalProps {
@@ -52,6 +53,21 @@ export default function TutorialModal({ tutorial, onClose }: TutorialModalProps)
                         {tutorial.subtitle}
                     </p>
                 </div>
+
+                {/* Video Player if available */}
+                {tutorial.videoUrl && (
+                    <div className="mt-5 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 shadow-md">
+                        <video
+                            src={tutorial.videoUrl}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            className="w-full max-h-[340px] object-contain"
+                        >
+                            Votre navigateur ne supporte pas la lecture vidéo.
+                        </video>
+                    </div>
+                )}
 
                 {/* Step by Step Guide */}
                 <div className="py-6 space-y-5">

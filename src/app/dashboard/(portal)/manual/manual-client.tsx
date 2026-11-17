@@ -31,12 +31,44 @@ interface UserContext {
 
 const TUTORIALS: TutorialItem[] = [
     {
+        id: "tut-fnui",
+        title: "Présentation Institutionnelle QAPRIL & FNUI",
+        subtitle: "Découvrez l'infrastructure numérique de confiance pour l'immobilier ivoirien et les garanties offertes avec la FNUI.",
+        category: "Présentation & FNUI",
+        duration: "Vidéo HD",
+        badgeColor: "indigo",
+        videoUrl: "/videos/QAPRIL_Presentation_FNUI.mp4",
+        actionUrl: "/a-propos",
+        actionLabel: "Découvrir la mission",
+        steps: [
+            {
+                stepNumber: 1,
+                title: "Vision et cadre institutionnel",
+                description: "Comprenez comment QAPRIL et la FNUI collaborent pour assainir le secteur locatif et instaurer un climat de confiance réciproque.",
+                tip: "L'alignement avec les directives du Ministère de la Construction et de la DGI garantit la force probante des actes."
+            },
+            {
+                stepNumber: 2,
+                title: "Inclusion financière et quittances certifiées",
+                description: "Visualisez l'intégration native des paiements Wave et Mobile Money permettant le quittancement instantané.",
+                tip: "Les quittances générées avec QR code sont acceptées par les banques, consulats et administrations."
+            },
+            {
+                stepNumber: 3,
+                title: "Protection des droits et sécurisation des cautions",
+                description: "Découvrez le mécanisme de compte séquestre garantissant la restitution de la caution sans litige.",
+                tip: "Le plafonnement strict à 2 mois de caution protège les deux parties."
+            }
+        ]
+    },
+    {
         id: "tut-1",
         title: "Créer et faire signer un contrat de bail numérique",
         subtitle: "Générez un contrat de bail 100% conforme à la loi 2019-576, signé par OTP SMS et scellé cryptographiquement.",
         category: "Baux & Contrats",
-        duration: "3 min",
+        duration: "Vidéo & Guide",
         badgeColor: "indigo",
+        videoUrl: "/videos/QAPRIL_Enregistrement_du_Bail.mp4",
         actionUrl: "/dashboard/leases",
         actionLabel: "Accéder aux baux",
         steps: [

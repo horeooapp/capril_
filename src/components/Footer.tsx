@@ -29,6 +29,9 @@ export default function Footer() {
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-5">Découvrir QAPRIL</div>
             <ul className="space-y-3 text-sm">
               <li>
+                <Link href="/videos" className="text-white/45 hover:text-white transition-colors">Vidéos & Démonstrations</Link>
+              </li>
+              <li>
                 <Link href="/piliers" className="text-white/45 hover:text-white transition-colors">Les 4 Piliers</Link>
               </li>
               <li>
