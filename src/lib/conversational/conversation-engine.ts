@@ -271,7 +271,7 @@ export async function handleIncomingMessage(params: {
       conversationId: conversation.id,
       sens: 'IN',
       transport,
-      texteBrut,
+      texteBrut: parsed.intention === 'PIN_INPUT' ? '****' : texteBrut,
       texteInterprete: parsed.intention,
       motsCles: parsed.codeBail || parsed.mois || null,
       referenceMessage,

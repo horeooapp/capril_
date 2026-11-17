@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
             data: {
                 operator: "CDCCI",
                 eventType: "DEPOSIT_CONFIRMATION",
+                externalEventId: String(cdcReference || depositId || `cdcci_${Date.now()}`),
                 payload,
                 signatureValid: true,
                 processed: true
