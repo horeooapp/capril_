@@ -25,7 +25,8 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
     const router = useRouter()
 
     const cleanInput = email.replace(/[\s-]/g, '')
-    const isPhoneMode = !email.includes('@') && /^[0-9+]+$/.test(cleanInput)
+    const isEmailMode = email.includes('@')
+    const isPhoneMode = !isEmailMode
 
     async function handleRequestOTP(e: React.FormEvent) {
         e.preventDefault()
@@ -162,18 +163,18 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                             <div className="relative group">
                                 <div className="flex items-center justify-between mb-2">
                                     <label htmlFor="email" className="block text-[11px] font-black uppercase tracking-wider text-slate-700">
-                                        E-mail ou Téléphone ivoirien
+                                        {isEmailMode ? "Adresse E-mail" : "Numéro WhatsApp / Mobile"}
                                     </label>
-                                    <span className="text-[10px] text-amber-700 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                                        {isPhoneMode ? "🇨🇮 Mobile CI (+225)" : "Email ou Mobile CI"}
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${isEmailMode ? 'text-slate-600 bg-slate-100 border-slate-300' : 'text-emerald-800 bg-emerald-50 border-emerald-300'}`}>
+                                        {isEmailMode ? "Mode e-mail alternatif" : "💬 WhatsApp prioritaire (+225)"}
                                     </span>
                                 </div>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                        {isPhoneMode ? (
-                                            <Smartphone className="h-4 w-4 text-emerald-600 animate-pulse" />
-                                        ) : (
+                                        {isEmailMode ? (
                                             <Mail className={`h-4 w-4 text-slate-400 transition-colors ${theme.focusWithin}`} />
+                                        ) : (
+                                            <Smartphone className="h-4 w-4 text-emerald-600" />
                                         )}
                                     </div>
                                     <input
@@ -184,11 +185,13 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         className={`block w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none transition-all font-semibold placeholder:text-slate-400 text-slate-900 ${theme.inputFocus}`}
-                                        placeholder={isPhoneMode ? "07 XX XX XX XX" : "nom@exemple.ci ou 07 01 02 03 04"}
+                                        placeholder={isEmailMode ? "nom@exemple.ci" : "07 01 02 03 04 (ou nom@exemple.ci)"}
                                     />
                                 </div>
                                 <p className="text-[10px] text-slate-500 mt-1.5 font-medium">
-                                    Connexion immédiate ou inscription automatique par e-mail ou mobile (Orange, MTN, Moov).
+                                    {isEmailMode 
+                                        ? "Code d'accès sécurisé envoyé directement sur votre boîte e-mail." 
+                                        : "Connexion instantanée : votre code sécurisé vous sera transmis par message WhatsApp."}
                                 </p>
                             </div>
 
@@ -217,7 +220,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                 ) : (
                                     <>
-                                        <span>{isPhoneMode ? 'Recevoir le code par SMS / WhatsApp' : 'Recevoir mon code par e-mail'}</span>
+                                        <span>{isEmailMode ? 'Recevoir mon code par e-mail' : 'Recevoir mon code sur WhatsApp'}</span>
                                         <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                     </>
                                 )}
@@ -242,6 +245,13 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                 <label htmlFor="otp" className="block text-[11px] font-black uppercase tracking-wider mb-2 text-slate-700">
                                     Code de sécurité à usage unique (6 chiffres)
                                 </label>
+                                <p className="text-xs text-slate-500 mb-3">
+                                    {isEmailMode ? (
+                                        <>Code envoyé à votre adresse e-mail <strong>{email}</strong>.</>
+                                    ) : (
+                                        <>Code envoyé par WhatsApp au numéro <strong>{email}</strong>.</>
+                                    )}
+                                </p>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                         <ShieldCheck className="h-5 w-5 text-[#D97706]" />
@@ -277,7 +287,7 @@ export default function EmailOTPForm({ role, redirectPath, title, subtitle }: Em
                                     className="w-full flex items-center justify-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider transition-colors py-1.5 hover:text-slate-900"
                                 >
                                     <ArrowLeft className="h-3.5 w-3.5" />
-                                    Changer d'email
+                                    {isEmailMode ? "Changer d'e-mail" : "Changer de numéro WhatsApp"}
                                 </button>
                             </div>
                         </motion.form>

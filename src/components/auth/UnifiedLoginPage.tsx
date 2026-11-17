@@ -151,7 +151,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                     role="TENANT"
                                     redirectPath="/mon-espace-locataire"
                                     title="Espace Locataire"
-                                    subtitle="Saisissez votre email certifié pour accéder à votre habitat et vos quittances."
+                                    subtitle="Saisissez votre numéro WhatsApp ou e-mail pour accéder à votre habitat et vos quittances."
                                 />
                             )}
                             
@@ -160,7 +160,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                     role="LANDLORD"
                                     redirectPath="/dashboard"
                                     title="Espace Bailleur"
-                                    subtitle="Saisissez votre email certifié pour superviser vos actifs et rendements."
+                                    subtitle="Saisissez votre numéro WhatsApp ou e-mail pour superviser votre patrimoine et vos loyers."
                                 />
                             )}
                             
@@ -169,7 +169,7 @@ export default function UnifiedLoginPage({ initialTab = 'tenant' }: UnifiedLogin
                                     role="AGENCY"
                                     redirectPath="/dashboard"
                                     title="Console Agences & Démarcheurs"
-                                    subtitle="Saisissez votre email certifié pour accéder à votre espace de gestion et mandats."
+                                    subtitle="Saisissez votre numéro WhatsApp ou e-mail pour accéder à vos mandats et commissions."
                                 />
                             )}
                             

@@ -26,8 +26,13 @@ export function normalizePhone(phone: string | null | undefined, defaultPrefix: 
 
     // If it doesn't start with +, assume it's a local number and add the default prefix
     if (!cleaned.startsWith('+')) {
-        // e.g. 0505007188 -> +2250505007188
-        cleaned = defaultPrefix + cleaned;
+        // e.g. 2250749452418 -> +2250749452418 (avoid double prefix +225225...)
+        if (cleaned.startsWith('225') && cleaned.length >= 12) {
+            cleaned = '+' + cleaned;
+        } else {
+            // e.g. 0749452418 -> +2250749452418
+            cleaned = defaultPrefix + cleaned;
+        }
     }
 
     return cleaned;

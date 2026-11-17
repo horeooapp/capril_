@@ -118,7 +118,7 @@ export default function LandlordLoginPage() {
                                 role="LANDLORD"
                                 redirectPath="/dashboard"
                                 title="Espace Propriétaire"
-                                subtitle="Saisissez votre email certifié pour accéder à votre console de gestion."
+                                subtitle="Saisissez votre numéro WhatsApp ou e-mail pour accéder à votre patrimoine."
                             />
                         </div>
 

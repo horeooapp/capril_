@@ -124,7 +124,7 @@ export default function AgencyLoginPage() {
                                 role="AGENCY"
                                 redirectPath="/dashboard"
                                 title="Espace Agences & Démarcheurs"
-                                subtitle="Saisissez votre email certifié pour accéder à votre console professionnelle."
+                                subtitle="Saisissez votre numéro WhatsApp ou e-mail pour accéder à vos mandats."
                             />
                         </div>
 

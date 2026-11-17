@@ -411,7 +411,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                                 styles.segmentText, 
                                 loginType === 'PHONE' && styles.segmentTextActive
                             ]}>
-                                Téléphone
+                                WhatsApp / Mobile
                             </Text>
                         </Pressable>
 
@@ -521,7 +521,9 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                     <View style={styles.otpHeader}>
                         <Text style={styles.otpTitle}>Code de vérification</Text>
                         <Text style={styles.otpSubtitle}>
-                            Saisi pour le {loginType === 'PHONE' ? phoneNumber || getRawIdentifier() : emailAddress}
+                            {loginType === 'PHONE'
+                                ? `Code envoyé par WhatsApp au ${phoneNumber || getRawIdentifier()}`
+                                : `Code envoyé par e-mail à ${emailAddress}`}
                         </Text>
                     </View>
 

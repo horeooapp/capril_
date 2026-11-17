@@ -121,7 +121,7 @@ export default function TenantLoginPage() {
                                 role="TENANT"
                                 redirectPath="/mon-espace-locataire"
                                 title="Espace Locataire"
-                                subtitle="Saisissez votre email pour accéder à votre espace de vie et vos quittances."
+                                subtitle="Saisissez votre numéro WhatsApp ou e-mail pour accéder à votre habitat et vos quittances."
                             />
                         </div>
 
