@@ -231,7 +231,7 @@ export async function creerBien(formData: FormData) {
       if (effectiveLat !== null && effectiveLng !== null) {
         codeLocalisation = generateLocalisationCode(effectiveCommune, effectiveLat, effectiveLng);
         w3w = deriveSimulatedW3W(effectiveCommune, effectiveLat, effectiveLng);
-        statutPosition = "DECLAREE";
+        statutPosition = "PROVISOIRE";
       }
 
       // 5. Création
@@ -782,7 +782,7 @@ export async function enregistrerPositionGpsBien(params: {
     });
 
     // 2. Mise à jour du bien
-    const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'DECLAREE';
+    const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'PROVISOIRE';
     await prisma.property.update({
       where: { id: propertyId },
       data: {

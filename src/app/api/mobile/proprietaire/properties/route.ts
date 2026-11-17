@@ -205,12 +205,12 @@ export async function POST(request: Request) {
 
         let codeLocalisation: string | null = null;
         let w3w: string | null = null;
-        let statutPosition = 'MANQUANTE';
+        let statutPosition: 'MANQUANTE' | 'PROVISOIRE' | 'CONFIRMEE' | 'GELEE' = 'MANQUANTE';
 
         if (hasGps) {
             codeLocalisation = generateLocalisationCode(cleanCommune, rawLat, rawLng);
             w3w = deriveSimulatedW3W(cleanCommune, rawLat, rawLng);
-            statutPosition = 'DECLAREE';
+            statutPosition = 'PROVISOIRE';
         }
 
         const property = await prisma.property.create({

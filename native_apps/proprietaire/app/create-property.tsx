@@ -36,8 +36,9 @@ try {
 }
 
 const fmtFcfa = (n?: number | string | null) => {
-  const num = typeof n === 'number' ? n : Number(n);
-  if (isNaN(num)) return '0 F';
+  const clean = typeof n === 'string' ? n.replace(/[^\d]/g, '') : n;
+  const num = typeof clean === 'number' ? clean : Number(clean);
+  if (isNaN(num) || !clean) return '0 F';
   return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
 };
 
@@ -45,7 +46,6 @@ const COMMUNES_ABIDJAN = [
   'Cocody',
   'Marcory',
   'Plateau',
-  'Riviera',
   'Yopougon',
   'Bingerville',
   'Treichville',
@@ -55,6 +55,7 @@ const COMMUNES_ABIDJAN = [
   'Attécoubé',
   'Abobo',
   'Songon',
+  'Anyama',
   'Autre',
 ];
 
@@ -255,9 +256,12 @@ export default function CreatePropertyScreen() {
       Alert.alert('Commune requise', 'Veuillez préciser la commune de situation du bien.');
       return;
     }
+    const cleanRentDigits = rent.replace(/[^\d]/g, '');
+    const cleanSurfaceDigits = surface.replace(/\s/g, '').replace(',', '.');
+
     if (isForSale) {
-      const parsedPrix = parseFloat(rent.replace(/\s/g, ''));
-      if (!rent.trim() || isNaN(parsedPrix) || parsedPrix <= 0) {
+      const parsedPrix = cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0;
+      if (!cleanRentDigits || isNaN(parsedPrix) || parsedPrix <= 0) {
         Alert.alert('Prix de vente requis', 'Veuillez préciser le prix de vente en FCFA.');
         return;
       }
@@ -265,15 +269,15 @@ export default function CreatePropertyScreen() {
         Alert.alert('Titre de propriété absent', 'Veuillez renseigner le numéro du titre de propriété (ACD, Titre Foncier ou Lettre d\'attribution).');
         return;
       }
-    } else if (rent.trim()) {
-      const parsedLoyer = parseFloat(rent.replace(/\s/g, ''));
+    } else if (cleanRentDigits) {
+      const parsedLoyer = parseInt(cleanRentDigits, 10);
       if (isNaN(parsedLoyer) || parsedLoyer <= 0) {
         Alert.alert('Loyer invalide', 'Veuillez saisir un montant de loyer mensuel valide en chiffres (FCFA).');
         return;
       }
     }
-    if (surface.trim()) {
-      const parsedSurf = parseFloat(surface.replace(/\s/g, ''));
+    if (cleanSurfaceDigits) {
+      const parsedSurf = parseFloat(cleanSurfaceDigits);
       if (isNaN(parsedSurf) || parsedSurf <= 0) {
         Alert.alert('Superficie invalide', 'Veuillez saisir une superficie valide en mètres carrés (m²).');
         return;
@@ -288,16 +292,17 @@ export default function CreatePropertyScreen() {
           name: name.trim(),
           address: address.trim(),
           commune: finalCommune,
+          quartier: detectedQuartier || undefined,
           city: detectedVille || 'Abidjan',
           propertyType,
           leaseType,
-          declaredRentFcfa: !isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : 0,
-          superficieM2: surface ? parseFloat(surface.replace(/\s/g, '')) : undefined,
-          rooms: rooms ? parseInt(rooms.replace(/\s/g, ''), 10) : undefined,
+          declaredRentFcfa: !isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0,
+          superficieM2: cleanSurfaceDigits ? parseFloat(cleanSurfaceDigits) : undefined,
+          rooms: rooms ? parseInt(rooms.replace(/[^\d]/g, ''), 10) : undefined,
           unitLabel: unitLabel.trim() || undefined,
           // Extensions ADD-25
           forSale: isForSale,
-          prixVenteFcfa: isForSale && rent ? parseFloat(rent.replace(/\s/g, '')) : undefined,
+          prixVenteFcfa: isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : undefined,
           categorie_vente: isForSale ? propertyType : undefined,
           titre_type: isForSale ? natureTitre : undefined,
           titre_numero: isForSale && numeroTitre.trim() ? numeroTitre.trim().toUpperCase() : undefined,

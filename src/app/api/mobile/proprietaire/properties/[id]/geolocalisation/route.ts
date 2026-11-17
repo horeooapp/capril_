@@ -87,7 +87,7 @@ export async function POST(
         });
 
         // 2. Mettre à jour la propriété
-        const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'DECLAREE';
+        const nextStatut = property.statutPosition === 'CONFIRMEE' ? 'CONFIRMEE' : 'PROVISOIRE';
         await prisma.property.update({
             where: { id: propertyId },
             data: {
