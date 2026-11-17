@@ -1608,23 +1608,23 @@ export default function LocatairePrototypeScreen() {
                   <Home color="#2C3E6B" size={28} />
                 </View>
                 <Text style={[styles.h1, { fontSize: 20, textAlign: 'center', color: '#1A1D26' }]}>
-                  Aucun logement déclaré
+                  Aucun bail actif rattaché
                 </Text>
                 <Text style={[styles.subMuted, { textAlign: 'center', marginTop: 6, marginBottom: 16, maxWidth: 300 }]}>
-                  Déclarez votre logement pour inviter votre bailleur, activer votre bail officiel et recevoir vos quittances numériques.
+                  Déclarez votre bail actuel pour débloquer vos quittances officielles, ou recherchez votre futur logement certifié.
                 </Text>
                 <View style={{ flexDirection: 'row', gap: 10, width: '100%', flexWrap: 'wrap' }}>
                   <Pressable
                     style={[styles.btnPrimary, { flex: 1, minWidth: 140, backgroundColor: '#2C3E6B' }]}
                     onPress={() => setDeclareModal(true)}
                   >
-                    <Text style={styles.btnPrimaryText}>Déclarer mon logement</Text>
+                    <Text style={styles.btnPrimaryText}>Je déclare mon bail</Text>
                   </Pressable>
                   <Pressable
                     style={[styles.btnSecondary, { flex: 1, minWidth: 140 }]}
-                    onPress={() => setInviteModal(true)}
+                    onPress={() => setScreen('recherche')}
                   >
-                    <Text style={styles.btnSecondaryText}>Inviter mon bailleur</Text>
+                    <Text style={styles.btnSecondaryText}>Je cherche un logement</Text>
                   </Pressable>
                 </View>
               </View>
