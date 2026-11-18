@@ -11,7 +11,7 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Upload, ShieldCheck, Users, Building2, Wallet, Plus, Home, BookOpen, ExternalLink, Download } from 'lucide-react-native';
+import { Upload, ShieldCheck, Users, Building2, Wallet, Plus, Home, BookOpen, ExternalLink, Download, MessageCircle } from 'lucide-react-native';
 import { fetchWithAuth } from '../../lib/api';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { TopNavHeader } from '../../components/TopNavHeader';
@@ -86,23 +86,42 @@ export default function AgencePrototypeHomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavHeader title="QAPRIL AGENCE" subtitle="Console de Gestion Immobilière" />
+      <TopNavHeader
+        title="QAPRIL AGENCE"
+        subtitle="Console de Gestion Immobilière"
+        rightElement={
+          <Pressable
+            onPress={() => router.push('/(tabs)/chat' as any)}
+            style={{ padding: 6, borderRadius: 8, backgroundColor: '#EEF2FF' }}
+            accessibilityLabel="Messagerie"
+          >
+            <MessageCircle color="#1F2A44" size={20} />
+          </Pressable>
+        }
+      />
       <View style={styles.subNav}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
           {(
             [
               ['home', 'Accueil'],
+              ['chat', 'Messagerie'],
               ['biens', `Biens sous mandat (${properties.length})`],
               ['mandants', 'Bailleurs mandants'],
               ['ext', 'Bail externe → Enregistrement DGI'],
               ['flux', 'Reversements (− 8 %)'],
               ['verif', 'Visites de conformité (15 000 F)'],
               ['team', 'Équipe & Confidentialité'],
-            ] as [typeof aTab, string][]
+            ] as [string, string][]
           ).map(([id, label]) => (
             <Pressable
               key={id}
-              onPress={() => setATab(id)}
+              onPress={() => {
+                if (id === 'chat') {
+                  router.push('/(tabs)/chat' as any);
+                } else {
+                  setATab(id as any);
+                }
+              }}
               style={[styles.chip, aTab === id && { backgroundColor: '#1F2A44', borderColor: '#1F2A44' }]}
             >
               <Text style={[styles.chipText, aTab === id && { color: '#fff' }]}>{label}</Text>

@@ -24,6 +24,7 @@ import {
   ExternalLink,
   ChevronRight,
   CheckCircle2,
+  MessageCircle,
 } from 'lucide-react-native';
 import { TopNavHeader } from '../../components/TopNavHeader';
 import { fetchWithAuth } from '../../lib/api';
@@ -170,6 +171,25 @@ export default function MonBailScreen() {
               >
                 <Users color="#2C3E6B" size={16} />
                 <Text style={styles.btnSecondaryText}>Gérer les occupants</Text>
+              </Pressable>
+            </View>
+
+            {/* MESSAGERIE DU BAIL (ML-06) */}
+            <View style={styles.card}>
+              <View style={styles.cardHeaderRow}>
+                <MessageCircle color="#2C3E6B" size={20} />
+                <Text style={styles.cardTitle}>Messagerie du bail</Text>
+              </View>
+              <Text style={styles.cardSub}>
+                Échangez directement avec votre bailleur ou agence. Tous les messages sont horodatés et conservés.
+              </Text>
+
+              <Pressable
+                style={[styles.btnSecondary, { backgroundColor: '#2C3E6B', borderWidth: 0 }]}
+                onPress={() => router.push({ pathname: '/(tabs)/chat', params: { leaseId: lease.id } } as any)}
+              >
+                <MessageCircle color="#FFFFFF" size={16} />
+                <Text style={[styles.btnSecondaryText, { color: '#FFFFFF' }]}>Écrire au bailleur</Text>
               </Pressable>
             </View>
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ShieldCheck, HelpCircle, Info, LogOut } from 'lucide-react-native';
+import { ShieldCheck, HelpCircle, Info, LogOut, MessageCircle } from 'lucide-react-native';
 import { logoutAndRedirect } from '../../lib/api';
 import { APP_VERSION, BUILD_NUMBER } from '../../lib/version';
 
@@ -31,6 +31,16 @@ export default function PlusScreen() {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.sub}>Administration</Text>
         <Text style={styles.title}>Plus</Text>
+
+        <Pressable style={styles.card} onPress={() => router.push('/(tabs)/chat' as any)}>
+          <View style={styles.row}>
+            <MessageCircle size={20} color="#1F2A44" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>Messagerie Portefeuille</Text>
+              <Text style={styles.cardSub}>Consulter les échanges en direct avec les locataires et mandants.</Text>
+            </View>
+          </View>
+        </Pressable>
 
         <View style={styles.card}>
           <View style={styles.row}>

@@ -1,63 +1,90 @@
 import { TopNavHeader } from '../../components/TopNavHeader';
-import { View, Text, FlatList, TextInput, Pressable, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TextInput, Pressable, Platform, ActivityIndicator, ScrollView } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState, useEffect, useRef } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { fetchWithAuth } from '../../lib/api';
 import { playMessageNotificationSound } from '../../lib/notifications';
-import { Send, Check, CheckCheck } from 'lucide-react-native';
+import { Send, Check, CheckCheck, MessageCircle, Building2, User } from 'lucide-react-native';
 
 export default function ProprietaireChatScreen() {
     const insets = useSafeAreaInsets();
+    const params = useLocalSearchParams<{ leaseId?: string }>();
+    const [selectedLeaseId, setSelectedLeaseId] = useState<string | null>(params.leaseId || null);
+    const [conversations, setConversations] = useState<any[]>([]);
     const [messages, setMessages] = useState<any[]>([]);
     const [newMessage, setNewMessage] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [interlocutorName, setInterlocutorName] = useState('Locataire');
+    const [propertyName, setPropertyName] = useState('Logement');
     const flatListRef = useRef<FlatList>(null);
     const lastMessageIdRef = useRef<string | null>(null);
     const isFirstLoadRef = useRef<boolean>(true);
 
-    const loadMessages = async () => {
+    const loadMessages = async (targetLeaseId?: string | null) => {
         try {
-            const response = await fetchWithAuth('/chat');
+            const queryLeaseId = targetLeaseId || selectedLeaseId;
+            const endpoint = queryLeaseId ? `/chat?leaseId=${queryLeaseId}` : '/chat';
+            const response = await fetchWithAuth(endpoint);
             const json = await response.json();
-            if (response.ok && Array.isArray(json.messages)) {
-                const newMessages = json.messages;
 
-                // Jouer une notification sonore et vibrer si un nouveau message de l'interlocuteur est reçu
-                if (!isFirstLoadRef.current && newMessages.length > 0) {
-                    const latest = newMessages[newMessages.length - 1];
-                    if (latest.id !== lastMessageIdRef.current && latest.roleExpediteur !== 'PROPRIO') {
-                        playMessageNotificationSound(json.interlocutorName || 'Locataire', latest.contenu);
+            if (response.ok) {
+                if (Array.isArray(json.conversations)) {
+                    setConversations(json.conversations);
+                }
+                if (json.activeLeaseId && !selectedLeaseId) {
+                    setSelectedLeaseId(json.activeLeaseId);
+                }
+
+                if (Array.isArray(json.messages)) {
+                    const newMessages = json.messages;
+
+                    // Notification sonore et vibration si un nouveau message du locataire est reçu
+                    if (!isFirstLoadRef.current && newMessages.length > 0) {
+                        const latest = newMessages[newMessages.length - 1];
+                        if (latest.id !== lastMessageIdRef.current && latest.roleExpediteur !== 'PROPRIO' && latest.roleExpediteur !== 'AGENCE') {
+                            playMessageNotificationSound(json.interlocutorName || 'Locataire', latest.contenu);
+                        }
                     }
-                }
 
-                if (newMessages.length > 0) {
-                    lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
-                }
-                isFirstLoadRef.current = false;
-                setMessages(newMessages);
+                    if (newMessages.length > 0) {
+                        lastMessageIdRef.current = newMessages[newMessages.length - 1].id;
+                    }
+                    isFirstLoadRef.current = false;
+                    setMessages(newMessages);
 
-                if (json.interlocutorName) {
-                    setInterlocutorName(json.interlocutorName);
-                }
-                if (newMessages.length > 0) {
-                    await fetchWithAuth('/chat/read', {
-                        method: 'POST',
-                        body: JSON.stringify({ role: 'PROPRIO' })
-                    });
+                    if (json.interlocutorName) setInterlocutorName(json.interlocutorName);
+                    if (json.propertyName) setPropertyName(json.propertyName);
+
+                    // Marquer comme lus
+                    if (newMessages.length > 0) {
+                        await fetchWithAuth('/chat/read', {
+                            method: 'POST',
+                            body: JSON.stringify({ leaseId: json.activeLeaseId || queryLeaseId, role: 'PROPRIO' })
+                        }).catch(() => {});
+                    }
                 }
             }
         } catch (e) {
-            console.error("Erreur chargement chat proprio", e);
+            console.error("Erreur chargement chat bailleur", e);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadMessages();
-        const interval = setInterval(loadMessages, 3500);
+        loadMessages(params.leaseId || null);
+        const interval = setInterval(() => loadMessages(), 3500);
         return () => clearInterval(interval);
-    }, []);
+    }, [selectedLeaseId]);
+
+    const handleSelectConversation = (leaseId: string) => {
+        setSelectedLeaseId(leaseId);
+        isFirstLoadRef.current = true;
+        setLoading(true);
+        loadMessages(leaseId);
+    };
 
     const sendMessage = async () => {
         if (!newMessage.trim()) return;
@@ -66,7 +93,7 @@ export default function ProprietaireChatScreen() {
             id: Date.now().toString(),
             contenu: newMessage.trim(),
             roleExpediteur: 'PROPRIO',
-            statut: 'RECU', // 2 encoches grises dès émission
+            statut: 'RECU',
             dateEnvoi: new Date().toISOString()
         };
 
@@ -79,18 +106,19 @@ export default function ProprietaireChatScreen() {
             await fetchWithAuth('/chat', {
                 method: 'POST',
                 body: JSON.stringify({
+                    leaseId: selectedLeaseId,
                     contenu: optimisticMessage.contenu,
                     role: 'PROPRIO'
                 })
             });
             loadMessages();
         } catch (e) {
-            console.error("Erreur envoi message", e);
+            console.error("Erreur envoi message bailleur", e);
         }
     };
 
     const renderMessage = ({ item }: { item: any }) => {
-        const isMe = item.roleExpediteur === 'PROPRIO';
+        const isMe = item.roleExpediteur === 'PROPRIO' || item.roleExpediteur === 'AGENCE';
         
         return (
             <View style={{ marginBottom: 12, flexDirection: 'row', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
@@ -121,14 +149,13 @@ export default function ProprietaireChatScreen() {
                         <Text style={{ fontSize: 10, color: isMe ? 'rgba(255,255,255,0.7)' : '#94A3B8' }}>
                             {new Date(item.dateEnvoi).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </Text>
-                        {/* ENCOCHES RÉGLEMENTAIRES SUR LES MESSAGES ENVOYÉS */}
                         {isMe && (
                             item.statut === 'LU' ? (
-                                <CheckCheck size={14} color="#EF4444" />
+                                <CheckCheck size={14} color="#34D399" />
                             ) : item.statut === 'RECU' ? (
-                                <CheckCheck size={14} color="#9CA3AF" />
+                                <CheckCheck size={14} color="rgba(255,255,255,0.7)" />
                             ) : (
-                                <Check size={13} color="#9CA3AF" />
+                                <Check size={13} color="rgba(255,255,255,0.7)" />
                             )
                         )}
                     </View>
@@ -138,53 +165,84 @@ export default function ProprietaireChatScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
-      <TopNavHeader title="Messages" subtitle="Échanges directs & quittances" />
-            {/* HEADER CHAT */}
-            <View style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <View>
-                        <Text style={{ fontSize: 18, fontWeight: '900', color: '#0F172A' }}>
-                            Messages
-                        </Text>
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#1B4D3E' }}>
-                            Vos échanges sont conservés et datés
-                        </Text>
-                    </View>
-                </View>
-            </View>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FAF9F6' }}>
+            <TopNavHeader
+                title="Messagerie locataires"
+                subtitle={propertyName ? `${propertyName} · ${interlocutorName}` : "Échanges officiels horodatés"}
+                primaryColor="#1B4D3E"
+            />
 
-            {interlocutorName === 'Locataire (identité protégée)' && (
-              <View style={{ backgroundColor: '#FFF7ED', paddingHorizontal: 16, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#FED7AA' }}>
-                <Text style={{ fontSize: 11, color: '#9A3412', fontWeight: '700' }}>
-                  L'identité de ce locataire est protégée pour ce bail.
-                </Text>
-              </View>
+            {/* SÉLECTEUR DE CONVERSATION SI MULTIPLES BAUX */}
+            {conversations.length > 1 && (
+                <View style={{ backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E4E0D7', paddingVertical: 8 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+                        {conversations.map((c) => {
+                            const isSelected = c.leaseId === selectedLeaseId;
+                            return (
+                                <Pressable
+                                    key={c.leaseId}
+                                    onPress={() => handleSelectConversation(c.leaseId)}
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        gap: 6,
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 7,
+                                        borderRadius: 20,
+                                        backgroundColor: isSelected ? '#1B4D3E' : '#F3F4F6',
+                                        borderWidth: 1,
+                                        borderColor: isSelected ? '#1B4D3E' : '#E5E7EB',
+                                    }}
+                                >
+                                    <User size={13} color={isSelected ? '#FFFFFF' : '#4B5563'} />
+                                    <Text style={{ fontSize: 12, fontWeight: '700', color: isSelected ? '#FFFFFF' : '#1F2937' }} numberOfLines={1}>
+                                        {c.otherPartyName} · {c.propertyName}
+                                    </Text>
+                                    {c.unreadCount > 0 && (
+                                        <View style={{ backgroundColor: '#EF4444', borderRadius: 10, paddingHorizontal: 5, paddingVertical: 1 }}>
+                                            <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '800' }}>{c.unreadCount}</Text>
+                                        </View>
+                                    )}
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
+                </View>
             )}
 
             <KeyboardAvoidingView 
                 behavior="padding"
                 style={{ flex: 1 }}
             >
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderMessage}
-                    contentContainerStyle={{ padding: 16, paddingBottom: 24, flexGrow: 1 }}
-                    keyboardShouldPersistTaps="handled"
-                    ListEmptyComponent={
-                        <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
-                            <Text style={{ fontSize: 16, fontWeight: '700', color: '#64748B', textAlign: 'center' }}>
-                                Aucun message échangé
-                            </Text>
-                            <Text style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', marginTop: 8, lineHeight: 18 }}>
-                                Vos échanges avec vos locataires apparaîtront ici en temps réel.
-                            </Text>
-                        </View>
-                    }
-                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                />
+                {loading && messages.length === 0 ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator size="small" color="#1B4D3E" />
+                        <Text style={{ fontSize: 13, color: '#6B7280', marginTop: 8 }}>Chargement des messages...</Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        ref={flatListRef}
+                        data={messages}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderMessage}
+                        contentContainerStyle={{ padding: 16, paddingBottom: 24, flexGrow: 1 }}
+                        keyboardShouldPersistTaps="handled"
+                        ListEmptyComponent={
+                            <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
+                                <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#E8F5E9', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
+                                    <MessageCircle size={28} color="#1B4D3E" />
+                                </View>
+                                <Text style={{ fontSize: 16, fontWeight: '800', color: '#1B4D3E', textAlign: 'center' }}>
+                                    Aucun message échangé
+                                </Text>
+                                <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 8, lineHeight: 18, maxWidth: 280 }}>
+                                    Communiquez directement avec vos locataires en toute sérénité. L'historique certifié est sauvegardé en cas de litige.
+                                </Text>
+                            </View>
+                        }
+                        onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                    />
+                )}
 
                 <View style={{ 
                     flexDirection: 'row', 
@@ -193,30 +251,30 @@ export default function ProprietaireChatScreen() {
                     paddingBottom: Math.max(insets.bottom, 10), 
                     backgroundColor: '#FFFFFF', 
                     borderTopWidth: 1, 
-                    borderTopColor: '#E2E8F0', 
+                    borderTopColor: '#E4E0D7', 
                     alignItems: 'center', 
                     gap: 8 
                 }}>
                     <TextInput
                         style={{
                             flex: 1,
-                            backgroundColor: '#F1F5F9',
+                            backgroundColor: '#F9FAFB',
                             borderWidth: 1,
-                            borderColor: '#CBD5E1',
+                            borderColor: '#D1D5DB',
                             borderRadius: 20,
                             paddingHorizontal: 14,
                             paddingVertical: 10,
-                            color: '#0F172A',
+                            color: '#111827',
                             fontSize: 14,
                         }}
                         placeholder={`Écrire à ${interlocutorName}...`}
-                        placeholderTextColor="#94A3B8"
+                        placeholderTextColor="#9CA3AF"
                         value={newMessage}
                         onChangeText={setNewMessage}
                     />
                     <Pressable 
                         style={{
-                            backgroundColor: newMessage.trim() ? '#1B4D3E' : '#94A3B8',
+                            backgroundColor: newMessage.trim() ? '#1B4D3E' : '#9CA3AF',
                             width: 42,
                             height: 42,
                             borderRadius: 21,
@@ -225,6 +283,7 @@ export default function ProprietaireChatScreen() {
                         }}
                         onPress={sendMessage}
                         disabled={!newMessage.trim()}
+                        accessibilityLabel="Envoyer le message"
                     >
                         <Send color="#FFFFFF" size={18} />
                     </Pressable>

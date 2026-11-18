@@ -19,6 +19,7 @@ import {
   Clock,
   ChevronRight,
   Building2,
+  MessageCircle,
 } from 'lucide-react-native';
 import { TopNavHeader } from '../../components/TopNavHeader';
 import { fetchWithAuth } from '../../lib/api';
@@ -164,6 +165,29 @@ export default function BauxScreen() {
                   thumbColor="#FFFFFF"
                 />
               </View>
+
+              {/* Bouton d'accès direct à la messagerie */}
+              <Pressable
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  backgroundColor: '#E8F5E9',
+                  borderWidth: 1,
+                  borderColor: '#C8E6C9',
+                  borderRadius: 10,
+                  paddingVertical: 10,
+                  marginTop: 12,
+                }}
+                onPress={() => router.push({ pathname: '/(tabs)/chat', params: { leaseId: l.id } } as any)}
+                accessibilityLabel="Échanger avec le locataire"
+              >
+                <MessageCircle size={15} color="#1B4D3E" />
+                <Text style={{ fontSize: 13, fontWeight: '800', color: '#1B4D3E' }}>
+                  Échanger avec le locataire
+                </Text>
+              </Pressable>
             </View>
           ))
         )}

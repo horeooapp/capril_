@@ -63,6 +63,7 @@ import {
   Download,
   Play,
   Film,
+  MessageCircle,
 } from 'lucide-react-native';
 
 const formatImageUrl = (uri?: string | null) => {
@@ -166,10 +167,12 @@ type LocScreen =
   | 'documents'
   | 'passeport'
   | 'recherche'
+  | 'chat'
   | 'manuel';
 
 const MENU_ITEMS = [
   { id: 'accueil' as LocScreen, label: 'Accueil', desc: 'Statut du bail, loyer et alertes', icon: Home },
+  { id: 'chat' as LocScreen, label: 'Messagerie du bail', desc: 'Échanges certifiés avec votre bailleur', icon: MessageCircle },
   { id: 'factures' as LocScreen, label: 'Régler mes factures', desc: 'Eau (SODECI), Élec (CIE), Téléphone, Internet', icon: Zap },
   { id: 'payer' as LocScreen, label: 'Payer mon loyer', desc: 'Wave, Orange, MTN, Moov et Carte bancaire', icon: CreditCard },
   { id: 'quittances' as LocScreen, label: 'Mes quittances', desc: 'La preuve officielle de vos paiements', icon: FileText },
@@ -1138,12 +1141,23 @@ export default function LocatairePrototypeScreen() {
           </View>
         </Pressable>
 
-        <Pressable
-          style={styles.iconBtn}
-          onPress={() => router.push('/notifications' as any)}
-        >
-          <Bell color="#1A1D26" size={18} />
-        </Pressable>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Pressable
+            style={styles.iconBtn}
+            onPress={() => router.push('/(tabs)/chat' as any)}
+            accessibilityLabel="Messagerie du bail"
+          >
+            <MessageCircle color="#1A1D26" size={19} />
+          </Pressable>
+
+          <Pressable
+            style={styles.iconBtn}
+            onPress={() => router.push('/notifications' as any)}
+            accessibilityLabel="Notifications"
+          >
+            <Bell color="#1A1D26" size={18} />
+          </Pressable>
+        </View>
       </View>
 
       {/* MENU MOBILE DÉROULANT / TIROIR */}
@@ -1202,6 +1216,11 @@ export default function LocatairePrototypeScreen() {
                       if (item.id === 'passeport') {
                         setMenuOpen(false);
                         router.push('/(tabs)/passeport' as any);
+                        return;
+                      }
+                      if (item.id === 'chat') {
+                        setMenuOpen(false);
+                        router.push('/(tabs)/chat' as any);
                         return;
                       }
                       setScreen(item.id);

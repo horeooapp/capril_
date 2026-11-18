@@ -2,86 +2,170 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 
-// Récupérer les messages
+// Récupérer les messages et la liste des conversations
 export async function GET(request: Request) {
     try {
         const user = await authenticateMobileRequest(request);
         if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
         const url = new URL(request.url);
-        let leaseId = url.searchParams.get('leaseId');
+        let requestedLeaseId = url.searchParams.get('leaseId');
+        const listOnly = url.searchParams.get('list') === '1' || url.searchParams.get('list') === 'true';
 
-        if (!leaseId) {
-            // Trouver le bail actif associé à l'utilisateur (locataire ou bailleur)
-            const activeLease = await prisma.lease.findFirst({
-                where: {
-                    OR: [
-                        { tenantId: user.userId },
-                        { landlordId: user.userId },
-                        { property: { ownerUserId: user.userId } }
-                    ],
-                    status: 'ACTIVE'
+        // 1. Récupérer tous les baux accessibles par cet utilisateur (locataire, bailleur ou agence)
+        const accessibleLeases = await prisma.lease.findMany({
+            where: {
+                OR: [
+                    { tenantId: user.userId },
+                    { landlordId: user.userId },
+                    { property: { ownerUserId: user.userId } },
+                    { property: { managedByUserId: user.userId } }
+                ],
+                status: { notIn: ['CANCELLED', 'ARCHIVED'] }
+            },
+            include: {
+                property: {
+                    select: {
+                        id: true,
+                        name: true,
+                        address: true,
+                        commune: true,
+                        ownerUserId: true,
+                        managedByUserId: true
+                    }
                 },
-                orderBy: { createdAt: 'desc' }
-            });
-            if (activeLease) {
-                leaseId = activeLease.id;
-            } else {
-                return NextResponse.json({ messages: [], interlocutorName: '', interlocutorRole: '' });
-            }
-        }
-
-        // Vérifier que l'utilisateur a le droit de lire ce bail
-        const lease = await prisma.lease.findUnique({
-            where: { id: leaseId },
-            include: { property: true }
+                tenant: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        phone: true
+                    }
+                },
+                landlord: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        phone: true
+                    }
+                },
+                messagesBail: {
+                    orderBy: { dateEnvoi: 'desc' },
+                    take: 1
+                }
+            },
+            orderBy: { updatedAt: 'desc' }
         });
 
-        if (!lease || (lease.tenantId !== user.userId && lease.landlordId !== user.userId && lease.property?.ownerUserId !== user.userId)) {
-            return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
+        if (accessibleLeases.length === 0) {
+            return NextResponse.json({
+                messages: [],
+                conversations: [],
+                activeLeaseId: null,
+                interlocutorName: '',
+                interlocutorRole: '',
+                leaseReference: '',
+                propertyName: '',
+                unreadTotal: 0
+            });
         }
 
-        // Déterminer l'interlocuteur
-        const isTenant = lease.tenantId === user.userId;
-        let interlocutorName = isTenant ? 'Bailleur' : 'Locataire';
-        const interlocutorRole = isTenant ? 'Bailleur' : 'Locataire';
+        // 2. Compter les messages non lus pour chaque bail
+        const unreadCounts = await prisma.messagerieBail.groupBy({
+            by: ['leaseId'],
+            where: {
+                leaseId: { in: accessibleLeases.map(l => l.id) },
+                expediteurId: { not: user.userId },
+                statut: { not: 'LU' }
+            },
+            _count: { id: true }
+        });
 
-        if (isTenant) {
-            const landlordId = lease.landlordId || lease.property?.ownerUserId;
-            if (landlordId) {
-                const landlord = await prisma.user.findUnique({
-                    where: { id: landlordId },
-                    select: { firstName: true, lastName: true }
-                });
-                if (landlord) {
-                    interlocutorName = lease.bailleurMasque
-                        ? 'Bailleur certifié'
-                        : `${landlord.firstName || ''} ${landlord.lastName || ''}`.trim() || 'Bailleur';
+        const unreadMap = new Map<string, number>();
+        let unreadTotal = 0;
+        unreadCounts.forEach(c => {
+            const count = c._count.id;
+            unreadMap.set(c.leaseId, count);
+            unreadTotal += count;
+        });
+
+        // 3. Formater les conversations
+        const conversations = accessibleLeases.map(l => {
+            const isTenant = l.tenantId === user.userId;
+            const isAgency = l.property?.managedByUserId === user.userId;
+            let otherPartyName = 'Correspondant';
+            let otherPartyRole = 'Bailleur';
+
+            if (isTenant) {
+                otherPartyRole = l.property?.managedByUserId ? 'Agence' : 'Bailleur';
+                if (l.bailleurMasque) {
+                    otherPartyName = 'Bailleur certifié';
+                } else if (l.landlord) {
+                    otherPartyName = `${l.landlord.firstName || ''} ${l.landlord.lastName || ''}`.trim() || 'Bailleur';
+                }
+            } else if (isAgency) {
+                otherPartyRole = 'Locataire';
+                if (l.tenant) {
+                    otherPartyName = `${l.tenant.firstName || ''} ${l.tenant.lastName || ''}`.trim() || 'Locataire';
+                }
+            } else {
+                // Landlord
+                otherPartyRole = 'Locataire';
+                if (l.tenant) {
+                    otherPartyName = `${l.tenant.firstName || ''} ${l.tenant.lastName || ''}`.trim() || 'Locataire';
                 }
             }
-        } else {
-            if (lease.tenantId) {
-                const tenant = await prisma.user.findUnique({
-                    where: { id: lease.tenantId },
-                    select: { firstName: true, lastName: true }
-                });
-                if (tenant) {
-                    interlocutorName = `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || 'Locataire';
-                }
-            }
+
+            const lastMsg = l.messagesBail?.[0];
+
+            return {
+                leaseId: l.id,
+                leaseReference: l.leaseReference,
+                propertyName: l.property?.name || l.property?.address || 'Logement',
+                propertyCommune: l.property?.commune || 'Abidjan',
+                otherPartyName,
+                otherPartyRole,
+                lastMessage: lastMsg?.contenu || '',
+                lastMessageDate: lastMsg?.dateEnvoi ? lastMsg.dateEnvoi.toISOString() : null,
+                lastMessageIsMe: lastMsg ? lastMsg.expediteurId === user.userId : false,
+                unreadCount: unreadMap.get(l.id) || 0
+            };
+        });
+
+        if (listOnly) {
+            return NextResponse.json({
+                conversations,
+                unreadTotal
+            });
         }
 
+        // 4. Identifier le bail actif à ouvrir
+        let targetLease = requestedLeaseId
+            ? accessibleLeases.find(l => l.id === requestedLeaseId)
+            : accessibleLeases[0];
+
+        if (!targetLease) {
+            targetLease = accessibleLeases[0];
+        }
+
+        // 5. Charger les messages du bail sélectionné
         const messages = await prisma.messagerieBail.findMany({
-            where: { leaseId },
+            where: { leaseId: targetLease.id },
             orderBy: { dateEnvoi: 'asc' }
         });
 
+        const activeConv = conversations.find(c => c.leaseId === targetLease.id);
+
         return NextResponse.json({
             messages,
-            interlocutorName,
-            interlocutorRole,
-            leaseReference: lease.leaseReference,
-            propertyName: lease.property?.name || 'Logement'
+            conversations,
+            activeLeaseId: targetLease.id,
+            interlocutorName: activeConv?.otherPartyName || 'Correspondant',
+            interlocutorRole: activeConv?.otherPartyRole || 'Bailleur',
+            leaseReference: targetLease.leaseReference,
+            propertyName: activeConv?.propertyName || 'Logement',
+            unreadTotal
         });
 
     } catch (error) {
@@ -110,11 +194,12 @@ export async function POST(request: Request) {
                     OR: [
                         { tenantId: user.userId },
                         { landlordId: user.userId },
-                        { property: { ownerUserId: user.userId } }
+                        { property: { ownerUserId: user.userId } },
+                        { property: { managedByUserId: user.userId } }
                     ],
-                    status: 'ACTIVE'
+                    status: { notIn: ['CANCELLED', 'ARCHIVED'] }
                 },
-                orderBy: { createdAt: 'desc' }
+                orderBy: { updatedAt: 'desc' }
             });
             if (activeLease) {
                 leaseId = activeLease.id;
@@ -129,25 +214,35 @@ export async function POST(request: Request) {
             include: { property: true }
         });
 
-        if (!lease || (lease.tenantId !== user.userId && lease.landlordId !== user.userId && lease.property?.ownerUserId !== user.userId)) {
+        const isAuthorized = lease && (
+            lease.tenantId === user.userId ||
+            lease.landlordId === user.userId ||
+            lease.property?.ownerUserId === user.userId ||
+            lease.property?.managedByUserId === user.userId
+        );
+
+        if (!isAuthorized || !lease) {
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
+
+        const isTenant = lease.tenantId === user.userId;
+        const expediteurRole = role || (isTenant ? 'LOCATAIRE' : (lease.property?.managedByUserId === user.userId ? 'AGENCE' : 'PROPRIO'));
 
         // Création du message infalsifiable
         const message = await prisma.messagerieBail.create({
             data: {
                 leaseId,
                 expediteurId: user.userId,
-                roleExpediteur: role || (lease.tenantId === user.userId ? 'LOCATAIRE' : 'PROPRIO'),
+                roleExpediteur: expediteurRole,
                 contenu: contenu.trim(),
                 statut: 'RECU', // Immédiatement "reçu" par le serveur central QAPRIL (2 encoches grises)
                 dateEnvoi: new Date()
             }
         });
 
-        // Envoi immédiat de la notification push au destinataire avec sonnerie
-        const destinataireId = lease.tenantId === user.userId
-            ? (lease.landlordId || lease.property?.ownerUserId)
+        // Envoi immédiat de la notification push au destinataire
+        const destinataireId = isTenant
+            ? (lease.property?.managedByUserId || lease.landlordId || lease.property?.ownerUserId)
             : lease.tenantId;
 
         if (destinataireId) {
@@ -165,7 +260,7 @@ export async function POST(request: Request) {
 
                 const senderName = expediteur
                     ? `${expediteur.firstName || ''} ${expediteur.lastName || ''}`.trim()
-                    : (lease.tenantId === user.userId ? 'Locataire' : 'Bailleur');
+                    : (isTenant ? 'Locataire' : 'Bailleur');
 
                 if (destinataire?.pushToken) {
                     const { sendExpoPushNotification } = await import('@/lib/expo-push');

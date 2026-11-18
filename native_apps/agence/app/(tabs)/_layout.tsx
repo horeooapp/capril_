@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Building2, Users, UserCheck, MoreHorizontal } from 'lucide-react-native';
+import { Home, Building2, Users, UserCheck, MoreHorizontal, MessageCircle } from 'lucide-react-native';
 
 /**
  * Navigation Agence conforme CDC IC-01-R1 (Ticket MA-03) :
@@ -70,6 +70,16 @@ export default function AgenceTabLayout() {
         options={{
           title: 'Plus',
           tabBarIcon: ({ color, focused }) => <MoreHorizontal color={color} size={focused ? 22 : 20} strokeWidth={focused ? 2.4 : 1.8} />,
+        }}
+      />
+
+      {/* Messagerie intégrée portefeuille */}
+      <Tabs.Screen
+        name="chat"
+        options={{
+          href: null,
+          title: 'Messagerie',
+          tabBarIcon: ({ color }) => <MessageCircle color={color} size={20} />,
         }}
       />
     </Tabs>

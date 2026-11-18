@@ -53,6 +53,7 @@ import {
   Globe,
   Play,
   Film,
+  MessageCircle,
 } from 'lucide-react-native';
 
 const EUR_RATE = 655.957;
@@ -66,6 +67,7 @@ function calcDroitsDgi(loyer: number, duree: number, pages = PAGES_STD) {
 
 const BAILLEUR_MENU_ITEMS = [
   { id: 'home', label: 'Accueil & Synthèse', desc: 'Encaissements, loyers perçus et alertes', icon: Home },
+  { id: 'chat', label: 'Messagerie locataires', desc: 'Échanges directs et historique horodaté', icon: MessageCircle },
   { id: 'biens', label: 'Mes biens & Lots', desc: 'Gestion du patrimoine et taux d’occupation', icon: Building2 },
   { id: 'baux', label: 'Mes baux & DGI', desc: 'Enregistrement fiscal et contrats certifiés', icon: FileSpreadsheet },
   { id: 'quit', label: 'Quittances certifiées', desc: 'Émission et historique mensuel', icon: FileText },
@@ -80,6 +82,7 @@ const BAILLEUR_MENU_ITEMS = [
 
 const AGENCE_MENU_ITEMS = [
   { id: 'home', label: 'Vue d’ensemble agence', desc: 'Tableau de bord mandats et collecte globale', icon: Home },
+  { id: 'chat', label: 'Messagerie du portefeuille', desc: 'Échanges avec locataires et mandants', icon: MessageCircle },
   { id: 'biens', label: 'Portefeuille multi-bailleurs', desc: 'Biens et lots sous gestion agence', icon: Building2 },
   { id: 'mandants', label: 'Bailleurs mandants', desc: 'Contrats de mandat et reversements', icon: Users },
   { id: 'baux', label: 'Baux sous gestion', desc: 'Baux rédigés, actifs et enregistrés DGI', icon: FileSpreadsheet },
@@ -491,6 +494,14 @@ export default function BailleurAndAgencePrototypeScreen() {
 
           <Pressable
             style={styles.headerIconBtn}
+            onPress={() => router.push('/(tabs)/chat' as any)}
+            accessibilityLabel="Messagerie locataires"
+          >
+            <MessageCircle color="#FFFFFF" size={18} />
+          </Pressable>
+
+          <Pressable
+            style={styles.headerIconBtn}
             onPress={() => router.push('/(tabs)/profile' as any)}
           >
             <User color="#FFFFFF" size={18} />
@@ -614,6 +625,11 @@ export default function BailleurAndAgencePrototypeScreen() {
                       if (item.id === 'diaspora') {
                         setMenuOpen(false);
                         router.push('/(tabs)/diaspora' as any);
+                        return;
+                      }
+                      if (item.id === 'chat') {
+                        setMenuOpen(false);
+                        router.push('/(tabs)/chat' as any);
                         return;
                       }
                       if (isBailleur) {

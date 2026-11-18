@@ -8,9 +8,8 @@ export async function POST(request: Request) {
         const user = await authenticateMobileRequest(request);
         if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-        const body = await request.json();
+        const body = await request.json().catch(() => ({}));
         let { leaseId } = body;
-        const { role } = body;
 
         if (!leaseId) {
             const activeLease = await prisma.lease.findFirst({
@@ -18,11 +17,12 @@ export async function POST(request: Request) {
                     OR: [
                         { tenantId: user.userId },
                         { landlordId: user.userId },
-                        { property: { ownerUserId: user.userId } }
+                        { property: { ownerUserId: user.userId } },
+                        { property: { managedByUserId: user.userId } }
                     ],
-                    status: 'ACTIVE'
+                    status: { notIn: ['CANCELLED', 'ARCHIVED'] }
                 },
-                orderBy: { createdAt: 'desc' }
+                orderBy: { updatedAt: 'desc' }
             });
             if (activeLease) {
                 leaseId = activeLease.id;
@@ -31,14 +31,11 @@ export async function POST(request: Request) {
             }
         }
 
-        // On met à jour tous les messages du bail où l'expéditeur n'est PAS le rôle actuel
-        // (ex: si le locataire ouvre le chat, il lit les messages envoyés par le proprio)
-        const targetRole = role === 'LOCATAIRE' ? 'PROPRIO' : 'LOCATAIRE';
-
+        // Marquer tous les messages de ce bail dont l'expéditeur n'est PAS l'utilisateur actuel comme LUS
         await prisma.messagerieBail.updateMany({
             where: {
                 leaseId: leaseId,
-                roleExpediteur: targetRole,
+                expediteurId: { not: user.userId },
                 statut: { not: 'LU' }
             },
             data: {
