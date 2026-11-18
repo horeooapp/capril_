@@ -320,7 +320,6 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
             setLoginType('EMAIL');
         }
     };
-    };
 
     // RÉCEPTION ET AUTO-SOUMISSION INSTANTANÉE DU CODE (0-TAP)
     const handleOtpChange = (txt: string) => {
