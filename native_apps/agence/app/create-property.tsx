@@ -146,10 +146,81 @@ export default function CreatePropertyScreen() {
   const [isCustomCity, setIsCustomCity] = useState(false);
   const [customCityInput, setCustomCityInput] = useState('');
 
-  // Configuration Immeuble / Bloc résidentiel
-  const [immeubleUnitsCount, setImmeubleUnitsCount] = useState('4');
-  const [immeubleRoomsPerUnit, setImmeubleRoomsPerUnit] = useState('3');
-  const [immeubleRentPerUnit, setImmeubleRentPerUnit] = useState('150000');
+  interface ImmeubleUnitItem {
+    id: string;
+    label: string;
+    rooms: number;
+    rent: number;
+  }
+
+  // Configuration Immeuble / Bloc résidentiel (tous les appartements n'ont pas le même nombre de pièces)
+  const [immeubleUnits, setImmeubleUnits] = useState<ImmeubleUnitItem[]>([
+    { id: '1', label: 'Appartement 1', rooms: 2, rent: 120000 },
+    { id: '2', label: 'Appartement 2', rooms: 3, rent: 150000 },
+    { id: '3', label: 'Appartement 3', rooms: 3, rent: 150000 },
+    { id: '4', label: 'Appartement 4', rooms: 4, rent: 200000 },
+  ]);
+  const [immeubleDefaultRent, setImmeubleDefaultRent] = useState('150000');
+
+  const handleSetUnitsCount = (countStr: string) => {
+    const clean = countStr.replace(/[^\d]/g, '');
+    const count = parseInt(clean, 10);
+    if (isNaN(count)) return;
+    const target = Math.min(100, Math.max(1, count));
+    const dRent = parseInt(immeubleDefaultRent.replace(/[^\d]/g, ''), 10) || 150000;
+    setImmeubleUnits(prev => {
+      if (prev.length === target) return prev;
+      if (prev.length < target) {
+        const added: ImmeubleUnitItem[] = [];
+        for (let i = prev.length + 1; i <= target; i++) {
+          added.push({
+            id: String(Date.now() + i),
+            label: `Appartement ${i}`,
+            rooms: 3,
+            rent: dRent,
+          });
+        }
+        return [...prev, ...added];
+      }
+      return prev.slice(0, target);
+    });
+  };
+
+  const handleUpdateUnitRooms = (index: number, newRooms: number) => {
+    setImmeubleUnits(prev => prev.map((u, i) => i === index ? { ...u, rooms: newRooms } : u));
+  };
+
+  const handleUpdateUnitRent = (index: number, newRentStr: string) => {
+    const clean = parseInt(newRentStr.replace(/[^\d]/g, ''), 10) || 0;
+    setImmeubleUnits(prev => prev.map((u, i) => i === index ? { ...u, rent: clean } : u));
+  };
+
+  const handleUpdateUnitLabel = (index: number, newLabel: string) => {
+    setImmeubleUnits(prev => prev.map((u, i) => i === index ? { ...u, label: newLabel } : u));
+  };
+
+  const handleAddUnit = () => {
+    const nextNum = immeubleUnits.length + 1;
+    const dRent = parseInt(immeubleDefaultRent.replace(/[^\d]/g, ''), 10) || 150000;
+    setImmeubleUnits(prev => [
+      ...prev,
+      { id: String(Date.now() + nextNum), label: `Appartement ${nextNum}`, rooms: 3, rent: dRent }
+    ]);
+  };
+
+  const handleRemoveUnit = (index: number) => {
+    if (immeubleUnits.length <= 1) {
+      Alert.alert('Action impossible', 'Un immeuble doit comporter au moins 1 appartement.');
+      return;
+    }
+    setImmeubleUnits(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleApplyDefaultRentToAll = () => {
+    const dRent = parseInt(immeubleDefaultRent.replace(/[^\d]/g, ''), 10) || 150000;
+    setImmeubleUnits(prev => prev.map(u => ({ ...u, rent: dRent })));
+    Alert.alert('Loyer appliqué', `Le montant de ${fmtFcfa(dRent)} a été appliqué à tous les appartements.`);
+  };
 
   const resolveLocationDetails = async (lat: number, lng: number) => {
     try {
@@ -322,21 +393,20 @@ export default function CreatePropertyScreen() {
       }
     }
 
-    const unitsCount = Math.max(1, parseInt(immeubleUnitsCount, 10) || 1);
-    const roomsPerUnit = Math.max(1, parseInt(immeubleRoomsPerUnit, 10) || 3);
-    const rentPerUnit = parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0;
-    const totalBuildingRent = unitsCount * rentPerUnit;
+    const totalBuildingRent = immeubleUnits.reduce((sum, u) => sum + (Number(u.rent) || 0), 0);
+    const totalBuildingRooms = immeubleUnits.reduce((sum, u) => sum + (Number(u.rooms) || 0), 0);
 
     const customUnits = [];
     if (propertyType === 'IMMEUBLE') {
-      for (let i = 1; i <= unitsCount; i++) {
+      for (let i = 0; i < immeubleUnits.length; i++) {
+        const u = immeubleUnits[i];
         customUnits.push({
-          id: `u-${i}`,
-          label: `Apt ${i}`,
-          type: roomsPerUnit <= 1 ? 'STUDIO' : 'APPARTEMENT',
-          rent: rentPerUnit,
-          rooms: roomsPerUnit,
-          area: roomsPerUnit === 1 ? 30 : (roomsPerUnit === 2 ? 45 : (roomsPerUnit === 3 ? 65 : 85))
+          id: `u-${i + 1}`,
+          label: u.label.trim() || `Apt ${i + 1}`,
+          type: u.rooms <= 1 ? 'STUDIO' : 'APPARTEMENT',
+          rent: Number(u.rent) || 0,
+          rooms: Number(u.rooms) || 3,
+          area: u.rooms === 1 ? 30 : (u.rooms === 2 ? 45 : (u.rooms === 3 ? 65 : (u.rooms === 4 ? 85 : 110)))
         });
       }
     }
@@ -355,10 +425,10 @@ export default function CreatePropertyScreen() {
           typeStructure: propertyType === 'IMMEUBLE' ? 'IMMEUBLE' : 'INDEPENDANT',
           leaseType,
           declaredRentFcfa: propertyType === 'IMMEUBLE' ? totalBuildingRent : (!isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0),
-          nbUnits: propertyType === 'IMMEUBLE' ? unitsCount : undefined,
+          nbUnits: propertyType === 'IMMEUBLE' ? immeubleUnits.length : undefined,
           customUnits: propertyType === 'IMMEUBLE' ? customUnits : undefined,
           superficieM2: cleanSurfaceDigits ? parseFloat(cleanSurfaceDigits) : undefined,
-          rooms: rooms ? parseInt(rooms.replace(/[^\d]/g, ''), 10) : undefined,
+          rooms: propertyType === 'IMMEUBLE' ? totalBuildingRooms : (rooms ? parseInt(rooms.replace(/[^\d]/g, ''), 10) : undefined),
           unitLabel: unitLabel.trim() || undefined,
           // Extensions ADD-25
           forSale: isForSale,
@@ -503,74 +573,155 @@ export default function CreatePropertyScreen() {
 
             {propertyType === 'IMMEUBLE' ? (
               <View style={{ backgroundColor: '#F0F9FF', borderWidth: 1, borderColor: '#BAE6FD', borderRadius: 16, padding: 16, marginTop: 14 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                  <Building2 size={18} color="#0284C7" />
-                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#0369A1', textTransform: 'uppercase' }}>
-                    Configuration globale de l'immeuble
-                  </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <Building2 size={20} color="#0284C7" />
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: '#0369A1', textTransform: 'uppercase' }}>
+                      Composition de l'immeuble / bloc résidentiel
+                    </Text>
+                    <Text style={{ fontSize: 11, color: '#0284C7', marginTop: 2 }}>
+                      Personnalisez le nombre de pièces et le loyer de chaque appartement
+                    </Text>
+                  </View>
                 </View>
 
-                {/* 1. Nombre d'appartements */}
-                <Text style={styles.fieldLabel}>1. Nombre d'appartements *</Text>
+                {/* 1. Nombre total d'appartements */}
+                <Text style={[styles.fieldLabel, { marginTop: 8 }]}>Nombre d'appartements de l'immeuble *</Text>
                 <TextInput
-                  style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#BAE6FD' }]}
+                  style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#BAE6FD', fontWeight: '800' }]}
                   placeholder="Ex: 4"
                   placeholderTextColor="#94A3B8"
                   keyboardType="numeric"
-                  value={immeubleUnitsCount}
-                  onChangeText={setImmeubleUnitsCount}
+                  value={String(immeubleUnits.length)}
+                  onChangeText={handleSetUnitsCount}
                 />
 
-                {/* 2. Nombre de pièces par appartement */}
-                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>2. Nombre de pièces par appartement *</Text>
-                <View style={styles.chipsWrap}>
-                  {['1', '2', '3', '4', '5', '6'].map((nb) => {
-                    const active = immeubleRoomsPerUnit === nb;
-                    return (
-                      <Pressable
-                        key={nb}
-                        onPress={() => setImmeubleRoomsPerUnit(nb)}
-                        style={[styles.chipSmall, active && styles.chipActive]}
-                      >
-                        <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
-                          {nb === '1' ? '1 pièce (Studio)' : `${nb} pièces`}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
+                {/* 2. Loyer de référence par défaut */}
+                <View style={{ marginTop: 10 }}>
+                  <Text style={styles.fieldLabel}>Loyer de référence par défaut (FCFA)</Text>
+                  <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                    <TextInput
+                      style={[styles.input, { flex: 1, backgroundColor: '#FFFFFF', borderColor: '#BAE6FD', fontWeight: '700' }]}
+                      placeholder="Ex: 150000"
+                      placeholderTextColor="#94A3B8"
+                      keyboardType="numeric"
+                      value={immeubleDefaultRent}
+                      onChangeText={(t) => setImmeubleDefaultRent(t.replace(/[^\d]/g, ''))}
+                    />
+                    <Pressable
+                      onPress={handleApplyDefaultRentToAll}
+                      style={{ backgroundColor: '#0284C7', paddingHorizontal: 10, paddingVertical: 12, borderRadius: 10 }}
+                    >
+                      <Text style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '700' }}>Appliquer à tous</Text>
+                    </Pressable>
+                  </View>
                 </View>
 
-                {/* 3. Montant du loyer par appartement */}
-                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>3. Montant du loyer par appartement (FCFA) *</Text>
-                <TextInput
-                  style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#BAE6FD', fontWeight: '800' }]}
-                  placeholder="Ex: 150000"
-                  placeholderTextColor="#94A3B8"
-                  keyboardType="numeric"
-                  value={immeubleRentPerUnit}
-                  onChangeText={(text) => {
-                    const clean = text.replace(/[^\d]/g, '');
-                    setImmeubleRentPerUnit(clean);
-                  }}
-                />
+                {/* 3. Liste détaillée de chaque appartement */}
+                <Text style={[styles.fieldLabel, { marginTop: 16, color: '#0C4A6E', fontWeight: '800' }]}>
+                  Détail par appartement ({immeubleUnits.length}) :
+                </Text>
 
-                {/* Total prévisionnel */}
-                <View style={{ backgroundColor: '#E0F2FE', borderRadius: 12, padding: 12, marginTop: 14 }}>
-                  <Text style={{ fontSize: 11, color: '#0369A1', fontWeight: '700' }}>
-                    💡 Revenu locatif total prévisionnel :
+                {immeubleUnits.map((u, idx) => (
+                  <View key={u.id || idx} style={styles.unitCard}>
+                    {/* En-tête appartement */}
+                    <View style={styles.unitHeaderRow}>
+                      <View style={styles.unitBadge}>
+                        <Text style={styles.unitBadgeText}>Lot #{idx + 1}</Text>
+                      </View>
+                      <TextInput
+                        style={styles.unitLabelInput}
+                        value={u.label}
+                        placeholder={`Appartement ${idx + 1}`}
+                        placeholderTextColor="#94A3B8"
+                        onChangeText={(text) => handleUpdateUnitLabel(idx, text)}
+                      />
+                      {immeubleUnits.length > 1 && (
+                        <Pressable
+                          onPress={() => handleRemoveUnit(idx)}
+                          style={styles.unitDeleteBtn}
+                          hitSlop={8}
+                        >
+                          <Text style={styles.unitDeleteText}>✕ Supprimer</Text>
+                        </Pressable>
+                      )}
+                    </View>
+
+                    {/* Nombre de pièces de cet appartement */}
+                    <Text style={styles.unitFieldTitle}>Nombre de pièces de cet appartement :</Text>
+                    <View style={styles.chipsWrap}>
+                      {[
+                        { r: 1, label: '1p (Studio)' },
+                        { r: 2, label: '2 pièces' },
+                        { r: 3, label: '3 pièces' },
+                        { r: 4, label: '4 pièces' },
+                        { r: 5, label: '5 pièces' },
+                        { r: 6, label: '6+ pièces' },
+                      ].map((item) => {
+                        const active = u.rooms === item.r;
+                        return (
+                          <Pressable
+                            key={item.r}
+                            onPress={() => handleUpdateUnitRooms(idx, item.r)}
+                            style={[styles.chipSmall, active && styles.chipActive]}
+                          >
+                            <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                              {item.label}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+
+                    {/* Loyer de cet appartement */}
+                    <View style={styles.unitRentRow}>
+                      <Text style={styles.unitFieldTitle}>Loyer mensuel de cet appartement (FCFA) :</Text>
+                      <TextInput
+                        style={styles.unitRentInput}
+                        keyboardType="numeric"
+                        value={u.rent ? String(u.rent) : ''}
+                        placeholder="Ex: 150000"
+                        placeholderTextColor="#94A3B8"
+                        onChangeText={(text) => handleUpdateUnitRent(idx, text)}
+                      />
+                    </View>
+                  </View>
+                ))}
+
+                {/* Bouton Ajouter un appartement */}
+                <Pressable style={styles.addUnitBtn} onPress={handleAddUnit}>
+                  <Text style={styles.addUnitBtnText}>➕ Ajouter un appartement supplémentaire</Text>
+                </Pressable>
+
+                {/* Récapitulatif global en direct */}
+                <View style={styles.immeubleSummaryBox}>
+                  <Text style={styles.summaryTitle}>
+                    🏢 Total prévisionnel ({immeubleUnits.length} appartements) :
                   </Text>
-                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#0C4A6E', marginTop: 2 }}>
-                    {fmtFcfa(
-                      (Math.max(1, parseInt(immeubleUnitsCount, 10) || 1)) * 
-                      (parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0)
-                    )} / mois
+                  <Text style={styles.summaryBreakdown}>
+                    Typologies : {(() => {
+                      const breakdown = immeubleUnits.reduce((acc: Record<number, number>, itm) => {
+                        acc[itm.rooms] = (acc[itm.rooms] || 0) + 1;
+                        return acc;
+                      }, {});
+                      return Object.entries(breakdown)
+                        .sort(([a], [b]) => Number(a) - Number(b))
+                        .map(([rms, cnt]) => {
+                          const r = Number(rms);
+                          if (r === 1) return `${cnt} studio${cnt > 1 ? 's' : ''}`;
+                          return `${cnt} de ${r} pièces`;
+                        })
+                        .join(', ') || 'Non spécifié';
+                    })()}
                   </Text>
-                  <Text style={{ fontSize: 10, color: '#0284C7', marginTop: 2 }}>
-                    ({Math.max(1, parseInt(immeubleUnitsCount, 10) || 1)} appartements de {immeubleRoomsPerUnit} pièces à {fmtFcfa(parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0)})
+                  <Text style={styles.summaryRentTotal}>
+                    {fmtFcfa(immeubleUnits.reduce((sum, itm) => sum + (Number(itm.rent) || 0), 0))} / mois
+                  </Text>
+                  <Text style={{ fontSize: 10, color: '#0369A1', marginTop: 2 }}>
+                    Total de {immeubleUnits.reduce((sum, itm) => sum + (Number(itm.rooms) || 0), 0)} pièces ventilées sur les {immeubleUnits.length} lots enfants
                   </Text>
                 </View>
-              </View>
-            ) : (
+              </View>) : (
               propertyType !== 'TERRAIN_URBAIN_NU' && propertyType !== 'TERRAIN_RURAL' && (
                 <>
                   <Text style={styles.fieldLabel}>Nombre de pièces *</Text>
@@ -1287,6 +1438,116 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '700',
+  },
+  unitCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 10,
+    gap: 8,
+  },
+  unitHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  unitBadge: {
+    backgroundColor: '#0284C7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  unitBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  unitLabelInput: {
+    flex: 1,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  unitDeleteBtn: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  unitDeleteText: {
+    fontSize: 11,
+    color: '#DC2626',
+    fontWeight: '700',
+  },
+  unitFieldTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#475569',
+    marginTop: 4,
+  },
+  unitRentRow: {
+    marginTop: 4,
+  },
+  unitRentInput: {
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#0C4A6E',
+    marginTop: 4,
+  },
+  addUnitBtn: {
+    backgroundColor: '#E0F2FE',
+    borderWidth: 1,
+    borderColor: '#7DD3FC',
+    borderStyle: 'dashed',
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  addUnitBtnText: {
+    color: '#0284C7',
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  immeubleSummaryBox: {
+    backgroundColor: '#E0F2FE',
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#BAE6FD',
+  },
+  summaryTitle: {
+    fontSize: 12,
+    color: '#0369A1',
+    fontWeight: '800',
+  },
+  summaryBreakdown: {
+    fontSize: 11,
+    color: '#0284C7',
+    fontWeight: '600',
+    marginTop: 3,
+  },
+  summaryRentTotal: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#0C4A6E',
+    marginTop: 4,
   },
   geoStatusText: {
     fontSize: 11,
