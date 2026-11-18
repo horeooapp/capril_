@@ -19,6 +19,8 @@
     },
     "android": {
       "package": "ci.qapril.agence",
+      "allowBackup": false,
+      "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "../proprietaire/assets/logo-qapril.png",
         "backgroundColor": "#1F2A44"

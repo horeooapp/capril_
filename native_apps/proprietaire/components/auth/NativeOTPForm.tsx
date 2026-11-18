@@ -82,7 +82,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                     setDetectedClipboardCode(foundCode);
 
                     if (autoSubmit && (!otp || otp !== foundCode) && !isPending) {
-                        console.log('[OTP AUTO-FILL] Code détecté depuis le presse-papiers:', foundCode);
+                        console.log('[OTP AUTO-FILL] Code détecté depuis le presse-papiers: ******');
                         setOtp(foundCode);
                         handleVerifyOTP(foundCode);
                     }
@@ -124,7 +124,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                 const fullText = `${title} ${body}`;
                 const match = fullText.match(/\b\d{6}\b/) || fullText.match(/\d{6}/);
                 if (match && match[0]) {
-                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté depuis notification:', match[0]);
+                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté depuis notification: ******');
                     setOtp(match[0]);
                     handleVerifyOTP(match[0]);
                 }
@@ -136,7 +136,7 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
                 const fullText = `${title} ${body}`;
                 const match = fullText.match(/\b\d{6}\b/) || fullText.match(/\d{6}/);
                 if (match && match[0]) {
-                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté au clic notification:', match[0]);
+                    console.log('[OTP AUTO-RETRIEVAL] Code intercepté au clic notification: ******');
                     setOtp(match[0]);
                     handleVerifyOTP(match[0]);
                 }
@@ -305,50 +305,21 @@ export default function NativeOTPForm({ role, profile = 'proprietaire' }: Native
 
     const handleSocialAuth = async (provider: 'google' | 'facebook') => {
         const trimmedEmail = emailAddress.trim().toLowerCase();
-        if (!trimmedEmail || !trimmedEmail.includes('@')) {
+        if (trimmedEmail && trimmedEmail.includes('@')) {
             setFeedback({
                 type: 'info',
-                text: `Renseignez votre e-mail dans l'onglet E-mail pour continuer avec ${provider === 'google' ? 'Google' : 'Facebook'}.`
+                text: `Pour votre sécurité, nous vous envoyons un code de vérification à ${trimmedEmail}.`
             });
             setLoginType('EMAIL');
-            return;
-        }
-
-        setIsPending(true);
-        setFeedback(null);
-        try {
-            const response = await fetch(`${API_URL}/auth/oauth`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    provider,
-                    email: trimmedEmail,
-                    role: role || 'LANDLORD',
-                    name: trimmedEmail.split('@')[0],
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success && result.token) {
-                await setStoredToken(result.token);
-                if (profile) await setStoredProfile(profile);
-                registerForPushNotificationsAsync().catch(console.error);
-                router.replace({ pathname: '/(tabs)', params: profile ? { profile } : undefined } as any);
-            } else {
-                setFeedback({
-                    type: 'error',
-                    text: result.error || `Erreur d'authentification ${provider}`
-                });
-            }
-        } catch (err: any) {
+            await handleRequestOTP();
+        } else {
             setFeedback({
-                type: 'error',
-                text: 'Connexion réseau impossible.'
+                type: 'info',
+                text: `Sélectionnez l'onglet E-mail ou WhatsApp pour recevoir un code de vérification sécurisé.`
             });
-        } finally {
-            setIsPending(false);
+            setLoginType('EMAIL');
         }
+    };
     };
 
     // RÉCEPTION ET AUTO-SOUMISSION INSTANTANÉE DU CODE (0-TAP)

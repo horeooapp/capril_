@@ -24,6 +24,8 @@
     },
     "android": {
       "package": "ci.qapril.proprietaire",
+      "allowBackup": false,
+      "usesCleartextTraffic": false,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo-qapril.png",

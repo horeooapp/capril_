@@ -24,6 +24,8 @@
     },
     "android": {
       "package": "ci.qapril.locataire",
+      "allowBackup": false,
+      "usesCleartextTraffic": false,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",

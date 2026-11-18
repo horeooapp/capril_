@@ -2,10 +2,48 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { signMobileToken } from "@/lib/mobile-auth";
 
+/**
+ * Valide un id_token Google auprès de l'API de vérification Google
+ */
+async function verifyGoogleIdToken(idToken: string): Promise<{ email: string; email_verified: boolean; name?: string } | null> {
+  try {
+    const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.email && (data.email_verified === "true" || data.email_verified === true)) {
+      return {
+        email: data.email,
+        email_verified: true,
+        name: data.name || data.given_name,
+      };
+    }
+  } catch (e) {
+    console.error("[OAuth Security] Erreur validation jeton Google:", e);
+  }
+  return null;
+}
+
+/**
+ * Valide un access_token Facebook auprès de l'API Graph Facebook
+ */
+async function verifyFacebookAccessToken(accessToken: string): Promise<{ email?: string; name?: string } | null> {
+  try {
+    const res = await fetch(`https://graph.facebook.com/me?fields=id,name,email&access_token=${encodeURIComponent(accessToken)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.email) {
+      return { email: data.email, name: data.name };
+    }
+  } catch (e) {
+    console.error("[OAuth Security] Erreur validation jeton Facebook:", e);
+  }
+  return null;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { provider, email, name, providerAccountId, role, avatarUrl } = body;
+    const { provider, idToken, accessToken, providerAccountId, role, avatarUrl } = body;
 
     if (!provider || !["google", "facebook"].includes(provider.toLowerCase())) {
       return NextResponse.json(
@@ -14,24 +52,61 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    const normalizedProvider = provider.toLowerCase().trim();
+    let verifiedEmail: string | null = null;
+    let verifiedName: string | null = body.name || null;
+
+    // 1. Validation cryptographique obligatoire du jeton d'authentification tiers
+    if (normalizedProvider === "google") {
+      if (!idToken) {
+        return NextResponse.json(
+          { error: "Jeton Google OAuth (idToken) obligatoire pour une connexion sécurisée." },
+          { status: 401 }
+        );
+      }
+      const googleData = await verifyGoogleIdToken(idToken);
+      if (!googleData || !googleData.email) {
+        return NextResponse.json(
+          { error: "Jeton Google invalide ou expiré." },
+          { status: 401 }
+        );
+      }
+      verifiedEmail = googleData.email.toLowerCase().trim();
+      verifiedName = googleData.name || verifiedName;
+    } else if (normalizedProvider === "facebook") {
+      if (!accessToken) {
+        return NextResponse.json(
+          { error: "Jeton Facebook OAuth (accessToken) obligatoire pour une connexion sécurisée." },
+          { status: 401 }
+        );
+      }
+      const fbData = await verifyFacebookAccessToken(accessToken);
+      if (!fbData || !fbData.email) {
+        return NextResponse.json(
+          { error: "Jeton Facebook invalide ou adresse email non autorisée." },
+          { status: 401 }
+        );
+      }
+      verifiedEmail = fbData.email.toLowerCase().trim();
+      verifiedName = fbData.name || verifiedName;
+    }
+
+    if (!verifiedEmail) {
       return NextResponse.json(
-        { error: "Une adresse email valide est requise pour l'authentification sociale" },
-        { status: 400 }
+        { error: "Impossible de valider l'identité avec le fournisseur social." },
+        { status: 401 }
       );
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const normalizedProvider = provider.toLowerCase().trim();
-    const targetAccountId = providerAccountId || `${normalizedProvider}_${Buffer.from(normalizedEmail).toString("base64")}`;
+    const targetAccountId = providerAccountId || `${normalizedProvider}_${Buffer.from(verifiedEmail).toString("base64")}`;
 
-    // Rôle cible
+    // Rôle cible (restriction stricte : pas d'ADMIN ou SUPER_ADMIN par OAuth)
     const isLandlordRole = ["LANDLORD", "PROPRIETAIRE", "BAILLEUR"].includes(String(role).toUpperCase());
     const targetRole = isLandlordRole ? "LANDLORD" : "TENANT";
 
-    // 1. Recherche de l'utilisateur par email
+    // 2. Recherche de l'utilisateur par l'email vérifié
     let user = await prisma.user.findFirst({
-      where: { email: normalizedEmail },
+      where: { email: verifiedEmail },
       include: { accounts: true }
     });
 
@@ -52,7 +127,6 @@ export async function POST(request: Request) {
         }).catch(err => console.warn("[OAuth link warning]:", err?.message));
       }
 
-      // Si le rôle de l'utilisateur n'est pas encore défini ou profil incomplet
       if (avatarUrl && !user.avatarUrl) {
         await prisma.user.update({
           where: { id: user.id },
@@ -60,15 +134,15 @@ export async function POST(request: Request) {
         }).catch(() => null);
       }
     } else {
-      // 2. Création automatique de l'utilisateur
-      const rawName = name || normalizedEmail.split("@")[0] || "Utilisateur QAPRIL";
+      // 3. Création automatique de l'utilisateur avec email cryptographiquement vérifié
+      const rawName = verifiedName || verifiedEmail.split("@")[0] || "Utilisateur QAPRIL";
       const parts = rawName.trim().split(/\s+/);
       const firstName = parts[0] || "Utilisateur";
       const lastName = parts.slice(1).join(" ") || "";
 
       user = await prisma.user.create({
         data: {
-          email: normalizedEmail,
+          email: verifiedEmail,
           firstName,
           lastName,
           avatarUrl: avatarUrl || null,
@@ -89,7 +163,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Génération du JWT mobile
+    // 4. Génération du JWT mobile
     const token = await signMobileToken({
       userId: user.id,
       email: user.email!,

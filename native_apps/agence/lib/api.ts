@@ -30,11 +30,11 @@ export async function setStoredToken(token: string): Promise<void> {
             await AsyncStorage.setItem('userToken', token);
             return;
         }
-        await SecureStore.setItemAsync('userToken', token);
-    } catch {
-        try {
-            await AsyncStorage.setItem('userToken', token);
-        } catch {}
+        await SecureStore.setItemAsync('userToken', token, {
+            keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+        });
+    } catch (e) {
+        console.warn('[Security] Erreur écriture SecureStore:', e);
     }
 }
 
@@ -108,11 +108,16 @@ export async function fetchWithAuth(endpoint: string, options: RequestInit = {})
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const targetUrl = endpoint.startsWith('http')
+    let targetUrl = endpoint.startsWith('http')
         ? endpoint
         : endpoint.startsWith('/api/')
             ? `${API_URL.replace(/\/api\/mobile$/, '')}${endpoint}`
             : `${API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+    // Forcer le chiffrement TLS/HTTPS en production pour protéger les jetons d'authentification
+    if (targetUrl.startsWith('http://') && !targetUrl.includes('localhost') && !targetUrl.includes('127.0.0.1')) {
+        targetUrl = targetUrl.replace('http://', 'https://');
+    }
 
     try {
         const response = await fetch(targetUrl, {
