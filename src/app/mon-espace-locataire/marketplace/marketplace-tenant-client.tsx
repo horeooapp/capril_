@@ -478,7 +478,7 @@ export default function MarketplaceTenantClient({ initialAnnonces }: { initialAn
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {displayedAnnonces.map((annonce) => {
                         const logement = annonce.logement || {}
-                        const isLoue = annonce.statut === "LOUE" || logement.status === "RENTED" || (logement.leases && logement.leases.some((l: any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status)))
+                        const isLoue = annonce.statut === "LOUEE" || annonce.statut === "LOUE" || logement.status === "RENTED" || (logement.leases && logement.leases.some((l: any) => ['ACTIVE', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status)))
                         const rentPrice = Number(annonce.loyerDemande || logement.declaredRentFcfa || 0)
 
                         return (

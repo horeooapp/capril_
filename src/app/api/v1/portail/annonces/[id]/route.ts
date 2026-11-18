@@ -23,7 +23,7 @@ export async function GET(
       where: { id },
       include: {
         logement: true,
-        agence: {
+        publiePar: {
           select: {
             id: true,
             firstName: true,
@@ -79,9 +79,10 @@ export async function GET(
 
     // RG-PORT-05 / RG-CONF-01 : Confidentialité absolue de l'identité du propriétaire.
     // Seule l'agence agréée est l'interlocuteur visible.
-    const agenceNom = `${annonce.agence?.firstName || ""} ${annonce.agence?.lastName || ""}`.trim() || "Agence Partenaire QAPRIL";
-    const contactWhatsapp = annonce.agence?.phone
-      ? `https://wa.me/${annonce.agence.phone.replace(/[^0-9]/g, "")}?text=Bonjour,%20je%20suis%20intéressé%20par%20l'annonce%20${encodeURIComponent(annonce.titre)}%20(Réf:%20${annonce.id})`
+    const agenceUser = (annonce as any).publiePar || (annonce as any).agence;
+    const agenceNom = `${agenceUser?.firstName || ""} ${agenceUser?.lastName || ""}`.trim() || "Agence Partenaire QAPRIL";
+    const contactWhatsapp = agenceUser?.phone
+      ? `https://wa.me/${agenceUser.phone.replace(/[^0-9]/g, "")}?text=Bonjour,%20je%20suis%20intéressé%20par%20l'annonce%20${encodeURIComponent(annonce.titre)}%20(Réf:%20${annonce.id})`
       : null;
 
     const data = {
@@ -105,19 +106,19 @@ export async function GET(
       nb_pieces: annonce.logement?.rooms || null,
       photos_urls: annonce.photosUrls || [],
       tags,
-      label_confiance: annonce.agence?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
+      label_confiance: agenceUser?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
       proprietaire_verifie: true, // Garanti par le socle d'onboarding QAPRIL (Bail réel / Titre foncier)
       historique_prix: historiquePrix,
       agence: {
-        id: annonce.agence?.id,
+        id: agenceUser?.id,
         nom: agenceNom,
-        agreee: Boolean(annonce.agence?.companyRegNumber || annonce.agence?.isCertified),
-        numero_agrement: annonce.agence?.companyRegNumber || "Agrément CPRAIMA-CI",
-        contact_telephone: annonce.agence?.phone || "+225 00 00 00 00 00",
-        contact_email: annonce.agence?.email || "contact@qapril.ci",
+        agreee: Boolean(agenceUser?.companyRegNumber || agenceUser?.isCertified),
+        numero_agrement: agenceUser?.companyRegNumber || "Agrément CPRAIMA-CI",
+        contact_telephone: agenceUser?.phone || "+225 00 00 00 00 00",
+        contact_email: agenceUser?.email || "contact@qapril.ci",
         contact_whatsapp: contactWhatsapp
       },
-      publiee_at: annonce.publieeAt || annonce.createdAt || null,
+      publiee_at: annonce.publieeAt || (annonce as any).createdAt || null,
       vues: (annonce.nbVisites || 0) + 1
     };
 

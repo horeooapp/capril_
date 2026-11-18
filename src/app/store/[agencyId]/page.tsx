@@ -14,7 +14,7 @@ export default async function StorefrontPage({ params }: { params: Promise<{ age
         agency = await prisma.user.findUnique({ where: { id: agencyId } });
         if (!agency) return notFound();
         annonces = await prisma.annonce.findMany({
-            where: { agenceId: agencyId, statut: "ACTIVE" },
+            where: { publieParId: agencyId, statut: "PUBLIEE" },
             include: { logement: true }
         });
     } else {

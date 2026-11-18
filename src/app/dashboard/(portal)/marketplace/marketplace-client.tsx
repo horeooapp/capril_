@@ -14,18 +14,18 @@ export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }
     const [isPending, startTransition] = useTransition()
     const router = useRouter()
 
-    const activesCount = listings.filter(l => l.statut === "ACTIVE").length
+    const activesCount = listings.filter(l => l.statut === "ACTIVE" || l.statut === "PUBLIEE").length
     const totalViews = listings.reduce((acc, l) => acc + (l.nbVisites || 0), 0)
 
     const handlePublish = (id: string, currentStatus: string) => {
-        if (currentStatus === "ACTIVE") return toast.info("Cette annonce est déjà en ligne.");
+        if (currentStatus === "ACTIVE" || currentStatus === "PUBLIEE") return toast.info("Cette annonce est déjà en ligne.");
 
         startTransition(async () => {
              const res = await publishAnnonce(id)
              if (res.error) toast.error(res.error)
              else {
                  toast.success("Annonce publiée sur QAPRIL Store avec succès.")
-                 setListings(prev => prev.map(l => l.id === id ? { ...l, statut: "ACTIVE" } : l))
+                 setListings(prev => prev.map(l => l.id === id ? { ...l, statut: "PUBLIEE" } : l))
              }
         })
     }
@@ -100,14 +100,14 @@ export default function MarketplaceDashboardClient({ initialAnnonces, agencyId }
                                         </div>
                                     </td>
                                     <td className="p-4">
-                                        {l.statut === 'ACTIVE' ? (
+                                        {(l.statut === 'ACTIVE' || l.statut === 'PUBLIEE') ? (
                                             <Badge color="emerald">En Ligne</Badge>
                                         ) : (
                                             <Badge color="gray">Brouillon</Badge>
                                         )}
                                     </td>
                                     <td className="p-4 text-right w-[150px]">
-                                        {l.statut !== 'ACTIVE' ? (
+                                        {(l.statut !== 'ACTIVE' && l.statut !== 'PUBLIEE') ? (
                                              <button 
                                                 onClick={(e) => { e.stopPropagation(); handlePublish(l.id, l.statut); }}
                                                 disabled={isPending}

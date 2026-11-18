@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // Construction de la clause where
     const whereClause: any = {
-      statut: { in: ["ACTIVE", "PUBLIEE", "active"] },
+      statut: "PUBLIEE",
       logement: {
         deletedAt: null,
         gpsLatitude: { gte: minLat, lte: maxLat },
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       where: whereClause,
       include: {
         logement: true,
-        agence: {
+        publiePar: {
           select: { id: true, firstName: true, lastName: true, companyRegNumber: true }
         }
       },

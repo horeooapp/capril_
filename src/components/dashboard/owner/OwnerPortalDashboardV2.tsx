@@ -53,7 +53,7 @@ export function OwnerPortalDashboardV2({
           unites: []
         };
       }
-      const isOnline = p.annonces?.some((a: any) => a.statut === "ACTIVE") || false;
+      const isOnline = p.annonces?.some((a: any) => a.statut === "PUBLIEE" || a.statut === "ACTIVE") || false;
       acc[key].unites.push({
         ...p, 
         isOnline,

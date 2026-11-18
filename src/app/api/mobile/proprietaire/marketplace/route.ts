@@ -24,20 +24,23 @@ export async function GET(request: Request) {
         const skip   = (page - 1) * limit;
 
         const where: any = {
-            property: {
+            logement: {
                 OR: [
                     { ownerUserId: user.userId },
                     { landlordId: user.userId },
                 ],
             },
         };
-        if (status) where.status = status;
+        if (status) {
+            const mappedStatut = status === 'ACTIVE' ? 'PUBLIEE' : status === 'CLOSED' ? 'RETIREE' : status === 'SUSPENDED' ? 'SUSPENDUE' : status;
+            where.statut = mappedStatut;
+        }
 
         const [annonces, total] = await Promise.all([
             prisma.annonce.findMany({
                 where,
                 include: {
-                    property: {
+                    logement: {
                         select: {
                             id:           true,
                             name:         true,
@@ -50,7 +53,7 @@ export async function GET(request: Request) {
                         },
                     },
                 },
-                orderBy: { createdAt: 'desc' },
+                orderBy: { publieeAt: 'desc' },
                 skip,
                 take: limit,
             }),
@@ -59,23 +62,23 @@ export async function GET(request: Request) {
 
         const formatted = annonces.map(a => ({
             id:            a.id,
-            title:         a.title,
-            description:   (a as any).description ?? null,
-            price:         Number(a.price ?? 0),
-            status:        a.status,
-            createdAt:     (a as any).createdAt?.toISOString() ?? null,
-            contactPhone:  (a as any).contactPhone ?? null,
-            availableFrom: (a as any).availableFrom?.toISOString() ?? null,
-            viewCount:     (a as any).viewCount ?? 0,
+            title:         a.titre,
+            description:   a.description ?? null,
+            price:         Number(a.loyerDemande ?? 0),
+            status:        a.statut === 'PUBLIEE' ? 'ACTIVE' : a.statut === 'LOUEE' ? 'CLOSED' : a.statut,
+            createdAt:     a.publieeAt?.toISOString() ?? null,
+            contactPhone:  null,
+            availableFrom: a.disponibleLe?.toISOString() ?? null,
+            viewCount:     a.nbVisites ?? 0,
             property: {
-                id:           a.property?.id,
-                name:         a.property?.name,
-                address:      a.property?.address,
-                commune:      a.property?.commune,
-                propertyCode: a.property?.propertyCode,
-                propertyType: a.property?.propertyType,
-                superficieM2: a.property?.superficieM2 ? Number(a.property.superficieM2) : null,
-                imageUrl:     a.property?.images?.[0]?.s3Key ?? null,
+                id:           a.logement?.id,
+                name:         a.logement?.name,
+                address:      a.logement?.address,
+                commune:      a.logement?.commune,
+                propertyCode: a.logement?.propertyCode,
+                propertyType: a.logement?.propertyType,
+                superficieM2: a.logement?.superficieM2 ? Number(a.logement.superficieM2) : null,
+                imageUrl:     a.logement?.images?.[0]?.s3Key ?? null,
             },
             currency: 'XOF',
         }));
@@ -128,20 +131,22 @@ export async function POST(request: Request) {
 
         // Désactiver les annonces précédentes du même bien
         await prisma.annonce.updateMany({
-            where: { propertyId, status: 'ACTIVE' },
-            data:  { status: 'CLOSED' },
+            where: { logementId: propertyId, statut: 'PUBLIEE' },
+            data:  { statut: 'RETIREE', archiveeAt: new Date() },
         });
 
         const annonce = await prisma.annonce.create({
             data: {
-                propertyId,
-                title,
-                price:        Number(price),
-                status:       'ACTIVE',
-                description:  description ?? null,
-                contactPhone: contactPhone ?? null,
-                availableFrom: availableFrom ? new Date(availableFrom) : null,
-            } as any,
+                logementId:   propertyId,
+                publieParId:  user.userId,
+                publieParRole: 'BAILLEUR',
+                titre:        title,
+                loyerDemande: Number(price),
+                statut:       'PUBLIEE',
+                publieeAt:    new Date(),
+                description:  description ?? '',
+                disponibleLe: availableFrom ? new Date(availableFrom) : null,
+            },
         });
 
         return NextResponse.json({

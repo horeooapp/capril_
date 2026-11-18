@@ -39,9 +39,9 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
     const skip = (page - 1) * limit;
 
-    // Construction de la clause WHERE (statut PUBLIEE ou ACTIVE)
+    // Construction de la clause WHERE (statut PUBLIEE)
     const whereClause: any = {
-      statut: { in: ["ACTIVE", "PUBLIEE", "active", "publiee"] },
+      statut: "PUBLIEE",
       logement: {
         deletedAt: null
       }
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
         where: whereClause,
         include: {
           logement: true,
-          agence: {
+          publiePar: {
             select: {
               id: true,
               firstName: true,
@@ -155,7 +155,7 @@ export async function GET(req: NextRequest) {
           where: whereClause,
           include: {
             logement: true,
-            agence: {
+            publiePar: {
               select: {
                 id: true,
                 firstName: true,
@@ -183,6 +183,7 @@ export async function GET(req: NextRequest) {
         prixPrecedent = Number((a.criteres as any).prix_precedent);
       }
 
+      const userAgence = a.publiePar || a.agence;
       return {
         annonce_id: a.id,
         titre: a.titre,
@@ -198,11 +199,11 @@ export async function GET(req: NextRequest) {
         surface_m2: a.logement?.areaSurface || null,
         photos_urls: a.photosUrls || [],
         tags,
-        label_confiance: a.agence?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
+        label_confiance: userAgence?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
         agence: {
-          id: a.agence?.id,
-          nom: `${a.agence?.firstName || ""} ${a.agence?.lastName || ""}`.trim() || "Agence QAPRIL",
-          agreee: Boolean(a.agence?.companyRegNumber || a.agence?.isCertified)
+          id: userAgence?.id,
+          nom: `${userAgence?.firstName || ""} ${userAgence?.lastName || ""}`.trim() || "Agence QAPRIL",
+          agreee: Boolean(userAgence?.companyRegNumber || userAgence?.isCertified)
         },
         publiee_at: a.publieeAt || null,
         vues: a.nbVisites || 0

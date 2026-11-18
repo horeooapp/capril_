@@ -187,7 +187,7 @@ export async function executerRechercheHybride(
 
   // Étape 2 : Construction de la requête Prisma (filtres)
   const whereClause: any = {
-    statut: { in: ["ACTIVE", "PUBLIEE", "active"] },
+    statut: "PUBLIEE",
     logement: {
       deletedAt: null
     }
@@ -238,7 +238,7 @@ export async function executerRechercheHybride(
       where: whereClause,
       include: {
         logement: true,
-        agence: {
+        publiePar: {
           select: { id: true, firstName: true, lastName: true, companyRegNumber: true }
         }
       },
@@ -272,7 +272,7 @@ export async function executerRechercheHybride(
       if (now - pubTime < 86400000 * 3) {
         tags.push("NOUVEAU");
       }
-      if (a.agence?.companyRegNumber) {
+      if ((a.publiePar || a.agence)?.companyRegNumber) {
         tags.push("AGENCE_AGREEE");
       }
 

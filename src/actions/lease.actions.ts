@@ -247,7 +247,7 @@ export async function createLease(data: {
         await prisma.annonce.updateMany({
             where: { logementId: data.propertyId },
             data: {
-                statut: "LOUE",
+                statut: "LOUEE",
                 archiveeAt: new Date()
             }
         });

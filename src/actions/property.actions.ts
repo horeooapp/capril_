@@ -644,7 +644,7 @@ export async function supprimerBien(propertyId: string) {
       // Désactiver toutes les annonces
       await tx.annonce.updateMany({
         where: { logementId: propertyId },
-        data: { statut: "ARCHIVEE", archiveeAt: new Date() }
+        data: { statut: "RETIREE", archiveeAt: new Date() }
       });
 
       // Supprimer ou archiver les unités enfants si structure parente
@@ -652,7 +652,7 @@ export async function supprimerBien(propertyId: string) {
         for (const unit of property.units) {
           await tx.annonce.updateMany({
             where: { logementId: unit.id },
-            data: { statut: "ARCHIVEE", archiveeAt: new Date() }
+            data: { statut: "RETIREE", archiveeAt: new Date() }
           });
           await tx.property.update({
             where: { id: unit.id },

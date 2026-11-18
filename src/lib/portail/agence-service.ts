@@ -119,7 +119,7 @@ export async function publierAnnonceAgence(agenceId: string, input: AnnoncePubli
   const annonceExistante = await prisma.annonce.findFirst({
     where: {
       logementId: input.logementId,
-      statut: { in: ["ACTIVE", "PUBLIEE", "active", "SOUS_OPTION"] }
+      statut: "PUBLIEE"
     }
   });
 
@@ -156,7 +156,7 @@ export async function publierAnnonceAgence(agenceId: string, input: AnnoncePubli
   return await prisma.annonce.create({
     data: {
       logementId: input.logementId,
-      agenceId: agenceId,
+      publieParId: agenceId,
       titre: input.titre,
       description: input.description,
       loyerDemande: input.loyerDemande,
@@ -175,7 +175,7 @@ export async function publierAnnonceAgence(agenceId: string, input: AnnoncePubli
  */
 export async function getDashboardAgence(agenceId: string) {
   const annonces = await prisma.annonce.findMany({
-    where: { agenceId },
+    where: { publieParId: agenceId },
     include: {
       logement: {
         select: { propertyCode: true, propertyType: true, commune: true, address: true }

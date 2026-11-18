@@ -45,7 +45,7 @@ export async function getDashboardAgence(agenceUserId: string) {
     }),
     // Annonces actives
     prisma.annonce.findMany({
-      where: { agenceId: agenceUserId, statut: "ACTIVE" },
+      where: { publieParId: agenceUserId, statut: "PUBLIEE" },
       include: { logement: { select: { commune: true, address: true } } },
       take: 10
     })

@@ -13,16 +13,16 @@ export async function GET(req: NextRequest) {
     // 1. Récupération des statistiques réelles en base de données
     const [biensCount, agencesCount, vedettesRaw] = await Promise.all([
       prisma.annonce.count({
-        where: { statut: { in: ["ACTIVE", "PUBLIEE", "active", "publiee"] }, logement: { deletedAt: null } }
+        where: { statut: "PUBLIEE", logement: { deletedAt: null } }
       }),
       prisma.user.count({
         where: { role: "AGENCY", OR: [{ companyRegNumber: { not: null } }, { isCertified: true }] }
       }),
       prisma.annonce.findMany({
-        where: { statut: { in: ["ACTIVE", "PUBLIEE", "active", "publiee"] }, logement: { deletedAt: null } },
+        where: { statut: "PUBLIEE", logement: { deletedAt: null } },
         include: {
           logement: true,
-          agence: {
+          publiePar: {
             select: { id: true, firstName: true, lastName: true, companyRegNumber: true, isCertified: true }
           }
         },
@@ -34,6 +34,7 @@ export async function GET(req: NextRequest) {
     // Formatage des annonces en vedette (Bloc 3 de la Table 20)
     const vedettes = vedettesRaw.map((a: any) => {
       const tags = calculerTagsDynamiques(a);
+      const agenceUser = a.publiePar || a.agence;
       return {
         annonce_id: a.id,
         titre: a.titre,
@@ -45,8 +46,8 @@ export async function GET(req: NextRequest) {
         nb_pieces: a.logement?.rooms || null,
         photos_urls: a.photosUrls || [],
         tags,
-        label_confiance: a.agence?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
-        agence_nom: `${a.agence?.firstName || ""} ${a.agence?.lastName || ""}`.trim() || "Agence QAPRIL",
+        label_confiance: agenceUser?.companyRegNumber ? "AGENCE_AGREEE_CPRAIMA_CI" : "BIEN_VERIFIE",
+        agence_nom: `${agenceUser?.firstName || ""} ${agenceUser?.lastName || ""}`.trim() || "Agence QAPRIL",
         publiee_at: a.publieeAt || a.createdAt || null
       };
     });

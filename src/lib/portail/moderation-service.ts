@@ -49,9 +49,9 @@ export async function signalerAnnonce(input: SignalementInput) {
   let nouveauStatut = annonce.statut;
   let motifSuspension = undefined;
 
-  // RG-MOD-01 : Au-delà du seuil, bascule automatique en SUSPUNDEE
-  if (newCount >= SEUIL_SIGNALEMENTS_AUTO_SUSPENSION && (annonce.statut === "ACTIVE" || annonce.statut === "PUBLIEE")) {
-    nouveauStatut = "SUSPUNDEE";
+  // RG-MOD-01 : Au-delà du seuil, bascule automatique en SUSPENDUE
+  if (newCount >= SEUIL_SIGNALEMENTS_AUTO_SUSPENSION && (annonce.statut === "PUBLIEE" || (annonce.statut as string) === "ACTIVE")) {
+    nouveauStatut = "SUSPENDUE";
     motifSuspension = `Suspension automatique suite à ${newCount} signalements citoyens (RG-MOD-01).`;
     
     // Log de garde-fous pour traçabilité agence (RG-MOD-02)
@@ -105,7 +105,7 @@ export async function verrouillerAnnonceApresLocation(logementId: string, motif:
   const annonceActive = await prisma.annonce.findFirst({
     where: {
       logementId,
-      statut: { in: ["ACTIVE", "PUBLIEE", "active", "SOUS_OPTION"] }
+      statut: "PUBLIEE"
     }
   });
 
@@ -113,7 +113,7 @@ export async function verrouillerAnnonceApresLocation(logementId: string, motif:
     return { verrouille: false, message: "Aucune annonce active sur ce logement." };
   }
 
-  const nouveauStatut = motif === "BAIL_SIGNE" ? "LOUEE" : "SOUS_OPTION";
+  const nouveauStatut = motif === "BAIL_SIGNE" ? "LOUEE" : "SUSPENDUE";
   const diffusions: any = annonceActive.diffusions || {};
 
   const updated = await prisma.annonce.update({

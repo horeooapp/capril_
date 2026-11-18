@@ -12,7 +12,7 @@ export async function getMarketplaceAnnonces() {
 
     try {
         const data = await prisma.annonce.findMany({
-            where: { agenceId: session.user.id },
+            where: { publieParId: session.user.id },
             include: { logement: true },
             orderBy: { publieeAt: 'desc' }
         })
@@ -61,7 +61,7 @@ export async function publishAnnonce(annonceId: string) {
         await prisma.annonce.update({
             where: { id: annonceId },
             data: { 
-                statut: "ACTIVE",
+                statut: "PUBLIEE",
                 publieeAt: new Date()
             }
         })
@@ -141,7 +141,7 @@ export async function createAnnonce(data: { logementId: string, titre: string, d
         const rep = await prisma.annonce.create({
             data: {
                 ...data,
-                agenceId: session.user.id,
+                publieParId: session.user.id,
                 statut: "BROUILLON"
             }
         })
@@ -181,7 +181,7 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
                 await prisma.annonce.update({
                     where: { id: existingAnnonce.id },
                     data: { 
-                        statut: "ACTIVE", 
+                        statut: "PUBLIEE", 
                         publieeAt: new Date(),
                         ...(propertyPhotos.length > 0 && (!existingAnnonce.photosUrls || existingAnnonce.photosUrls.length === 0) 
                             ? { photosUrls: propertyPhotos } 
@@ -192,12 +192,12 @@ export async function togglePropertyMarketplaceStatus(propertyId: string, isOnli
                 await prisma.annonce.create({
                     data: {
                         logementId: property.id,
-                        agenceId: session.user.id,
+                        publieParId: session.user.id,
                         titre: property.name || `Logement ${property.propertyType || ''} à ${property.commune || 'Abidjan'}`.trim(),
                         description: `Superbe logement idéalement situé à ${property.commune || 'Abidjan'} avec ${property.rooms || 2} pièces.`,
                         loyerDemande: property.declaredRentFcfa || (property.leases?.[0]?.rentAmount ? Number(property.leases[0].rentAmount) : 150000),
                         photosUrls: propertyPhotos,
-                        statut: "ACTIVE",
+                        statut: "PUBLIEE",
                         publieeAt: new Date()
                     }
                 })
@@ -239,7 +239,7 @@ export async function getPublicMarketplaceAnnonces(filters?: {
 }) {
     try {
         const whereClause: any = {
-            statut: { in: ["ACTIVE", "LOUE"] }
+            statut: { in: ["PUBLIEE", "LOUEE"] }
         }
 
         if (filters?.commune && filters.commune !== "Toutes" && filters.commune !== "Toutes les localisations") {
@@ -282,7 +282,7 @@ export async function getPublicMarketplaceAnnonces(filters?: {
                         }
                     }
                 },
-                agence: {
+                publiePar: {
                     select: { firstName: true, lastName: true, phone: true, email: true }
                 }
             },
