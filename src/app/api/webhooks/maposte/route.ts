@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { processMaPosteWebhook } from "@/lib/maposte";
 import { sendSMS } from "@/lib/sms";
 import { prisma } from "@/lib/prisma";
+import { checkWebhookSignature } from "@/lib/security";
 
 /**
  * Part 19.5: MaPoste Inbound Webhook
@@ -9,12 +10,29 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(req: NextRequest) {
     try {
-        const payload = await req.json();
-
-        // Basic signature validation (In production: HMAC check)
+        const rawBody = await req.text();
         const signature = req.headers.get("X-MaPoste-Signature");
-        if (!signature) {
-            return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+        const secret = process.env.MAPOSTE_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+
+        if (secret) {
+            if (!signature) {
+                return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+            }
+            const isValid = await checkWebhookSignature(rawBody, signature, secret);
+            if (!isValid) {
+                return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+            }
+        } else if (process.env.NODE_ENV === "production") {
+            if (!signature) {
+                return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+            }
+        }
+
+        let payload: any;
+        try {
+            payload = JSON.parse(rawBody);
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
         }
 
         const result = await processMaPosteWebhook({

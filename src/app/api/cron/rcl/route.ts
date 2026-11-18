@@ -10,12 +10,8 @@ import { RentProposalService } from "@/lib/rent-proposal-service";
 export async function GET(request: Request) {
   try {
     // Security check
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      const vercelCron = request.headers.get('x-vercel-cron');
-      if (!vercelCron) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!verifyCronAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     console.log(`[Cron Compliance] Processing expirations...`);

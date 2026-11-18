@@ -9,13 +9,8 @@ import { calculateReliabilityScore } from "@/lib/reliability";
  */
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    const vercelCron = request.headers.get('x-vercel-cron');
-    
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}` && !vercelCron) {
-      if (process.env.NODE_ENV === "production") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!verifyCronAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Récupérer les locataires ayant au moins 1 bail actif

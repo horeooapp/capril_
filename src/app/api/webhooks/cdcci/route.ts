@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { CDCDepositStatus } from "@prisma/client";
 import { logAction } from "@/actions/audit";
+import { checkWebhookSignature } from "@/lib/security";
 
 /**
  * Part 10.2: CDC-CI Webhook Receiver
@@ -9,13 +10,31 @@ import { logAction } from "@/actions/audit";
  */
 export async function POST(req: NextRequest) {
     try {
-        const payload = await req.json();
-        const { depositId, cdcReference, status, signature } = payload;
+        const rawBody = await req.text();
+        let payload: any;
+        try {
+            payload = JSON.parse(rawBody);
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+        }
 
-        // 1. Verify Signature (Simulated for v3.0)
-        // In prod, use HMAC-SHA256 with a secret key
-        if (!signature) {
-            return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+        const { depositId, cdcReference, status } = payload;
+        const signature = payload.signature || req.headers.get("x-cdc-signature");
+
+        // 1. Verify Signature
+        const secret = process.env.CDC_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+        if (secret) {
+            if (!signature) {
+                return NextResponse.json({ error: "Missing signature" }, { status: 401 });
+            }
+            const isValid = await checkWebhookSignature(rawBody, signature, secret);
+            if (!isValid) {
+                return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+            }
+        } else if (process.env.NODE_ENV === "production") {
+            if (!signature) {
+                return NextResponse.json({ error: "Missing signature in production" }, { status: 401 });
+            }
         }
 
         // 2. Find the deposit

@@ -84,6 +84,7 @@ export function validateRCCM(rccm: string): boolean {
 
 /**
  * Minimal HMAC signature verification for webhook payloads.
+ * Protects against timing attacks using constant-time comparison.
  * Usage: checkWebhookSignature(rawBody, sig, process.env.WEBHOOK_SECRET!)
  */
 export async function checkWebhookSignature(
@@ -91,15 +92,25 @@ export async function checkWebhookSignature(
     signature: string,
     secret: string
 ): Promise<boolean> {
-    const { createHmac } = await import("crypto");
+    if (!signature || !secret) return false;
+    const { createHmac, timingSafeEqual } = await import("crypto");
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
-    return expected === signature;
+    const cleanSig = signature.trim();
+    if (cleanSig.length !== expected.length) {
+        return false;
+    }
+    try {
+        return timingSafeEqual(Buffer.from(cleanSig, 'utf8'), Buffer.from(expected, 'utf8'));
+    } catch {
+        return false;
+    }
 }
 
 /**
  * Strict authorization check for background CRON endpoints.
  * Requires an explicit Authorization: Bearer <CRON_SECRET> header.
  * Rejects requests if CRON_SECRET is not configured or if there is a mismatch.
+ * Protected against timing side-channel attacks via timingSafeEqual.
  */
 export function verifyCronAuth(request: Request): boolean {
     const cronSecret = process.env.CRON_SECRET;
@@ -109,5 +120,15 @@ export function verifyCronAuth(request: Request): boolean {
     }
     const authHeader = request.headers.get("authorization");
     if (!authHeader) return false;
-    return authHeader.trim() === `Bearer ${cronSecret.trim()}`;
+
+    const expected = `Bearer ${cronSecret.trim()}`;
+    const actual = authHeader.trim();
+    if (actual.length !== expected.length) return false;
+
+    try {
+        const { timingSafeEqual } = require("crypto");
+        return timingSafeEqual(Buffer.from(actual, "utf8"), Buffer.from(expected, "utf8"));
+    } catch {
+        return false;
+    }
 }

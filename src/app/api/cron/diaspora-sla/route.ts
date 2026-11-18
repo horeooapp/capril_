@@ -9,12 +9,8 @@ import { NotificationService } from "@/lib/notification-service";
  */
 export async function GET(request: Request) {
   try {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      const vercelCron = request.headers.get('x-vercel-cron');
-      if (!vercelCron) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    if (!verifyCronAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     console.log("[CRON Diaspora SLA] Exécution...");

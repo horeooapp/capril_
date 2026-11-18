@@ -13,15 +13,34 @@ import crypto from "crypto";
 //   "operator": "WAVE_CI"
 // }
 
+import { checkWebhookSignature } from "@/lib/security";
+
 export async function POST(req: Request) {
     try {
-        const payload = await req.json();
+        const rawBody = await req.text();
+        const signature = req.headers.get("x-webhook-signature") || req.headers.get("x-signature");
+        const secret = process.env.MOBILE_MONEY_SECRET || process.env.WEBHOOK_SECRET;
 
-        // 1. Vérification de la signature (Simulation pour l'Open Banking)
-        // const signature = req.headers.get("x-webhook-signature");
-        // if (!verifySignature(payload, signature, process.env.MOBILE_MONEY_SECRET)) {
-        //     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-        // }
+        // 1. Vérification de la signature cryptographique (Open Banking / Agréateurs Mobile Money)
+        if (secret) {
+            if (!signature) {
+                return NextResponse.json({ error: "Missing webhook signature" }, { status: 401 });
+            }
+            const isValid = await checkWebhookSignature(rawBody, signature, secret);
+            if (!isValid) {
+                return NextResponse.json({ error: "Invalid webhook signature" }, { status: 401 });
+            }
+        } else if (process.env.NODE_ENV === "production") {
+            console.error("[MOBILE_MONEY_WEBHOOK] MOBILE_MONEY_SECRET non configuré en production!");
+            return NextResponse.json({ error: "Configuration de sécurité manquante" }, { status: 500 });
+        }
+
+        let payload: any;
+        try {
+            payload = JSON.parse(rawBody);
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
+        }
 
         const { transaction_id, reference: receiptId, amount, status, operator } = payload;
 
@@ -52,6 +71,12 @@ export async function POST(req: Request) {
 
         if (receipt.status === "PAYE") {
             return NextResponse.json({ message: "Receipt already paid" }, { status: 200 });
+        }
+
+        // Vérification de cohérence du montant encaissé avec la quittance
+        if (amount && Math.abs(Number(amount) - Number(receipt.amount)) > 5) {
+            console.error(`[MOBILE_MONEY_WEBHOOK] Montant incohérent: reçu ${amount}, attendu ${receipt.amount}`);
+            return NextResponse.json({ error: "Montant incohérent avec la quittance" }, { status: 400 });
         }
 
         // 3. Exécuter l'automatisation en transaction (ACID)

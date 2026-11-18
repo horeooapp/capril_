@@ -65,6 +65,18 @@ function parseTenantSmsDeclaration(
  */
 export async function POST(req: NextRequest) {
   try {
+    const secret = process.env.SMS_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    if (secret) {
+      const authHeader = req.headers.get("authorization");
+      const tokenHeader = req.headers.get("x-webhook-secret");
+      let authorized = false;
+      if (authHeader && authHeader.trim() === `Bearer ${secret.trim()}`) authorized = true;
+      if (tokenHeader && tokenHeader.trim() === secret.trim()) authorized = true;
+      if (!authorized && process.env.NODE_ENV === "production") {
+        return NextResponse.json({ error: "Unauthorized SMS webhook" }, { status: 401 });
+      }
+    }
+
     let from = "";
     let text = "";
 
@@ -133,6 +145,8 @@ export async function POST(req: NextRequest) {
     const amount = parsed.amount;
     const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h (ADD-11 Section 3.3)
 
+    const sanitizedSmsBrut = text.replace(/\b(pin|code|mdp|secret)\s*[:=]?\s*\d{4,8}\b/gi, '$1 ****');
+
     const declaration = await prisma.smsDeclaration.create({
       data: {
         leaseId: lease.id,
@@ -140,7 +154,7 @@ export async function POST(req: NextRequest) {
         montantDeclare: amount,
         canal: PaymentCanal.SMS_DECLARATIF,
         statut: DeclStatut.EN_ATTENTE,
-        smsBrut: text,
+        smsBrut: sanitizedSmsBrut,
         expireAt,
       },
     });

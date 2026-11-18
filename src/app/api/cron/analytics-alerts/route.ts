@@ -10,8 +10,7 @@ import { NotificationService } from "@/lib/notification-service";
  * Daily scan of the portfolio to detect and notify critical risks.
  */
 export async function GET(request: Request) {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!verifyCronAuth(request)) {
         return new Response('Unauthorized', { status: 401 });
     }
 

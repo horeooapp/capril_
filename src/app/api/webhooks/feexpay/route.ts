@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { PaymentGateway } from "@/lib/pgw/gateway";
+import { auth } from "@/auth";
 
 /**
  * Webhook FeexPay — Notifications de transaction (Payin)
@@ -32,6 +33,7 @@ export async function POST(request: NextRequest) {
     if (paymentId) {
       payment = await (prisma as any).paymentPgw.findUnique({
         where: { id: paymentId },
+        include: { lease: true },
       });
       if (!payment) {
         payment = await (prisma as any).paymentIntent.findUnique({
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
     if (!payment) {
       payment = await (prisma as any).paymentPgw.findFirst({
         where: { refInterne: reference },
+        include: { lease: true },
       });
     }
 
@@ -72,6 +75,43 @@ export async function POST(request: NextRequest) {
     if (!payment) {
       console.warn(`[Webhook FeexPay] Paiement introuvable pour ref: ${reference} / paymentId: ${paymentId}`);
       return NextResponse.json({ received: true });
+    }
+
+    // Sécurité: Vérification de l'intégrité du montant encaissé
+    if (amount && payment.amount && Math.abs(Number(amount) - Number(payment.amount)) > 5) {
+      console.error(`[Webhook FeexPay] Montant incohérent: reçu ${amount}, attendu ${payment.amount}`);
+      return NextResponse.json({ error: "Montant incohérent avec le paiement initial." }, { status: 400 });
+    }
+
+    // Sécurité: Authentification du webhook FeexPay ou session légitime
+    const webhookToken = request.headers.get("x-feexpay-token") || request.headers.get("x-webhook-secret");
+    const authHeader = request.headers.get("authorization");
+    const expectedSecret = process.env.FEEXPAY_WEBHOOK_SECRET || process.env.FEEXPAY_API_KEY;
+
+    let isAuthorized = false;
+    if (expectedSecret) {
+      if (webhookToken && webhookToken.trim() === expectedSecret.trim()) {
+        isAuthorized = true;
+      } else if (authHeader && authHeader.trim() === `Bearer ${expectedSecret.trim()}`) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      // Vérifier si l'appel provient d'un utilisateur connecté légitime (contexte de paiement web)
+      const session = await auth();
+      const currentUserId = session?.user?.id;
+      const payerId = payment.payeurId || payment.lease?.tenantId;
+      const landlordId = payment.beneficiaireId || payment.lease?.landlordId;
+
+      if (currentUserId && (currentUserId === payerId || currentUserId === landlordId || session?.user?.role === "ADMIN" || session?.user?.role === "SUPER_ADMIN")) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized && process.env.NODE_ENV === "production") {
+      console.error(`[Webhook FeexPay] Requête non autorisée pour le paiement ${payment.id}`);
+      return NextResponse.json({ error: "Accès refusé. Clé de webhook ou session requise." }, { status: 401 });
     }
 
     // Traitement spécifique PaymentIntent (généré depuis le web)

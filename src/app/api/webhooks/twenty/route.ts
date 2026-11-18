@@ -8,6 +8,20 @@ import { LeaseLifecycleService } from "@/lib/lease-lifecycle.service";
  */
 export async function POST(request: Request) {
   try {
+    const secret = process.env.TWENTY_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    if (secret) {
+      const authHeader = request.headers.get("authorization");
+      const tokenHeader = request.headers.get("x-webhook-secret");
+      let authorized = false;
+      if (authHeader && authHeader.trim() === `Bearer ${secret.trim()}`) authorized = true;
+      if (tokenHeader && tokenHeader.trim() === secret.trim()) authorized = true;
+      if (!authorized) {
+        return NextResponse.json({ error: "Unauthorized Twenty webhook" }, { status: 401 });
+      }
+    } else if (process.env.NODE_ENV === "production") {
+      console.warn("[TwentyWebhook] TWENTY_WEBHOOK_SECRET non configuré en production!");
+    }
+
     const payload = await request.json();
     
     if (process.env.NODE_ENV === "development") {

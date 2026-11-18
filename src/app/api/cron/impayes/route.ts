@@ -9,14 +9,9 @@ import { NotificationService } from "@/lib/notification-service";
  */
 export async function GET(request: Request) {
   try {
-    // 1. Sécuriser l'endpoint avec un CRON_SECRET pour éviter des appels externes non-autorisés
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      // Dans certains cas (Vercel), l'en-tête est x-vercel-cron
-      const vercelCron = request.headers.get('x-vercel-cron');
-      if (!vercelCron) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    // 1. Sécuriser l'endpoint avec un CRON_SECRET via verifyCronAuth
+    if (!verifyCronAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const today = new Date();

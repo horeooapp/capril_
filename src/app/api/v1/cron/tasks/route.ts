@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
+import { verifyCronAuth } from '@/lib/security';
 
 /**
  * GET /api/v1/cron/tasks
  * Processus automatisé pour les règles métiers ACT-01.
- * Sécurisé par un secret CRON passé en Authorization Header ou Query Param.
+ * Sécurisé par un secret CRON via verifyCronAuth.
  */
 export async function GET(req: Request) {
   try {
-    const defaultHeaders = new Headers(req.headers);
-    const authHeader = defaultHeaders.get('authorization');
-    const expectedSecret = process.env.CRON_SECRET || 'qapril-local-cron-secret';
-
-    if (authHeader !== `Bearer ${expectedSecret}`) {
-        // En prod, vous dé-commenterez cette ligne pour sécuriser.
-        // return NextResponse.json({ error: 'Unauthorized CRON request' }, { status: 401 });
+    if (!verifyCronAuth(req)) {
+      return NextResponse.json({ error: 'Unauthorized CRON request' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);

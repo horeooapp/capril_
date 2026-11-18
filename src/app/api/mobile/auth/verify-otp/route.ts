@@ -99,19 +99,24 @@ export async function POST(request: Request) {
 
         // 3. Inscription automatique si nouvel utilisateur
         if (!user) {
-            const assignedRole = (role === 'LANDLORD' || role === 'BAILLEUR' || role === 'PROPRIETAIRE')
-                ? 'LANDLORD'
-                : (role === 'AGENCY' || role === 'AGENCE')
-                    ? 'AGENCE_AGREE'
-                    : 'TENANT';
+            let assignedRole: "TENANT" | "LANDLORD" | "AGENCY" = "TENANT";
+            let assignedCapacite = "LOCATAIRE";
+
+            if (role === 'LANDLORD' || role === 'BAILLEUR' || role === 'PROPRIETAIRE') {
+                assignedRole = 'LANDLORD';
+                assignedCapacite = 'PROPRIETAIRE';
+            } else if (role === 'AGENCY' || role === 'AGENCE') {
+                assignedRole = 'AGENCY';
+                assignedCapacite = 'AGENCE';
+            }
 
             user = await prisma.user.create({
                 data: {
                     email: normalizedEmail,
                     phone: normalizedPhone || `PENDING_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-                    role: assignedRole as any,
+                    role: assignedRole,
                     status: 'ACTIVE',
-                    capaciteActive: assignedRole,
+                    capaciteActive: assignedCapacite,
                     onboardingComplete: assignedRole === 'TENANT'
                 }
             });
