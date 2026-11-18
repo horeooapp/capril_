@@ -23,7 +23,9 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success: true,
             channel: result.channel || "PHONE",
-            message: "Code de sécurité envoyé avec succès."
+            message: result.channel === "PHONE" 
+                ? "Code de sécurité envoyé par WhatsApp avec succès." 
+                : "Code de sécurité envoyé par e-mail avec succès."
         });
     } catch (error: any) {
         console.error("[MOBILE API] request-otp error:", error);

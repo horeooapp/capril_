@@ -35,6 +35,8 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
     const [isFocused, setIsFocused] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [feedback, setFeedback] = useState<{ type: 'error' | 'info' | 'success'; text: string } | null>(null);
+    const [resendCountdown, setResendCountdown] = useState(60);
+    const [canResend, setCanResend] = useState(false);
     
     const otpInputRef = useRef<TextInput>(null);
     const router = useRouter();
@@ -42,6 +44,25 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
     useEffect(() => {
         checkBiometricAuth();
     }, []);
+
+    // Compte à rebours de renvoi du code de vérification
+    useEffect(() => {
+        let timer: any = null;
+        if (step === 'OTP' && resendCountdown > 0) {
+            timer = setInterval(() => {
+                setResendCountdown((prev) => {
+                    if (prev <= 1) {
+                        setCanResend(true);
+                        return 0;
+                    }
+                    return prev - 1;
+                });
+            }, 1000);
+        }
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [step, resendCountdown]);
 
     // INSPECTION DU PRESSE-PAPIERS ET AUTO-REMPLISSAGE (0-TAP & RETOUR D'APP)
     const checkClipboardForOTP = async (autoSubmit = true) => {
@@ -253,6 +274,14 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
             if (response.ok && result.success) {
                 setOtp('');
                 setStep('OTP');
+                setResendCountdown(60);
+                setCanResend(false);
+                setFeedback({
+                    type: 'info',
+                    text: loginType === 'PHONE'
+                        ? `Code envoyé par WhatsApp au ${phoneNumber || getRawIdentifier()}.`
+                        : `Code envoyé par e-mail à ${emailAddress}.`
+                });
                 setTimeout(() => {
                     otpInputRef.current?.focus();
                 }, 300);
@@ -265,6 +294,13 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
         } finally {
             setIsPending(false);
         }
+    };
+
+    const handleResendOTP = async () => {
+        if (!canResend || isPending) return;
+        setResendCountdown(60);
+        setCanResend(false);
+        await handleRequestOTP();
     };
 
     const handleSocialAuth = async (provider: 'google' | 'facebook') => {
@@ -618,6 +654,24 @@ export default function NativeOTPForm({ role }: NativeOTPFormProps) {
                             <Text style={styles.primaryButtonText}>Valider</Text>
                         )}
                     </Pressable>
+
+                    {/* RENVOYER LE CODE */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 14 }}>
+                        <Text style={{ fontSize: 13, color: '#64748B' }}>
+                            Vous n'avez pas reçu le code ?{' '}
+                        </Text>
+                        {canResend ? (
+                            <TouchableOpacity onPress={handleResendOTP} disabled={isPending}>
+                                <Text style={{ fontSize: 13, fontWeight: '700', color: '#10B981' }}>
+                                    Renvoyer le code
+                                </Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: '#94A3B8' }}>
+                                Renvoyer ({resendCountdown}s)
+                            </Text>
+                        )}
+                    </View>
 
                     {/* MODIFIER LES COORDONNÉES */}
                     <TouchableOpacity 
