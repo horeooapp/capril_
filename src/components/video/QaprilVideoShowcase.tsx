@@ -114,46 +114,46 @@ export default function QaprilVideoShowcase() {
                     Visionnez nos vidéos de présentation institutionnelle et nos guides pratiques pour comprendre comment QAPRIL sécurise chaque étape du bail en Côte d&apos;Ivoire.
                 </p>
 
-                {/* Sélecteur des Vidéos */}
-                <div className="pt-4 flex justify-center">
-                    <div className="inline-flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200 gap-1.5 max-w-full overflow-x-auto">
+                {/* Sélecteur des Vidéos — Sans barre de défilement, affichage direct sur tout écran */}
+                <div className="pt-4 w-full max-w-4xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
                         <button
                             type="button"
                             onClick={() => handleSelectVideo("fnui")}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap ${
+                            className={`px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 text-center ${
                                 activeVideoKey === "fnui"
                                     ? "bg-slate-950 text-white shadow-md ring-1 ring-white/10"
                                     : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/60"
                             }`}
                         >
-                            <Building2 size={15} className={activeVideoKey === "fnui" ? "text-emerald-400" : "text-slate-500"} />
-                            <span>1. Présentation QAPRIL & FNUI</span>
+                            <Building2 size={15} className={activeVideoKey === "fnui" ? "text-emerald-400 shrink-0" : "text-slate-500 shrink-0"} />
+                            <span className="truncate">1. Présentation FNUI</span>
                         </button>
 
                         <button
                             type="button"
                             onClick={() => handleSelectVideo("bail")}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap ${
+                            className={`px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 text-center ${
                                 activeVideoKey === "bail"
                                     ? "bg-slate-950 text-white shadow-md ring-1 ring-white/10"
                                     : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/60"
                             }`}
                         >
-                            <FileText size={15} className={activeVideoKey === "bail" ? "text-amber-400" : "text-slate-500"} />
-                            <span>2. Enregistrement du Bail</span>
+                            <FileText size={15} className={activeVideoKey === "bail" ? "text-amber-400 shrink-0" : "text-slate-500 shrink-0"} />
+                            <span className="truncate">2. Enregistrement Bail</span>
                         </button>
 
                         <button
                             type="button"
                             onClick={() => handleSelectVideo("choisir")}
-                            className={`px-4 sm:px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap ${
+                            className={`px-3 sm:px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 text-center ${
                                 activeVideoKey === "choisir"
                                     ? "bg-slate-950 text-white shadow-md ring-1 ring-white/10"
                                     : "text-slate-600 hover:text-slate-950 hover:bg-slate-200/60"
                             }`}
                         >
-                            <Sparkles size={15} className={activeVideoKey === "choisir" ? "text-sky-400" : "text-slate-500"} />
-                            <span>3. Pourquoi choisir QAPRIL ?</span>
+                            <Sparkles size={15} className={activeVideoKey === "choisir" ? "text-sky-400 shrink-0" : "text-slate-500 shrink-0"} />
+                            <span className="truncate">3. Pourquoi QAPRIL</span>
                         </button>
                     </div>
                 </div>
@@ -259,6 +259,73 @@ export default function QaprilVideoShowcase() {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* Grille des 3 présentations vidéo — Affichage direct sans défilement */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                {(["fnui", "bail", "choisir"] as const).map((key, idx) => {
+                    const item = VIDEOS[key];
+                    const isSelected = activeVideoKey === key;
+                    const IconComponent = key === "fnui" ? Building2 : key === "bail" ? FileText : Sparkles;
+                    return (
+                        <div
+                            key={key}
+                            onClick={() => handleSelectVideo(key)}
+                            className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                                isSelected
+                                    ? "bg-slate-900 border-slate-900 text-white shadow-lg ring-2 ring-amber-500/50"
+                                    : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md text-slate-800"
+                            }`}
+                        >
+                            <div>
+                                <div className="flex items-center justify-between gap-2 mb-3">
+                                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                                        isSelected ? "bg-white/10 text-amber-300 border-white/20" : item.badgeColor
+                                    }`}>
+                                        Vidéo {idx + 1}
+                                    </span>
+                                    {isSelected ? (
+                                        <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
+                                            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                            En cours de lecture
+                                        </span>
+                                    ) : (
+                                        <span className="text-[11px] font-semibold text-slate-400">
+                                            {item.duration}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                                        isSelected ? "bg-white/10 text-amber-400" : "bg-slate-100 text-slate-600"
+                                    }`}>
+                                        <IconComponent size={18} />
+                                    </div>
+                                    <div>
+                                        <h4 className={`text-sm font-black leading-snug ${isSelected ? "text-white" : "text-slate-900"}`}>
+                                            {item.title}
+                                        </h4>
+                                        <p className={`text-xs mt-1 leading-relaxed ${isSelected ? "text-slate-300" : "text-slate-500"}`}>
+                                            {item.subtitle}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-slate-100/10 flex items-center justify-between text-xs">
+                                <span className={`font-medium ${isSelected ? "text-slate-400" : "text-slate-500"}`}>
+                                    {isSelected ? "Actuellement sélectionnée" : "Cliquer pour visionner"}
+                                </span>
+                                <span className={`font-bold inline-flex items-center gap-1.5 ${
+                                    isSelected ? "text-amber-400" : "text-slate-900"
+                                }`}>
+                                    <Play size={13} className={isSelected ? "fill-amber-400" : "fill-slate-900"} />
+                                    <span>{isSelected ? "Lecture" : "Regarder"}</span>
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </section>
     )
