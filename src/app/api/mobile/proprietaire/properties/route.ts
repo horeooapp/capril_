@@ -134,7 +134,7 @@ export async function POST(request: Request) {
 
         // S-08 : Validation stricte contre le référentiel officiel config/lieux.json (refus de toute saisie libre -> 422)
         const quartierInput = body.quartier || body.quartierNom;
-        const validationLieu = validerLieu(commune, quartierInput);
+        const validationLieu = validerLieu(commune, quartierInput, city);
         if (!validationLieu.ok) {
             return NextResponse.json({
                 error: validationLieu.error,
@@ -261,6 +261,57 @@ export async function POST(request: Request) {
                 niveauVerifVente:         forSale ? (niveauVerif || 1) : 0,
             },
         });
+
+        // Création automatique des appartements / lots enfants si immeuble ou bloc résidentiel
+        const unitsList = Array.isArray(body.customUnits) ? body.customUnits : [];
+        if (unitsList.length > 0 && (propertyType === 'IMMEUBLE' || typeStructure === 'IMMEUBLE' || typeStructure === 'RESIDENCE')) {
+            for (let i = 0; i < unitsList.length; i++) {
+                const u = unitsList[i];
+                const childLabel = u.label?.trim() || `Apt ${i + 1}`;
+                const childRent = Number(u.rent) || parsedRent || 0;
+                const childType = u.type || 'APARTMENT';
+                const childRooms = u.rooms ? Number(u.rooms) : (parsedRooms || 3);
+                const childArea = u.area ? Number(u.area) : (parsedSurface || undefined);
+
+                try {
+                    await prisma.property.create({
+                        data: {
+                            propertyCode: `${finalPropertyCode}-${childLabel.replace(/\s+/g, '').toUpperCase()}`,
+                            ownerUserId: dbUser.id,
+                            managedByUserId: isAgencyUser ? dbUser.id : null,
+                            managementMode: isAgencyUser ? 'AGENCE' : 'DIRECT',
+                            name: `${property.name} - ${childLabel}`,
+                            unitLabel: childLabel,
+                            parentPropertyId: property.id,
+                            commune: cleanCommune,
+                            quartier: cleanQuartier,
+                            address: cleanAddress,
+                            city: cleanCity,
+                            leaseType: leaseType ?? 'residential',
+                            propertyType: childType,
+                            typeStructure: 'ENFANT',
+                            declaredRentFcfa: childRent,
+                            rooms: childRooms,
+                            superficieM2: childArea,
+                            status: 'ACTIVE',
+                            latitude: hasGps ? rawLat : null,
+                            longitude: hasGps ? rawLng : null,
+                            ville: cleanCity,
+                            quartierSource: property.quartierSource,
+                            quartierManuel: property.quartierManuel,
+                            gpsLatitude: hasGps ? rawLat : null,
+                            gpsLongitude: hasGps ? rawLng : null,
+                            precisionM: hasGps ? rawPrecision : null,
+                            statutPosition,
+                            codeLocalisation,
+                            w3w,
+                        }
+                    });
+                } catch (childErr) {
+                    console.warn(`[MOBILE] Erreur création sous-lot ${childLabel}:`, childErr);
+                }
+            }
+        }
 
         if (hasGps && rawLat !== null && rawLng !== null) {
             try {

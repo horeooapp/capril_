@@ -31,6 +31,7 @@ import {
     Building
 } from "lucide-react"
 import { creerBien, getMyParentStructures, TypeStructure, getReverseGeocodingAction } from "@/actions/property.actions"
+import { VILLES_PRINCIPALES_CI, COMMUNES_PAR_VILLE, COMMUNES_ABIDJAN } from "@/lib/cities"
 
 interface CustomUnitItem {
     id: string
@@ -67,9 +68,16 @@ export default function NewPropertyClient() {
         { id: "u-4", label: "Studio 1 - 1er Étage", type: "STUDIO", rent: 90000, area: 30, rooms: 1 }
     ])
 
-    // Générateur rapide pour Immeuble
+    // Configuration Immeuble / Bloc Résidentiel (Nombre d'appartements, pièces par appt, loyer par appt)
     const [quickCount, setQuickCount] = useState<number>(4)
+    const [quickDefaultRooms, setQuickDefaultRooms] = useState<number>(3)
     const [quickDefaultRent, setQuickDefaultRent] = useState<number>(150000)
+
+    // Villes de Côte d'Ivoire et enrichissement dynamique
+    const [availableCities, setAvailableCities] = useState<string[]>([...VILLES_PRINCIPALES_CI])
+    const [selectedCity, setSelectedCity] = useState<string>("Abidjan")
+    const [isCustomCity, setIsCustomCity] = useState<boolean>(false)
+    const [customCityInput, setCustomCityInput] = useState<string>("")
 
     // Équipements sélectionnés
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([
@@ -192,20 +200,33 @@ export default function NewPropertyClient() {
         }))
     }
 
-    const handleApplyQuickGenerator = () => {
-        if (quickCount < 1) return
+    const handleApplyQuickGenerator = (count = quickCount, rooms = quickDefaultRooms, rent = quickDefaultRent) => {
+        if (count < 1) return
         const generated: CustomUnitItem[] = []
-        for (let i = 1; i <= quickCount; i++) {
+        for (let i = 1; i <= count; i++) {
             generated.push({
                 id: `u-gen-${i}-${Date.now()}`,
                 label: `Apt ${i}`,
-                type: "APARTMENT",
-                rent: quickDefaultRent,
-                area: 65,
-                rooms: 3
+                type: rooms <= 1 ? "STUDIO" : "APARTMENT",
+                rent: rent,
+                area: rooms === 1 ? 30 : (rooms === 2 ? 45 : (rooms === 3 ? 65 : 85)),
+                rooms: rooms
             })
         }
         setCustomUnits(generated)
+    }
+
+    const handleAddCustomCity = () => {
+        const trimmed = customCityInput.trim()
+        if (!trimmed) return
+        if (!availableCities.includes(trimmed)) {
+            setAvailableCities(prev => [...prev, trimmed])
+        }
+        setSelectedCity(trimmed)
+        setFormCity(trimmed)
+        setFormCommune(trimmed)
+        setIsCustomCity(false)
+        setCustomCityInput("")
     }
 
     const handleApplyRentToAll = (rentToApply: number) => {
@@ -246,6 +267,8 @@ export default function NewPropertyClient() {
                             if (geo.ville) {
                                 setDetectedVille(geo.ville)
                                 setFormCity(geo.ville)
+                                setSelectedCity(geo.ville)
+                                setAvailableCities(prev => prev.includes(geo.ville) ? prev : [...prev, geo.ville])
                             }
                             if (geo.commune) {
                                 setDetectedCommune(geo.commune)
@@ -298,6 +321,8 @@ export default function NewPropertyClient() {
                         if (geo.ville) {
                             setDetectedVille(geo.ville)
                             setFormCity(geo.ville)
+                            setSelectedCity(geo.ville)
+                            setAvailableCities(prev => prev.includes(geo.ville) ? prev : [...prev, geo.ville])
                         }
                         if (geo.commune) {
                             setDetectedCommune(geo.commune)
@@ -353,6 +378,10 @@ export default function NewPropertyClient() {
                 formData.set("precisionM", gpsAccuracy.toString())
             }
         }
+
+        // Ville et Commune certifiées
+        formData.set("city", selectedCity)
+        formData.set("commune", formCommune)
 
         // Configuration de la hiérarchie
         if (structureCategory === 'PARENT') {
@@ -657,50 +686,92 @@ export default function NewPropertyClient() {
                             </div>
                         </div>
 
-                        {/* Outil de génération rapide */}
-                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-4 sm:p-5">
-                            <div className="flex items-center gap-2 mb-3">
-                                <Sparkles size={16} className="text-amber-500" />
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                                    Générateur rapide (Optionnel pour gagner du temps)
+                        {/* Configuration directe Immeuble : Nombre d'appartements, pièces par appt, loyer par appt */}
+                        <div className="bg-sky-50/70 border border-sky-200 rounded-xl p-5 space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Building size={18} className="text-sky-600" />
+                                <span className="text-xs font-black text-sky-900 uppercase tracking-wider">
+                                    Configuration globale des appartements
                                 </span>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Nombre d'appartements</label>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                        1. Nombre d'appartements <span className="text-red-500">*</span>
+                                    </label>
                                     <input 
                                         type="number" 
                                         min="1" 
-                                        max="50"
+                                        max="100"
                                         value={quickCount} 
-                                        onChange={(e) => setQuickCount(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800" 
+                                        onChange={(e) => {
+                                            const val = Math.max(1, parseInt(e.target.value) || 1);
+                                            setQuickCount(val);
+                                            handleApplyQuickGenerator(val, quickDefaultRooms, quickDefaultRent);
+                                        }}
+                                        className="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm font-black text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none" 
+                                        placeholder="Ex: 6"
                                     />
+                                    <p className="text-[11px] text-slate-500 mt-1">Nombre total de portes / logements.</p>
                                 </div>
+
                                 <div>
-                                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">Loyer de base indicatif (XOF)</label>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                        2. Pièces par appartement <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        value={quickDefaultRooms}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 3;
+                                            setQuickDefaultRooms(val);
+                                            handleApplyQuickGenerator(quickCount, val, quickDefaultRent);
+                                        }}
+                                        className="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 outline-none"
+                                    >
+                                        <option value="1">1 pièce (Studio)</option>
+                                        <option value="2">2 pièces (1 chambre + salon)</option>
+                                        <option value="3">3 pièces (2 chambres + salon)</option>
+                                        <option value="4">4 pièces (3 chambres + salon)</option>
+                                        <option value="5">5 pièces (4 chambres + salon)</option>
+                                        <option value="6">6 pièces et plus</option>
+                                    </select>
+                                    <p className="text-[11px] text-slate-500 mt-1">Nombre de pièces par défaut.</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                                        3. Loyer par appartement (XOF) <span className="text-red-500">*</span>
+                                    </label>
                                     <input 
                                         type="number" 
-                                        min="0"
+                                        min="0" 
                                         step="5000"
                                         value={quickDefaultRent} 
-                                        onChange={(e) => setQuickDefaultRent(parseInt(e.target.value) || 0)}
-                                        className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800" 
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value) || 0;
+                                            setQuickDefaultRent(val);
+                                            handleApplyQuickGenerator(quickCount, quickDefaultRooms, val);
+                                        }}
+                                        className="w-full px-3.5 py-2.5 bg-white border border-sky-200 rounded-xl text-sm font-black text-slate-900 focus:ring-2 focus:ring-sky-500 outline-none" 
+                                        placeholder="Ex: 150000"
                                     />
-                                </div>
-                                <div className="flex items-end">
-                                    <button 
-                                        type="button" 
-                                        onClick={handleApplyQuickGenerator}
-                                        className="w-full py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs"
-                                    >
-                                        <Calculator size={14} /> Pré-générer les {quickCount} unités
-                                    </button>
+                                    <p className="text-[11px] text-slate-500 mt-1">Montant mensuel par appartement.</p>
                                 </div>
                             </div>
-                            <p className="text-[11px] text-slate-400 mt-2">
-                                💡 Vous pourrez ensuite modifier individuellement le montant de loyer ou le nom de chaque appartement dans le tableau ci-dessous.
-                            </p>
+
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-sky-100">
+                                <div className="text-xs text-slate-600">
+                                    💡 <strong>Total prévisionnel :</strong> {quickCount} appartements × {quickDefaultRent.toLocaleString("fr-FR")} XOF = <span className="font-bold text-sky-700">{(quickCount * quickDefaultRent).toLocaleString("fr-FR")} XOF / mois</span>
+                                </div>
+                                <button 
+                                    type="button" 
+                                    onClick={() => handleApplyQuickGenerator(quickCount, quickDefaultRooms, quickDefaultRent)}
+                                    className="py-2 px-3.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-xs w-fit"
+                                >
+                                    <Calculator size={14} /> Synchroniser les {quickCount} appartements
+                                </button>
+                            </div>
                         </div>
 
                         {/* Liste interactive des logements */}
@@ -860,41 +931,96 @@ export default function NewPropertyClient() {
 
                     {structureCategory !== 'ENFANT' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <input type="hidden" name="city" value={formCity} />
+                            <input type="hidden" name="city" value={selectedCity} />
+                            
+                            {/* Liste déroulante des 20 principales villes de Côte d'Ivoire avec enrichissement */}
                             <div>
                                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-                                    Commune ou Ville <span className="text-red-500">*</span>
+                                    Ville de Côte d'Ivoire <span className="text-red-500">*</span>
                                 </label>
                                 <select 
-                                    required 
-                                    name="commune" 
-                                    value={formCommune}
-                                    onChange={(e) => setFormCommune(e.target.value)}
+                                    value={isCustomCity ? '__OTHER__' : selectedCity}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (v === '__OTHER__') {
+                                            setIsCustomCity(true);
+                                        } else {
+                                            setIsCustomCity(false);
+                                            setSelectedCity(v);
+                                            setFormCity(v);
+                                            if (v === 'Abidjan') {
+                                                setFormCommune('Cocody');
+                                            } else {
+                                                setFormCommune(v);
+                                            }
+                                        }
+                                    }}
                                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white outline-none text-sm font-semibold text-slate-800"
                                 >
-                                    <optgroup label="District d'Abidjan">
-                                        <option value="Cocody">Cocody (Angré, Riviera, Deux-Plateaux, Danga...)</option>
-                                        <option value="Plateau">Plateau (Centre des affaires)</option>
-                                        <option value="Marcory">Marcory (Zone 4, Biétry, Résidentiel...)</option>
-                                        <option value="Treichville">Treichville</option>
-                                        <option value="Yopougon">Yopougon (Niangon, Maroc, Bel Air...)</option>
-                                        <option value="Abobo">Abobo (Samaké, Avocatier, Clouetcha...)</option>
-                                        <option value="Koumassi">Koumassi (Remblais, Prodomo...)</option>
-                                        <option value="Adjamé">Adjamé</option>
-                                        <option value="Attécoubé">Attécoubé</option>
-                                        <option value="Port-Bouët">Port-Bouët (Vridi, Aéroport...)</option>
-                                        <option value="Bingerville">Bingerville</option>
-                                        <option value="Songon">Songon</option>
-                                        <option value="Anyama">Anyama</option>
+                                    <optgroup label="20 Principales Villes de Côte d'Ivoire">
+                                        {availableCities.map(v => (
+                                            <option key={v} value={v}>{v}</option>
+                                        ))}
                                     </optgroup>
-                                    <optgroup label="Autres Villes">
-                                        <option value="Grand-Bassam">Grand-Bassam</option>
-                                        <option value="Yamoussoukro">Yamoussoukro</option>
-                                        <option value="Bouaké">Bouaké</option>
-                                        <option value="San Pedro">San Pedro</option>
-                                        <option value="Autre">Autre localité...</option>
-                                    </optgroup>
+                                    <option value="__OTHER__">➕ Ajouter une autre ville...</option>
                                 </select>
+
+                                {isCustomCity && (
+                                    <div className="flex gap-2 mt-2">
+                                        <input 
+                                            type="text" 
+                                            value={customCityInput}
+                                            onChange={(e) => setCustomCityInput(e.target.value)}
+                                            placeholder="Saisissez la ville (ex: Odienné, Daoukro...)"
+                                            className="flex-1 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-[#FF8200]"
+                                        />
+                                        <button 
+                                            type="button" 
+                                            onClick={handleAddCustomCity}
+                                            className="px-3.5 py-2 bg-[#FF8200] hover:bg-[#e67500] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                                        >
+                                            Ajouter
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={() => { setIsCustomCity(false); setSelectedCity(availableCities[0] || 'Abidjan'); }}
+                                            className="px-2.5 py-2 text-slate-400 hover:text-slate-600 text-xs font-medium"
+                                        >
+                                            Annuler
+                                        </button>
+                                    </div>
+                                )}
+                                <p className="text-[11px] text-slate-400 mt-1">Sélectionnez parmi les 20 principales villes ou ajoutez votre localité.</p>
+                            </div>
+
+                            {/* Commune ou Secteur */}
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                                    Commune ou Secteur <span className="text-red-500">*</span>
+                                </label>
+                                {selectedCity === 'Abidjan' ? (
+                                    <select 
+                                        required 
+                                        name="commune" 
+                                        value={formCommune}
+                                        onChange={(e) => setFormCommune(e.target.value)}
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white outline-none text-sm font-semibold text-slate-800"
+                                    >
+                                        {COMMUNES_ABIDJAN.map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <input 
+                                        required 
+                                        name="commune" 
+                                        value={formCommune}
+                                        onChange={(e) => setFormCommune(e.target.value)}
+                                        placeholder={`Commune ou quartier de ${selectedCity}`}
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#FF8200] focus:bg-white outline-none text-sm font-semibold text-slate-800"
+                                    />
+                                )}
+                                <p className="text-[11px] text-slate-400 mt-1">Précisez la commune ou le secteur géographique.</p>
                             </div>
 
                             <div>

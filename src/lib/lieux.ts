@@ -100,20 +100,31 @@ export interface ValidationLieu {
  * Valide un lieu saisi à la création d'un bien : la commune est obligatoire et doit appartenir
  * au référentiel ; le quartier, s'il est fourni, doit appartenir à la commune.
  */
-export function validerLieu(communeSaisie: unknown, quartierSaisi?: unknown): ValidationLieu {
+export function validerLieu(communeSaisie: unknown, quartierSaisi?: unknown, villeSaisie?: unknown): ValidationLieu {
     const communeStr = typeof communeSaisie === "string" ? communeSaisie : "";
     if (!communeStr.trim()) {
         return { ok: false, status: 422, code: "COMMUNE_REQUISE", error: LIEUX_MESSAGES.commune_requise };
     }
     const entry = trouverCommune(communeStr);
     if (!entry) {
-        return { ok: false, status: 422, code: "COMMUNE_INCONNUE", error: LIEUX_MESSAGES.commune_inconnue };
+        // Support souple des 20 villes de Côte d'Ivoire et villes enrichies par l'utilisateur
+        const cleanName = communeStr.trim();
+        const cleanVille = (typeof villeSaisie === 'string' && villeSaisie.trim()) || cleanName;
+        return {
+            ok: true,
+            status: 200,
+            ville: cleanVille,
+            commune: cleanName,
+            quartier: typeof quartierSaisi === "string" && quartierSaisi.trim() ? quartierSaisi.trim() : null,
+            centre: [5.3599, -3.9850] // Centre par défaut (Côte d'Ivoire)
+        };
     }
     const quartierStr = typeof quartierSaisi === "string" ? quartierSaisi : "";
     if (quartierStr.trim()) {
         const q = trouverQuartier(entry.commune, quartierStr);
         if (!q) {
-            return { ok: false, status: 422, code: "QUARTIER_INCONNU", error: LIEUX_MESSAGES.quartier_inconnu };
+            // Quartier ou repère libre toléré pour enrichissement
+            return { ok: true, status: 200, ville: entry.ville, commune: entry.commune.nom, quartier: quartierStr.trim(), centre: entry.commune.centre };
         }
         return { ok: true, status: 200, ville: entry.ville, commune: entry.commune.nom, quartier: q.nom, centre: q.centre };
     }

@@ -42,6 +42,29 @@ const fmtFcfa = (n?: number | string | null) => {
   return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' F';
 };
 
+export const VILLES_PRINCIPALES_CI = [
+  'Abidjan',
+  'Bouaké',
+  'Daloa',
+  'Korhogo',
+  'Yamoussoukro',
+  'San-Pédro',
+  'Gagnoa',
+  'Man',
+  'Divo',
+  'Soubré',
+  'Anyama',
+  'Bingerville',
+  'Grand-Bassam',
+  'Abengourou',
+  'Agboville',
+  'Dabou',
+  'Bondoukou',
+  'Séguéla',
+  'Ferkessédougou',
+  'Dimbokro',
+];
+
 const COMMUNES_ABIDJAN = [
   'Cocody',
   'Marcory',
@@ -66,7 +89,7 @@ const PROPERTY_TYPES = [
   { id: 'TERRAIN_RURAL', label: 'Terrain rural' },
   { id: 'STUDIO', label: 'Studio' },
   { id: 'COMMERCIAL', label: 'Commerce / Local' },
-  { id: 'IMMEUBLE', label: 'Immeuble entier' },
+  { id: 'IMMEUBLE', label: '🏢 Immeuble / Bloc résidentiel' },
 ];
 
 const NATURES_TITRES = [
@@ -117,6 +140,17 @@ export default function CreatePropertyScreen() {
   const [detectedCommune, setDetectedCommune] = useState<string | null>(null);
   const [detectedQuartier, setDetectedQuartier] = useState<string | null>(null);
 
+  // Villes de Côte d'Ivoire et enrichissement dynamique
+  const [availableCities, setAvailableCities] = useState<string[]>([...VILLES_PRINCIPALES_CI]);
+  const [selectedCity, setSelectedCity] = useState('Abidjan');
+  const [isCustomCity, setIsCustomCity] = useState(false);
+  const [customCityInput, setCustomCityInput] = useState('');
+
+  // Configuration Immeuble / Bloc résidentiel
+  const [immeubleUnitsCount, setImmeubleUnitsCount] = useState('4');
+  const [immeubleRoomsPerUnit, setImmeubleRoomsPerUnit] = useState('3');
+  const [immeubleRentPerUnit, setImmeubleRentPerUnit] = useState('150000');
+
   const resolveLocationDetails = async (lat: number, lng: number) => {
     try {
       // 1. Appel API hybride QAPRIL
@@ -124,7 +158,11 @@ export default function CreatePropertyScreen() {
       const data = await res.json();
       if (data && data.success && data.data) {
         const info = data.data;
-        if (info.ville) setDetectedVille(info.ville);
+        if (info.ville) {
+          setDetectedVille(info.ville);
+          setSelectedCity(info.ville);
+          setAvailableCities(prev => prev.includes(info.ville) ? prev : [...prev, info.ville]);
+        }
         if (info.commune) {
           setDetectedCommune(info.commune);
           if (COMMUNES_ABIDJAN.includes(info.commune)) {
@@ -284,6 +322,25 @@ export default function CreatePropertyScreen() {
       }
     }
 
+    const unitsCount = Math.max(1, parseInt(immeubleUnitsCount, 10) || 1);
+    const roomsPerUnit = Math.max(1, parseInt(immeubleRoomsPerUnit, 10) || 3);
+    const rentPerUnit = parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0;
+    const totalBuildingRent = unitsCount * rentPerUnit;
+
+    const customUnits = [];
+    if (propertyType === 'IMMEUBLE') {
+      for (let i = 1; i <= unitsCount; i++) {
+        customUnits.push({
+          id: `u-${i}`,
+          label: `Apt ${i}`,
+          type: roomsPerUnit <= 1 ? 'STUDIO' : 'APPARTEMENT',
+          rent: rentPerUnit,
+          rooms: roomsPerUnit,
+          area: roomsPerUnit === 1 ? 30 : (roomsPerUnit === 2 ? 45 : (roomsPerUnit === 3 ? 65 : 85))
+        });
+      }
+    }
+
     setLoading(true);
     try {
       const response = await fetchWithAuth('/proprietaire/properties', {
@@ -291,12 +348,15 @@ export default function CreatePropertyScreen() {
         body: JSON.stringify({
           name: name.trim(),
           address: address.trim(),
-          commune: finalCommune,
+          commune: selectedCity === 'Abidjan' ? finalCommune : (commune || selectedCity),
           quartier: detectedQuartier || undefined,
-          city: detectedVille || 'Abidjan',
+          city: selectedCity,
           propertyType,
+          typeStructure: propertyType === 'IMMEUBLE' ? 'IMMEUBLE' : 'INDEPENDANT',
           leaseType,
-          declaredRentFcfa: !isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0,
+          declaredRentFcfa: propertyType === 'IMMEUBLE' ? totalBuildingRent : (!isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0),
+          nbUnits: propertyType === 'IMMEUBLE' ? unitsCount : undefined,
+          customUnits: propertyType === 'IMMEUBLE' ? customUnits : undefined,
           superficieM2: cleanSurfaceDigits ? parseFloat(cleanSurfaceDigits) : undefined,
           rooms: rooms ? parseInt(rooms.replace(/[^\d]/g, ''), 10) : undefined,
           unitLabel: unitLabel.trim() || undefined,
@@ -441,16 +501,35 @@ export default function CreatePropertyScreen() {
               })}
             </View>
 
-            {propertyType !== 'TERRAIN_URBAIN_NU' && propertyType !== 'TERRAIN_RURAL' && (
-              <>
-                <Text style={styles.fieldLabel}>Nombre de pièces *</Text>
+            {propertyType === 'IMMEUBLE' ? (
+              <View style={{ backgroundColor: '#F0F9FF', borderWidth: 1, borderColor: '#BAE6FD', borderRadius: 16, padding: 16, marginTop: 14 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <Building2 size={18} color="#0284C7" />
+                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#0369A1', textTransform: 'uppercase' }}>
+                    Configuration globale de l'immeuble
+                  </Text>
+                </View>
+
+                {/* 1. Nombre d'appartements */}
+                <Text style={styles.fieldLabel}>1. Nombre d'appartements *</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#BAE6FD' }]}
+                  placeholder="Ex: 4"
+                  placeholderTextColor="#94A3B8"
+                  keyboardType="numeric"
+                  value={immeubleUnitsCount}
+                  onChangeText={setImmeubleUnitsCount}
+                />
+
+                {/* 2. Nombre de pièces par appartement */}
+                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>2. Nombre de pièces par appartement *</Text>
                 <View style={styles.chipsWrap}>
                   {['1', '2', '3', '4', '5', '6'].map((nb) => {
-                    const active = rooms === nb;
+                    const active = immeubleRoomsPerUnit === nb;
                     return (
                       <Pressable
                         key={nb}
-                        onPress={() => setRooms(nb)}
+                        onPress={() => setImmeubleRoomsPerUnit(nb)}
                         style={[styles.chipSmall, active && styles.chipActive]}
                       >
                         <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
@@ -460,15 +539,67 @@ export default function CreatePropertyScreen() {
                     );
                   })}
                 </View>
+
+                {/* 3. Montant du loyer par appartement */}
+                <Text style={[styles.fieldLabel, { marginTop: 10 }]}>3. Montant du loyer par appartement (FCFA) *</Text>
                 <TextInput
-                  style={[styles.input, { marginTop: 8 }]}
-                  placeholder="Nombre exact de pièces (ex: 3)"
-                  placeholderTextColor="#9CA3AF"
+                  style={[styles.input, { backgroundColor: '#FFFFFF', borderColor: '#BAE6FD', fontWeight: '800' }]}
+                  placeholder="Ex: 150000"
+                  placeholderTextColor="#94A3B8"
                   keyboardType="numeric"
-                  value={rooms}
-                  onChangeText={setRooms}
+                  value={immeubleRentPerUnit}
+                  onChangeText={(text) => {
+                    const clean = text.replace(/[^\d]/g, '');
+                    setImmeubleRentPerUnit(clean);
+                  }}
                 />
-              </>
+
+                {/* Total prévisionnel */}
+                <View style={{ backgroundColor: '#E0F2FE', borderRadius: 12, padding: 12, marginTop: 14 }}>
+                  <Text style={{ fontSize: 11, color: '#0369A1', fontWeight: '700' }}>
+                    💡 Revenu locatif total prévisionnel :
+                  </Text>
+                  <Text style={{ fontSize: 16, fontWeight: '900', color: '#0C4A6E', marginTop: 2 }}>
+                    {fmtFcfa(
+                      (Math.max(1, parseInt(immeubleUnitsCount, 10) || 1)) * 
+                      (parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0)
+                    )} / mois
+                  </Text>
+                  <Text style={{ fontSize: 10, color: '#0284C7', marginTop: 2 }}>
+                    ({Math.max(1, parseInt(immeubleUnitsCount, 10) || 1)} appartements de {immeubleRoomsPerUnit} pièces à {fmtFcfa(parseInt(immeubleRentPerUnit.replace(/[^\d]/g, ''), 10) || 0)})
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              propertyType !== 'TERRAIN_URBAIN_NU' && propertyType !== 'TERRAIN_RURAL' && (
+                <>
+                  <Text style={styles.fieldLabel}>Nombre de pièces *</Text>
+                  <View style={styles.chipsWrap}>
+                    {['1', '2', '3', '4', '5', '6'].map((nb) => {
+                      const active = rooms === nb;
+                      return (
+                        <Pressable
+                          key={nb}
+                          onPress={() => setRooms(nb)}
+                          style={[styles.chipSmall, active && styles.chipActive]}
+                        >
+                          <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                            {nb === '1' ? '1 pièce (Studio)' : `${nb} pièces`}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                  <TextInput
+                    style={[styles.input, { marginTop: 8 }]}
+                    placeholder="Nombre exact de pièces (ex: 3)"
+                    placeholderTextColor="#9CA3AF"
+                    keyboardType="numeric"
+                    value={rooms}
+                    onChangeText={setRooms}
+                  />
+                </>
+              )
             )}
 
             <Text style={styles.fieldLabel}>Usage du bail *</Text>
@@ -549,31 +680,105 @@ export default function CreatePropertyScreen() {
           <View style={styles.formSection}>
             <Text style={styles.sectionTitle}>2. LOCALISATION GÉOGRAPHIQUE</Text>
 
-            <Text style={styles.fieldLabel}>Commune d'Abidjan / Ville *</Text>
-            <View style={styles.chipsWrap}>
-              {COMMUNES_ABIDJAN.map((c) => {
-                const active = commune === c;
-                return (
-                  <Pressable
-                    key={c}
-                    onPress={() => setCommune(c)}
-                    style={[styles.chipSmall, active && styles.chipActive]}
-                  >
-                    <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
-                      {c}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            {/* VILLE : 20 PRINCIPALES VILLES DE CÔTE D'IVOIRE */}
+            <Text style={styles.fieldLabel}>Ville de Côte d'Ivoire *</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                {availableCities.map((v) => {
+                  const active = selectedCity === v && !isCustomCity;
+                  return (
+                    <Pressable
+                      key={v}
+                      onPress={() => {
+                        setSelectedCity(v);
+                        setIsCustomCity(false);
+                        if (v === 'Abidjan') {
+                          setCommune('Cocody');
+                        } else {
+                          setCommune(v);
+                        }
+                      }}
+                      style={[styles.chipSmall, active && styles.chipActive]}
+                    >
+                      <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                        {v}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+                <Pressable
+                  onPress={() => setIsCustomCity(true)}
+                  style={[styles.chipSmall, isCustomCity && styles.chipActive]}
+                >
+                  <Text style={[styles.chipTextSmall, isCustomCity && styles.chipTextActive]}>
+                    + Autre ville...
+                  </Text>
+                </Pressable>
+              </View>
+            </ScrollView>
 
-            {commune === 'Autre' && (
+            {isCustomCity && (
+              <View style={{ marginBottom: 12, backgroundColor: '#F8FAFC', borderRadius: 12, borderWidth: 1, borderColor: '#CBD5E1', padding: 10 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', marginBottom: 6 }}>
+                  Ajouter une autre ville de Côte d'Ivoire
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TextInput
+                    style={[styles.input, { flex: 1, backgroundColor: '#FFFFFF' }]}
+                    placeholder="Ex: Odienné, Daoukro, Sassandra..."
+                    placeholderTextColor="#94A3B8"
+                    value={customCityInput}
+                    onChangeText={setCustomCityInput}
+                  />
+                  <Pressable
+                    style={{ backgroundColor: '#1B4D3E', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center' }}
+                    onPress={() => {
+                      const trimmed = customCityInput.trim();
+                      if (trimmed) {
+                        if (!availableCities.includes(trimmed)) {
+                          setAvailableCities(prev => [...prev, trimmed]);
+                        }
+                        setSelectedCity(trimmed);
+                        setCommune(trimmed);
+                        setIsCustomCity(false);
+                        setCustomCityInput('');
+                      }
+                    }}
+                  >
+                    <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>Ajouter</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
+            {/* COMMUNE OU SECTEUR */}
+            <Text style={styles.fieldLabel}>
+              {selectedCity === 'Abidjan' ? "Commune d'Abidjan *" : `Commune ou secteur de ${selectedCity} *`}
+            </Text>
+            {selectedCity === 'Abidjan' ? (
+              <View style={styles.chipsWrap}>
+                {COMMUNES_ABIDJAN.map((c) => {
+                  const active = commune === c;
+                  return (
+                    <Pressable
+                      key={c}
+                      onPress={() => setCommune(c)}
+                      style={[styles.chipSmall, active && styles.chipActive]}
+                    >
+                      <Text style={[styles.chipTextSmall, active && styles.chipTextActive]}>
+                        {c}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : (
               <TextInput
-                style={[styles.input, { marginTop: 10 }]}
-                placeholder="Précisez la commune ou ville (ex: Grand-Bassam, Yamoussoukro)"
+                style={styles.input}
+                placeholder={`Commune ou quartier de ${selectedCity}`}
                 placeholderTextColor="#9CA3AF"
-                value={customCommune}
-                onChangeText={setCustomCommune}
+                value={commune}
+                onChangeText={setCommune}
               />
             )}
 
