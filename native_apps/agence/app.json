@@ -29,7 +29,7 @@
         "USE_BIOMETRIC",
         "USE_FINGERPRINT"
       ],
-      "versionCode": 7
+      "versionCode": 28
     },
     "plugins": [
       [
@@ -44,4 +44,3 @@
     ]
   }
 }
-

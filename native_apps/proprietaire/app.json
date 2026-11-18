@@ -37,7 +37,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE"
       ],
-      "versionCode": 27
+      "versionCode": 28
     },
     "web": {
       "favicon": "./assets/favicon.png"
