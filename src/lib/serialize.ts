@@ -82,6 +82,9 @@ export const serializeLease = (lease: any) => {
 
     const tenantData = lease.tenant ? {
         id: lease.tenant.id || null,
+        firstName: lease.tenant.firstName || null,
+        lastName: lease.tenant.lastName || null,
+        email: lease.tenant.email || null,
         fullName: (lease.tenant.firstName || lease.tenant.lastName)
             ? ((lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "")).trim()
             : (lease.tenant.phone ? `Locataire (${lease.tenant.phone})` : "Locataire [Nom non renseigné]"),
@@ -101,6 +104,7 @@ export const serializeLease = (lease: any) => {
         loyerTotalFcfa: Number(lease.loyerTotalFcfa || 0),
         landlord: landlordData,
         tenant: tenantData,
+        incidents: Array.isArray(lease.incidents) ? lease.incidents : (Array.isArray(lease.incidentLogs) ? lease.incidentLogs : []),
         cdcDeposits: (lease.cdcDeposits || []).map((dep: any) => ({
             ...dep,
             amount: Number(dep.amount || 0)

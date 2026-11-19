@@ -96,7 +96,7 @@ export default function RootLayout() {
           router.push('/(tabs)/chat' as any);
         } else if (data.type === 'payment' || data.type === 'PAYMENT_CONFIRMATION') {
           router.push('/(tabs)/finance' as any);
-        } else if (data.type === 'APP_UPDATE' || data.type === 'SYSTEM_UPDATE') {
+        } else if (data.type === 'APP_UPDATE' || data.type === 'MAJ_DISPONIBLE') {
           Updates.reloadAsync().catch(() => {});
         }
       } catch (navErr) {

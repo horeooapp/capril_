@@ -216,11 +216,11 @@ export async function GET(request: Request) {
         // 5. VÉRIFIER LES PROPOSITIONS DE RÉVISION DE LOYER EN ATTENTE (POUR LOCATAIRE)
         const pendingPropositions = await prisma.propositionLoyer.findMany({
             where: {
-                bail: { tenantId: userId, deletedAt: null },
+                lease: { tenantId: userId, deletedAt: null },
                 statut: 'PROPOSE'
             },
             include: {
-                bail: { include: { property: { select: { name: true } } } }
+                lease: { include: { property: { select: { name: true } } } }
             }
         });
 

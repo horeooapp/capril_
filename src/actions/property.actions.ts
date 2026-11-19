@@ -462,7 +462,8 @@ export async function getPropertyPassport(id: string) {
             include: {
                 leases: {
                     include: {
-                        tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } }
+                        tenant: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } },
+                        incidentLogs: true
                     },
                     orderBy: { startDate: 'desc' }
                 },
@@ -479,6 +480,8 @@ export async function getPropertyPassport(id: string) {
             addressLine1: property.address, // UI compatibility
             type: property.propertyType, // UI compatibility
             surface: property.superficieM2, // UI compatibility
+            maintenanceRecords: property.maintenanceRecords || [],
+            technicalDocuments: property.technicalDocuments || [],
         };
     } catch (error) {
         console.error("[ACTION] getPropertyPassport error:", error);

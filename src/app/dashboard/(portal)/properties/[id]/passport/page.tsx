@@ -23,7 +23,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                         </ol>
                     </nav>
                     <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Passeport Logement</h1>
-                    <p className="text-sm text-gray-500 mt-1">Identité numérique et historique du bien QAPRIL-{property.id.slice(-6).toUpperCase()}</p>
+                    <p className="text-sm text-gray-500 mt-1">Identité numérique et historique du bien QAPRIL-{property.id ? property.id.slice(-6).toUpperCase() : "N/A"}</p>
                 </div>
                 <div className="bg-primary/10 text-primary px-4 py-2 rounded-lg border border-primary/20 flex flex-col items-center">
                     <span className="text-[10px] uppercase font-bold tracking-tighter">Statut QAPRIL</span>
@@ -40,7 +40,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                         <div className="space-y-4">
                             <div>
                                 <label className="text-xs text-gray-400">Type de bien</label>
-                                <p className="font-medium text-gray-900">{property.type}</p>
+                                <p className="font-medium text-gray-900">{property.type || property.propertyType || "Non spécifié"}</p>
                             </div>
                             <div>
                                 <label className="text-xs text-gray-400">Surface</label>
@@ -78,58 +78,69 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             Mémoire Locative (Historique des Baux)
                         </h2>
 
-                        {property.leases.length === 0 ? (
+                        {(!property.leases || property.leases.length === 0) ? (
                             <p className="text-sm text-gray-500 italic py-10 text-center">Aucun bail enregistré dans l'historique numérique.</p>
                         ) : (
                             <div className="flow-root">
                                 <ul className="-mb-8">
-                                    {property.leases.map((lease: any, idx: number) => (
-                                        <li key={lease.id}>
-                                            <div className="relative pb-8">
-                                                {idx !== property.leases.length - 1 && (
-                                                    <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
-                                                )}
-                                                <div className="relative flex space-x-3">
-                                                    <div>
-                                                        <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${lease.status === 'ACTIVE' ? 'bg-green-500' : 'bg-gray-400'}`}>
-                                                            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    {property.leases.map((lease: any, idx: number) => {
+                                        const tenantName = lease.tenant?.fullName || 
+                                            [lease.tenant?.firstName, lease.tenant?.lastName].filter(Boolean).join(" ") || 
+                                            lease.tenant?.phone || 
+                                            lease.tenant?.email || 
+                                            "Locataire non renseigné";
+                                        const startDate = lease.startDate ? new Date(lease.startDate) : null;
+                                        const endDate = lease.endDate ? new Date(lease.endDate) : null;
+                                        const incidents = Array.isArray(lease.incidents) ? lease.incidents : (Array.isArray(lease.incidentLogs) ? lease.incidentLogs : []);
+
+                                        return (
+                                            <li key={lease.id}>
+                                                <div className="relative pb-8">
+                                                    {idx !== (property.leases?.length || 0) - 1 && (
+                                                        <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                                    )}
+                                                    <div className="relative flex space-x-3">
                                                         <div>
-                                                            <p className="text-sm text-gray-500">
-                                                                Occupé par <span className="font-bold text-gray-900">{(lease.tenant.firstName ? lease.tenant.firstName + " " : "") + (lease.tenant.lastName || "") || lease.tenant.email}</span>
-                                                            </p>
-                                                            <p className="text-xs text-gray-400 mt-1">
-                                                                Loyer : <span className="font-bold text-primary">{lease.rentAmount.toLocaleString()} XOF</span>
-                                                            </p>
+                                                            <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${lease.status === 'ACTIVE' || lease.status === 'ACTIVE_DECLARATIF' ? 'bg-green-500' : 'bg-gray-400'}`}>
+                                                                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                </svg>
+                                                            </span>
                                                         </div>
-                                                        <div className="text-right text-xs whitespace-nowrap text-gray-500">
-                                                            <time dateTime={lease.startDate.toISOString()}>
-                                                                {new Date(lease.startDate).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}
-                                                            </time>
-                                                            {lease.endDate && (
-                                                                <span> — {new Date(lease.endDate).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}</span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                {/* Summary of incidents for this lease */}
-                                                {(lease.incidents as any[]).length > 0 && (
-                                                    <div className="ml-12 mt-2">
-                                                        {(lease.incidents as any[]).map(inc => (
-                                                            <div key={inc.id} className="text-[10px] bg-red-50 text-red-700 px-2 py-0.5 rounded inline-flex items-center mr-2">
-                                                                ⚠️ {inc.type} : {inc.severity}
+                                                        <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                            <div>
+                                                                <p className="text-sm text-gray-500">
+                                                                    Occupé par <span className="font-bold text-gray-900">{tenantName}</span>
+                                                                </p>
+                                                                <p className="text-xs text-gray-400 mt-1">
+                                                                    Loyer : <span className="font-bold text-primary">{Number(lease.rentAmount || 0).toLocaleString('fr-FR')} XOF</span>
+                                                                </p>
                                                             </div>
-                                                        ))}
+                                                            <div className="text-right text-xs whitespace-nowrap text-gray-500">
+                                                                <time dateTime={startDate ? startDate.toISOString() : undefined}>
+                                                                    {startDate ? startDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : "N/A"}
+                                                                </time>
+                                                                {endDate && (
+                                                                    <span> — {endDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
-                                        </li>
-                                    ))}
+                                                    
+                                                    {/* Summary of incidents for this lease */}
+                                                    {incidents.length > 0 && (
+                                                        <div className="ml-12 mt-2">
+                                                            {incidents.map((inc: any) => (
+                                                                <div key={inc.id} className="text-[10px] bg-red-50 text-red-700 px-2 py-0.5 rounded inline-flex items-center mr-2">
+                                                                    ⚠️ {inc.type} : {inc.severity}
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
                             </div>
                         )}
@@ -143,11 +154,11 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             Carnet d'Entretien (Maintenance)
                         </h2>
                         
-                        {(property as any).maintenanceRecords?.length === 0 ? (
+                        {(!property.maintenanceRecords || property.maintenanceRecords.length === 0) ? (
                             <p className="text-sm text-gray-500 italic py-4">Aucune intervention enregistrée.</p>
                         ) : (
                             <div className="space-y-4">
-                                {(property as any).maintenanceRecords.map((record: any) => (
+                                {property.maintenanceRecords.map((record: any) => (
                                     <div key={record.id} className="flex justify-between items-start border-l-2 border-primary/30 pl-4 py-2 hover:bg-gray-50 transition-colors">
                                         <div>
                                             <p className="text-sm font-bold text-gray-900">{record.type}</p>
@@ -155,8 +166,8 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                             {record.provider && <p className="text-[10px] text-gray-400 italic">Par : {record.provider}</p>}
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-black text-primary">{record.cost?.toLocaleString() || 0} XOF</p>
-                                            <p className="text-[10px] text-gray-400">{new Date(record.date).toLocaleDateString()}</p>
+                                            <p className="text-xs font-black text-primary">{Number(record.cost || 0).toLocaleString('fr-FR')} XOF</p>
+                                            <p className="text-[10px] text-gray-400">{record.date ? new Date(record.date).toLocaleDateString('fr-FR') : "N/A"}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -172,11 +183,11 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             Documents Techniques
                         </h2>
                         
-                        {(property as any).technicalDocuments?.length === 0 ? (
+                        {(!property.technicalDocuments || property.technicalDocuments.length === 0) ? (
                             <p className="text-sm text-gray-500 italic py-4">Aucun document technique disponible.</p>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {(property as any).technicalDocuments.map((doc: any) => (
+                                {property.technicalDocuments.map((doc: any) => (
                                     <a 
                                         key={doc.id} 
                                         href={doc.fileUrl} 
@@ -210,12 +221,12 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <p className="text-[10px] text-gray-400 uppercase font-bold">Investissement Maintenance</p>
                                 <p className="text-xl font-black text-gray-800">
-                                    {((property as any).maintenanceRecords?.reduce((acc: number, r: any) => acc + (r.cost || 0), 0))?.toLocaleString() || 0} <span className="text-[10px]">XOF</span>
+                                    {(property.maintenanceRecords || []).reduce((acc: number, r: any) => acc + (Number(r.cost) || 0), 0).toLocaleString('fr-FR')} <span className="text-[10px]">XOF</span>
                                 </p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <p className="text-[10px] text-gray-400 uppercase font-bold">Evolution Loyer (Historique)</p>
-                                <p className="text-xl font-black text-green-600">+{(property.leases.length > 1 ? "4.2%" : "---")}</p>
+                                <p className="text-xl font-black text-green-600">+{(property.leases && property.leases.length > 1 ? "4.2%" : "---")}</p>
                             </div>
                         </div>
                     </div>
