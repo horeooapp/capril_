@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { differenceInMonths, addDays } from "date-fns";
 import { PDFDocument } from "pdf-lib";
+import { fraisTimbre, pagesBail } from "@/lib/timbre";
 
 export interface TaxSimulation {
   exercice: number;
@@ -38,10 +39,10 @@ export class FiscalService {
 
       // Calcul initial
       const duree = lease.durationMonths || 12;
-      const nbPages = lease.nbPagesBail || 3;
+      const nbPages = pagesBail(lease.nbPagesBail);
       const loyerTotal = lease.rentAmount * duree;
       const droits = Math.round(loyerTotal * 0.025);
-      const timbre = nbPages * 500;
+      const timbre = fraisTimbre(nbPages);
       const fraisQapril = 0; // Mode Gratuit: Frais de service QAPRIL par défaut à 0 (WAS: 5000)
       const deadline = addDays(lease.signedAt || new Date(), 30);
 
@@ -86,7 +87,7 @@ export class FiscalService {
 
     if (!lease) throw new Error("Bail non trouvé");
 
-    let nbPages = lease.nbPagesBail || 3;
+    let nbPages = pagesBail(lease.nbPagesBail);
     if (pdfBuffer) {
       try {
         const pdfDoc = await PDFDocument.load(pdfBuffer);
@@ -99,7 +100,7 @@ export class FiscalService {
     const dossier = await this.getOrCreateDossier(leaseId);
     
     // Recalcul si nécessaire
-    const timbre = nbPages * 500;
+    const timbre = fraisTimbre(nbPages);
     const totalDgi = dossier.droitsEnregistrement + timbre;
     const totalBailleur = totalDgi + dossier.fraisQapril;
 

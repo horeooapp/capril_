@@ -1,68 +1,57 @@
-export function numberToFrenchWords(num: number): string {
-    if (num === 0) return "zéro";
-    
-    const units = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
-    const teens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
-    const tens = ["", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingts", "quatre-vingt-dix"];
-    
-    function convertBelowOneThousand(n: number): string {
-        if (n === 0) return "";
-        let res = "";
-        
-        const hundred = Math.floor(n / 100);
-        const remainder = n % 100;
-        
-        if (hundred > 0) {
-            if (hundred === 1) res += "cent ";
-            else res += units[hundred] + " cent " + (remainder === 0 ? "s " : "");
-        }
-        
-        if (remainder > 0) {
-            if (remainder < 10) res += units[remainder];
-            else if (remainder < 20) res += teens[remainder - 10];
-            else {
-                const ten = Math.floor(remainder / 10);
-                const unit = remainder % 10;
-                
-                if (ten === 7 || ten === 9) {
-                    res += tens[ten - 1] + "-" + teens[unit];
-                } else {
-                    res += tens[ten];
-                    if (unit === 1) res += " et un";
-                    else if (unit > 1) res += "-" + units[unit];
-                }
-            }
-        }
-        return res.trim();
-    }
+/**
+ * Montant en toutes lettres, en français.
+ *
+ * Règles d'accord appliquées (elles comptent : ce texte figure dans le bail signé) :
+ *  - « quatre-vingts » ne prend un s que lorsqu'il termine le nombre : quatre-vingts,
+ *    mais quatre-vingt-cinq, quatre-vingt mille ;
+ *  - « cent » multiplié ne prend un s que lorsqu'il termine le nombre : deux cents,
+ *    mais deux cent cinq, trois cent mille ;
+ *  - devant « million(s) » et « milliard(s) », qui sont des noms, l'accord est conservé :
+ *    quatre-vingts millions, deux cents millions ;
+ *  - « mille » est invariable.
+ */
+const UNITES = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
+const DIX_A_DIX_NEUF = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
+const DIZAINES = ["", "dix", "vingt", "trente", "quarante", "cinquante", "soixante"];
 
-    let result = "";
-    
-    const billions = Math.floor(num / 1000000000);
-    let rem = num % 1000000000;
-    
-    const millions = Math.floor(rem / 1000000);
-    rem %= 1000000;
-    
-    const thousands = Math.floor(rem / 1000);
-    rem %= 1000;
-    
-    if (billions > 0) {
-        result += convertBelowOneThousand(billions) + " milliard" + (billions > 1 ? "s " : " ");
+/** n de 1 à 99. `final` : le nombre se termine ici (ou précède million/milliard). */
+function moinsDeCent(n: number, final: boolean): string {
+    if (n < 10) return UNITES[n];
+    if (n < 20) return DIX_A_DIX_NEUF[n - 10];
+    const d = Math.floor(n / 10), u = n % 10;
+    if (d <= 6) {
+        if (u === 0) return DIZAINES[d];
+        return u === 1 ? `${DIZAINES[d]} et un` : `${DIZAINES[d]}-${UNITES[u]}`;
     }
-    
-    if (millions > 0) {
-        result += convertBelowOneThousand(millions) + " million" + (millions > 1 ? "s " : " ");
-    }
-    
-    if (thousands > 0) {
-        if (thousands === 1) result += "mille ";
-        else result += convertBelowOneThousand(thousands) + " mille ";
-    }
-    
-    if (rem > 0) {
-        result += convertBelowOneThousand(rem);
-    }
-    
-    return result.trim();
+    if (d === 7) return n === 71 ? "soixante et onze" : `soixante-${DIX_A_DIX_NEUF[n - 70]}`;
+    if (n === 80) return final ? "quatre-vingts" : "quatre-vingt";
+    return d === 8 ? `quatre-vingt-${UNITES[u]}` : `quatre-vingt-${DIX_A_DIX_NEUF[n - 90]}`;
+}
+
+/** n de 1 à 999. */
+function moinsDeMille(n: number, final: boolean): string {
+    const c = Math.floor(n / 100), r = n % 100;
+    let s = "";
+    if (c === 1) s = "cent";
+    else if (c > 1) s = `${UNITES[c]} cent${r === 0 && final ? "s" : ""}`;
+    if (r > 0) s += (s ? " " : "") + moinsDeCent(r, final);
+    return s;
+}
+
+export function numberToFrenchWords(num: number): string {
+    const n = Math.round(Math.abs(Number(num) || 0));
+    if (n === 0) return "zéro";
+
+    const milliards = Math.floor(n / 1_000_000_000);
+    const millions = Math.floor((n % 1_000_000_000) / 1_000_000);
+    const milliers = Math.floor((n % 1_000_000) / 1000);
+    const reste = n % 1000;
+
+    const parts: string[] = [];
+    if (milliards > 0) parts.push(`${moinsDeMille(milliards, true)} milliard${milliards > 1 ? "s" : ""}`);
+    if (millions > 0) parts.push(`${moinsDeMille(millions, true)} million${millions > 1 ? "s" : ""}`);
+    if (milliers === 1) parts.push("mille");
+    else if (milliers > 1) parts.push(`${moinsDeMille(milliers, false)} mille`); // invariable devant mille
+    if (reste > 0) parts.push(moinsDeMille(reste, true));
+    return parts.join(" ");
 }

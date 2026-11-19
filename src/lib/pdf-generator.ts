@@ -4,6 +4,7 @@ import { fr } from 'date-fns/locale';
 import QRCode from 'qrcode';
 import type { MarqueDocument } from './pdf-branding';
 import { drawStandardHeader, drawStandardFooter, COLORS, drawSectionTitle, drawInfoBox } from './pdf-branding';
+import { fraisTimbre as calculerTimbre, libelleTimbre, pagesBail } from './timbre';
 
 export interface ReceiptPDFParams {
   receiptRef: string;
@@ -305,6 +306,8 @@ export interface LeasePDFParams {
   dgiEnregistre?: boolean;
   dgiDate?: Date;
   dgiRef?: string;
+  /** Nombre de pages du bail complet (sert au timbre). Par défaut : bail QAPRIL. */
+  nbPagesBail?: number | null;
 }
 
 /**
@@ -321,7 +324,9 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
   const { width, height } = page.getSize();
   
   // 1. Header
-  await drawStandardHeader(page, pdfDoc, "CONTRAT DE BAIL À USAGE D'HABITATION", `Réf: ${data.leaseRef}`);
+  // [IC-06] Ce document d'une page est la fiche de bail : récapitulative, indicative, non signée.
+  // Le bail complet (21 articles) est celui qui est signé, timbré et enregistré.
+  await drawStandardHeader(page, pdfDoc, "FICHE DE BAIL", `Réf: ${data.leaseRef}`);
 
   let currentY = height - 135;
 
@@ -329,7 +334,11 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
   page.drawText("Bail soumis à la loi n° 2019-576 relative au bail à usage d'habitation.", {
     x: 50, y: currentY, size: 8.5, font: fontBold, color: COLORS.NAVY
   });
-  currentY -= 24;
+  currentY -= 12;
+  page.drawText("Fiche récapitulative et indicative. Seul le bail complet, signé par les parties, fait foi.", {
+    x: 50, y: currentY, size: 8, font, color: COLORS.SLATE
+  });
+  currentY -= 16;
 
   // Parties
   drawSectionTitle(page, fontBold, 'ENTRE LES SOUSSIGNÉS', currentY);
@@ -425,7 +434,9 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
 
   const assietteAnnuelle = data.rentAmount * Math.min(duration, 12);
   const droitsEnregistrement = Math.round(assietteAnnuelle * 0.025);
-  const fraisTimbre = 1000;
+  // Le timbre porte sur le bail complet, pas sur cette fiche d'une page.
+  const nbPagesBail = pagesBail(data.nbPagesBail);
+  const fraisTimbre = calculerTimbre(nbPagesBail);
   const totalFiscalDgi = droitsEnregistrement + fraisTimbre;
 
   // Box fiscal
@@ -440,7 +451,7 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
   page.drawText(`Assiette fiscale (12 mois max) : ${montantPdf(assietteAnnuelle)} F CFA · Taux légal : 2,5 %`, {
     x: 60, y: currentY - 14, size: 8, font
   });
-  page.drawText(`Droits d'enregistrement : ${montantPdf(droitsEnregistrement)} F CFA  |  Frais de timbre fiscal : ${montantPdf(fraisTimbre)} F CFA  |  Total DGI : ${montantPdf(totalFiscalDgi)} F CFA`, {
+  page.drawText(`Droits d'enregistrement : ${montantPdf(droitsEnregistrement)} F CFA  |  Timbre fiscal (${libelleTimbre(nbPagesBail)}) : ${montantPdf(fraisTimbre)} F CFA  |  Total DGI : ${montantPdf(totalFiscalDgi)} F CFA`, {
     x: 60, y: currentY - 28, size: 8.5, font: fontBold, color: COLORS.NAVY
   });
 

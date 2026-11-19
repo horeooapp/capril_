@@ -50,7 +50,7 @@ export async function GET(
         // S-06 : Récapitulatif des droits d'enregistrement calculé avant signature
         const duration = lease.durationMonths || 12;
         const rent = lease.rentAmount || 0;
-        const recapitulatifDroitsEnregistrement = calculerDroitsEnregistrement(rent, duration);
+        const recapitulatifDroitsEnregistrement = calculerDroitsEnregistrement(rent, duration, (lease as any).nbPagesBail);
 
         return NextResponse.json({ 
             lease: {

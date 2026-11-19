@@ -24,6 +24,7 @@ export async function GET(
 
         const pdfBuffer = await generateLeasePDF({
             leaseRef: lease.leaseReference,
+            nbPagesBail: (lease as any).nbPagesBail,
             landlord: lease.landlord,
             tenant: lease.tenant,
             property: lease.property,

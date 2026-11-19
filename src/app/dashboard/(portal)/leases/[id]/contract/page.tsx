@@ -34,7 +34,7 @@ export default async function LeaseContractViewPage({ params }: { params: Promis
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-sm transition-all"
                     >
-                        <Download size={15} /> Télécharger PDF
+                        <Download size={15} /> Fiche de bail (PDF, 1 page)
                     </a>
 
                     {/* Bouton Impression immédiate du document officiel */}

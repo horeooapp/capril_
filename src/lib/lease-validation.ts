@@ -7,12 +7,13 @@
  *   - Art. 416 CCH : Dépôt de garantie plafonné à 2 mois maximum.
  * - Article 550 CGI Côte d'Ivoire :
  *   - Droits d'enregistrement : 2,5 % de l'assiette locative annuelle.
- *   - Frais de timbre fiscal : 1 000 FCFA (2 pages à 500 FCFA).
+ *   - Frais de timbre fiscal : 500 FCFA par page (voir src/lib/timbre.ts).
  *
  * Messages issus de config/lexique.json (bail.duree_requise, bail.depot_max, bail.avance_max)
  */
 
 import lexique from "../../config/lexique.json";
+import { fraisTimbre as calculerTimbre, pagesBail } from "@/lib/timbre";
 
 export const DUREES_VALIDES_MOIS = [12, 24, 36] as const;
 export type DureeValideMois = (typeof DUREES_VALIDES_MOIS)[number];
@@ -31,7 +32,8 @@ export interface DroitsEnregistrementResult {
     baseCalcul: number;
     taux: number; // 0.025 (2.5%)
     droitsEnregistrement: number;
-    fraisTimbre: number; // 1 000 FCFA
+    fraisTimbre: number; // 500 F CFA par page
+    nbPages: number;
     totalDroitsDgi: number;
     mentionLegale: string;
 }
@@ -41,7 +43,8 @@ export interface DroitsEnregistrementResult {
  */
 export function calculerDroitsEnregistrement(
     loyerMensuel: number,
-    dureeMois: number
+    dureeMois: number,
+    nbPages?: number | null
 ): DroitsEnregistrementResult {
     const rent = Math.max(0, Math.round(Number(loyerMensuel) || 0));
     const duration = Math.max(1, Math.round(Number(dureeMois) || 12));
@@ -50,7 +53,7 @@ export function calculerDroitsEnregistrement(
     const dureeRetenueMois = Math.min(duration, 12);
     const baseCalcul = rent * dureeRetenueMois;
     const droitsEnregistrement = Math.round(baseCalcul * 0.025);
-    const fraisTimbre = 1000; // 2 pages x 500 F
+    const fraisTimbre = calculerTimbre(nbPages); // 500 F par page
     const totalDroitsDgi = droitsEnregistrement + fraisTimbre;
 
     return {
@@ -61,6 +64,7 @@ export function calculerDroitsEnregistrement(
         taux: 0.025,
         droitsEnregistrement,
         fraisTimbre,
+        nbPages: pagesBail(nbPages),
         totalDroitsDgi,
         mentionLegale: LEASE_LEXIQUE_MESSAGES.mention_loi_pdf,
     };

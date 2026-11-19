@@ -25,6 +25,7 @@ import { createLease, createBDQ } from "@/actions/lease.actions"
 import { getProperties } from "@/actions/property.actions"
 import { searchLocataireByPhonePartial } from "@/actions/search-locataire"
 import AgentBailDeclaratif from "@/components/AgentBailDeclaratif"
+import { fraisTimbre, libelleTimbre } from "@/lib/timbre";
 
 enum TypeBail {
     ECRIT = "ECRIT",
@@ -95,7 +96,7 @@ function LeaseRegistrationForm() {
     // Droits d'Enregistrement DGI (Art. 550 CGI CI - S-06)
     const baseCalculDgi = rentAmount * Math.min(durationMonths || 12, 12);
     const droitsDgi = Math.round(baseCalculDgi * 0.025);
-    const timbresDgi = 1000;
+    const timbresDgi = fraisTimbre();
     const totalDroitsDgi = droitsDgi + timbresDgi;
 
     const selectedProp = properties.find(p => p.id === propertyId);
@@ -642,7 +643,7 @@ function LeaseRegistrationForm() {
                                             <p className="text-sm font-bold text-white">{droitsDgi.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">
-                                            <span className="text-emerald-300/80">Timbre fiscal (2 p.)</span>
+                                            <span className="text-emerald-300/80">Timbre fiscal ({libelleTimbre()})</span>
                                             <p className="text-sm font-bold text-white">{timbresDgi.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">

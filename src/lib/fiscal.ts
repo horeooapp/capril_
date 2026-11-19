@@ -6,8 +6,10 @@
 import { DYNAMIC_PRICING } from "@/constants/pricing-dynamic";
 
 export const FISCAL_TAX_RATE = 0.025; // 2.5%
-export const STAMP_DUTY_PER_PAGE = 500;
-export const DEFAULT_PAGES_COUNT = 2;
+import { TIMBRE_PAR_PAGE, PAGES_BAIL_QAPRIL } from "@/lib/timbre";
+
+export const STAMP_DUTY_PER_PAGE = TIMBRE_PAR_PAGE;
+export const DEFAULT_PAGES_COUNT = PAGES_BAIL_QAPRIL;
 export const PENALTY_MONTHLY_RATE = 0.10; // 10% amende de retard (estimation standard)
 
 export interface FiscalCalculation {

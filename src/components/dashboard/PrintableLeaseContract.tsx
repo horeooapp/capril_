@@ -2,6 +2,7 @@ import React from 'react';
 import { format, addMonths, startOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { numberToFrenchWords } from '@/lib/number-to-letters';
+import { fraisTimbre, libelleTimbre } from "@/lib/timbre";
 
 interface PrintableLeaseContractProps {
   lease: any;
@@ -41,7 +42,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
   const durationMonths = lease.durationMonths || 12;
   const baseCalculDgi = rentAmount * Math.min(durationMonths, 12);
   const droitsEnregDgi = Math.round(baseCalculDgi * 0.025);
-  const fraisTimbreDgi = 1000;
+  const fraisTimbreDgi = Number(lease.fraisTimbre) || fraisTimbre(lease.nbPagesBail);
   const totalDgiEstime = Number(lease.droitsDgiCalcules) || (droitsEnregDgi + fraisTimbreDgi);
 
   return (
@@ -171,7 +172,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
             <div><span className="text-gray-500">Assiette annuelle :</span> <strong className="text-gray-900">{baseCalculDgi.toLocaleString()} XOF</strong></div>
             <div><span className="text-gray-500">Droits DGI (2,5 %) :</span> <strong className="text-gray-900">{droitsEnregDgi.toLocaleString()} XOF</strong></div>
-            <div><span className="text-gray-500">Timbres fiscaux (2 p.) :</span> <strong className="text-gray-900">{fraisTimbreDgi.toLocaleString()} XOF</strong></div>
+            <div><span className="text-gray-500">Timbre fiscal ({libelleTimbre(lease.nbPagesBail || (Number(lease.fraisTimbre) ? Number(lease.fraisTimbre) / 500 : null))}) :</span> <strong className="text-gray-900">{fraisTimbreDgi.toLocaleString()} XOF</strong></div>
             <div><span className="text-gray-500">Total prévisionnel :</span> <strong className="text-gray-900">{totalDgiEstime.toLocaleString()} XOF</strong></div>
           </div>
         </div>
@@ -298,7 +299,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
 
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div className="text-sm md:text-base">
-           <p>Fait à <strong>Abidjan</strong></p>
+           <p>Fait à <strong>{property.city || property.ville || property.commune || "Abidjan"}</strong></p>
            <p className="mt-2">En 2 exemplaires originaux</p>
            <p className="mt-2">Le <strong>{startStr}</strong></p>
         </div>

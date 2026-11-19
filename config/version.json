@@ -1,23 +1,23 @@
 {
-  "version": "2.0.4",
-  "buildNumber": 33,
+  "version": "2.0.5",
+  "buildNumber": 34,
   "releaseDate": "2026-11-19",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
   "apps": {
     "locataire": {
       "name": "QAPRIL Locataire",
-      "version": "2.0.4",
-      "versionCode": 33,
+      "version": "2.0.5",
+      "versionCode": 34,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Quittance express, personnalisation agence et correctifs IC-03 IC-04 IC-05"
+      "releaseNotes": "Timbre fiscal a 500 F par page (IC-06) et montants du bail en lettres (IC-07)"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
-      "version": "2.0.4",
-      "versionCode": 33,
+      "version": "2.0.5",
+      "versionCode": 34,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Quittance express, personnalisation agence et correctifs IC-03 IC-04 IC-05"
+      "releaseNotes": "Timbre fiscal a 500 F par page (IC-06) et montants du bail en lettres (IC-07)"
     }
   }
 }

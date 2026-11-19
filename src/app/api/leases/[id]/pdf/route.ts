@@ -101,6 +101,7 @@ export async function GET(
 
         const pdfBuffer = await generateLeasePDF({
             leaseRef: lease.leaseReference || `BAIL-${lease.id.substring(0, 8)}`,
+            nbPagesBail: (lease as any).nbPagesBail,
             landlord: lease.landlord || {
                 firstName: "Bailleur",
                 lastName: "",
