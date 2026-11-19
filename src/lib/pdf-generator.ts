@@ -2,6 +2,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import QRCode from 'qrcode';
+import type { MarqueDocument } from './pdf-branding';
 import { drawStandardHeader, drawStandardFooter, COLORS, drawSectionTitle, drawInfoBox } from './pdf-branding';
 
 export interface ReceiptPDFParams {
@@ -19,10 +20,27 @@ export interface ReceiptPDFParams {
   receiptHash?: string;
   qrToken?: string;
   declarative?: boolean;
+  /** Mention affichée au-dessus de l'empreinte (ex. quittance émise avant formalisation du bail). */
+  mention?: string;
+  /** Intitulé de la case de l'émetteur (« Propriétaire » par défaut, « Agence gestionnaire » pour une agence). */
+  emetteurLibelle?: string;
+  /** Précision sous le mode de règlement (ex. paiement reçu hors plateforme). */
+  paymentNote?: string;
+  /** Identité de l'agence ou du bailleur affichée en en-tête à la place du bloc QAPRIL. */
+  marque?: MarqueDocument;
   bailleurMasque?: boolean;
   agencyName?: string;
   agencyLicense?: string;
   mandateRef?: string;
+}
+
+/**
+ * Montant lisible dans un PDF. toLocaleString('fr-FR') sépare les milliers par une
+ * espace fine insécable (U+202F) que les polices standard du PDF ne savent pas
+ * encoder : la génération échouait pour tout montant supérieur à 999.
+ */
+function montantPdf(n: number): string {
+  return Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
 export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise<Buffer> {
@@ -37,7 +55,7 @@ export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise
   
   // 1. Header
   const title = receiptData.declarative ? 'QUITTANCE DÉCLARATIVE' : 'QUITTANCE DE LOYER';
-  await drawStandardHeader(page, pdfDoc, title, `Réf: ${receiptData.receiptRef}`);
+  await drawStandardHeader(page, pdfDoc, title, `Réf: ${receiptData.receiptRef}`, receiptData.marque);
 
   // 2. Info Sections
   let currentY = height - 145;
@@ -49,7 +67,7 @@ export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise
   // Calcul du libellé Bailleur (RG-CONF D-01)
   const isMasque = Boolean(receiptData.bailleurMasque);
   const landlordDisplayName = isMasque ? 'Bailleur (identité protégée)' : (receiptData.landlordName || 'Bailleur');
-  const landlordSubtitle = isMasque ? 'Identité protégée' : 'Propriétaire';
+  const landlordSubtitle = isMasque ? 'Identité protégée' : (receiptData.emetteurLibelle || 'Propriétaire');
 
   // Landlord Box
   drawInfoBox(page, 50, currentY - 55, 240, 55, landlordSubtitle, landlordDisplayName, fontBold, font);
@@ -97,19 +115,19 @@ export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise
 
   // Loyer
   page.drawText('Loyer net', { x: 60, y: currentY, size: 10, font });
-  page.drawText(`${receiptData.rentAmount.toLocaleString('fr-FR')} F`, { x: width - 180, y: currentY, size: 10, font });
+  page.drawText(`${montantPdf(receiptData.rentAmount)} F`, { x: width - 180, y: currentY, size: 10, font });
   currentY -= 20;
 
   // Charges
   page.drawText('Provisions pour charges', { x: 60, y: currentY, size: 10, font });
-  page.drawText(`${receiptData.chargesAmount.toLocaleString('fr-FR')} F`, { x: width - 180, y: currentY, size: 10, font });
+  page.drawText(`${montantPdf(receiptData.chargesAmount)} F`, { x: width - 180, y: currentY, size: 10, font });
   currentY -= 15;
 
   // Total Line
   page.drawLine({ start: { x: 50, y: currentY }, end: { x: width - 50, y: currentY }, thickness: 1, color: COLORS.LIGHT_GRAY });
   currentY -= 25;
   page.drawText('TOTAL PAYÉ', { x: 60, y: currentY, size: 13, font: fontBold, color: COLORS.NAVY });
-  page.drawText(`${receiptData.totalAmount.toLocaleString('fr-FR')} F CFA`, { x: width - 180, y: currentY, size: 13, font: fontBold, color: COLORS.NAVY });
+  page.drawText(`${montantPdf(receiptData.totalAmount)} F CFA`, { x: width - 180, y: currentY, size: 13, font: fontBold, color: COLORS.NAVY });
   currentY -= 45;
 
   // 4. Verification & Metadata
@@ -122,6 +140,9 @@ export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise
   page.drawText(`Date de règlement : ${formattedDate}`, { x: 50, y: currentY, size: 9, font });
   currentY -= 14;
   page.drawText(`Bail de référence : ${receiptData.leaseRef}`, { x: 50, y: currentY, size: 9, font });
+  if (receiptData.paymentNote) {
+    page.drawText(receiptData.paymentNote, { x: 50, y: currentY - 14, size: 8.5, font, color: COLORS.SLATE });
+  }
 
   // QR CODE
   const token = receiptData.qrToken || receiptData.receiptRef;
@@ -145,6 +166,10 @@ export async function generateReceiptPDF(receiptData: ReceiptPDFParams): Promise
     });
   } catch (e) {
     console.error('Failed to embed QR code', e);
+  }
+
+  if (receiptData.mention) {
+    page.drawText(receiptData.mention, { x: 50, y: 135, size: 8.5, font: fontBold, color: COLORS.NAVY, maxWidth: width - 100, lineHeight: 11 });
   }
 
   // 5. Empreinte numérique & formule conforme au lexique (D-01 / quittances.pied_pdf)
@@ -371,20 +396,20 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
   });
   currentY -= 14;
 
-  page.drawText(`LOYER MENSUEL NET : ${data.rentAmount.toLocaleString('fr-FR')} F CFA`, {
+  page.drawText(`LOYER MENSUEL NET : ${montantPdf(data.rentAmount)} F CFA`, {
     x: 50, y: currentY, size: 9.5, font: fontBold
   });
   currentY -= 14;
 
   const maxDepot = data.rentAmount * 2;
   const depot = Math.min(data.depositAmount || 0, maxDepot);
-  page.drawText(`DÉPÔT DE GARANTIE : ${depot.toLocaleString('fr-FR')} F CFA (Plafond légal : maximum 2 mois de loyer)`, {
+  page.drawText(`DÉPÔT DE GARANTIE : ${montantPdf(depot)} F CFA (Plafond légal : maximum 2 mois de loyer)`, {
     x: 50, y: currentY, size: 8.5, font
   });
   currentY -= 14;
 
   const avance = Math.min(data.avanceAmount || 0, maxDepot);
-  page.drawText(`AVANCE SUR LOYER : ${avance.toLocaleString('fr-FR')} F CFA (Plafond légal : maximum 2 mois de loyer)`, {
+  page.drawText(`AVANCE SUR LOYER : ${montantPdf(avance)} F CFA (Plafond légal : maximum 2 mois de loyer)`, {
     x: 50, y: currentY, size: 8.5, font
   });
   currentY -= 14;
@@ -412,10 +437,10 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
     color: COLORS.LIGHT_GRAY,
   });
 
-  page.drawText(`Assiette fiscale (12 mois max) : ${assietteAnnuelle.toLocaleString('fr-FR')} F CFA · Taux légal : 2,5 %`, {
+  page.drawText(`Assiette fiscale (12 mois max) : ${montantPdf(assietteAnnuelle)} F CFA · Taux légal : 2,5 %`, {
     x: 60, y: currentY - 14, size: 8, font
   });
-  page.drawText(`Droits d'enregistrement : ${droitsEnregistrement.toLocaleString('fr-FR')} F CFA  |  Frais de timbre fiscal : ${fraisTimbre.toLocaleString('fr-FR')} F CFA  |  Total DGI : ${totalFiscalDgi.toLocaleString('fr-FR')} F CFA`, {
+  page.drawText(`Droits d'enregistrement : ${montantPdf(droitsEnregistrement)} F CFA  |  Frais de timbre fiscal : ${montantPdf(fraisTimbre)} F CFA  |  Total DGI : ${montantPdf(totalFiscalDgi)} F CFA`, {
     x: 60, y: currentY - 28, size: 8.5, font: fontBold, color: COLORS.NAVY
   });
 
@@ -427,7 +452,7 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
       x: 60, y: currentY - 44, size: 8.5, font: fontBold, color: COLORS.SUCCESS
     });
   } else {
-    page.drawText(`Signé, en attente d'enregistrement fiscal (Droits calculés : ${totalFiscalDgi.toLocaleString('fr-FR')} F CFA)`, {
+    page.drawText(`Signé, en attente d'enregistrement fiscal (Droits calculés : ${montantPdf(totalFiscalDgi)} F CFA)`, {
       x: 60, y: currentY - 44, size: 8.5, font: fontBold, color: rgb(0.7, 0.35, 0)
     });
   }

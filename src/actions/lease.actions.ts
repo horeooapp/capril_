@@ -823,44 +823,34 @@ export async function requestSignatureOTP(leaseId: string) {
         const risk = await evaluateTransactionRisk({ userId: session.user.id, action: "SIGNATURE" });
         if (!risk.isSafe) throw new Error(`Risque détecté : ${risk.reason}`);
 
-        const lease = await prisma.lease.findUnique({ 
-            where: { id: leaseId }, 
-            include: { tenant: true, property: true } 
+        // [IC-05] Contrôle d'accès, code à durée limitée, envoi au seul locataire.
+        const { preparerCodeSignature } = await import("@/lib/lease-signature");
+        const r = await preparerCodeSignature(prisma, {
+            leaseId, demandeurId: session.user.id, demandeurRole: session.user.role as string,
         });
-        if (!lease) throw new Error("Bail introuvable.");
+        const estLocataire = r.destinataire.userId === session.user.id;
 
-        // [SEC-FIX F-03] OTP cryptographiquement sécurisé
-        const otp = randomInt(100000, 999999).toString();
-        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours de validité
-
-        await prisma.lease.update({ 
-            where: { id: leaseId }, 
-            data: { 
-                signingOtpHash: hashOtp(otp),
-                signingOtpExpiresAt: otpExpiresAt 
-            } as any
-        });
-
-        const targetPhone = lease.tenant?.phone || (session.user as any).phone;
-        const targetEmail = lease.tenant?.email || session.user.email;
-        const targetName = lease.tenant?.firstName ? `${lease.tenant.firstName} ${lease.tenant.lastName || ''}`.trim() : 'Locataire';
-
-        await dispatchLeaseInitiationNotification({
-            leaseId: lease.id,
-            leaseReference: lease.leaseReference,
-            propertyName: lease.property?.name || lease.property?.address || 'le logement',
-            rentAmount: lease.rentAmount,
-            depositAmount: lease.depositAmount || 0,
-            signingOtp: otp,
+        const envoi = await dispatchLeaseInitiationNotification({
+            leaseId: r.bail.id,
+            leaseReference: r.bail.leaseReference,
+            propertyName: r.bail.property?.name || r.bail.property?.address || 'le logement',
+            rentAmount: r.bail.rentAmount,
+            depositAmount: r.bail.depositAmount || 0,
+            signingOtp: r.code,
             recipientRole: 'TENANT',
-            recipientName: targetName,
-            recipientPhone: targetPhone,
-            recipientEmail: targetEmail,
-            recipientUserId: lease.tenantId,
-            initiatorName: 'Le bailleur'
-        });
+            recipientName: r.destinataire.nom,
+            recipientPhone: r.destinataire.telephone || undefined,
+            recipientEmail: r.destinataire.email || undefined,
+            recipientUserId: r.destinataire.userId || undefined,
+            initiatorName: estLocataire ? 'QAPRIL' : 'Le bailleur'
+        } as any);
 
-        return { success: true };
+        const c = (envoi || {}) as Record<string, boolean>;
+        if (!c.sms && !c.whatsapp && !c.email && !c.inApp && !c.push) {
+            return { success: false, error: "Le code n’a pu être envoyé au locataire par aucun canal. Vérifiez son numéro de téléphone, puis réessayez." };
+        }
+        revalidatePath(`/dashboard/leases/${leaseId}`);
+        return { success: true, canaux: c };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
@@ -872,55 +862,23 @@ export async function requestSignatureOTP(leaseId: string) {
 export async function signLease(leaseId: string, otp: string) {
     try {
         const session = await ensureAuthenticated();
-        const userId = session.user.id;
-        const cleanOtp = (otp || "").trim();
 
-        if (!cleanOtp) throw new Error("Veuillez saisir votre code de validation à 6 chiffres.");
-
-        const lease = await prisma.lease.findUnique({ 
-            where: { id: leaseId },
-            include: { tenant: true, property: true }
+        // [IC-05] Seul le locataire signe ; expiration, 5 essais, empreinte du contenu, preuve.
+        const { signerBail } = await import("@/lib/lease-signature");
+        const { headers } = await import("next/headers");
+        const h = await headers();
+        const r = await signerBail(prisma, {
+            leaseId,
+            signataireId: session.user.id,
+            code: otp,
+            ip: (h.get("x-forwarded-for") || h.get("x-real-ip") || "").split(",")[0].trim() || undefined,
+            userAgent: h.get("user-agent") || undefined,
         });
-        if (!lease) throw new Error("Contrat de bail introuvable.");
 
-        // Check user identity: user is tenantId or user phone/email matches tenant
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { phone: true, email: true }
-        });
-        const isAuthorizedTenant = lease.tenantId === userId || 
-            (user?.phone && lease.tenant?.phone && normalizePhone(user.phone) === normalizePhone(lease.tenant.phone)) ||
-            (user?.email && lease.tenant?.email && user.email.toLowerCase() === lease.tenant.email.toLowerCase());
-
-        const isAdmin = session.user.role === Role.ADMIN || session.user.role === Role.SUPER_ADMIN;
-        if (!isAuthorizedTenant && !isAdmin) {
-            throw new Error("Vous n'êtes pas autorisé à signer ce contrat de bail.");
-        }
-
-        // Verify OTP via secure sha256 hash (M-02)
-        const isOtpValid = lease.signingOtpHash === hashOtp(cleanOtp) || (lease as any).signingOtp === cleanOtp;
-        if (!isOtpValid) {
-            throw new Error("Code de validation incorrect ou expiré. Veuillez vérifier le code reçu par WhatsApp / Email.");
-        }
-
-        // Update lease to ACTIVE and link tenantId if needed
-        await prisma.lease.update({
-            where: { id: leaseId },
-            data: {
-                tenantId: userId,
-                isSignedElectronically: true,
-                signedAt: new Date(),
-                signingOtpHash: null,
-                signingOtpExpiresAt: null,
-                status: LeaseStatus.ACTIVE
-            } as any
-        });
-        await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });
-        
         // --- [ORCHESTRATION] P1 Transitions ---
         try {
             await LoyerService.initLeaseSynthesis(leaseId);
-            if (lease.typeBail === TypeBail.ECRIT) {
+            if (r.typeBail === TypeBail.ECRIT) {
                 await FiscalService.getOrCreateDossier(leaseId);
             }
             // Notification bilatérale (Locataire & Bailleur) dès que le bail est validé et actif
@@ -930,6 +888,7 @@ export async function signLease(leaseId: string, otp: string) {
         }
 
         revalidatePath(`/dashboard/leases/${leaseId}`);
+        revalidatePath("/dashboard/quittance-express");
         revalidatePath("/mon-espace-locataire");
         revalidatePath("/mon-espace-locataire/leases");
         revalidatePath(`/mon-espace-locataire/leases/${leaseId}`);
@@ -966,11 +925,11 @@ export async function validateLeaseWithCode(otp: string, leaseId?: string) {
 
             lease = await prisma.lease.findFirst({
                 where: {
-                    OR: [
-                        { signingOtpHash: hashOtp(cleanOtp) },
-                        { signingOtp: cleanOtp } as any,
-                    ],
-                    status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] },
+                    // [IC-05] « signingOtp » n'existe pas en base : la requête échouait à chaque appel.
+                    signingOtpHash: hashOtp(cleanOtp),
+                    isSignedElectronically: false,
+                    deletedAt: null,
+                    status: { notIn: [LeaseStatus.CANCELLED, LeaseStatus.TERMINATED, LeaseStatus.ARCHIVED] },
                     AND: [
                         {
                             OR: [
@@ -984,19 +943,7 @@ export async function validateLeaseWithCode(otp: string, leaseId?: string) {
                 include: { tenant: true, property: true }
             });
 
-            // Fallback global par code OTP si unique
-            if (!lease) {
-                lease = await prisma.lease.findFirst({
-                    where: {
-                        OR: [
-                            { signingOtpHash: hashOtp(cleanOtp) },
-                            { signingOtp: cleanOtp } as any,
-                        ],
-                        status: { in: [LeaseStatus.PENDING_SIGNATURE, LeaseStatus.PENDING_CONFIRMATION, LeaseStatus.DRAFT] }
-                    },
-                    include: { tenant: true, property: true }
-                });
-            }
+            // [IC-05] Pas de recherche parmi les baux des autres : on ne signe que le sien.
         }
 
         if (!lease) {

@@ -237,7 +237,15 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
                     ...(normalized ? [{ tenant: { phone: normalized } }] : []),
                     ...(user.email ? [{ tenant: { email: user.email } }] : [])
                 ],
-                status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] },
+                // [IC-05] Un bail né d'une quittance express est déjà « actif déclaratif » quand il part à la
+                // signature : on l'affiche aussi dès qu'un code de signature est en cours.
+                AND: [{
+                    OR: [
+                        { status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] } },
+                        { status: "ACTIVE_DECLARATIF", isSignedElectronically: false, signingOtpHash: { not: null } }
+                    ]
+                }],
+                deletedAt: null,
                 ...(activeLease ? { id: { not: activeLease.id } } : {})
             },
             include: {

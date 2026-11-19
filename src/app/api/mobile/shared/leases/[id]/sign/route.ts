@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
-import { sendSMS } from '@/lib/sms';
 import { LoyerService } from '@/lib/loyer-service';
 import { FiscalService } from '@/lib/fiscal-service';
 import { TypeBail } from '@prisma/client';
-import crypto from 'crypto';
 
 export async function POST(
     request: Request,
@@ -27,66 +25,25 @@ export async function POST(
             return NextResponse.json({ error: "Code OTP manquant." }, { status: 400 });
         }
 
-        const lease = await prisma.lease.findUnique({ 
-            where: { id: leaseId }, 
-            include: { tenant: true, property: true } 
-        });
-
-        if (!lease) {
-            return NextResponse.json({ error: "Bail introuvable." }, { status: 404 });
-        }
-
-        // Verify access
-        const isTenant = lease.tenantId === user.userId;
-        const isOwner = lease.ownerId === user.userId;
-        const isAgent = lease.agentId === user.userId;
-        const isPropertyOwner = lease.property?.ownerUserId === user.userId;
-        const isPropertyLandlord = (lease.landlordId === user.userId || lease.property?.ownerUserId === user.userId);
-
-        if (!isTenant && !isOwner && !isAgent && !isPropertyOwner && !isPropertyLandlord) {
-            return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
-        }
-
-        // [SEC-FIX F-04] Vérification expiration OTP (15 min)
-        const leaseWithOtp = lease as any;
-        if (leaseWithOtp.signingOtpExpiresAt && new Date() > new Date(leaseWithOtp.signingOtpExpiresAt)) {
-            return NextResponse.json({ error: "Code OTP expiré. Veuillez en demander un nouveau." }, { status: 400 });
-        }
-
-        // [SEC-FIX F-04] Compteur d'échecs - bloquer après 5 tentatives
-        const failedAttempts = (leaseWithOtp.signingOtpAttempts || leaseWithOtp.signingOtpFailedAttempts || 0);
-        if (failedAttempts >= 5) {
-            return NextResponse.json({ error: "Trop de tentatives échouées. Veuillez demander un nouveau code." }, { status: 429 });
-        }
-
-        // Verify OTP via hash
-        const hashedInput = crypto.createHash('sha256').update(String(otp).trim()).digest('hex');
-        const isOtpValid = leaseWithOtp.signingOtpHash === hashedInput || leaseWithOtp.signingOtp === otp;
-
-        if (!isOtpValid) {
-            // Incrémenter le compteur d'échecs
-            await prisma.lease.update({
-                where: { id: leaseId },
-                data: { signingOtpAttempts: failedAttempts + 1 }
+        // [IC-05] Même règle que le web : seul le locataire signe (plus le bailleur ni l'agence).
+        const { signerBail, SignatureError } = await import('@/lib/lease-signature');
+        let lease: { typeBail: string };
+        try {
+            lease = await signerBail(prisma, {
+                leaseId,
+                signataireId: user.userId,
+                code: String(otp),
+                ip: (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || undefined,
+                userAgent: request.headers.get('user-agent') || undefined,
             });
-            return NextResponse.json({ error: "Code OTP invalide." }, { status: 400 });
+        } catch (e: any) {
+            if (e instanceof SignatureError) {
+                const statut = e.code === 'ACCES' ? 403 : e.code === 'INTROUVABLE' ? 404 : e.code === 'BLOQUE' ? 429 : 400;
+                return NextResponse.json({ error: e.message, code: e.code }, { status: statut });
+            }
+            throw e;
         }
 
-        // Sign Lease — réinitialiser les champs OTP (F-04)
-        await prisma.lease.update({
-            where: { id: leaseId },
-            data: {
-                isSignedElectronically: true,
-                signedAt: new Date(),
-                signingOtpHash: null,
-                signingOtpExpiresAt: null,
-                signingOtpAttempts: 0,
-                status: "ACTIVE"
-            }
-        });
-        
-        await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });
-        
         // Orchestration (Loyer, Fiscal, Notification bilatérale)
         try {
             await LoyerService.initLeaseSynthesis(leaseId);

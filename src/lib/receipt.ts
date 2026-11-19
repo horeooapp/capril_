@@ -165,6 +165,7 @@ async function issueSingleReceipt(params: {
                 agencyName: (params.lease as any).agency?.name || (params.lease.typeGestion === 'AGREE' ? 'Agence de gestion agréée' : undefined),
                 agencyLicense: (params.lease as any).agency?.licenseNumber || undefined,
                 mandateRef: (params.lease as any).mandatGestionId || undefined,
+                marque: await (await import('./quittance-personnalisation')).chargerMarque((params.lease as any).agentId || (params.lease as any).landlordId).catch(() => null) || undefined,
             });
 
             // Trigger Notification (Async - Simultaneous SMS + WA)

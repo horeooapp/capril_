@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
-import { sendSMS } from '@/lib/sms';
-import crypto from 'crypto';
 
 export async function POST(
     request: Request,
@@ -17,54 +15,34 @@ export async function POST(
         const { id } = await params;
         const leaseId = id;
 
-        const lease = await prisma.lease.findUnique({ 
-            where: { id: leaseId }, 
-            include: { tenant: true, property: true } 
-        });
-
-        if (!lease || !lease.tenant) {
-            return NextResponse.json({ error: "Bail ou locataire introuvable." }, { status: 404 });
-        }
-
-        // Verify access
-        const isTenant = lease.tenantId === user.userId;
-        const isOwner = lease.ownerId === user.userId;
-        const isAgent = lease.agentId === user.userId;
-        const isPropertyOwner = lease.property?.ownerUserId === user.userId;
-        const isPropertyLandlord = (lease.landlordId === user.userId || lease.property?.ownerUserId === user.userId);
-
-        if (!isTenant && !isOwner && !isAgent && !isPropertyOwner && !isPropertyLandlord) {
-            return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
-        }
-
-        const otp = crypto.randomInt(100000, 999999).toString();
-        // Expiration OTP à 7 jours pour signature
-        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        
-        await prisma.lease.update({ 
-            where: { id: leaseId }, 
-            data: { 
-                signingOtpHash: crypto.createHash('sha256').update(otp).digest('hex'),
-                signingOtpExpiresAt: otpExpiresAt,
-                signingOtpAttempts: 0
+        // [IC-05] Même règle que le web : contrôle d'accès, code limité, envoi au seul locataire.
+        const { preparerCodeSignature, SignatureError } = await import('@/lib/lease-signature');
+        let r;
+        try {
+            r = await preparerCodeSignature(prisma, { leaseId, demandeurId: user.userId, demandeurRole: (user as any).role });
+        } catch (e: any) {
+            if (e instanceof SignatureError) {
+                const statut = e.code === 'ACCES' ? 403 : e.code === 'INTROUVABLE' ? 404 : 400;
+                return NextResponse.json({ error: e.message, code: e.code }, { status: statut });
             }
-        });
+            throw e;
+        }
 
         const { dispatchLeaseInitiationNotification } = await import('@/lib/lease-notification');
         await dispatchLeaseInitiationNotification({
-            leaseId: lease.id,
-            leaseReference: lease.leaseReference,
-            propertyName: lease.property?.name || lease.property?.address || 'le logement',
-            rentAmount: lease.rentAmount,
-            depositAmount: lease.depositAmount || 0,
-            signingOtp: otp,
+            leaseId: r.bail.id,
+            leaseReference: r.bail.leaseReference,
+            propertyName: r.bail.property?.name || r.bail.property?.address || 'le logement',
+            rentAmount: r.bail.rentAmount,
+            depositAmount: r.bail.depositAmount || 0,
+            signingOtp: r.code,
             recipientRole: 'TENANT',
-            recipientName: `${lease.tenant.firstName || ''} ${lease.tenant.lastName || ''}`.trim() || 'Locataire',
-            recipientPhone: lease.tenant.phone,
-            recipientEmail: lease.tenant.email,
-            recipientUserId: lease.tenantId,
+            recipientName: r.destinataire.nom,
+            recipientPhone: r.destinataire.telephone || undefined,
+            recipientEmail: r.destinataire.email || undefined,
+            recipientUserId: r.destinataire.userId || undefined,
             initiatorName: 'Le bailleur'
-        });
+        } as any);
 
         return NextResponse.json({ success: true });
 

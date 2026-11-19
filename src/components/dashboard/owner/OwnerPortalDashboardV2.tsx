@@ -135,6 +135,13 @@ export function OwnerPortalDashboardV2({
             <Building2 size={15} className="text-slate-400" />
             <span>Ajouter un Bien</span>
           </Link>
+          <Link
+            href="/dashboard/quittance-express"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FF8200] hover:bg-[#e67500] text-white text-xs font-bold transition-all duration-200"
+          >
+            <Receipt size={15} />
+            <span>Quittance express</span>
+          </Link>
           <Link 
             href="/dashboard/receipts" 
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-xs font-bold transition-all duration-200"
