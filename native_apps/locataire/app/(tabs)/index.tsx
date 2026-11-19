@@ -1596,6 +1596,31 @@ export default function LocatairePrototypeScreen() {
                   </View>
                 )}
               </View>
+            ) : data?.pendingSignatureLease ? (
+              <View style={[styles.card, { borderColor: '#FDE68A', backgroundColor: '#FFFDF5', padding: 20 }]}>
+                <View style={styles.rowBetween}>
+                  <Text style={[styles.label, { color: '#92400E', fontWeight: '800' }]}>CONTRAT DE BAIL À SIGNER</Text>
+                  <View style={{ backgroundColor: '#FEF3C7', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: '#B45309' }}>En attente de signature</Text>
+                  </View>
+                </View>
+                <Text style={[styles.h2, { color: '#1A1D26', marginTop: 6 }]}>
+                  {data.pendingSignatureLease.propertyName || 'Logement conventionné'}
+                </Text>
+                <Text style={[styles.subMuted, { marginTop: 2 }]}>
+                  Bailleur : {data.pendingSignatureLease.landlordName} · Loyer : {fmt(Number(data.pendingSignatureLease.rentAmount) || 0)}
+                </Text>
+                <Text style={{ fontSize: 12, color: '#92400E', marginTop: 8, lineHeight: 17 }}>
+                  Votre contrat de bail a été initié. Saisissez votre code de validation reçu par WhatsApp, texto ou e-mail pour valider et signer votre contrat.
+                </Text>
+                <Pressable
+                  style={[styles.btnPrimary, { backgroundColor: '#10B981', marginTop: 14 }]}
+                  onPress={() => router.push({ pathname: '/signature/[id]', params: { id: data.pendingSignatureLease.id } } as any)}
+                >
+                  <CheckCircle2 color="#fff" size={16} />
+                  <Text style={styles.btnPrimaryText}>Saisir mon code et signer le bail →</Text>
+                </Pressable>
+              </View>
             ) : pendingDeclaration ? (
               <View style={[styles.card, { borderColor: '#FCD34D', backgroundColor: '#FFFDF5', padding: 20 }]}>
                 <View style={styles.rowBetween}>

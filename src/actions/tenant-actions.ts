@@ -133,49 +133,10 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
             }
         }
 
-        // Sélectionner le bail actif demandé ou le premier disponible
+        // Sélectionner le bail actif demandé ou le premier disponible (strictement actif et signé)
         let activeLease = requestedLeaseId 
             ? allActiveLeases.find(l => l.id === requestedLeaseId) || allActiveLeases[0]
             : allActiveLeases[0];
-
-        // 3.1 Si aucun bail actif confirmé, chercher un bail en cours (PENDING_SIGNATURE, PENDING_CONFIRMATION, DRAFT)
-        if (!activeLease) {
-            activeLease = await prisma.lease.findFirst({
-                where: {
-                    OR: [
-                        { tenantId: userId },
-                        ...(normalized ? [{ tenant: { phone: normalized } }] : []),
-                        ...(user.email ? [{ tenant: { email: user.email } }] : [])
-                    ],
-                    status: { in: ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT"] }
-                },
-                orderBy: { createdAt: "desc" },
-                include: {
-                    property: true,
-                    landlord: { 
-                        select: { 
-                            lastName: true, 
-                            firstName: true, 
-                            phone: true,
-                            walletConfig: { select: { landlordCode: true } }
-                        } 
-                    },
-                    receipts: {
-                        orderBy: { createdAt: "desc" },
-                        take: 5
-                    },
-                    arrears: {
-                        where: { status: { in: ["unpaid", "UNPAID"] } }
-                    },
-                    openingState: true,
-                    etatsDesLieux: {
-                        orderBy: { createdAt: "desc" },
-                        take: 2
-                    },
-                    caution: true
-                }
-            });
-        }
 
         // ────────────────────────────────────────────────────────
         // LOGIQUE D'AUTORÉPARATION (C-MERGE-AUTO)
@@ -222,7 +183,7 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
                 activeLease = await prisma.lease.findFirst({
                     where: {
                         tenantId: userId,
-                        status: { in: ["ACTIVE", "LOYER_IMPAYE", "PENDING_SIGNATURE", "ACTIVE_DECLARATIF", "DRAFT", "PENDING_CONFIRMATION"] }
+                        status: { in: ["ACTIVE", "LOYER_IMPAYE", "ACTIVE_DECLARATIF"] }
                     },
                     include: {
                         property: true,

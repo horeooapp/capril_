@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextI
 import { FormScreen } from '../../components/forms/FormScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ShieldCheck, FileText, CheckCircle2 } from 'lucide-react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchWithAuth } from '../../lib/api';
 
 export default function SignatureScreen() {
   const { id } = useLocalSearchParams();
@@ -22,16 +22,7 @@ export default function SignatureScreen() {
 
   const fetchLeaseDetails = async () => {
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      // For development, assuming the API runs on localhost or a known IP. 
-      // In production, use your actual API URL.
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:3000';
-      const response = await fetch(`${apiUrl}/api/mobile/shared/leases/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
+      const response = await fetchWithAuth(`/shared/leases/${id}`);
       const data = await response.json();
       if (response.ok) {
         setLease(data.lease);
@@ -50,13 +41,8 @@ export default function SignatureScreen() {
   const handleRequestOTP = async () => {
     setProcessing(true);
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:3000';
-      const response = await fetch(`${apiUrl}/api/mobile/shared/leases/${id}/otp`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const response = await fetchWithAuth(`/shared/leases/${id}/otp`, {
+        method: 'POST'
       });
       
       const data = await response.json();
@@ -80,14 +66,8 @@ export default function SignatureScreen() {
     
     setProcessing(true);
     try {
-      const token = await AsyncStorage.getItem('userToken');
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.100:3000';
-      const response = await fetch(`${apiUrl}/api/mobile/shared/leases/${id}/sign`, {
+      const response = await fetchWithAuth(`/shared/leases/${id}/sign`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify({ otp })
       });
       

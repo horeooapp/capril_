@@ -116,7 +116,7 @@ export default function BauxScreen() {
                 </View>
                 <View style={l.status === 'ACTIVE' ? styles.pillActive : styles.pillPending}>
                   <Text style={l.status === 'ACTIVE' ? styles.pillActiveText : styles.pillPendingText}>
-                    {l.status === 'ACTIVE' ? 'Actif' : 'En attente'}
+                    {l.status === 'ACTIVE' ? 'Actif & validé' : 'En attente de signature'}
                   </Text>
                 </View>
               </View>

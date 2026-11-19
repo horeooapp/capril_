@@ -37,10 +37,9 @@ export async function POST(
             return NextResponse.json({ error: "Accès refusé" }, { status: 403 });
         }
 
-        // [SEC-FIX F-03] OTP cryptographiquement sécurisé (remplace Math.random non-crypto)
         const otp = crypto.randomInt(100000, 999999).toString();
-        // [SEC-FIX F-04] Expiration OTP à 15 minutes maximum
-        const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+        // Expiration OTP à 7 jours pour signature
+        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         
         await prisma.lease.update({ 
             where: { id: leaseId }, 
@@ -51,10 +50,21 @@ export async function POST(
             }
         });
 
-        if (lease.tenant.phone) {
-            const { sendOpenWAOTP } = await import("@/lib/openwa");
-            await sendOpenWAOTP(lease.tenant.phone, otp, "Signature de contrat de bail");
-        }
+        const { dispatchLeaseInitiationNotification } = await import('@/lib/lease-notification');
+        await dispatchLeaseInitiationNotification({
+            leaseId: lease.id,
+            leaseReference: lease.leaseReference,
+            propertyName: lease.property?.name || lease.property?.address || 'le logement',
+            rentAmount: lease.rentAmount,
+            depositAmount: lease.depositAmount || 0,
+            signingOtp: otp,
+            recipientRole: 'TENANT',
+            recipientName: `${lease.tenant.firstName || ''} ${lease.tenant.lastName || ''}`.trim() || 'Locataire',
+            recipientPhone: lease.tenant.phone,
+            recipientEmail: lease.tenant.email,
+            recipientUserId: lease.tenantId,
+            initiatorName: 'Le bailleur'
+        });
 
         return NextResponse.json({ success: true });
 

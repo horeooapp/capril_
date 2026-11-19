@@ -22,12 +22,12 @@ export async function GET(
                 property: true,
                 tenant: {
                     include: {
-                        tenantProfile: true
+                        locataireProfile: true
                     }
                 },
                 tenantEntity: true,
-                owner: true,
-                propertyAgent: true,
+                landlord: true,
+                agent: true,
                 mandatGestion: true
             }
         });

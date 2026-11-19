@@ -21,7 +21,27 @@ export async function GET(request: Request) {
         });
 
         if (!lease) {
-            return NextResponse.json({ error: "Aucun bail trouvé" }, { status: 404 });
+            // Chercher si un bail est en attente de signature
+            const pendingLease = await prisma.lease.findFirst({
+                where: { tenantId: user.userId, status: 'PENDING_SIGNATURE' },
+                include: { property: true, landlord: { select: { firstName: true, lastName: true, phone: true } } },
+                orderBy: { createdAt: 'desc' }
+            });
+
+            return NextResponse.json({ 
+                hasLease: false, 
+                lease: null,
+                pendingLease: pendingLease ? {
+                    id: pendingLease.id,
+                    leaseReference: pendingLease.leaseReference,
+                    property: pendingLease.property?.name || 'Votre logement',
+                    rentAmount: pendingLease.rentAmount,
+                    depositAmount: pendingLease.depositAmount,
+                    landlordName: `${pendingLease.landlord?.firstName || ''} ${pendingLease.landlord?.lastName || ''}`.trim() || 'Bailleur',
+                    status: 'PENDING_SIGNATURE'
+                } : null,
+                message: "Aucun bail actif validé." 
+            });
         }
 
         const paidMonths = lease.receipts.map(r => r.periodMonth);

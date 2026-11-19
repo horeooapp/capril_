@@ -293,20 +293,28 @@ export default function TenantLeasesPage() {
 
                                     {/* Actions */}
                                     <div className="pt-4 flex flex-col gap-3">
-                                        {lease.status === 'PENDING_SIGNATURE' && (
-                                            <Link href={`/mon-espace-locataire/leases/${lease.id}/signature`} className="w-full bg-qgreen text-white py-4 rounded-xl font-black text-sm text-center hover:opacity-90 transition-all shadow-lg shadow-qgreen/20 uppercase tracking-widest animate-bounce">
-                                                🖋️ Signer mon Bail maintenant
-                                            </Link>
+                                        {lease.status === 'PENDING_SIGNATURE' ? (
+                                            <div className="space-y-2">
+                                                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-center">
+                                                    <p className="text-xs text-amber-900 font-semibold">
+                                                        Contrat en attente de validation. Saisissez votre code reçu par WhatsApp, texto ou e-mail pour le signer.
+                                                    </p>
+                                                </div>
+                                                <Link href={`/mon-espace-locataire/leases/${lease.id}/signature`} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 px-4 rounded-xl font-black text-xs text-center transition-all shadow-md uppercase tracking-widest block">
+                                                    Signer mon bail avec mon code de validation →
+                                                </Link>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-3">
+                                                {DownloadLeaseButton && <DownloadLeaseButton leaseId={lease.id} />}
+                                                <Link href={`/mon-espace-locataire/occupants`} className="flex-1 bg-emerald-700 text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/15 uppercase tracking-wider flex items-center justify-center gap-1.5">
+                                                    <Users size={14} /> Occupants &amp; Attestation
+                                                </Link>
+                                                <Link href={`/mon-espace-locataire/passeport`} className="flex-1 bg-slate-900 text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:bg-slate-800 transition-opacity shadow-lg shadow-slate-900/20 uppercase tracking-wider flex items-center justify-center">
+                                                    Voir mon score
+                                                </Link>
+                                            </div>
                                         )}
-                                        <div className="flex flex-wrap gap-3">
-                                            {DownloadLeaseButton && <DownloadLeaseButton leaseId={lease.id} />}
-                                            <Link href={`/mon-espace-locataire/occupants`} className="flex-1 bg-emerald-700 text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:bg-emerald-800 transition-colors shadow-lg shadow-emerald-700/15 uppercase tracking-wider flex items-center justify-center gap-1.5">
-                                                <Users size={14} /> Occupants &amp; Attestation
-                                            </Link>
-                                            <Link href={`/mon-espace-locataire/passeport`} className="flex-1 bg-qnavy text-white py-3 px-4 rounded-xl font-bold text-xs text-center hover:opacity-90 transition-opacity shadow-lg shadow-qnavy/20 uppercase tracking-wider flex items-center justify-center">
-                                                Voir mon score
-                                            </Link>
-                                        </div>
                                     </div>
                                 </div>
                             </motion.div>

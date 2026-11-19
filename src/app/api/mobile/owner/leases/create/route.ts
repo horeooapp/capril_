@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyMobileToken } from '@/lib/mobile-auth';
 import { formatUserFriendlyError } from '@/lib/friendly-error';
+import crypto from 'crypto';
+import { dispatchLeaseInitiationNotification } from '@/lib/lease-notification';
 
 export async function POST(req: Request) {
     try {
@@ -25,38 +27,50 @@ export async function POST(req: Request) {
              return NextResponse.json({ error: "Propriété invalide ou non autorisée." }, { status: 403 });
         }
 
-        const leaseCount = await prisma.lease.count({ where: { landlordId: userId } });
+        const signingOtp = crypto.randomInt(100000, 999999).toString();
+        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const signingOtpHash = crypto.createHash('sha256').update(signingOtp).digest('hex');
+        const leaseReference = `MOB-BAIL-${Date.now()}`;
 
         const lease = await prisma.lease.create({
             data: {
                 propertyId,
                 tenantId: tenantId || null,
                 landlordId: userId,
-                leaseReference: `MOB-BAIL-${Date.now()}`,
+                leaseReference,
                 durationMonths: 12,
                 leaseType: leaseType || 'RESIDENTIEL',
                 startDate: new Date(),
                 rentAmount: parseFloat(rentAmount),
-                depositAmount: parseFloat(depositAmount),
-                status: 'ACTIVE',
+                depositAmount: parseFloat(depositAmount || 0),
+                status: 'PENDING_SIGNATURE',
+                isSignedElectronically: false,
+                signingOtpHash,
+                signingOtpExpiresAt: otpExpiresAt,
+                signingOtpAttempts: 0,
             }
         });
 
-        // Génération automatique d'un premier reçu ou frais de dossier
-        await prisma.receipt.create({
-            data: {
-                leaseId: lease.id,
-                totalAmount: parseFloat(rentAmount),
-                rentAmount: parseFloat(rentAmount),
-                periodMonth: new Date().toISOString().substring(0, 7),
-                paymentMethod: 'CASH',
-                receiptRef: `B-REC-${Date.now()}`,
-                status: 'pending',
-                declarative: true
+        // Envoi de la notification impérative multicanale au locataire
+        if (tenantId) {
+            const tenant = await prisma.user.findUnique({ where: { id: tenantId } });
+            if (tenant) {
+                await dispatchLeaseInitiationNotification({
+                    leaseId: lease.id,
+                    leaseReference,
+                    propertyName: property.name || property.address || 'le logement',
+                    rentAmount: parseFloat(rentAmount),
+                    depositAmount: parseFloat(depositAmount || 0),
+                    signingOtp,
+                    recipientRole: 'TENANT',
+                    recipientName: `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || 'Locataire',
+                    recipientPhone: tenant.phone,
+                    recipientEmail: tenant.email,
+                    recipientUserId: tenant.id,
+                    initiatorName: 'Le bailleur'
+                });
             }
-        });
-
-
+        }
 
         return NextResponse.json({ success: true, lease });
 

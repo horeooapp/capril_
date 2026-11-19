@@ -47,6 +47,21 @@ export async function GET(request: Request) {
         // Bail actif principal (le plus récent)
         const lease = allActiveLeases[0] ?? null;
 
+        // Fetch pending formal lease awaiting signature (PENDING_SIGNATURE)
+        const pendingFormalLease = await prisma.lease.findFirst({
+            where: {
+                tenantId: user.userId,
+                status: 'PENDING_SIGNATURE'
+            },
+            include: {
+                property: true,
+                landlord: {
+                    select: { firstName: true, lastName: true, phone: true }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
         // Fetch pending lease (BailDeclaratif) for the tenant
         const pendingLease = await prisma.bailDeclaratif.findFirst({
             where: {
@@ -70,6 +85,15 @@ export async function GET(request: Request) {
                 hasLease: false,
                 user: userRecord,
                 rentedProperties: [],
+                pendingSignatureLease: pendingFormalLease ? {
+                    id: pendingFormalLease.id,
+                    leaseReference: pendingFormalLease.leaseReference,
+                    propertyName: pendingFormalLease.property?.name || pendingFormalLease.property?.address || 'Logement conventionné',
+                    rentAmount: pendingFormalLease.rentAmount,
+                    depositAmount: pendingFormalLease.depositAmount,
+                    landlordName: `${pendingFormalLease.landlord?.firstName || ''} ${pendingFormalLease.landlord?.lastName || ''}`.trim() || 'Le bailleur',
+                    status: 'PENDING_SIGNATURE'
+                } : null,
                 pendingDeclaration: pendingLease ? {
                     id: pendingLease.id,
                     landlordName: `${pendingLease.bailleur?.firstName || ''} ${pendingLease.bailleur?.lastName || ''}`.trim() || 'Bailleur',
@@ -79,7 +103,7 @@ export async function GET(request: Request) {
                     status: pendingLease.statut,
                     sourceCreation: pendingLease.sourceCreation
                 } : null,
-                message: "Aucun bail actif trouvé."
+                message: "Aucun bail actif validé."
             });
         }
 

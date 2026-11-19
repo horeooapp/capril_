@@ -25,6 +25,7 @@ import { LoyerService } from "@/lib/loyer-service";
 import { FiscalService } from "@/lib/fiscal-service";
 import { NotificationService } from "@/lib/notification-service";
 import { validateLeaseInput, calculerDroitsEnregistrement } from "@/lib/lease-validation";
+import { dispatchLeaseInitiationNotification, dispatchLeaseSignedBilateralNotification } from "@/lib/lease-notification";
 
 // --- [CORE] Baux Standard ---
 
@@ -260,71 +261,21 @@ export async function createLease(data: {
         const bienNom = property.name || property.address || "le logement";
         const tenantDisplayName = finalTenantName || "Locataire";
 
-        // 10. Multi-Channel Notifications to Locataire (Tenant)
-        const signatureUrl = `${appUrl}/mon-espace-locataire/leases/${lease.id}/signature`;
-        const dashboardUrl = `${appUrl}/mon-espace-locataire`;
-
-        // a) In-App Notification
-        if (tenantId) {
-            await prisma.notification.create({
-                data: {
-                    userId: tenantId,
-                    title: "🎉 Contrat de bail prêt à signer !",
-                    content: `Le propriétaire a validé votre bail (${leaseRef}). Votre code de signature électronique est : ${signingOtp}.`,
-                    type: "BAIL_CREE",
-                    link: signatureUrl
-                }
-            }).catch(() => null);
-        }
-
-        // b) WhatsApp & SMS Notification to Tenant with OTP Code
-        if (data.tenantPhone) {
-            const tenantPhoneNorm = normalizePhone(data.tenantPhone);
-            const waMsg = `🎉 *QAPRIL — Votre Contrat de Bail est Prêt !*\n\nBonjour ${tenantDisplayName},\n\nLe propriétaire a validé votre dossier et vous a transmis votre contrat de bail officiel pour *${bienNom}* (Loyer : ${data.rentAmount.toLocaleString('fr-FR')} XOF/mois).\n\n🔑 *Votre Code de Signature Électronique :* *${signingOtp}*\n\n👉 *Pour valider et signer votre contrat dès maintenant :*\n${signatureUrl}\n\nVous pouvez également saisir ce code directement depuis votre Espace Locataire (${dashboardUrl}) pour sceller votre bail.\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
-
-            const waRes = await sendOpenWAMessage(tenantPhoneNorm, waMsg).catch(() => ({ success: false }));
-            if (!waRes?.success) {
-                await sendSMS(
-                    tenantPhoneNorm,
-                    `QAPRIL : Votre contrat pour ${bienNom} est prêt. Votre code de signature est : ${signingOtp}. Validez sur : ${signatureUrl}`
-                ).catch(() => null);
-            }
-        }
-
-        // c) Email Notification to Tenant with OTP Box
-        if (tenantEmail) {
-            const emailHtml = `
-                <p style="margin: 0 0 16px 0;">Bonjour <strong>${tenantDisplayName}</strong>,</p>
-                <p style="margin: 0 0 16px 0;">Excellente nouvelle ! Le propriétaire a validé votre dossier de candidature et vous a transmis votre contrat de bail pour le bien <strong>${bienNom}</strong>.</p>
-                
-                <div style="background-color: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Référence du Bail :</strong> ${leaseRef}</p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Loyer mensuel :</strong> ${data.rentAmount.toLocaleString('fr-FR')} XOF</p>
-                    <p style="margin: 0 0 8px 0; font-size: 14px; color: #065F46;"><strong>Dépôt de garantie :</strong> ${(data.depositAmount || 0).toLocaleString('fr-FR')} XOF</p>
-                    <p style="margin: 0; font-size: 14px; color: #065F46;">Ce bail est certifié conforme au Code de la Construction et de l'Habitation (CCH) et sécurisé par empreinte numérique SHA-256.</p>
-                </div>
-
-                <div style="background-color: #FEF3C7; border: 2px dashed #F59E0B; border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
-                    <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #92400E; text-transform: uppercase; letter-spacing: 1px;">Votre Code de Validation / Signature</p>
-                    <p style="margin: 0; font-size: 34px; font-weight: 900; letter-spacing: 6px; color: #B45309; font-family: monospace;">${signingOtp}</p>
-                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #78350F;">Ce code à usage unique est nécessaire pour signer électroniquement et certifier votre contrat.</p>
-                </div>
-
-                <p style="margin: 0 0 24px 0;">Cliquez sur le bouton ci-dessous pour relire attentivement votre contrat et saisir votre code de validation :</p>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="${signatureUrl}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; display: inline-block;">
-                        Valider & Signer mon Bail avec ce Code →
-                    </a>
-                </div>
-            `;
-
-            await sendEmail({
-                to: tenantEmail,
-                subject: `🔑 [Code: ${signingOtp}] Votre contrat de bail pour ${bienNom} est prêt - QAPRIL`,
-                html: wrapInPremiumTemplate(emailHtml, "Validation de Bail & Signature")
-            }).catch(err => console.error("[Tenant Acceptance Email Error]", err));
-        }
+        // 10. Multi-Channel Notifications to Locataire (Tenant) (WhatsApp, Texto/SMS, Email, In-App, Push)
+        await dispatchLeaseInitiationNotification({
+            leaseId: lease.id,
+            leaseReference: leaseRef,
+            propertyName: bienNom,
+            rentAmount: data.rentAmount,
+            depositAmount: data.depositAmount || 0,
+            signingOtp,
+            recipientRole: 'TENANT',
+            recipientName: tenantDisplayName,
+            recipientPhone: data.tenantPhone,
+            recipientEmail: tenantEmail,
+            recipientUserId: tenantId,
+            initiatorName: (session.user as any)?.name || 'Le bailleur'
+        });
 
         // 11. Multi-Channel Notifications to Propriétaire (Landlord)
         const ownerUser = await prisma.user.findUnique({
@@ -890,40 +841,24 @@ export async function requestSignatureOTP(leaseId: string) {
             } as any
         });
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://qapril.net";
-        const signatureUrl = `${appUrl}/mon-espace-locataire/leases/${lease.id}/signature`;
         const targetPhone = lease.tenant?.phone || (session.user as any).phone;
         const targetEmail = lease.tenant?.email || session.user.email;
+        const targetName = lease.tenant?.firstName ? `${lease.tenant.firstName} ${lease.tenant.lastName || ''}`.trim() : 'Locataire';
 
-        if (targetPhone) {
-            const { sendOpenWAMessage } = await import("@/lib/openwa");
-            const phoneNorm = normalizePhone(targetPhone);
-            const waMsg = `🔑 *QAPRIL — Code de Signature de Bail*\n\nVotre code de validation/signature pour le contrat *${lease.leaseReference}* est : *${otp}*.\n\n👉 Cliquez ici pour valider directement votre bail :\n${signatureUrl}\n\n*QAPRIL — Gestion Immobilière Intelligente*`;
-            const waRes = await sendOpenWAMessage(phoneNorm, waMsg).catch(() => ({ success: false }));
-            if (!waRes?.success) {
-                await sendSMS(phoneNorm, `QAPRIL : Votre code de signature pour ${lease.leaseReference} est : ${otp}. Validez sur : ${signatureUrl}`).catch(() => null);
-            }
-        }
-
-        if (targetEmail) {
-            const { sendEmail, wrapInPremiumTemplate } = await import("@/lib/email");
-            await sendEmail({
-                to: targetEmail,
-                subject: `🔑 [${otp}] Votre code de validation de bail QAPRIL`,
-                html: wrapInPremiumTemplate(`
-                    <p>Bonjour,</p>
-                    <p>Voici votre code de validation pour signer votre contrat de bail <strong>${lease.leaseReference}</strong> :</p>
-                    <div style="background-color: #FEF3C7; border: 2px dashed #F59E0B; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                        <span style="font-size: 32px; font-weight: 900; letter-spacing: 6px; color: #B45309; font-family: monospace;">${otp}</span>
-                    </div>
-                    <div style="text-align: center; margin: 24px 0;">
-                        <a href="${signatureUrl}" style="background-color: #10B981; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 10px; font-weight: 800;">
-                            Accéder à la signature →
-                        </a>
-                    </div>
-                `, "Code de Signature Électronique")
-            }).catch(() => null);
-        }
+        await dispatchLeaseInitiationNotification({
+            leaseId: lease.id,
+            leaseReference: lease.leaseReference,
+            propertyName: lease.property?.name || lease.property?.address || 'le logement',
+            rentAmount: lease.rentAmount,
+            depositAmount: lease.depositAmount || 0,
+            signingOtp: otp,
+            recipientRole: 'TENANT',
+            recipientName: targetName,
+            recipientPhone: targetPhone,
+            recipientEmail: targetEmail,
+            recipientUserId: lease.tenantId,
+            initiatorName: 'Le bailleur'
+        });
 
         return { success: true };
     } catch (error: any) {
@@ -988,9 +923,8 @@ export async function signLease(leaseId: string, otp: string) {
             if (lease.typeBail === TypeBail.ECRIT) {
                 await FiscalService.getOrCreateDossier(leaseId);
             }
-            if (lease.tenant?.phone) {
-                await sendSMS(lease.tenant.phone, `Félicitations ! Votre bail QAPRIL (${lease.leaseReference}) est désormais validé et actif.`);
-            }
+            // Notification bilatérale (Locataire & Bailleur) dès que le bail est validé et actif
+            await dispatchLeaseSignedBilateralNotification(leaseId);
         } catch (orchestrationError) {
             console.error("[ORCHESTRATION_ERROR] Post-signature logic failed:", orchestrationError);
         }

@@ -9,6 +9,8 @@ import path from 'path';
 import { UPLOADS_DIR } from '@/lib/storage';
 import { sendSMS } from '@/lib/sms';
 import { validateLeaseInput, calculerDroitsEnregistrement } from '@/lib/lease-validation';
+import crypto from 'crypto';
+import { dispatchLeaseInitiationNotification } from '@/lib/lease-notification';
 
 // Fonction de nettoyage strict pour PDF (compatible Helvetica / WinAnsi)
 function cleanPdfText(str: string): string {
@@ -279,7 +281,11 @@ export async function POST(request: Request) {
         const protocol = request.url.startsWith('https') ? 'https' : 'https';
         const fullPublicPdfUrl = `${protocol}://${host}${publicRelativeUrl}`;
 
-        // 7. Enregistrement du Bail dans la base de données (avec récapitulatif DGI S-06)
+        // 7. Enregistrement du Bail dans la base de données (avec code OTP et statut PENDING_SIGNATURE)
+        const signingOtp = crypto.randomInt(100000, 999999).toString();
+        const otpExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const signingOtpHash = crypto.createHash('sha256').update(signingOtp).digest('hex');
+
         const newLease = await prisma.lease.create({
             data: {
                 leaseReference: leaseRef,
@@ -293,7 +299,11 @@ export async function POST(request: Request) {
                 startDate: new Date(),
                 durationMonths: parsedDuration,
                 leaseType: property.leaseType || 'residential',
-                status: 'ACTIVE',
+                status: 'PENDING_SIGNATURE',
+                isSignedElectronically: false,
+                signingOtpHash,
+                signingOtpExpiresAt: otpExpiresAt,
+                signingOtpAttempts: 0,
                 bailleurMasque: Boolean(body.bailleurMasque),
                 qrCodeUrl: fullPublicPdfUrl,
                 modeCreation: 'NUMERIQUE',
@@ -327,13 +337,21 @@ export async function POST(request: Request) {
             }).catch((err) => console.warn('[DEUX_HORLOGES] Erreur creation leaseOpeningState:', err));
         }
 
-        // 9. Notification par SMS du locataire
-        if (tenant.phone) {
-            await sendSMS(
-                tenant.phone, 
-                `QAPRIL : Votre contrat de bail pour "${property.name || 'votre logement'}" a ete cree par votre proprietaire. Ref: ${leaseRef}. Connectez-vous sur QAPRIL pour le signer.`
-            ).catch((smsErr) => console.warn('[SMS] Erreur envoi SMS locataire:', smsErr));
-        }
+        // 9. Envoi impératif multicanal au locataire (WhatsApp + Texto/SMS + Email + In-App/Push)
+        await dispatchLeaseInitiationNotification({
+            leaseId: newLease.id,
+            leaseReference: leaseRef,
+            propertyName: property.name || property.address || 'le logement',
+            rentAmount: rentNum,
+            depositAmount: finalDeposit,
+            signingOtp,
+            recipientRole: 'TENANT',
+            recipientName: tenantFullName || 'Locataire',
+            recipientPhone: tenant.phone,
+            recipientEmail: tenant.email,
+            recipientUserId: tenant.id,
+            initiatorName: ownerFullName || 'Le bailleur'
+        });
 
         return NextResponse.json({ 
             success: true, 

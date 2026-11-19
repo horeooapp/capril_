@@ -34,6 +34,7 @@ export default function MonBailScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lease, setLease] = useState<any>(null);
+  const [pendingLease, setPendingLease] = useState<any>(null);
   const [occupants, setOccupants] = useState<any[]>([]);
 
   const loadBailData = async () => {
@@ -42,6 +43,7 @@ export default function MonBailScreen() {
       if (res.ok) {
         const data = await res.json();
         setLease(data.lease || null);
+        setPendingLease(data.pendingLease || null);
         setOccupants(data.occupants || []);
       }
     } catch (e) {
@@ -74,19 +76,60 @@ export default function MonBailScreen() {
         {loading ? (
           <ActivityIndicator size="large" color="#2C3E6B" style={{ marginTop: 40 }} />
         ) : !lease ? (
-          <View style={styles.cardEmpty}>
-            <AlertCircle color="#D97706" size={40} />
-            <Text style={styles.emptyTitle}>Aucun logement déclaré</Text>
-            <Text style={styles.emptyText}>
-              Déclarez votre logement en 4 questions. Vous obtenez des quittances pour chaque loyer et une attestation de résidence, même si votre bailleur n'a pas l'application.
-            </Text>
-            <Pressable
-              style={styles.btnPrimary}
-              onPress={() => router.push('/(tabs)/' as any)}
-            >
-              <Text style={styles.btnPrimaryText}>Déclarer mon logement</Text>
-            </Pressable>
-          </View>
+          pendingLease ? (
+            <View style={[styles.heroCard, { backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }]}>
+              <View style={styles.badgeRow}>
+                <View style={[styles.pillActive, { backgroundColor: '#FEF3C7' }]}>
+                  <Text style={[styles.pillActiveText, { color: '#B45309' }]}>En attente de signature</Text>
+                </View>
+                <Text style={[styles.leaseRef, { color: '#92400E' }]}>Réf : {pendingLease.leaseReference}</Text>
+              </View>
+
+              <Text style={[styles.propName, { color: '#78350F' }]}>{pendingLease.propertyName || 'Logement conventionné'}</Text>
+              <Text style={[styles.propAddress, { color: '#92400E' }]}>{pendingLease.propertyCommune || pendingLease.propertyAddress || 'Abidjan'}</Text>
+
+              <View style={[styles.separator, { backgroundColor: '#FDE68A' }]} />
+
+              <View style={styles.grid2}>
+                <View>
+                  <Text style={styles.metaLabel}>Loyer mensuel</Text>
+                  <Text style={[styles.metaValue, { color: '#78350F' }]}>{Number(pendingLease.rentAmount || 0).toLocaleString('fr-FR')} F</Text>
+                </View>
+                <View>
+                  <Text style={styles.metaLabel}>Bailleur</Text>
+                  <Text style={[styles.metaValue, { color: '#78350F' }]}>{pendingLease.landlordName}</Text>
+                </View>
+              </View>
+
+              <View style={{ marginTop: 16, padding: 12, backgroundColor: '#FEF3C7', borderRadius: 12 }}>
+                <Text style={{ fontSize: 12, color: '#92400E', lineHeight: 18 }}>
+                  Votre bailleur a initié ce contrat de bail. Pour qu'il prenne effet et soit validé, vous devez le signer à l'aide du code de validation reçu par WhatsApp, texto ou e-mail.
+                </Text>
+              </View>
+
+              <Pressable
+                style={[styles.btnPrimary, { backgroundColor: '#10B981', marginTop: 16 }]}
+                onPress={() => router.push({ pathname: '/signature/[id]', params: { id: pendingLease.id } } as any)}
+              >
+                <CheckCircle2 color="#FFFFFF" size={16} />
+                <Text style={styles.btnPrimaryText}>Signer mon bail avec mon code →</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <View style={styles.cardEmpty}>
+              <AlertCircle color="#D97706" size={40} />
+              <Text style={styles.emptyTitle}>Aucun logement déclaré</Text>
+              <Text style={styles.emptyText}>
+                Déclarez votre logement en 4 questions. Vous obtenez des quittances pour chaque loyer et une attestation de résidence, même si votre bailleur n'a pas l'application.
+              </Text>
+              <Pressable
+                style={styles.btnPrimary}
+                onPress={() => router.push('/(tabs)/' as any)}
+              >
+                <Text style={styles.btnPrimaryText}>Déclarer mon logement</Text>
+              </Pressable>
+            </View>
+          )
         ) : (
           <>
             {/* CARTE RÉCAPITULATIVE DU BAIL */}

@@ -87,7 +87,7 @@ export async function POST(
         
         await prisma.property.update({ where: { id: lease.propertyId }, data: { status: "rented" } });
         
-        // Orchestration (Loyer, Fiscal, Notification)
+        // Orchestration (Loyer, Fiscal, Notification bilatérale)
         try {
             await LoyerService.initLeaseSynthesis(leaseId);
             
@@ -95,9 +95,8 @@ export async function POST(
                 await FiscalService.getOrCreateDossier(leaseId);
             }
             
-            if (lease.tenant?.phone) {
-                await sendSMS(lease.tenant.phone, `Félicitations ! Votre bail QAPRIL est actif. Votre quittance du mois sera disponible bientôt.`);
-            }
+            const { dispatchLeaseSignedBilateralNotification } = await import('@/lib/lease-notification');
+            await dispatchLeaseSignedBilateralNotification(leaseId);
         } catch (orchestrationError) {
             console.error("[ORCHESTRATION_ERROR] Post-signature logic failed:", orchestrationError);
         }

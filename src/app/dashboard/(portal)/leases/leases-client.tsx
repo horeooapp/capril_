@@ -382,7 +382,7 @@ export default function LeasesDashboardClient({ initialLeases, properties = [] }
                                             ) : (
                                                 <div className="flex flex-col gap-1 items-start">
                                                     <Badge color={l.status === 'ANNULÉ' ? 'rose' : 'amber'}>
-                                                        {l.status === 'PENDING_CONFIRMATION' ? 'EN ATTENTE PRENEUR' : l.status}
+                                                        {l.status === 'PENDING_CONFIRMATION' ? 'EN ATTENTE PRENEUR' : l.status === 'PENDING_SIGNATURE' ? 'EN ATTENTE DE SIGNATURE' : l.status}
                                                     </Badge>
                                                     {['DRAFT', 'PENDING_SIGNATURE', 'PENDING_CONFIRMATION'].includes(l.status) && l.daysSinceCreation !== undefined && (
                                                         <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${l.daysSinceCreation >= 4 ? 'text-rose-600 bg-rose-50 border-rose-200 animate-pulse' : 'text-amber-700 bg-amber-50 border-amber-200'}`}>
