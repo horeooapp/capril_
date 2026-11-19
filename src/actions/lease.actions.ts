@@ -825,8 +825,11 @@ export async function requestSignatureOTP(leaseId: string) {
 
         // [IC-05] Contrôle d'accès, code à durée limitée, envoi au seul locataire.
         const { preparerCodeSignature } = await import("@/lib/lease-signature");
+        const { figerBail } = await import("@/lib/bail/figer");
         const r = await preparerCodeSignature(prisma, {
             leaseId, demandeurId: session.user.id, demandeurRole: session.user.role as string,
+            // [ADD-32] Le bail complet est produit et figé ici : c'est ce fichier que le locataire signe.
+            figer: () => figerBail(leaseId),
         });
         const estLocataire = r.destinataire.userId === session.user.id;
 
@@ -867,6 +870,7 @@ export async function signLease(leaseId: string, otp: string) {
         const { signerBail } = await import("@/lib/lease-signature");
         const { headers } = await import("next/headers");
         const h = await headers();
+        await (await import("@/lib/bail/figer")).verifierBailAvantSignature(leaseId);
         const r = await signerBail(prisma, {
             leaseId,
             signataireId: session.user.id,

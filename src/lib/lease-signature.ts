@@ -50,6 +50,8 @@ export function empreinteBail(bail: any): string {
     debut: bail.startDate ? new Date(bail.startDate).toISOString().slice(0, 10) : null,
     dureeMois: bail.durationMonths ?? null,
     jourPaiement: bail.paymentDay ?? null,
+    // Empreinte du bail complet figé (PDF) : la signature couvre tout le texte, pas seulement les termes.
+    document: (bail.signatureContext as any)?.bail?.sha256 ?? null,
   };
   return createHash("sha256").update(JSON.stringify(termes)).digest("hex");
 }
@@ -75,8 +77,11 @@ async function chargerBail(prisma: any, leaseId: string) {
  * Prépare l'envoi du code de signature. Renvoie le code en clair à l'appelant, qui
  * doit l'envoyer au locataire et à personne d'autre (voir `destinataire`).
  */
-export async function preparerCodeSignature(prisma: any, p: { leaseId: string; demandeurId: string; demandeurRole?: string }) {
-  const bail = await chargerBail(prisma, p.leaseId);
+export async function preparerCodeSignature(
+  prisma: any,
+  p: { leaseId: string; demandeurId: string; demandeurRole?: string; /** Fige le bail complet (PDF) une fois les contrôles passés. */ figer?: () => Promise<unknown> }
+) {
+  let bail = await chargerBail(prisma, p.leaseId);
   const demandeur = await prisma.user.findUnique({ where: { id: p.demandeurId }, select: { id: true, phone: true, email: true } });
   if (!demandeur) throw new SignatureError("ACCES", "Compte introuvable.");
   const admin = ["ADMIN", "SUPER_ADMIN"].includes(p.demandeurRole || "");
@@ -90,6 +95,11 @@ export async function preparerCodeSignature(prisma: any, p: { leaseId: string; d
   }
   if (!(Number(bail.rentAmount) > 0) || !bail.startDate) {
     throw new SignatureError("INCOMPLET", "Le bail est incomplet (loyer, date d’effet) : complétez-le avant l’envoi à la signature.");
+  }
+
+  if (p.figer) {
+    await p.figer();
+    bail = await chargerBail(prisma, p.leaseId);
   }
 
   const code = randomInt(100000, 1000000).toString();

@@ -84,3 +84,22 @@ export async function chargerMarque(userId?: string | null): Promise<MarqueDocum
   if (!p || !p.actif || !p.nomAffiche) return null;
   return { nom: p.nomAffiche, lignes: lignesMarque(p, profilAgence?.numeroAgrement), logo: await lireLogo(p.logoUrl) };
 }
+
+/**
+ * En-tête des baux : réservé aux agences immobilières agréées (profil d'agence au statut AGREE).
+ * Reprend la personnalisation enregistrée pour les quittances ; à défaut, le profil d'agence.
+ */
+export async function chargerMarqueAgenceAgreee(userId?: string | null): Promise<MarqueDocument | null> {
+  if (!userId) return null;
+  const u = await (prisma as any).user.findUnique({
+    where: { id: userId },
+    select: { whiteLabelConfig: true, agenceProfile: { select: { nomAgence: true, numeroAgrement: true, rccm: true, adresseLocal: true, statutLegal: true } } },
+  });
+  const ag = u?.agenceProfile;
+  if (!ag || ag.statutLegal !== "AGREE") return null;
+  const enregistree = (u?.whiteLabelConfig as any)?.quittance;
+  const p = nettoyerPersonnalisation(enregistree && enregistree.actif !== false ? enregistree : { nomAffiche: ag.nomAgence, rccm: ag.rccm, adresse: ag.adresseLocal });
+  if (!p.nomAffiche) p.nomAffiche = ag.nomAgence;
+  const lignes = lignesMarque(p, ag.numeroAgrement);
+  return { nom: p.nomAffiche, lignes, logo: await lireLogo(p.logoUrl) };
+}

@@ -29,6 +29,7 @@ export async function POST(
         const { signerBail, SignatureError } = await import('@/lib/lease-signature');
         let lease: { typeBail: string };
         try {
+            await (await import('@/lib/bail/figer')).verifierBailAvantSignature(leaseId);
             lease = await signerBail(prisma, {
                 leaseId,
                 signataireId: user.userId,

@@ -258,6 +258,9 @@ function EnvoyerSignature({ bailId, telephone }: { bailId: string; telephone: st
         className="rounded-xl bg-[#FF8200] px-4 py-2 text-sm font-black text-white disabled:opacity-60"
       >{enCours ? "Envoi…" : etat?.ok ? "Renvoyer le code" : "Envoyer le bail à la signature"}</button>
       {etat && <p role="status" className={`mt-2 text-sm font-semibold ${etat.ok ? "text-emerald-800" : "text-red-700"}`}>{etat.texte}</p>}
+      <p className="mt-2 text-sm">
+        <Link href={`/dashboard/leases/${bailId}/bail`} className="font-bold text-[#FF8200] underline">Compléter les mentions du bail et voir l’aperçu</Link>
+      </p>
     </div>
   );
 }

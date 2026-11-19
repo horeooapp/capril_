@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "verifier:baux": "node scripts/verifier-baux.cjs",
     "dev": "next dev",
     "build": "next build && node -e \"require('fs').mkdirSync('out', { recursive: true }); require('fs').writeFileSync('out/.nojekyll', '')\"",
     "start": "next start",

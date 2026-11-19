@@ -1,23 +1,23 @@
 {
-  "version": "2.0.5",
-  "buildNumber": 34,
+  "version": "2.0.6",
+  "buildNumber": 35,
   "releaseDate": "2026-11-19",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
   "apps": {
     "locataire": {
       "name": "QAPRIL Locataire",
-      "version": "2.0.5",
-      "versionCode": 34,
+      "version": "2.0.6",
+      "versionCode": 35,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Timbre fiscal a 500 F par page (IC-06) et montants du bail en lettres (IC-07)"
+      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
-      "version": "2.0.5",
-      "versionCode": 34,
+      "version": "2.0.6",
+      "versionCode": 35,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Timbre fiscal a 500 F par page (IC-06) et montants du bail en lettres (IC-07)"
+      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
     }
   }
 }

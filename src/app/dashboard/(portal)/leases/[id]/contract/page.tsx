@@ -27,6 +27,13 @@ export default async function LeaseContractViewPage({ params }: { params: Promis
                 </Link>
 
                 <div className="flex items-center gap-2">
+                    {/* [ADD-32] Bail complet produit par le serveur : c'est le document signé et enregistré */}
+                    <Link
+                        href={`/dashboard/leases/${lease.id}/bail`}
+                        className="inline-flex items-center gap-2 bg-[#FF8200] hover:bg-[#e67500] text-white px-4 py-2.5 rounded-xl font-bold text-xs"
+                    >
+                        <FileText size={15} /> Bail complet et signature
+                    </Link>
                     {/* Lien direct de téléchargement PDF natif généré */}
                     <a
                         href={`/api/leases/${lease.id}/pdf`}

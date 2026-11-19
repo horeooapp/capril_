@@ -19,12 +19,14 @@ export async function POST(
         const { preparerCodeSignature, SignatureError } = await import('@/lib/lease-signature');
         let r;
         try {
-            r = await preparerCodeSignature(prisma, { leaseId, demandeurId: user.userId, demandeurRole: (user as any).role });
+            const { figerBail } = await import('@/lib/bail/figer');
+            r = await preparerCodeSignature(prisma, { leaseId, demandeurId: user.userId, demandeurRole: (user as any).role, figer: () => figerBail(leaseId) });
         } catch (e: any) {
             if (e instanceof SignatureError) {
                 const statut = e.code === 'ACCES' ? 403 : e.code === 'INTROUVABLE' ? 404 : 400;
                 return NextResponse.json({ error: e.message, code: e.code }, { status: statut });
             }
+            if (e?.manquants) return NextResponse.json({ error: e.message, code: 'BAIL_INCOMPLET', manquants: e.manquants }, { status: 400 });
             throw e;
         }
 
