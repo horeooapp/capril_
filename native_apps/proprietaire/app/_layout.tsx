@@ -5,6 +5,8 @@ import { BackHandler, Platform, View, Text, Pressable } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import * as Updates from "expo-updates";
+import * as Notifications from "expo-notifications";
+import { registerForPushNotificationsAsync } from "../lib/notifications";
 import "../global.css";
 import { confirmExitApp } from "../components/TopNavHeader";
 
@@ -77,11 +79,40 @@ export default function RootLayout() {
     }
     checkAppUpdates();
 
+    // Enregistrement push notifications & synchronisation du jeton
+    registerForPushNotificationsAsync().catch((err) => {
+      console.log('[Push] Enregistrement initial ignoré:', err);
+    });
+
+    // Écouteur de clic sur notification pour navigation contextuelle
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      try {
+        const data = response?.notification?.request?.content?.data;
+        if (!data) return;
+
+        if (data.type === 'LEASE_SIGNATURE' || data.type === 'LEASE_CONFIRMED' || data.leaseId) {
+          router.push('/(tabs)/baux' as any);
+        } else if (data.type === 'chat' || data.type === 'NOUVEAU_MESSAGE_BAIL') {
+          router.push('/(tabs)/chat' as any);
+        } else if (data.type === 'payment' || data.type === 'PAYMENT_CONFIRMATION') {
+          router.push('/(tabs)/finance' as any);
+        } else if (data.type === 'APP_UPDATE' || data.type === 'SYSTEM_UPDATE') {
+          Updates.reloadAsync().catch(() => {});
+        }
+      } catch (navErr) {
+        console.warn('[Push] Erreur navigation push:', navErr);
+      }
+    });
+
     const timeout = setTimeout(async () => {
       await SplashScreen.hideAsync().catch(() => {});
     }, 400);
-    return () => clearTimeout(timeout);
-  }, []);
+
+    return () => {
+      clearTimeout(timeout);
+      responseListener.remove();
+    };
+  }, [router]);
 
   // Interception du bouton retour Android pour demander confirmation avant de quitter
   useEffect(() => {

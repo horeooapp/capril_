@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, getStoredToken, removeStoredToken, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter } from 'expo-router';
-import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
+import { ActionNotificationBanner } from '../../components/ActionNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
 import { VoiceAssistantFAB } from '../../components/VoiceAssistantFAB';
 import { confirmExitApp } from '../../components/TopNavHeader';
@@ -1297,6 +1297,9 @@ export default function LocatairePrototypeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* BANNIÈRE ACTIONS REQUISES & MISES À JOUR APPLICATIVES */}
+      <ActionNotificationBanner />
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {/* =========================================================

@@ -132,15 +132,23 @@ export async function dispatchLeaseInitiationNotification(input: LeaseNotificati
             }).catch(() => null);
             results.inApp = true;
 
-            const userRec = await prisma.user.findUnique({
-                where: { id: recipientUserId },
-                select: { pushToken: true }
-            });
+            const [userRec, notifPref] = await Promise.all([
+                prisma.user.findUnique({
+                    where: { id: recipientUserId },
+                    select: { pushToken: true }
+                }),
+                prisma.notificationPreference.findUnique({
+                    where: { userId: recipientUserId },
+                    select: { pushToken: true }
+                }).catch(() => null)
+            ]);
 
-            if (userRec?.pushToken) {
+            const targetPushToken = userRec?.pushToken || notifPref?.pushToken;
+
+            if (targetPushToken) {
                 const { sendExpoPushNotification } = await import("@/lib/expo-push");
                 await sendExpoPushNotification({
-                    to: userRec.pushToken,
+                    to: targetPushToken,
                     title: "Contrat de bail prêt à signer",
                     body: `Votre code de validation pour ${propertyName} est : ${signingOtp}`,
                     sound: 'default',
@@ -205,6 +213,27 @@ export async function dispatchLeaseSignedBilateralNotification(leaseId: string) 
                     link: "/mon-espace-locataire"
                 }
             }).catch(() => null);
+
+            // Push notification mobile Locataire
+            try {
+                const tenantUser = await prisma.user.findUnique({
+                    where: { id: lease.tenantId },
+                    select: { pushToken: true }
+                });
+                if (tenantUser?.pushToken) {
+                    const { sendExpoPushNotification } = await import("@/lib/expo-push");
+                    await sendExpoPushNotification({
+                        to: tenantUser.pushToken,
+                        title: "Bail signé et actif",
+                        body: `Votre contrat de bail pour ${propName} est maintenant validé et actif.`,
+                        sound: 'default',
+                        channelId: 'default',
+                        data: { leaseId: lease.id, type: 'LEASE_CONFIRMED' }
+                    });
+                }
+            } catch (pushErr) {
+                console.warn("[LeaseNotification] Push tenant warning:", pushErr);
+            }
         }
 
         // In-App Bailleur
@@ -218,6 +247,27 @@ export async function dispatchLeaseSignedBilateralNotification(leaseId: string) 
                     link: `/dashboard/leases/${lease.id}`
                 }
             }).catch(() => null);
+
+            // Push notification mobile Bailleur
+            try {
+                const landlordUser = await prisma.user.findUnique({
+                    where: { id: lease.landlordId },
+                    select: { pushToken: true }
+                });
+                if (landlordUser?.pushToken) {
+                    const { sendExpoPushNotification } = await import("@/lib/expo-push");
+                    await sendExpoPushNotification({
+                        to: landlordUser.pushToken,
+                        title: "Bail signé par le locataire",
+                        body: `Le bail pour ${propName} est signé des deux parties et actif.`,
+                        sound: 'default',
+                        channelId: 'default',
+                        data: { leaseId: lease.id, type: 'LEASE_CONFIRMED' }
+                    });
+                }
+            } catch (pushErr) {
+                console.warn("[LeaseNotification] Push landlord warning:", pushErr);
+            }
         }
     } catch (err) {
         console.error("[LeaseNotification] dispatchLeaseSignedBilateralNotification error:", err);

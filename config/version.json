@@ -1,23 +1,23 @@
 {
-  "version": "2.0.2",
-  "buildNumber": 31,
+  "version": "2.0.3",
+  "buildNumber": 32,
   "releaseDate": "2026-11-19",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
   "apps": {
     "locataire": {
       "name": "QAPRIL Locataire",
-      "version": "2.0.2",
-      "versionCode": 31,
+      "version": "2.0.3",
+      "versionCode": 32,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Retrait de tous les baux non bilateralement signes et verrouillage strict systeme"
+      "releaseNotes": "Notifications push et banniere d alertes actions requises pour les utilisateurs"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
-      "version": "2.0.2",
-      "versionCode": 31,
+      "version": "2.0.3",
+      "versionCode": 32,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Retrait de tous les baux non bilateralement signes et verrouillage strict systeme"
+      "releaseNotes": "Notifications push et banniere d alertes actions requises pour les utilisateurs"
     }
   }
 }

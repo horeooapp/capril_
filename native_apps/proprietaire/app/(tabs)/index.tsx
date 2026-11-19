@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { fetchWithAuth, removeStoredToken, getStoredProfile, removeStoredProfile, clearAppSessionAndCache, logoutAndRedirect } from '../../lib/api';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { UpdateNotificationBanner } from '../../components/UpdateNotificationBanner';
+import { ActionNotificationBanner } from '../../components/ActionNotificationBanner';
 import { VersionUpdateModal } from '../../components/VersionUpdateModal';
 import { VoiceAssistantFAB } from '../../components/VoiceAssistantFAB';
 import { confirmExitApp } from '../../components/TopNavHeader';
@@ -509,8 +509,8 @@ export default function BailleurAndAgencePrototypeScreen() {
         </View>
       </View>
 
-      {/* BANNIÈRE MISE À JOUR DISPONIBLE */}
-      <UpdateNotificationBanner />
+      {/* BANNIÈRE ACTIONS REQUISES & MISES À JOUR APPLICATIVES */}
+      <ActionNotificationBanner />
       <VersionUpdateModal />
 
       {/* MENU MOBILE DÉROULANT / TIROIR DE GAUCHE */}

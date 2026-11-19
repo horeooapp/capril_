@@ -27,29 +27,47 @@ export async function GET(request: Request) {
             createdAt: n.createdAt
         }));
 
-        // 2. Récupérer les baux en attente pour en faire des notifications "ACTION"
-        const pendingLeases = await prisma.bailDeclaratif.findMany({
-            where: {
-                locataireId: user.userId,
-                statut: 'PENDING_LOCATAIRE'
-            },
-            include: {
-                property: true
-            }
-        });
+        // 2. Récupérer les baux formels et déclaratifs en attente pour en faire des notifications "ACTION"
+        const [formalLeases, pendingDeclarations] = await Promise.all([
+            prisma.lease.findMany({
+                where: {
+                    tenantId: user.userId,
+                    status: 'PENDING_SIGNATURE',
+                    deletedAt: null
+                },
+                include: { property: true }
+            }),
+            prisma.bailDeclaratif.findMany({
+                where: {
+                    locataireId: user.userId,
+                    statut: 'PENDING_LOCATAIRE'
+                },
+                include: { property: true }
+            })
+        ]);
 
-        const formattedLeases = pendingLeases.map(lease => ({
-            id: `lease-${lease.id}`,
+        const formattedFormalLeases = formalLeases.map(lease => ({
+            id: `lease-formal-${lease.id}`,
+            title: 'Contrat de bail prêt à signer',
+            content: `Votre bail pour "${lease.property?.name || lease.property?.address || 'votre logement'}" attend votre signature et code de validation.`,
+            type: 'ACTION',
+            actionUrl: `/signature/${lease.id}`,
+            read: false,
+            createdAt: lease.createdAt
+        }));
+
+        const formattedDeclarations = pendingDeclarations.map(lease => ({
+            id: `lease-dec-${lease.id}`,
             title: 'Nouveau Contrat de Bail',
             content: `Le propriétaire de "${lease.property?.name || 'votre logement'}" vous a envoyé un contrat de bail pour signature.`,
             type: 'ACTION',
-            actionUrl: '/(tabs)/leases',
+            actionUrl: '/(tabs)/bail',
             read: false,
             createdAt: lease.createdAt
         }));
 
         // 3. Fusionner et trier
-        const allNotifications = [...formattedLeases, ...formattedStandard].sort((a, b) => {
+        const allNotifications = [...formattedFormalLeases, ...formattedDeclarations, ...formattedStandard].sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
