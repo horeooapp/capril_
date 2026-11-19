@@ -95,7 +95,10 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
                     ...(normalized ? [{ tenant: { phone: normalized } }] : []),
                     ...(user.email ? [{ tenant: { email: user.email } }] : [])
                 ],
-                status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] }
+                status: { in: ["ACTIVE", "ACTIVE_DECLARATIF", "LOYER_IMPAYE"] },
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null
             },
             orderBy: { createdAt: "desc" },
             include: {
@@ -183,7 +186,10 @@ export async function getTenantDashboard(requestedLeaseId?: string) {
                 activeLease = await prisma.lease.findFirst({
                     where: {
                         tenantId: userId,
-                        status: { in: ["ACTIVE", "LOYER_IMPAYE", "ACTIVE_DECLARATIF"] }
+                        status: { in: ["ACTIVE", "LOYER_IMPAYE", "ACTIVE_DECLARATIF"] },
+                        isSignedElectronically: true,
+                        signedAt: { not: null },
+                        deletedAt: null
                     },
                     include: {
                         property: true,

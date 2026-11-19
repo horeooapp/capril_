@@ -9,7 +9,13 @@ export async function GET(request: Request) {
         if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
         const lease = await prisma.lease.findFirst({
-            where: { tenantId: user.userId, status: 'ACTIVE' },
+            where: {
+                tenantId: user.userId,
+                status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
+            },
             include: { 
                 property: true,
                 receipts: {
@@ -23,7 +29,11 @@ export async function GET(request: Request) {
         if (!lease) {
             // Chercher si un bail est en attente de signature
             const pendingLease = await prisma.lease.findFirst({
-                where: { tenantId: user.userId, status: 'PENDING_SIGNATURE' },
+                where: {
+                    tenantId: user.userId,
+                    status: 'PENDING_SIGNATURE',
+                    deletedAt: null,
+                },
                 include: { property: true, landlord: { select: { firstName: true, lastName: true, phone: true } } },
                 orderBy: { createdAt: 'desc' }
             });

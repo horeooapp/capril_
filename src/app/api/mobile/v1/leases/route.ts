@@ -19,7 +19,8 @@ export async function GET(request: Request) {
                     { property: { managedByUserId: user.userId } },
                     { agentId: user.userId }
                 ],
-                status: { not: 'ARCHIVED' }
+                status: { notIn: ['CANCELLED', 'ARCHIVED'] },
+                deletedAt: null
             },
             include: {
                 property: { select: { id: true, name: true, address: true, commune: true, propertyCode: true, unitLabel: true } },

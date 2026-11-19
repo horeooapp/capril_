@@ -108,15 +108,19 @@ export default function BauxScreen() {
             </Pressable>
           </View>
         ) : (
-          leases.map((l) => (
+          leases
+            .filter((l) => l.status !== 'CANCELLED' && l.status !== 'ARCHIVED')
+            .map((l) => {
+              const isBilateralementValide = l.status === 'ACTIVE' && Boolean(l.isSignedElectronically) && Boolean(l.signedAt);
+              return (
             <View key={l.id} style={styles.leaseCard}>
               <View style={styles.cardTop}>
                 <View style={styles.refBadge}>
                   <Text style={styles.refText}>{l.leaseReference || 'BAIL-QAPRIL'}</Text>
                 </View>
-                <View style={l.status === 'ACTIVE' ? styles.pillActive : styles.pillPending}>
-                  <Text style={l.status === 'ACTIVE' ? styles.pillActiveText : styles.pillPendingText}>
-                    {l.status === 'ACTIVE' ? 'Actif & validé' : 'En attente de signature'}
+                <View style={isBilateralementValide ? styles.pillActive : styles.pillPending}>
+                  <Text style={isBilateralementValide ? styles.pillActiveText : styles.pillPendingText}>
+                    {isBilateralementValide ? 'Actif & validé' : 'En attente de signature'}
                   </Text>
                 </View>
               </View>
@@ -189,7 +193,8 @@ export default function BauxScreen() {
                 </Text>
               </Pressable>
             </View>
-          ))
+              );
+            })
         )}
       </ScrollView>
     </SafeAreaView>

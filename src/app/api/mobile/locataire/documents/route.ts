@@ -19,9 +19,15 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const type = searchParams.get('type') ?? undefined; // 'lease' | 'receipts' | 'edl' | null
 
-        // Bail actif du locataire
+        // Bail actif du locataire (uniquement si bilatéralement signé et validé)
         const lease = await prisma.lease.findFirst({
-            where: { tenantId: user.userId, status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] } },
+            where: {
+                tenantId: user.userId,
+                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] },
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
+            },
             select: {
                 id:               true,
                 leaseReference:   true,
@@ -51,7 +57,7 @@ export async function GET(request: Request) {
 
         const documents: any[] = [];
 
-        if (lease) {
+        if (lease && lease.isSignedElectronically && lease.signedAt) {
             // Document Bail
             if (!type || type === 'lease') {
                 documents.push({

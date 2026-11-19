@@ -14,11 +14,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized or role mismatch' }, { status: 401 });
     }
 
-    // 1. Try to find a formal Lease
+    // 1. Try to find an active bilaterally signed formal Lease
     const lease = await prisma.lease.findFirst({
       where: { 
         tenantId: user.id,
-        status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'PENDING_CONFIRMATION', 'PENDING_SIGNATURE', 'PENDING_DEPOSIT', 'LOYER_IMPAYE', 'DRAFT'] }
+        status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] },
+        isSignedElectronically: true,
+        signedAt: { not: null },
+        deletedAt: null
       },
       include: {
         property: true,
@@ -62,7 +65,10 @@ export async function GET(req: Request) {
         OR: [
           { locataireId: user.id },
           { telephoneLocataire: user.phone || 'N/A' }
-        ]
+        ],
+        statut: 'CONFIRME',
+        confirmationLocataire: true,
+        deletedAt: null
       },
       include: {
         property: true,

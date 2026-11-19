@@ -1022,7 +1022,9 @@ export async function getTenantLeases() {
             OR: [
                 { tenantId: session.user.id },
                 ...(user?.phone ? [{ tenant: { phone: user.phone } }] : [])
-            ]
+            ],
+            status: { notIn: [LeaseStatus.CANCELLED, LeaseStatus.ARCHIVED] },
+            deletedAt: null
         },
         include: {
             property: true,

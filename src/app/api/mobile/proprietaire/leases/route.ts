@@ -30,6 +30,8 @@ export async function GET(request: Request) {
                 { landlordId: user.userId },
                 { property: { ownerUserId: user.userId } },
             ],
+            status: { notIn: ['CANCELLED', 'ARCHIVED'] },
+            deletedAt: null,
         };
         if (status)     where.status     = status;
         if (propertyId) where.propertyId = propertyId;
@@ -57,6 +59,9 @@ export async function GET(request: Request) {
             id:             l.id,
             leaseReference: l.leaseReference,
             status:         l.status,
+            isSignedElectronically: Boolean(l.isSignedElectronically),
+            signedAt:       l.signedAt?.toISOString() ?? null,
+            isBilateralementValide: Boolean(l.status === 'ACTIVE' && l.isSignedElectronically && l.signedAt),
             leaseType:      l.leaseType,
             typeBail:       l.typeBail,
             startDate:      l.startDate?.toISOString() ?? null,

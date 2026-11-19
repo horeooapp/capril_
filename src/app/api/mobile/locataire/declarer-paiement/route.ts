@@ -24,7 +24,10 @@ export async function POST(request: Request) {
         const lease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
-                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] }
+                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF'] },
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null
             },
             include: {
                 property: { include: { owner: true } },

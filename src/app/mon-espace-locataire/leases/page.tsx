@@ -62,6 +62,8 @@ export default function TenantLeasesPage() {
         )
     }
 
+    const certifiedCount = leases.filter((l: any) => l.status === 'ACTIVE' && Boolean(l.isSignedElectronically) && Boolean(l.signedAt)).length;
+
     return (
         <div className="space-y-10 pb-20">
             {/* Header Section */}
@@ -72,7 +74,7 @@ export default function TenantLeasesPage() {
                 </div>
                 <div className="bg-white shadow-sm border border-gray-100 px-6 py-3 rounded-2xl flex items-center space-x-3 w-full sm:w-auto justify-center sm:justify-start">
                     <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs sm:text-sm font-bold text-gray-700">{leases.length} Contrat(s) Certifié(s)</span>
+                    <span className="text-xs sm:text-sm font-bold text-gray-700">{certifiedCount} Contrat(s) Certifié(s)</span>
                 </div>
             </div>
 

@@ -10,7 +10,13 @@ export async function GET(request: Request) {
         }
 
         const activeLease = await prisma.lease.findFirst({
-            where: { tenantId: user.userId, status: 'ACTIVE' },
+            where: {
+                tenantId: user.userId,
+                status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
+            },
             include: { property: true },
             orderBy: { createdAt: 'desc' }
         });
@@ -91,7 +97,13 @@ export async function POST(request: Request) {
 
         // Récupérer le bail (pour lier la requête à une propriété)
         const lease = await prisma.lease.findFirst({
-            where: { tenantId: user.userId, status: 'ACTIVE' },
+            where: {
+                tenantId: user.userId,
+                status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
+            },
             include: { property: true },
             orderBy: { createdAt: 'desc' }
         });

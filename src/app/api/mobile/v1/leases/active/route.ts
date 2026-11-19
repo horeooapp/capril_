@@ -12,11 +12,14 @@ export async function GET(request: Request) {
         const user = await authenticateMobileRequest(request);
         if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-        // 1. Rechercher strictement un bail actif validé et signé
+        // 1. Rechercher strictement un bail actif validé et signé bilatéralement
         const activeLease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
                 status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
             },
             include: {
                 property: true,
@@ -63,7 +66,8 @@ export async function GET(request: Request) {
         const pendingLease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
-                status: 'PENDING_SIGNATURE'
+                status: 'PENDING_SIGNATURE',
+                deletedAt: null
             },
             include: {
                 property: true,

@@ -25,11 +25,14 @@ export async function GET(request: Request) {
             }
         });
 
-        // Récupérer TOUS les baux (Leases) actifs du locataire pour multi-biens
+        // Récupérer TOUS les baux (Leases) actifs et bilatéralement signés du locataire
         const allActiveLeases = await prisma.lease.findMany({
             where: {
                 tenantId: user.userId,
-                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] }
+                status: { in: ['ACTIVE', 'ACTIVE_DECLARATIF', 'LOYER_IMPAYE'] },
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null,
             },
             include: {
                 property: {
@@ -51,7 +54,8 @@ export async function GET(request: Request) {
         const pendingFormalLease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
-                status: 'PENDING_SIGNATURE'
+                status: 'PENDING_SIGNATURE',
+                deletedAt: null,
             },
             include: {
                 property: true,

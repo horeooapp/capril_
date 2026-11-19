@@ -13,7 +13,10 @@ export async function GET(request: Request) {
         const lease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
-                status: 'ACTIVE'
+                status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null
             }
         });
 
@@ -50,7 +53,10 @@ export async function POST(request: Request) {
         const lease = await prisma.lease.findFirst({
             where: {
                 tenantId: user.userId,
-                status: 'ACTIVE'
+                status: 'ACTIVE',
+                isSignedElectronically: true,
+                signedAt: { not: null },
+                deletedAt: null
             },
             include: { property: true }
         });

@@ -32,7 +32,8 @@ export default async function LeasesDashboardPage() {
                         ] : []),
                         { agent: { agencyConfig: { path: ['managerId'], equals: userId } } }
                     ],
-                    status: { not: "ARCHIVED" }
+                    status: { notIn: ["CANCELLED", "ARCHIVED"] },
+                    deletedAt: null
                 },
                 include: {
                     tenant: { select: { firstName: true, lastName: true, phone: true } },
