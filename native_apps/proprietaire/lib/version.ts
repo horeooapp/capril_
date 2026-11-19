@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL Propriétaire';
 export const APP_KEY = 'proprietaire';
-export const APP_VERSION = '2.0.0';
-export const BUILD_NUMBER = 29;
+export const APP_VERSION = '2.0.1';
+export const BUILD_NUMBER = 30;
 export const BUILD_DATE = '18/11/2026';
 export const BUILD_TIME = '01:25 UTC';
 export const BUILD_TIMESTAMP = '18/11/2026 à 01:25 UTC';

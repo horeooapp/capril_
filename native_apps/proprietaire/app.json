@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qapril Proprietaires",
     "slug": "proprietaire",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -39,7 +39,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE"
       ],
-      "versionCode": 29
+      "versionCode": 30
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -48,14 +48,14 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Autoriser $(PRODUCT_NAME) à accéder à vos photos pour la numérisation de vos documents d'identité.",
-          "cameraPermission": "Autoriser $(PRODUCT_NAME) à utiliser l'appareil photo pour la numérisation de votre pièce d'identité et le contrôle facial KYC."
+          "photosPermission": "Autoriser $(PRODUCT_NAME) \u00e0 acc\u00e9der \u00e0 vos photos pour la num\u00e9risation de vos documents d'identit\u00e9.",
+          "cameraPermission": "Autoriser $(PRODUCT_NAME) \u00e0 utiliser l'appareil photo pour la num\u00e9risation de votre pi\u00e8ce d'identit\u00e9 et le contr\u00f4le facial KYC."
         }
       ],
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) \u00e0 utiliser Face ID ou Touch ID pour une connexion s\u00e9curis\u00e9e."
         }
       ],
       "expo-font",
