@@ -48,6 +48,8 @@ test-smtp.js
 
 # databases
 *.db
+*.bundle
+scratch/
 
 # audit deliverables directory
 audit_AUD-02/

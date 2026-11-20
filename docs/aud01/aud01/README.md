@@ -4,8 +4,8 @@ Réf. QAPRIL/CDC/003/2026-IC-01-R1 — complément « base de données ».
 S'applique au fichier `schema.prisma` transmis par le CTO le 14/11 (185 modèles, 73 enums).
 
 ## Contenu
-- `prisma/corrections/00_enums_IC-01-R1.prisma` — 18 énumérations à ajouter.
-- `prisma/corrections/01_modeles_corriges.prisma` — modèles modifiés, lignes marquées `[M-xx]`.
+- `prisma/corrections/00_enums_IC-01-R1.prisma.txt` — 18 énumérations à ajouter.
+- `prisma/corrections/01_modeles_corriges.prisma.txt` — modèles modifiés, lignes marquées `[M-xx]`.
 - `prisma/migrations/M-01 … M-13.sql` — migrations PostgreSQL, une par point, dans l'ordre.
 - `extensions/PERIMETRE_EXTENSIONS.md` — modèles à sortir du noyau (décision de direction).
 

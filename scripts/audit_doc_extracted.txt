@@ -243,9 +243,9 @@ Fichier
 Contenu
 README.md
 Ordre d'exécution, méthode IC-M4, tests de recette
-prisma/corrections/00_enums_IC-01-R1.prisma
+prisma/corrections/00_enums_IC-01-R1.prisma.txt
 18 énumérations à ajouter au schéma
-prisma/corrections/01_modeles_corriges.prisma
+prisma/corrections/01_modeles_corriges.prisma.txt
 Modèles User, Candidature, Annonce, Lease, Receipt, Property, MandatGestion, Occupant, AttestationResidence, DeclarationPaiement, TransmissionAdressage, AutomationSettings ; lignes marquées [M-xx]
 prisma/migrations/M-01 … M-13.sql
 Treize migrations PostgreSQL transactionnelles, commentées, avec requêtes de contrôle
