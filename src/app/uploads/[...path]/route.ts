@@ -29,19 +29,39 @@ export async function GET(
       return new NextResponse('Not Found', { status: 404 });
     }
 
-    // Pièces d'identité (KYC) : accès réservé au titulaire et aux administrateurs
-    const isPrivateKyc = pathSegments[0] === 'kyc';
-    if (isPrivateKyc) {
+    // Documents sensibles (KYC, identité, quittances, justificatifs) : accès sécurisé et restreint
+    const sensitiveFolders = ['kyc', 'identity', 'receipts', 'justificatifs'];
+    const isSensitive = sensitiveFolders.includes(pathSegments[0]);
+
+    if (isSensitive) {
       const session = await auth();
-      const role = String((session?.user as any)?.role || '').toUpperCase();
-      const isOwner = !!session?.user?.id && pathSegments[1] === session.user.id;
+      let userId = session?.user?.id;
+      let role = String((session?.user as any)?.role || '').toUpperCase();
+
+      if (!userId) {
+        const { authenticateMobileRequest } = await import('@/lib/mobile-auth');
+        const mobileUser = await authenticateMobileRequest(req);
+        if (mobileUser) {
+          userId = mobileUser.userId;
+          role = String(mobileUser.role || '').toUpperCase();
+        }
+      }
+
+      if (!userId) {
+        return new NextResponse('Unauthorized', { status: 401 });
+      }
+
       let isStaff = ['ADMIN', 'SUPER_ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(role);
-      if (!isOwner && !isStaff && session?.user?.id) {
+      if (!isStaff && userId) {
         const { prisma } = await import('@/lib/prisma');
-        const dbUser = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
+        const dbUser = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
         isStaff = ['ADMIN', 'SUPER_ADMIN', 'ANAH_AGENT', 'CDC_AGENT'].includes(String(dbUser?.role || '').toUpperCase());
       }
-      if (!isOwner && !isStaff) {
+
+      const isOwner = (pathSegments.length > 1 && pathSegments[1] === userId) || isStaff;
+
+      // Pour les pièces d'identité et KYC : uniquement le titulaire du compte ou le personnel habilité
+      if ((pathSegments[0] === 'kyc' || pathSegments[0] === 'identity') && !isOwner) {
         return new NextResponse('Forbidden', { status: 403 });
       }
     }
@@ -69,7 +89,7 @@ export async function GET(
     return new NextResponse(outputBuffer as any, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': isPrivateKyc ? 'private, no-store' : 'public, max-age=31536000, immutable',
+        'Cache-Control': isSensitive ? 'private, no-store' : 'public, max-age=31536000, immutable',
         'X-Content-Type-Options': 'nosniff',
       },
     });

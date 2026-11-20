@@ -1,21 +1,42 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { authenticateMobileRequest, verifyMobileToken } from '@/lib/mobile-auth';
+import { auth } from '@/auth';
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const { token, moduleName } = body;
 
-        if (!token) {
-            return NextResponse.json({ success: false, error: 'Token manquant' }, { status: 400 });
+        // Résolution sécurisée de l'identité de l'utilisateur (Token Bearer, token payload, ou session Web)
+        const authUser = await authenticateMobileRequest(req);
+        let userId = authUser?.userId;
+        if (!userId && token) {
+            const decoded = await verifyMobileToken(token);
+            if (decoded) userId = decoded.userId;
         }
+        if (!userId) {
+            const session = await auth();
+            if (session?.user?.id) userId = session.user.id;
+        }
+
+        if (!userId) {
+            return NextResponse.json({ success: false, error: 'Authentification requise' }, { status: 401 });
+        }
+
+        const currentUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, firstName: true, lastName: true, role: true }
+        });
+        const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(currentUser?.role || '').toUpperCase());
+        const userFullName = [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ');
 
         let results: Array<{ id: string, title: string, subtitle: string, status: string, date: string, amount?: number, type: string }> = [];
 
         switch (moduleName) {
             case 'Mes Baux':
                 const leases: any = await prisma.lease.findMany({
-                    where: { property: { ownerUserId: token } },
+                    where: isStaff ? {} : { property: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] } },
                     include: { property: true, tenant: true },
                     orderBy: { createdAt: 'desc' }
                 });
@@ -32,7 +53,7 @@ export async function POST(req: Request) {
 
             case 'Loyers':
                 const receipts: any = await prisma.receipt.findMany({
-                    where: { lease: { property: { ownerUserId: token } } },
+                    where: isStaff ? {} : { lease: { property: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] } } },
                     include: { lease: { include: { property: true, tenant: true } } },
                     orderBy: { createdAt: 'desc' },
                     take: 50
@@ -50,7 +71,7 @@ export async function POST(req: Request) {
 
             case 'Impayés':
                 const arrears: any = await prisma.leaseArrear.findMany({
-                    where: { status: 'unpaid', lease: { property: { ownerUserId: token } } },
+                    where: isStaff ? { status: 'unpaid' } : { status: 'unpaid', lease: { property: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] } } },
                     include: { lease: { include: { property: true, tenant: true } } },
                     orderBy: { dueDate: 'asc' }
                 });
@@ -67,7 +88,7 @@ export async function POST(req: Request) {
 
             case 'Mes Mandats':
                 const mandats: any = await prisma.mandatGestion.findMany({
-                    where: { intermediaireId: token },
+                    where: isStaff ? {} : { OR: [{ intermediaireId: userId }, { property: { ownerUserId: userId } }] },
                     orderBy: { createdAt: 'desc' }
                 });
                 results = mandats.map((m: any) => ({
@@ -82,6 +103,7 @@ export async function POST(req: Request) {
 
             case 'Matching Locataire':
                 const candidatures: any = await prisma.candidature.findMany({
+                    where: isStaff ? {} : { property: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] } },
                     orderBy: { createdAt: 'desc' }
                 });
                 results = candidatures.map((c: any) => ({
@@ -95,7 +117,9 @@ export async function POST(req: Request) {
                 break;
 
             case 'Agenda & Visites':
-                const visites: any = await prisma.agendaEvenement.findMany();
+                const visites: any = await prisma.agendaEvenement.findMany({
+                    where: isStaff ? {} : { OR: [{ agenceId: userId }, { agentId: userId }, { contactId: userId }] }
+                });
                 results = visites.map((v: any) => ({
                     id: v.id,
                     title: v.titre,
@@ -107,7 +131,9 @@ export async function POST(req: Request) {
                 break;
 
             case 'Syndic':
-                const syndicates: any = await prisma.syndicate.findMany();
+                const syndicates: any = await prisma.syndicate.findMany({
+                    where: isStaff ? {} : { OR: [{ syndicUserId: userId }, { properties: { some: { ownerUserId: userId } } }] }
+                });
                 results = syndicates.map((s: any) => ({
                     id: s.id,
                     title: s.residenceName,
@@ -120,6 +146,10 @@ export async function POST(req: Request) {
                 break;
 
             case 'Successions':
+                if (!isStaff) {
+                    results = [];
+                    break;
+                }
                 const successions: any = await prisma.succession.findMany();
                 results = successions.map((s: any) => ({
                     id: s.id,
@@ -132,7 +162,9 @@ export async function POST(req: Request) {
                 break;
 
             case 'Rapports':
-                const rapports: any = await prisma.financialReport.findMany();
+                const rapports: any = await prisma.financialReport.findMany({
+                    where: isStaff ? {} : (userFullName ? { ownerName: { contains: userFullName, mode: 'insensitive' } } : { id: 'none' })
+                });
                 results = rapports.map((r: any) => ({
                     id: r.id,
                     title: `CRG ${r.ownerName}`,
@@ -145,7 +177,9 @@ export async function POST(req: Request) {
                 break;
 
             case 'Régulation des Charges':
-                const regules: any = await prisma.regularisationCharges.findMany();
+                const regules: any = await prisma.regularisationCharges.findMany({
+                    where: isStaff ? {} : { lease: { property: { OR: [{ ownerUserId: userId }, { managedByUserId: userId }] } } }
+                });
                 results = regules.map((r: any) => ({
                     id: r.id,
                     title: `Régularisation ${r.annee}`,
@@ -159,7 +193,7 @@ export async function POST(req: Request) {
 
             case 'Automatisations':
                 const automations: any = await prisma.automationSettings.findMany({
-                    where: { userId: token }
+                    where: { userId: userId }
                 });
                 results = automations.map((a: any) => ({
                     id: a.id,
@@ -172,7 +206,6 @@ export async function POST(req: Request) {
                 break;
 
             default:
-                // Pour les 3 ou 4 modules finaux n'ayant PAS encore de table Prisma (Assistant IA, Indice ICL, Manuel Officiel, Assurances).
                 results = [];
                 break;
         }

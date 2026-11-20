@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { ensureAdmin } from "@/actions/auth-helpers"
 
 export async function getActiveNews() {
     try {
@@ -28,6 +29,7 @@ export async function getAllNews() {
 
 export async function createNews(content: string, priority: number = 0) {
     try {
+        await ensureAdmin()
         const news = await prisma.newsTicker.create({
             data: { content, priority }
         })
@@ -41,6 +43,7 @@ export async function createNews(content: string, priority: number = 0) {
 
 export async function updateNews(id: string, data: { content?: string, priority?: number, isActive?: boolean }) {
     try {
+        await ensureAdmin()
         const news = await prisma.newsTicker.update({
             where: { id },
             data
@@ -55,6 +58,7 @@ export async function updateNews(id: string, data: { content?: string, priority?
 
 export async function deleteNews(id: string) {
     try {
+        await ensureAdmin()
         await prisma.newsTicker.delete({
             where: { id }
         })

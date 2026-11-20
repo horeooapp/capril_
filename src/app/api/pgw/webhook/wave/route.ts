@@ -15,20 +15,30 @@ export async function POST(req: Request) {
     const body = JSON.parse(rawBody);
     console.log("[WAVE WEBHOOK] Notification reçue:", body);
 
-    // 1. Validation de la signature cryptographique Wave
+    // 1. Validation de la signature cryptographique Wave (Fail-Closed)
     const waveSignature = req.headers.get("wave-signature");
     const secret = process.env.WAVE_WEBHOOK_SECRET;
 
-    if (secret && waveSignature) {
-      // Wave docs usually mention HMAC-SHA256
-      const hmac = crypto.createHmac("sha256", secret);
-      hmac.update(rawBody);
-      const calculatedSignature = hmac.digest("hex");
-      
-      if (calculatedSignature !== waveSignature) {
-        console.error("[WAVE WEBHOOK] Signature Invalide !");
-        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-      }
+    if (!secret) {
+      console.error("[WAVE WEBHOOK] Erreur: WAVE_WEBHOOK_SECRET non configuré sur le serveur.");
+      return NextResponse.json({ error: "Webhook secret not configured" }, { status: 500 });
+    }
+
+    if (!waveSignature) {
+      console.error("[WAVE WEBHOOK] Rejet: En-tête wave-signature absent.");
+      return NextResponse.json({ error: "Missing signature header" }, { status: 401 });
+    }
+
+    const hmac = crypto.createHmac("sha256", secret);
+    hmac.update(rawBody);
+    const calculatedSignature = hmac.digest("hex");
+
+    const sigBuffer = Buffer.from(calculatedSignature, "utf8");
+    const waveSigBuffer = Buffer.from(waveSignature, "utf8");
+
+    if (sigBuffer.length !== waveSigBuffer.length || !crypto.timingSafeEqual(sigBuffer, waveSigBuffer)) {
+      console.error("[WAVE WEBHOOK] Signature Invalide !");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     const eventType = body.type;

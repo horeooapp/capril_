@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { generateLeasePDF } from '@/lib/pdf-generator';
 import { NextResponse } from 'next/server';
+import { authenticateMobileRequest } from '@/lib/mobile-auth';
+import { auth } from '@/auth';
 
 export async function GET(
     req: Request,
@@ -8,6 +10,23 @@ export async function GET(
 ) {
     try {
         const { id: leaseId } = await params;
+
+        // 1. Authentification (Mobile Bearer Token ou Session Web)
+        const mobileUser = await authenticateMobileRequest(req);
+        let userId = mobileUser?.userId;
+        let userRole = mobileUser?.role ? String(mobileUser.role).toUpperCase() : '';
+
+        if (!userId) {
+            const session = await auth();
+            if (session?.user?.id) {
+                userId = session.user.id;
+                userRole = String((session.user as any).role || '').toUpperCase();
+            }
+        }
+
+        if (!userId) {
+            return new NextResponse("Authentification requise", { status: 401 });
+        }
 
         const lease = await prisma.lease.findUnique({
             where: { id: leaseId },
@@ -20,6 +39,16 @@ export async function GET(
 
         if (!lease) {
             return new Response("Bail introuvable", { status: 404 });
+        }
+
+        // 2. Contrôle d'accès strict (BOLA / IDOR)
+        const isStaff = ['ADMIN', 'SUPER_ADMIN', 'CDC_AGENT', 'ANAH_AGENT'].includes(userRole);
+        const isTenant = lease.tenantId === userId;
+        const isLandlord = lease.landlordId === userId || lease.property.ownerUserId === userId;
+        const isManagingAgent = lease.property.managedByUserId === userId;
+
+        if (!isStaff && !isTenant && !isLandlord && !isManagingAgent) {
+            return new NextResponse("Accès non autorisé à ce contrat de bail", { status: 403 });
         }
 
         const pdfBuffer = await generateLeasePDF({

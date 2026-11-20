@@ -16,21 +16,30 @@ export const authConfig = {
         async jwt({ token, user, trigger, session }) {
             if (trigger === "update" && session) {
                 const updateData = session.user ? session.user : session;
-                if (updateData.chosenRole) {
-                    token.chosenRole = updateData.chosenRole;
-                    token.role = updateData.chosenRole as Role;
-                    token.capaciteActive = updateData.chosenRole;
+                const requestedRole = updateData.chosenRole || updateData.role || updateData.capaciteActive;
+                
+                if (requestedRole) {
+                    const privilegedRoles = ['ADMIN', 'SUPER_ADMIN', 'CDC_AGENT', 'ANAH_AGENT', 'COMMISSAIRE_JUSTICE'];
+                    const existingRole = String(token.role || '').toUpperCase();
+                    const isAlreadyPrivileged = privilegedRoles.includes(existingRole);
+                    const isEligible = Array.isArray(token.eligibleRoles) && token.eligibleRoles.includes(requestedRole);
+                    
+                    if (privilegedRoles.includes(String(requestedRole).toUpperCase()) && !isAlreadyPrivileged) {
+                        console.warn(`[AUTH SECURITY] Tentative d'élévation de privilèges non autorisée vers ${requestedRole} bloquée pour l'utilisateur ${token.id}`);
+                    } else if (isEligible || isAlreadyPrivileged || ['TENANT', 'LANDLORD', 'AGENCY', 'PARTICULIER', 'PROPRIETAIRE', 'LOCATAIRE', 'INTERMEDIAIRE'].includes(requestedRole)) {
+                        token.chosenRole = requestedRole;
+                        token.role = requestedRole as Role;
+                        token.capaciteActive = requestedRole;
+                    }
                 }
-                if (updateData.role) {
-                    token.role = updateData.role as Role;
-                    token.chosenRole = updateData.role;
-                }
-                if (updateData.capaciteActive) {
-                    token.capaciteActive = updateData.capaciteActive;
-                    token.chosenRole = updateData.capaciteActive;
-                    token.role = updateData.capaciteActive as Role;
-                }
-                Object.assign(token, updateData);
+                
+                // Assigner uniquement les champs autorisés sans écraser id, email ou privilèges
+                if (updateData.firstName !== undefined) token.firstName = updateData.firstName;
+                if (updateData.lastName !== undefined) token.lastName = updateData.lastName;
+                if (updateData.phone !== undefined) token.phone = updateData.phone;
+                if (updateData.agencyName !== undefined) token.agencyName = updateData.agencyName;
+                if (updateData.onboardingComplete !== undefined) token.onboardingComplete = updateData.onboardingComplete;
+                if (updateData.diasporaAbonnement !== undefined) token.diasporaAbonnement = updateData.diasporaAbonnement;
             }
             if (user) {
                 const activeRole = (user as any).chosenRole || (user as any).capaciteActive || user.role || 'TENANT';

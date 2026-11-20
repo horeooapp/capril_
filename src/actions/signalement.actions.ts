@@ -4,6 +4,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { ensureAuthenticated } from "@/actions/auth-helpers";
 
 // Categories valides (enum SignalCatEnum du schema)
 export const CATEGORIES_SIGNALEMENT = [
@@ -25,6 +26,13 @@ export async function createSignalement(data: {
   urgence?:     "URGENTE" | "NORMALE" | "BASSE";
   photoUrl?:    string;
 }) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+  if (!isStaff && callerId !== data.locataireId) {
+    throw new Error("Action non autorisée.");
+  }
+
   const ref = "MAI-" + Date.now().toString(36).toUpperCase();
   const ticket = await prisma.ticketMaintenance.create({
     data: {
@@ -46,6 +54,13 @@ export async function createSignalement(data: {
 
 // Signalements du locataire
 export async function getSignalementsLocataire(locataireId: string) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+  if (!isStaff && callerId !== locataireId) {
+    throw new Error("Action non autorisée.");
+  }
+
   return prisma.ticketMaintenance.findMany({
     where:   { locataireId },
     orderBy: { dateSignalement: "desc" }
@@ -54,6 +69,20 @@ export async function getSignalementsLocataire(locataireId: string) {
 
 // Signalements d'un bien (bailleur)
 export async function getSignalementsForProperty(logementId: string) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+
+  if (!isStaff) {
+    const property = await prisma.property.findUnique({
+      where: { id: logementId },
+      select: { ownerUserId: true, managedByUserId: true }
+    });
+    if (!property || (property.ownerUserId !== callerId && property.managedByUserId !== callerId)) {
+      throw new Error("Action non autorisée.");
+    }
+  }
+
   return prisma.ticketMaintenance.findMany({
     where:   { logementId },
     include: {
@@ -66,6 +95,21 @@ export async function getSignalementsForProperty(logementId: string) {
 
 // Marquer vu par le bailleur (proprio_vu_at)
 export async function marquerVuParBailleur(ticketId: string) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+
+  const ticket = await prisma.ticketMaintenance.findUnique({
+    where: { id: ticketId },
+    include: { lease: { include: { property: true } } }
+  });
+  if (!ticket) throw new Error("Ticket introuvable.");
+
+  const isOwner = ticket.lease?.landlordId === callerId || ticket.lease?.property?.ownerUserId === callerId || ticket.lease?.property?.managedByUserId === callerId;
+  if (!isStaff && !isOwner) {
+    throw new Error("Action non autorisée.");
+  }
+
   return prisma.ticketMaintenance.update({
     where: { id: ticketId },
     data: {
@@ -86,6 +130,21 @@ export async function updateSignalementStatut(ticketId: string, data: {
   coutFinal?:          number;
   dateIntervention?:   Date;
 }) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+
+  const ticket = await prisma.ticketMaintenance.findUnique({
+    where: { id: ticketId },
+    include: { lease: { include: { property: true } } }
+  });
+  if (!ticket) throw new Error("Ticket introuvable.");
+
+  const isOwner = ticket.lease?.landlordId === callerId || ticket.lease?.property?.ownerUserId === callerId || ticket.lease?.property?.managedByUserId === callerId;
+  if (!isStaff && !isOwner) {
+    throw new Error("Action non autorisée.");
+  }
+
   return prisma.ticketMaintenance.update({
     where: { id: ticketId },
     data: {
@@ -108,6 +167,19 @@ export async function confirmerResolutionLocataire(
   note:     number,
   confirme: boolean
 ) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+
+  const ticket = await prisma.ticketMaintenance.findUnique({
+    where: { id: ticketId }
+  });
+  if (!ticket) throw new Error("Ticket introuvable.");
+
+  if (!isStaff && ticket.locataireId !== callerId) {
+    throw new Error("Action non autorisée.");
+  }
+
   return prisma.ticketMaintenance.update({
     where: { id: ticketId },
     data: {
@@ -122,6 +194,12 @@ export async function confirmerResolutionLocataire(
 
 // Stats signalements pour dashboard bailleur
 export async function getStatsSignalements(landlordId: string) {
+  const session = await ensureAuthenticated();
+  const callerId = session.user.id;
+  const isStaff = ['ADMIN', 'SUPER_ADMIN'].includes(String(session.user.role || '').toUpperCase());
+  if (!isStaff && callerId !== landlordId) {
+    throw new Error("Action non autorisée.");
+  }
   const leases = await prisma.lease.findMany({
     where:  { landlordId, status: { not: "ARCHIVED" } },
     select: { id: true }

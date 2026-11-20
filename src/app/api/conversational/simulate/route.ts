@@ -15,6 +15,11 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: NextRequest) {
   try {
+    // Interdiction stricte en production pour éviter toute fuite de données réelles ou exécution non contrôlée
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ error: "Ce simulateur est strictement désactivé en environnement de production." }, { status: 403 });
+    }
+
     const body = await request.json();
     const { action } = body;
 

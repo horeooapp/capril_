@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleIncomingMessage } from "@/lib/conversational/conversation-engine";
 import { CnvTransportType } from "@/lib/conversational/types";
+import crypto from "crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -13,13 +14,18 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get("hub.verify_token");
   const challenge = searchParams.get("hub.challenge");
 
-  const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN || "qapril_webhook_token_2026";
+  const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN;
+
+  if (!expectedToken) {
+    console.error("[WHATSAPP WEBHOOK] Erreur: WHATSAPP_VERIFY_TOKEN non défini dans l'environnement.");
+    return NextResponse.json({ error: "Webhook verify token not configured" }, { status: 500 });
+  }
 
   if (mode === "subscribe" && token === expectedToken) {
     return new NextResponse(challenge, { status: 200 });
   }
 
-  return NextResponse.json({ status: "QAPRIL Conversational Webhook Active" }, { status: 200 });
+  return NextResponse.json({ error: "Forbidden - Invalid token or mode" }, { status: 403 });
 }
 
 /**
@@ -28,7 +34,30 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
+    const rawBody = await request.text();
+    const appSecret = process.env.WHATSAPP_APP_SECRET || process.env.CONVERSATIONAL_SECRET;
+    const signature = request.headers.get("x-hub-signature-256");
+
+    // Si un secret est configuré, valider obligatoirement l'intégrité et la signature
+    if (appSecret) {
+      if (!signature) {
+        console.error("[CONVERSATIONAL WEBHOOK] Rejet: x-hub-signature-256 manquant.");
+        return NextResponse.json({ error: "Missing signature header" }, { status: 401 });
+      }
+
+      const cleanSig = signature.startsWith("sha256=") ? signature.slice(7) : signature;
+      const expectedSig = crypto.createHmac("sha256", appSecret).update(rawBody).digest("hex");
+
+      const sigBuffer = Buffer.from(cleanSig, "utf8");
+      const expectedSigBuffer = Buffer.from(expectedSig, "utf8");
+
+      if (sigBuffer.length !== expectedSigBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedSigBuffer)) {
+        console.error("[CONVERSATIONAL WEBHOOK] Rejet: Signature non concordante.");
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      }
+    }
+
+    const body = rawBody ? JSON.parse(rawBody) : {};
 
     let senderPhone = "";
     let messageText = "";
