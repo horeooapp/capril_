@@ -101,8 +101,20 @@ export async function POST(request: Request) {
     const targetAccountId = providerAccountId || `${normalizedProvider}_${Buffer.from(verifiedEmail).toString("base64")}`;
 
     // Rôle cible (restriction stricte : pas d'ADMIN ou SUPER_ADMIN par OAuth)
-    const isLandlordRole = ["LANDLORD", "PROPRIETAIRE", "BAILLEUR"].includes(String(role).toUpperCase());
-    const targetRole = isLandlordRole ? "LANDLORD" : "TENANT";
+    const normRole = String(role || "").toUpperCase().trim();
+    let targetRole: "TENANT" | "LANDLORD" | "AGENCY" = "TENANT";
+    let targetCapacite = "LOCATAIRE";
+
+    if (["LANDLORD", "PROPRIETAIRE", "BAILLEUR"].includes(normRole)) {
+      targetRole = "LANDLORD";
+      targetCapacite = "PROPRIETAIRE";
+    } else if (["AGENCY", "AGENCE", "GESTIONNAIRE"].includes(normRole)) {
+      targetRole = "AGENCY";
+      targetCapacite = "AGENCE";
+    } else {
+      targetRole = "TENANT";
+      targetCapacite = "LOCATAIRE";
+    }
 
     // 2. Recherche de l'utilisateur par l'email vérifié
     let user = await prisma.user.findFirst({
@@ -127,12 +139,24 @@ export async function POST(request: Request) {
         }).catch(err => console.warn("[OAuth link warning]:", err?.message));
       }
 
-      if (avatarUrl && !user.avatarUrl) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { avatarUrl }
-        }).catch(() => null);
+      // Si l'utilisateur avait le rôle par défaut TENANT et se connecte comme LANDLORD ou AGENCY
+      const needsRoleUpgrade = (user.role === "TENANT" && (targetRole === "LANDLORD" || targetRole === "AGENCY"));
+      const updateData: any = {
+        capaciteActive: targetCapacite,
+        ...(avatarUrl && !user.avatarUrl ? { avatarUrl } : {})
+      };
+      if (needsRoleUpgrade) {
+        updateData.role = targetRole;
+        if (!user.onboardingComplete && (targetRole === "LANDLORD" || targetRole === "AGENCY")) {
+          updateData.onboardingComplete = false;
+        }
       }
+
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: updateData,
+        include: { accounts: true }
+      });
     } else {
       // 3. Création automatique de l'utilisateur avec email cryptographiquement vérifié
       const rawName = verifiedName || verifiedEmail.split("@")[0] || "Utilisateur QAPRIL";
@@ -149,7 +173,7 @@ export async function POST(request: Request) {
           role: targetRole,
           status: "ACTIVE",
           emailVerified: true,
-          capaciteActive: targetRole === "LANDLORD" ? "PROPRIETAIRE" : "LOCATAIRE",
+          capaciteActive: targetCapacite,
           onboardingComplete: targetRole === "TENANT",
           accounts: {
             create: {

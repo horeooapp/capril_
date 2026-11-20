@@ -20,8 +20,24 @@ export default function SocialAuthButtons({
   const handleOAuthSignIn = async (provider: "google" | "facebook") => {
     try {
       setLoadingProvider(provider);
+
+      // 1. Déposer le cookie de rôle choisi pour que le callback serveur NextAuth le récupère avec certitude
+      if (typeof document !== "undefined") {
+        const isSecure = typeof window !== "undefined" && window.location.protocol === "https:";
+        document.cookie = `qapril_chosen_role=${encodeURIComponent(role)}; path=/; max-age=1800; SameSite=Lax; ${isSecure ? "Secure;" : ""}`;
+      }
+
+      // 2. Déterminer l'URL de redirection adéquate selon le rôle choisi
+      let targetUrl = callbackUrl;
+      if (role === "TENANT" && (!targetUrl || targetUrl === "/dashboard")) {
+        targetUrl = "/mon-espace-locataire";
+      } else if ((role === "LANDLORD" || role === "AGENCY") && (!targetUrl || targetUrl.startsWith("/mon-espace-locataire"))) {
+        targetUrl = "/dashboard";
+      }
+
+      const separator = targetUrl.includes("?") ? "&" : "?";
       await signIn(provider, {
-        callbackUrl: `${callbackUrl}${callbackUrl.includes("?") ? "&" : "?"}chosenRole=${role}`,
+        callbackUrl: `${targetUrl}${separator}chosenRole=${encodeURIComponent(role)}`,
       });
     } catch (error) {
       console.error(`Erreur connexion ${provider}:`, error);

@@ -450,6 +450,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 user.email = email;
 
+                // ── DÉTECTION DU RÔLE CHOISI PAR L'UTILISATEUR ──
+                let chosenRole: string | null = null;
+                try {
+                    const { cookies } = await import("next/headers");
+                    const cookieStore = await cookies();
+                    chosenRole = cookieStore.get("qapril_chosen_role")?.value || null;
+
+                    if (!chosenRole) {
+                        const cbCookie = cookieStore.get("__Secure-authjs.callback-url")?.value 
+                            || cookieStore.get("authjs.callback-url")?.value;
+                        if (cbCookie) {
+                            try {
+                                const parsedUrl = new URL(decodeURIComponent(cbCookie), "https://qapril.net");
+                                chosenRole = parsedUrl.searchParams.get("chosenRole");
+                            } catch {}
+                        }
+                    }
+                } catch (cookieErr) {
+                    console.warn("[OAuth] Impossible de lire les cookies de session:", cookieErr);
+                }
+
+                const normRole = (chosenRole || "").toUpperCase().trim();
+                let targetRole: "TENANT" | "LANDLORD" | "AGENCY" = "TENANT";
+                let targetCapacite = "LOCATAIRE";
+
+                if (["LANDLORD", "BAILLEUR", "PROPRIETAIRE", "LANDLORD_PRO"].includes(normRole)) {
+                    targetRole = "LANDLORD";
+                    targetCapacite = "PROPRIETAIRE";
+                } else if (["AGENCY", "AGENCE", "GESTIONNAIRE", "NON_CERTIFIED_AGENT"].includes(normRole)) {
+                    targetRole = "AGENCY";
+                    targetCapacite = "AGENCE";
+                } else {
+                    targetRole = "TENANT";
+                    targetCapacite = "LOCATAIRE";
+                }
+
                 try {
                     // 1. Chercher par compte OAuth existant
                     let dbUser: any = null;
@@ -483,7 +519,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             || null;
 
                         const defaultPhone = `PENDING_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-                        const targetRole = "TENANT";
+                        const isTenant = targetRole === "TENANT";
 
                         dbUser = await prisma.user.create({
                             data: {
@@ -495,9 +531,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 emailVerified: true,
                                 role: targetRole,
                                 status: "ACTIVE",
-                                capaciteActive: "LOCATAIRE",
-                                onboardingComplete: true,
+                                capaciteActive: targetCapacite,
+                                onboardingComplete: isTenant,
                             }
+                        });
+                    } else {
+                        // Utilisateur existant : si un rôle spécifique a été choisi à la connexion,
+                        // on adapte sa capaciteActive (et son rôle principal si l'ancien rôle était le défaut TENANT)
+                        const needsRoleUpgrade = (dbUser.role === "TENANT" && (targetRole === "LANDLORD" || targetRole === "AGENCY"));
+                        const dataToUpdate: any = {
+                            capaciteActive: targetCapacite,
+                        };
+                        if (needsRoleUpgrade) {
+                            dataToUpdate.role = targetRole;
+                            if (!dbUser.onboardingComplete && (targetRole === "LANDLORD" || targetRole === "AGENCY")) {
+                                dataToUpdate.onboardingComplete = false;
+                            }
+                        }
+                        dbUser = await prisma.user.update({
+                            where: { id: dbUser.id },
+                            data: dataToUpdate,
                         });
                     }
 
@@ -521,15 +574,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }).catch(e => console.warn("[OAuth account link notice]:", e?.message));
                     }
 
+                    const activeRole = targetRole || dbUser.role || "TENANT";
+                    const activeCapacite = targetCapacite || dbUser.capaciteActive || "LOCATAIRE";
+
                     user.id = dbUser.id;
-                    (user as any).role = dbUser.role;
-                    (user as any).chosenRole = dbUser.role;
-                    (user as any).capaciteActive = dbUser.capaciteActive || dbUser.role;
+                    (user as any).role = activeRole;
+                    (user as any).chosenRole = activeRole;
+                    (user as any).capaciteActive = activeCapacite;
                     (user as any).firstName = dbUser.firstName;
                     (user as any).lastName = dbUser.lastName;
                     (user as any).avatarUrl = dbUser.avatarUrl;
                     (user as any).status = dbUser.status;
                     (user as any).onboardingComplete = dbUser.onboardingComplete;
+                    (user as any).eligibleRoles = Array.from(new Set([activeRole, dbUser.role, "TENANT"]));
+                    (user as any).capacites = (user as any).eligibleRoles;
 
                     return true;
                 } catch (err) {
