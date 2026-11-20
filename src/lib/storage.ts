@@ -75,7 +75,7 @@ export async function savePhysicalFile(file: File, subfolder: string = 'general'
       }
     }
 
-    await fs.writeFile(filePath, buffer);
+    await fs.writeFile(filePath, buffer as any);
 
     // Retourne le chemin relatif pour l'accès public
     return `/uploads/${safeSubfolder}/${fileName}`.replace(/\/+/g, '/');

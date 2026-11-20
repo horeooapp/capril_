@@ -61,7 +61,7 @@ async function getEncryptionKey(): Promise<CryptoKey> {
 
   _cachedKey = await crypto.subtle.importKey(
     "raw",
-    new Uint8Array(rawKey),
+    rawKey as any,
     { name: ALGORITHM, length: KEY_LENGTH },
     false, // non-extractable
     ["encrypt", "decrypt"]

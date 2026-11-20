@@ -1,7 +1,7 @@
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useState, useEffect } from "react";
-import { BackHandler, Platform, View, Text, Pressable } from "react-native";
+import { BackHandler, Platform, View, Text, Pressable, AppState } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import * as Updates from "expo-updates";
@@ -79,6 +79,13 @@ export default function RootLayout() {
     }
     checkAppUpdates();
 
+    // Vérification automatique à chaque retour au premier plan de l'application
+    const appStateSub = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active') {
+        checkAppUpdates();
+      }
+    });
+
     // Enregistrement push notifications & synchronisation du jeton
     registerForPushNotificationsAsync().catch((err) => {
       console.log('[Push] Enregistrement initial ignoré:', err);
@@ -96,8 +103,8 @@ export default function RootLayout() {
           router.push('/(tabs)/chat' as any);
         } else if (data.type === 'payment' || data.type === 'PAYMENT_CONFIRMATION') {
           router.push('/(tabs)/finance' as any);
-        } else if (data.type === 'APP_UPDATE' || data.type === 'MAJ_DISPONIBLE') {
-          Updates.reloadAsync().catch(() => {});
+        } else if (data.type === 'APP_UPDATE' || data.type === 'MAJ_DISPONIBLE' || data.type === 'SYSTEM_UPDATE') {
+          Updates.fetchUpdateAsync().then(() => Updates.reloadAsync()).catch(() => {});
         }
       } catch (navErr) {
         console.warn('[Push] Erreur navigation push:', navErr);
@@ -110,6 +117,7 @@ export default function RootLayout() {
 
     return () => {
       clearTimeout(timeout);
+      appStateSub.remove();
       responseListener.remove();
     };
   }, [router]);

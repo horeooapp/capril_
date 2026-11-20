@@ -49,17 +49,16 @@ def sync_code_files(new_ver: str, new_build: int, notes: str = None):
     cfg['version'] = new_ver
     cfg['buildNumber'] = new_build
     cfg['releaseDate'] = datetime.now().strftime('%Y-%m-%d')
-    if notes:
-        cfg['apps']['locataire']['releaseNotes'] = notes
-        cfg['apps']['proprietaire']['releaseNotes'] = notes
-    cfg['apps']['locataire']['version'] = new_ver
-    cfg['apps']['locataire']['versionCode'] = new_build
-    cfg['apps']['proprietaire']['version'] = new_ver
-    cfg['apps']['proprietaire']['versionCode'] = new_build
+    for app_name in ['locataire', 'proprietaire', 'agence']:
+        if app_name in cfg.get('apps', {}):
+            if notes:
+                cfg['apps'][app_name]['releaseNotes'] = notes
+            cfg['apps'][app_name]['version'] = new_ver
+            cfg['apps'][app_name]['versionCode'] = new_build
     save_version_config(cfg)
 
-    # 2. Update app.json and package.json for locataire
-    for app_dir in ['native_apps/locataire', 'native_apps/proprietaire']:
+    # 2. Update app.json, package.json and lib/version.ts for all apps
+    for app_dir in ['native_apps/locataire', 'native_apps/proprietaire', 'native_apps/agence']:
         app_json_path = os.path.join(app_dir, 'app.json')
         pkg_json_path = os.path.join(app_dir, 'package.json')
         ver_ts_path = os.path.join(app_dir, 'lib/version.ts')
@@ -102,19 +101,22 @@ def show_status():
     print(f"Support minimal     : v{cfg['minSupportedVersion']}")
     print(f"Canal principal     : {cfg['channel']}")
     print("-" * 50)
-    print(f"Locataire           : v{cfg['apps']['locataire']['version']} (code: {cfg['apps']['locataire']['versionCode']})")
-    print(f"Notes Locataire     : {cfg['apps']['locataire']['releaseNotes']}")
-    print(f"Proprietaire        : v{cfg['apps']['proprietaire']['version']} (code: {cfg['apps']['proprietaire']['versionCode']})")
-    print(f"Notes Proprietaire  : {cfg['apps']['proprietaire']['releaseNotes']}")
+    for app_name in ['locataire', 'proprietaire', 'agence']:
+        app_info = cfg.get('apps', {}).get(app_name, {})
+        print(f"{app_name.capitalize():20}: v{app_info.get('version', '?')} (code: {app_info.get('versionCode', '?')})")
+        if app_info.get('releaseNotes'):
+            print(f"Notes {app_name.capitalize():14}: {app_info.get('releaseNotes')}")
     print("=" * 50)
 
 def deploy_ota(msg: str):
-    print("=== Deploiement OTA sur les deux applications et canaux ===")
-    apps = ['locataire', 'proprietaire']
+    print("=== Deploiement des mises a jour sur les applications et canaux ===")
+    apps = ['locataire', 'proprietaire', 'agence']
     branches = ['preview', 'production']
 
     for app in apps:
         app_dir = f'native_apps/{app}'
+        if not os.path.exists(app_dir):
+            continue
         for branch in branches:
             print(f"\n--> Publication EAS {app} [{branch}]...")
             cmd = f'cd {app_dir} && npx eas-cli update --branch {branch} --message "{msg}" --non-interactive'

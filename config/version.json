@@ -18,6 +18,13 @@
       "versionCode": 35,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
       "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
+    },
+    "agence": {
+      "name": "QAPRIL Agence Agréée",
+      "version": "2.0.6",
+      "versionCode": 35,
+      "apkUrl": "https://qapril.net/downloads/qapril-agence-latest.apk",
+      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
     }
   }
 }

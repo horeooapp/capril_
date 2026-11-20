@@ -1,13 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ShieldCheck, HelpCircle, Info, LogOut, MessageCircle } from 'lucide-react-native';
+import * as Updates from 'expo-updates';
+import { ShieldCheck, HelpCircle, Info, LogOut, MessageCircle, RefreshCw } from 'lucide-react-native';
 import { logoutAndRedirect } from '../../lib/api';
 import { APP_VERSION, BUILD_NUMBER } from '../../lib/version';
 
 export default function PlusScreen() {
   const router = useRouter();
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    try {
+      if (__DEV__ || !Updates.isEnabled) {
+        Alert.alert('Information', 'Votre application est à jour.');
+        return;
+      }
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        Alert.alert(
+          'Mise à jour disponible',
+          "Une nouvelle version est disponible pour votre application. Voulez-vous l'appliquer maintenant ?",
+          [
+            { text: 'Plus tard', style: 'cancel' },
+            {
+              text: 'Appliquer',
+              onPress: async () => {
+                await Updates.fetchUpdateAsync();
+                await Updates.reloadAsync();
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert('Information', 'Votre application est à jour.');
+      }
+    } catch {
+      Alert.alert('Information', 'Impossible de vérifier les mises à jour pour le moment.');
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -61,6 +96,18 @@ export default function PlusScreen() {
             </View>
           </View>
         </View>
+
+        <Pressable style={styles.card} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
+          <View style={styles.row}>
+            <RefreshCw size={20} color="#1F2A44" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>Vérifier les mises à jour</Text>
+              <Text style={styles.cardSub}>
+                {isCheckingUpdate ? 'Recherche en cours...' : `Version ${APP_VERSION} (Build ${BUILD_NUMBER})`}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
 
         <View style={styles.card}>
           <View style={styles.row}>

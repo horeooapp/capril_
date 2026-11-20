@@ -12,7 +12,11 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "mobile:start:locataire": "cd native_apps/locataire && npx expo start",
-    "mobile:start:proprietaire": "cd native_apps/proprietaire && npx expo start"
+    "mobile:start:proprietaire": "cd native_apps/proprietaire && npx expo start",
+    "mobile:start:agence": "cd native_apps/agence && npx expo start",
+    "mobile:update": "python scripts/release.py --deploy",
+    "mobile:bump:patch": "python scripts/release.py --bump patch",
+    "mobile:bump:minor": "python scripts/release.py --bump minor"
   },
   "prisma": {
     "seed": "npx ts-node prisma/seed.ts"
