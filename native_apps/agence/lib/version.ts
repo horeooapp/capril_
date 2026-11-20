@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL Agence Agréée';
 export const APP_KEY = 'agence';
-export const APP_VERSION = '2.0.0';
-export const BUILD_NUMBER = 29;
+export const APP_VERSION = '2.0.7';
+export const BUILD_NUMBER = 36;
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;

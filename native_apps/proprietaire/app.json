@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qapril Proprietaires",
     "slug": "proprietaire",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -39,7 +39,7 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE"
       ],
-      "versionCode": 35
+      "versionCode": 36
     },
     "web": {
       "favicon": "./assets/favicon.png"

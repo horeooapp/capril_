@@ -1,30 +1,30 @@
 {
-  "version": "2.0.6",
-  "buildNumber": 35,
-  "releaseDate": "2026-11-19",
+  "version": "2.0.7",
+  "buildNumber": 36,
+  "releaseDate": "2026-11-20",
   "minSupportedVersion": "1.0.0",
   "channel": "preview",
   "apps": {
     "locataire": {
       "name": "QAPRIL Locataire",
-      "version": "2.0.6",
-      "versionCode": 35,
+      "version": "2.0.7",
+      "versionCode": 36,
       "apkUrl": "https://qapril.net/downloads/qapril-locataire-latest.apk",
-      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
+      "releaseNotes": "Securite renforcee, hierarchy immeuble/appartement, correctifs baux et authentification"
     },
     "proprietaire": {
       "name": "QAPRIL Propriétaire",
-      "version": "2.0.6",
-      "versionCode": 35,
+      "version": "2.0.7",
+      "versionCode": 36,
       "apkUrl": "https://qapril.net/downloads/qapril-proprietaire-latest.apk",
-      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
+      "releaseNotes": "Securite renforcee, hierarchy immeuble/appartement, correctifs baux et authentification"
     },
     "agence": {
       "name": "QAPRIL Agence Agréée",
-      "version": "2.0.6",
-      "versionCode": 35,
+      "version": "2.0.7",
+      "versionCode": 36,
       "apkUrl": "https://qapril.net/downloads/qapril-agence-latest.apk",
-      "releaseNotes": "Bail complet produit par le serveur habitation et professionnel (ADD-32)"
+      "releaseNotes": "Securite renforcee, hierarchy immeuble/appartement, correctifs baux et authentification"
     }
   }
 }
