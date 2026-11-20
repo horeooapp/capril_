@@ -49,8 +49,8 @@ export function calculerDroitsEnregistrement(
     const rent = Math.max(0, Math.round(Number(loyerMensuel) || 0));
     const duration = Math.max(1, Math.round(Number(dureeMois) || 12));
 
-    // Assiette annuelle DGI (Art. 550 CGI : 1 an de loyer pour un bail à durée déterminée standard)
-    const dureeRetenueMois = Math.min(duration, 12);
+    // [IC-08] Assiette : loyer mensuel x durée totale du bail (2,5 % sur toute la durée, sans plafond à 12 mois).
+    const dureeRetenueMois = duration;
     const baseCalcul = rent * dureeRetenueMois;
     const droitsEnregistrement = Math.round(baseCalcul * 0.025);
     const fraisTimbre = calculerTimbre(nbPages); // 500 F par page

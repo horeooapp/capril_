@@ -385,8 +385,11 @@ export async function sendSMSWithDetails(
   forceProvider?: string
 ): Promise<{ success: boolean; provider?: string; messageId?: string; error?: string }> {
   const preferred = (process.env.SMS_GATEWAY_PROVIDER || "ORANGE").toUpperCase();
-  const defaultOrder = ["ORANGE", "OPENWA", "HSMS", "AFRICASTALKING", "TWILIO"];
-  const prioritized = defaultOrder.includes(preferred)
+  // [IC-09] WhatsApp (OPENWA) n'est plus un repli du SMS : un message WhatsApp « accepté » pour un numéro
+  // sans WhatsApp n'arrive jamais, et faisait croire que le SMS était parti. WhatsApp reste un canal
+  // distinct, envoyé à part. OPENWA n'est utilisé ici que s'il est explicitement choisi comme passerelle.
+  const defaultOrder = ["ORANGE", "HSMS", "AFRICASTALKING", "TWILIO"];
+  const prioritized = defaultOrder.includes(preferred) || preferred === "OPENWA"
     ? [preferred, ...defaultOrder.filter((p) => p !== preferred)]
     : ["ORANGE", ...defaultOrder.filter((p) => p !== "ORANGE")];
 

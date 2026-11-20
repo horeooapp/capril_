@@ -432,7 +432,7 @@ export async function generateLeasePDF(data: LeasePDFParams): Promise<Buffer> {
   drawSectionTitle(page, fontBold, 'ENREGISTREMENT FISCAL (DIRECTION GÉNÉRALE DES IMPÔTS)', currentY);
   currentY -= 18;
 
-  const assietteAnnuelle = data.rentAmount * Math.min(duration, 12);
+  const assietteAnnuelle = data.rentAmount * duration; // [IC-08] loyer x durée totale du bail
   const droitsEnregistrement = Math.round(assietteAnnuelle * 0.025);
   // Le timbre porte sur le bail complet, pas sur cette fiche d'une page.
   const nbPagesBail = pagesBail(data.nbPagesBail);

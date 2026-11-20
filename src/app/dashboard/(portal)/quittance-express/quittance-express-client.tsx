@@ -7,6 +7,7 @@ import {
   emettreQuittanceExpressAction, completerDossierExpressAction, envoyerBailASignatureAction,
 } from "@/actions/quittance-express.actions";
 import { MODES_PAIEMENT } from "@/lib/quittance-express-modes";
+import ActionsBailEnAttente from "@/components/dashboard/ActionsBailEnAttente";
 
 type Dossier = Awaited<ReturnType<typeof import("@/actions/quittance-express.actions").listerDossiersExpress>>[number];
 
@@ -173,7 +174,9 @@ export default function QuittanceExpressClient({ dossiers }: { dossiers: Dossier
                   ? <Completer dossier={d} fini={() => { setOuvert(null); router.refresh(); }} />
                   : <button onClick={() => setOuvert(d.bailId)} className="mt-2 text-sm font-bold text-[#FF8200] underline">Compléter maintenant</button>
               )}
-              {d.prochaine?.code === "BAIL_SIGNE" && <EnvoyerSignature bailId={d.bailId} telephone={d.telephone} />}
+              {d.prochaine?.code === "BAIL_SIGNE" && (d.enAttenteDeSignature
+                ? <div className="mt-3"><ActionsBailEnAttente leaseId={d.bailId} telephone={d.telephone} /></div>
+                : <EnvoyerSignature bailId={d.bailId} telephone={d.telephone} />)}
               {d.prochaine?.code === "BAIL_ENREGISTRE" && (
                 <Link href={`/dashboard/leases/${d.bailId}`} className="mt-2 inline-block text-sm font-bold text-[#FF8200] underline">Ouvrir le bail pour l’enregistrer</Link>
               )}

@@ -47,7 +47,7 @@ export function calculateFiscalDroits(
     const daysLate = isLate ? Math.floor((now.getTime() - limitDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
     // Plafonnement à 12 mois pour les baux à durée indéterminée (DI) 
-    const dureeRetenue = Math.min(dureeBailMois, 12);
+    const dureeRetenue = Math.max(1, Math.round(dureeBailMois || 12)); // [IC-08] durée totale du bail
     const baseCalcul = loyerMensuel * dureeRetenue;
 
     const droits = Math.round(baseCalcul * FISCAL_TAX_RATE);

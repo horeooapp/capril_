@@ -27,6 +27,9 @@ export async function etatBailComplet(leaseId: string) {
     modele: { code: a.modele.code, version: a.modele.version, intitule: a.modele.intitule, statut: a.modele.statut },
     mentions: mentionsDuBail(bail), manquants: a.manquants, pages: a.pages, timbre: a.pages * 500,
     agenceAgreee: a.agenceAgreee, nbClauses: a.nbClauses,
+    enAttenteDeSignature: !bail.isSignedElectronically && !!bail.signingOtpHash && bail.status !== "CANCELLED",
+    telephoneLocataire: (a.bail.tenant?.phone as string) || null,
+    annule: bail.status === "CANCELLED",
     fige: fige ? { pages: fige.pages, figeLe: fige.figeLe, sha256: fige.sha256 } : null,
   };
 }

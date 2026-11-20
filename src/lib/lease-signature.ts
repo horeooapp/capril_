@@ -105,7 +105,8 @@ export async function preparerCodeSignature(
   const code = randomInt(100000, 1000000).toString();
   const empreinte = empreinteBail(bail);
   const expireLe = new Date(Date.now() + CODE_VALIDITE_HEURES * 3600 * 1000);
-  const contexte = { ...((bail.signatureContext as any) || {}), empreinteEnvoyee: empreinte, envoyeLe: new Date().toISOString(), envoyePar: demandeur.id };
+  const avant = (bail.signatureContext as any) || {};
+  const contexte = { ...avant, empreinteEnvoyee: empreinte, envoyeLe: new Date().toISOString(), envoyePar: demandeur.id, premierEnvoiLe: avant.premierEnvoiLe || new Date().toISOString() };
 
   await prisma.$transaction(async (tx: any) => {
     await tx.lease.update({

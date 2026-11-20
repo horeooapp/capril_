@@ -40,7 +40,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
 
   // S-06 : Récapitulatif Droits d'Enregistrement DGI (Art. 550 CGI)
   const durationMonths = lease.durationMonths || 12;
-  const baseCalculDgi = rentAmount * Math.min(durationMonths, 12);
+  const baseCalculDgi = rentAmount * (durationMonths || 12); // [IC-08] durée totale du bail
   const droitsEnregDgi = Math.round(baseCalculDgi * 0.025);
   const fraisTimbreDgi = Number(lease.fraisTimbre) || fraisTimbre(lease.nbPagesBail);
   const totalDgiEstime = Number(lease.droitsDgiCalcules) || (droitsEnregDgi + fraisTimbreDgi);
@@ -170,7 +170,7 @@ export default function PrintableLeaseContract({ lease }: PrintableLeaseContract
         <div className="p-3 bg-gray-50 border border-gray-300 rounded font-sans text-[11px] my-2 space-y-1">
           <p className="font-bold text-gray-800 uppercase tracking-wider text-[10px]">Récapitulatif des Droits d'Enregistrement Calculé Avant Signature (Art. 550 CGI) :</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-            <div><span className="text-gray-500">Assiette annuelle :</span> <strong className="text-gray-900">{baseCalculDgi.toLocaleString()} XOF</strong></div>
+            <div><span className="text-gray-500">Assiette (loyer × durée du bail) :</span> <strong className="text-gray-900">{baseCalculDgi.toLocaleString()} XOF</strong></div>
             <div><span className="text-gray-500">Droits DGI (2,5 %) :</span> <strong className="text-gray-900">{droitsEnregDgi.toLocaleString()} XOF</strong></div>
             <div><span className="text-gray-500">Timbre fiscal ({libelleTimbre(lease.nbPagesBail || (Number(lease.fraisTimbre) ? Number(lease.fraisTimbre) / 500 : null))}) :</span> <strong className="text-gray-900">{fraisTimbreDgi.toLocaleString()} XOF</strong></div>
             <div><span className="text-gray-500">Total prévisionnel :</span> <strong className="text-gray-900">{totalDgiEstime.toLocaleString()} XOF</strong></div>

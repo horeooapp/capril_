@@ -50,9 +50,20 @@ export async function requestOTP(identifier: string) {
             await redis.set(`otp:${normalizedPhone}`, otp, 'EX', ttl);
             await redis.set(`otp:${cleanPhone}`, otp, 'EX', ttl);
 
-            const waResult = await sendOpenWAOTP(normalizedPhone, otp, "Connexion / Inscription QAPRIL");
-            console.log(`[AUTH] OTP ${otp} sent via OpenWA to ${normalizedPhone} (Success: ${waResult.success})`);
-            return { success: true, channel: "PHONE" };
+            // [IC-09] Le code partait uniquement par WhatsApp : un locataire sans WhatsApp ne pouvait pas se
+            // connecter, donc pas signer. Il part désormais par SMS et par WhatsApp ; on n'annonce le succès
+            // que si un canal l'a réellement accepté. Le code n'est plus écrit dans les journaux.
+            const { sendSMSWithDetails } = await import("@/lib/sms");
+            const [sms, wa] = await Promise.all([
+                sendSMSWithDetails(normalizedPhone, `QAPRIL : votre code de connexion est ${otp}. Valable ${Math.round(ttl / 60)} minutes. Ne le communiquez a personne.`)
+                    .catch((e: any) => ({ success: false, error: e?.message })),
+                sendOpenWAOTP(normalizedPhone, otp, "Connexion / Inscription QAPRIL").catch((e: any) => ({ success: false, error: e?.message })),
+            ]);
+            console.log(`[AUTH] Code de connexion pour ${normalizedPhone} : SMS=${sms.success ? "envoyé" : "échec"} WhatsApp=${wa.success ? "envoyé" : "échec"}`);
+            if (!sms.success && !wa.success) {
+                return { error: "Le code n’a pas pu être envoyé, ni par SMS ni par WhatsApp. Vérifiez le numéro ou réessayez dans quelques minutes." };
+            }
+            return { success: true, channel: "PHONE", canaux: { sms: !!sms.success, whatsapp: !!wa.success } };
         }
 
         // Si c'est un email
@@ -76,7 +87,7 @@ export async function requestOTP(identifier: string) {
             console.error(`[SERVER ACTION] Failed to send email to ${normalizedEmail}:`, emailResult.error);
         }
 
-        console.log(`[AUTH] OTP ${otp} generated for ${normalizedEmail} (TTL: ${ttl}s)`);
+        console.log(`[AUTH] Code de connexion généré pour ${normalizedEmail} (TTL: ${ttl}s)`);
         return { success: true, channel: "EMAIL" };
     } catch (error: any) {
         console.error("[SERVER ACTION] requestOTP error:", error?.message || error);

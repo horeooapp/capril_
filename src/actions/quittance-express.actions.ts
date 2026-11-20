@@ -84,6 +84,7 @@ export async function listerDossiersExpress() {
       etapes: etat.etapes,
       prochaine: etat.prochaine,
       bienId: b.propertyId,
+      enAttenteDeSignature: !b.isSignedElectronically && !!b.signingOtpHash,
     };
   });
 }

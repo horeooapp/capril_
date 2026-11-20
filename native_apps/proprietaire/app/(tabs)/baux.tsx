@@ -23,6 +23,7 @@ import {
 } from 'lucide-react-native';
 import { TopNavHeader } from '../../components/TopNavHeader';
 import { fetchWithAuth } from '../../lib/api';
+import { ActionsBailEnAttente } from '../../components/ActionsBailEnAttente';
 
 export default function BauxScreen() {
   const router = useRouter();
@@ -146,6 +147,11 @@ export default function BauxScreen() {
                   </Text>
                 </View>
               </View>
+
+              {/* [IC-09] Bail non signé : renvoyer le code, corriger le numéro, annuler */}
+              {!l.isSignedElectronically && l.status !== 'TERMINATED' && (
+                <ActionsBailEnAttente leaseId={l.id} telephone={l.tenant?.phone} onChange={loadLeases} />
+              )}
 
               {/* MB-09 : Interrupteur identité */}
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F3F4F6' }}>

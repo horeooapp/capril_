@@ -9,7 +9,7 @@ pwd = 'Qap@vpserv2026'
 print('Connecting to VPS...')
 client = paramiko.SSHClient()
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-client.connect(host, username=user, password=pwd, timeout=30)
+client.connect(host, username=user, password=pwd, timeout=30, disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']})
 
 def exec_stream(cmd):
     print(f'\n>>> {cmd}')

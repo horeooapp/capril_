@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { InsuranceButton } from "@/components/dashboard/leases/InsuranceButton";
 import DeuxHorlogesBox from "@/components/leases/DeuxHorlogesBox";
 import MrlAndDeclarationsBox from "@/components/leases/MrlAndDeclarationsBox";
+import ActionsBailEnAttente from "@/components/dashboard/ActionsBailEnAttente";
 
 export default async function LeaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: leaseId } = await params
@@ -146,21 +147,21 @@ export default async function LeaseDetailPage({ params }: { params: Promise<{ id
                 </div>
             </div>
 
-            {/* Alerte Signature si PENDING_SIGNATURE */}
-            {(tLease.status === "PENDING_SIGNATURE" || tLease.status === "DRAFT") && (
-                <div className="p-6 bg-amber-50 border border-amber-200 rounded-[20px] flex flex-col items-start shadow-sm">
-                    <div className="flex items-center gap-3 mb-4 text-amber-700">
-                        <ShieldAlert size={24}/>
-                        <div>
-                            <h3 className="text-[13px] font-black uppercase tracking-widest">Validation Requise</h3>
-                            <p className="text-[12px] font-medium mt-1">Ce contrat global (BDQ/Numérique) est en attente de signature bilatérale.</p>
+            {/* [IC-09] Bail non signé : c'est le locataire qui signe ; le bailleur prépare, envoie, relance ou annule. */}
+            {!(tLease as any).isSignedElectronically && ["PENDING_SIGNATURE", "PENDING_CONFIRMATION", "DRAFT", "ACTIVE_DECLARATIF"].includes(tLease.status) && (
+                <div className="space-y-3">
+                    {(tLease as any).signingOtpHash ? (
+                        <ActionsBailEnAttente leaseId={tLease.id} telephone={tLease.tenant?.phone} apresAnnulation="/dashboard/leases" />
+                    ) : (
+                        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                            <p className="text-sm font-bold text-amber-900">Ce bail n’a pas encore été envoyé au locataire pour signature.</p>
                         </div>
-                    </div>
-                    <Link 
-                        href={`/dashboard/leases/${tLease.id}/signature`}
-                        className="w-full sm:w-auto px-6 py-3 bg-amber-600 text-white font-bold rounded-[10px] hover:bg-amber-700 transition-colors uppercase tracking-widest text-[11px] shadow-sm flex items-center justify-center gap-2"
+                    )}
+                    <Link
+                        href={`/dashboard/leases/${tLease.id}/bail`}
+                        className="inline-flex items-center gap-2 rounded-xl bg-[#FF8200] px-4 py-2.5 text-sm font-black text-white"
                     >
-                        Accéder à la Signature
+                        <FileText size={15}/> Bail complet et envoi en signature
                     </Link>
                 </div>
             )}

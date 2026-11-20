@@ -94,7 +94,7 @@ function LeaseRegistrationForm() {
     const totalInitialPayable = rentAmount + depositTotal + advanceTotal + chargesAmount + agencyFees;
     
     // Droits d'Enregistrement DGI (Art. 550 CGI CI - S-06)
-    const baseCalculDgi = rentAmount * Math.min(durationMonths || 12, 12);
+    const baseCalculDgi = rentAmount * (durationMonths || 12); // [IC-08] durée totale du bail
     const droitsDgi = Math.round(baseCalculDgi * 0.025);
     const timbresDgi = fraisTimbre();
     const totalDroitsDgi = droitsDgi + timbresDgi;
@@ -635,7 +635,7 @@ function LeaseRegistrationForm() {
 
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-2 text-xs">
                                         <div className="space-y-1">
-                                            <span className="text-emerald-300/80">Assiette annuelle</span>
+                                            <span className="text-emerald-300/80">Assiette (loyer × durée)</span>
                                             <p className="text-sm font-bold text-white">{baseCalculDgi.toLocaleString()} XOF</p>
                                         </div>
                                         <div className="space-y-1">

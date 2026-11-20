@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { normalizePhone } from '@/lib/phone';
 import { authenticateMobileRequest } from '@/lib/mobile-auth';
 import { calculerDroitsEnregistrement } from '@/lib/lease-validation';
 
@@ -37,7 +38,10 @@ export async function GET(
         }
 
         // Verify access: user must be the tenant, owner, or agent
-        const isTenant = lease.tenantId === user.userId;
+        // [IC-09] Le locataire est aussi reconnu par son numéro : son compte a pu être créé par le bailleur.
+        const moi = await prisma.user.findUnique({ where: { id: user.userId }, select: { phone: true } });
+        const memeNumero = Boolean(moi?.phone && lease.tenant?.phone && normalizePhone(moi.phone) === normalizePhone(lease.tenant.phone));
+        const isTenant = lease.tenantId === user.userId || memeNumero;
         const isOwner = lease.ownerId === user.userId;
         const isAgent = lease.agentId === user.userId;
         const isPropertyOwner = lease.property?.ownerUserId === user.userId;

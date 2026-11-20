@@ -7,6 +7,45 @@ import { authenticateMobileRequest } from '@/lib/mobile-auth';
  * Retourne le bail actif UNIQUEMENT s'il est validé et signé des deux parties.
  * Si un bail est en attente de signature, retourne pendingLease.
  */
+/**
+ * [IC-09] Bail que ce locataire doit signer : retrouvé par son compte ou par son numéro, dans tous les
+ * états d'attente (y compris un bail né d'une quittance express, dès qu'un code est en cours).
+ */
+async function trouverBailASigner(userId: string, sauf?: string) {
+    const moi = await prisma.user.findUnique({ where: { id: userId }, select: { phone: true } });
+    return prisma.lease.findFirst({
+        where: {
+            deletedAt: null,
+            isSignedElectronically: false,
+            ...(sauf ? { id: { not: sauf } } : {}),
+            AND: [
+                { OR: [{ tenantId: userId }, ...(moi?.phone ? [{ tenant: { phone: moi.phone } }] : [])] },
+                { OR: [
+                    { status: { in: ['PENDING_SIGNATURE', 'PENDING_CONFIRMATION', 'DRAFT'] } },
+                    { status: 'ACTIVE_DECLARATIF', signingOtpHash: { not: null } },
+                ] },
+            ],
+        } as any,
+        include: { property: true, landlord: { select: { firstName: true, lastName: true, phone: true } } },
+        orderBy: { createdAt: 'desc' },
+    });
+}
+
+function resumeBailASigner(b: any) {
+    if (!b) return null;
+    return {
+        id: b.id,
+        leaseReference: b.leaseReference,
+        propertyName: b.property?.name || b.property?.address || 'Logement',
+        propertyAddress: b.property?.address || '',
+        propertyCommune: b.property?.commune || 'Abidjan',
+        rentAmount: b.rentAmount,
+        depositAmount: b.depositAmount,
+        landlordName: `${b.landlord?.firstName || ''} ${b.landlord?.lastName || ''}`.trim() || 'Le bailleur',
+        status: 'PENDING_SIGNATURE',
+    };
+}
+
 export async function GET(request: Request) {
     try {
         const user = await authenticateMobileRequest(request);
@@ -58,25 +97,12 @@ export async function GET(request: Request) {
                 },
                 occupants: activeLease.occupants || [],
                 history: activeLease.receipts || [],
-                pendingLease: null
+                pendingLease: resumeBailASigner(await trouverBailASigner(user.userId, activeLease.id))
             });
         }
 
         // 2. Si aucun bail actif signé, vérifier s'il existe un bail initié en attente de validation/signature
-        const pendingLease = await prisma.lease.findFirst({
-            where: {
-                tenantId: user.userId,
-                status: 'PENDING_SIGNATURE',
-                deletedAt: null
-            },
-            include: {
-                property: true,
-                landlord: {
-                    select: { firstName: true, lastName: true, phone: true }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+        const pendingLease = await trouverBailASigner(user.userId);
 
         return NextResponse.json({
             success: true,
@@ -84,17 +110,7 @@ export async function GET(request: Request) {
             lease: null,
             occupants: [],
             history: [],
-            pendingLease: pendingLease ? {
-                id: pendingLease.id,
-                leaseReference: pendingLease.leaseReference,
-                propertyName: pendingLease.property?.name || pendingLease.property?.address || 'Logement',
-                propertyAddress: pendingLease.property?.address || '',
-                propertyCommune: pendingLease.property?.commune || 'Abidjan',
-                rentAmount: pendingLease.rentAmount,
-                depositAmount: pendingLease.depositAmount,
-                landlordName: `${pendingLease.landlord?.firstName || ''} ${pendingLease.landlord?.lastName || ''}`.trim() || 'Le bailleur',
-                status: 'PENDING_SIGNATURE'
-            } : null
+            pendingLease: resumeBailASigner(pendingLease)
         });
 
     } catch (error) {

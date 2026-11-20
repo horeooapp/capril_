@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { enregistrerMentionsBail } from "@/actions/bail-complet.actions";
 import { requestSignatureOTP } from "@/actions/lease.actions";
+import ActionsBailEnAttente from "@/components/dashboard/ActionsBailEnAttente";
 
 type Etat = NonNullable<Awaited<ReturnType<typeof import("@/actions/bail-complet.actions").etatBailComplet>>>;
 const champ = "w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-[#FF8200] focus:outline-none focus:ring-2 focus:ring-[#FF8200]/30";
@@ -66,6 +67,9 @@ export default function BailCompletClient({ etat: initial }: { etat: Etat }) {
           </p>
         )}
       </header>
+
+      {etat.annule && <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800">Ce bail est annulé.</p>}
+      {etat.enAttenteDeSignature && <ActionsBailEnAttente leaseId={etat.leaseId} telephone={etat.telephoneLocataire} apresAnnulation="/dashboard/leases" />}
 
       {etat.manquants.length > 0 ? (
         <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4">
