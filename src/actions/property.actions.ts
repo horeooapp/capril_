@@ -13,6 +13,7 @@ import { isUserKycSufficient } from "@/lib/kyc-config";
 import { generateLocalisationCode, deriveSimulatedW3W, validateCaptureCoherence, confirmerPositionParConcordance } from "@/lib/geo-maposte";
 import { reverseGeocode } from "@/lib/geo/reverseGeocode";
 import { validerLieu } from "@/lib/lieux";
+import { formatUserFriendlyError } from "@/lib/friendly-error";
 
 export type TypeStructure = "INDEPENDANT" | "COUR_COMMUNE" | "IMMEUBLE" | "RESIDENCE";
 
@@ -165,7 +166,12 @@ export async function creerBien(formData: FormData) {
       // 1. Validation hiérarchie
       if (typeStructure !== "INDEPENDANT") {
         if (!unitLabel?.trim() && parentPropertyId) throw new Error(`Nom de l'unité obligatoire pour un bien enfant`);
-        if (!parentPropertyId && !["COUR_COMMUNE", "IMMEUBLE", "RESIDENCE"].includes(typeStructure)) throw new Error(`Structure parente obligatoire`);
+        if (!parentPropertyId && !["COUR_COMMUNE", "IMMEUBLE", "RESIDENCE"].includes(typeStructure)) {
+          throw new Error("Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord.");
+        }
+      }
+      if ((data.propertyType === "APARTMENT" || data.propertyType === "APPARTEMENT") && !parentPropertyId && (typeStructure as string) === "ENFANT") {
+        throw new Error("Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord.");
       }
 
       // 2. Unicité du label au sein d'une structure
@@ -425,7 +431,7 @@ export async function creerBien(formData: FormData) {
     });
   } catch (error: any) {
     console.error("[créerBien Error]:", error);
-    return { error: error.message || "Erreur lors de la création." };
+    return { error: formatUserFriendlyError(error, "Impossible de créer le bien. Veuillez vérifier les informations saisies.") };
   }
 }
 

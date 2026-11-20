@@ -3,6 +3,20 @@ import { getPropertyPassport } from "@/actions/property.actions"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 
+const safeFormatDate = (d: any, formatOpts: Intl.DateTimeFormatOptions = { month: 'short', year: 'numeric' }): string => {
+    if (!d) return "N/A";
+    const dateObj = d instanceof Date ? d : new Date(d);
+    if (isNaN(dateObj.getTime())) return "N/A";
+    return dateObj.toLocaleDateString('fr-FR', formatOpts);
+};
+
+const safeToISOString = (d: any): string | undefined => {
+    if (!d) return undefined;
+    const dateObj = d instanceof Date ? d : new Date(d);
+    if (isNaN(dateObj.getTime())) return undefined;
+    return dateObj.toISOString();
+};
+
 export default async function PropertyPassportPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const property = await getPropertyPassport(id)
@@ -117,11 +131,11 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                                                 </p>
                                                             </div>
                                                             <div className="text-right text-xs whitespace-nowrap text-gray-500">
-                                                                <time dateTime={startDate ? startDate.toISOString() : undefined}>
-                                                                    {startDate ? startDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }) : "N/A"}
+                                                                <time dateTime={safeToISOString(lease.startDate)}>
+                                                                    {safeFormatDate(lease.startDate)}
                                                                 </time>
-                                                                {endDate && (
-                                                                    <span> — {endDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })}</span>
+                                                                {lease.endDate && (
+                                                                    <span> — {safeFormatDate(lease.endDate)}</span>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -167,7 +181,7 @@ export default async function PropertyPassportPage({ params }: { params: Promise
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xs font-black text-primary">{Number(record.cost || 0).toLocaleString('fr-FR')} XOF</p>
-                                            <p className="text-[10px] text-gray-400">{record.date ? new Date(record.date).toLocaleDateString('fr-FR') : "N/A"}</p>
+                                            <p className="text-[10px] text-gray-400">{safeFormatDate(record.date, { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                                         </div>
                                     </div>
                                 ))}

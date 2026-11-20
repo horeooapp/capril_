@@ -38,25 +38,16 @@ export default function Error({
             </h1>
 
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 mb-10">
-              <p className="text-gray-600 font-medium leading-relaxed mb-4">
-                Une exception serveur s&apos;est produite lors du traitement de votre demande. Notre infrastructure de sécurité a capturé l&apos;incident pour analyse.
+              <p className="text-gray-700 font-medium leading-relaxed mb-4">
+                Une difficulté temporaire est survenue lors du traitement de votre demande. Nos équipes ont été automatiquement informées pour assurer la continuité de votre service.
               </p>
               
-              <div className="flex flex-col gap-2 mt-4 text-left overflow-x-auto w-full max-w-full">
-                <div className="flex items-center gap-3 px-4 py-2 bg-red-100 border border-red-200 rounded-xl inline-flex text-red-900 font-mono text-sm max-w-full truncate overflow-hidden">
-                   <b>MSG:</b> {error.message || "Aucun message spécifique."}
+              <div className="flex flex-col gap-2 mt-4 text-left w-full max-w-full">
+                <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-sm font-medium">
+                  {error.message && !error.message.includes('Server Components render') && !error.message.includes('digest')
+                    ? error.message
+                    : "L'opération n'a pas pu aboutir dans les délais prévus. Veuillez vérifier votre connexion ou réactualiser la page."}
                 </div>
-                {error.digest && (
-                  <div className="flex items-center gap-3 px-4 py-2 bg-white border border-gray-200 rounded-xl inline-flex">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Digest Code:</span>
-                    <code className="text-xs font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{error.digest}</code>
-                  </div>
-                )}
-                {error.stack && (
-                  <div className="mt-2 text-[10px] text-gray-500 bg-black/5 p-4 rounded-xl leading-relaxed max-w-full overflow-hidden truncate">
-                    <b>STACK:</b> {error.stack.split('\n').slice(0, 3).join('\n')}
-                  </div>
-                )}
               </div>
             </div>
 

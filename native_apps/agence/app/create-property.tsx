@@ -111,7 +111,7 @@ export default function CreatePropertyScreen() {
 
   // Form states
   const [name, setName] = useState('');
-  const [propertyType, setPropertyType] = useState('APPARTEMENT');
+  const [propertyType, setPropertyType] = useState('VILLA');
   const [leaseType, setLeaseType] = useState('residential');
   const [commune, setCommune] = useState('Cocody');
   const [customCommune, setCustomCommune] = useState('');
@@ -127,6 +127,8 @@ export default function CreatePropertyScreen() {
   const [numeroIlot, setNumeroIlot] = useState('');
   const [estViabilise, setEstViabilise] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [existingImmeubles, setExistingImmeubles] = useState<any[]>([]);
+  const [selectedImmeubleId, setSelectedImmeubleId] = useState<string | null>(null);
 
   // ADD-28 : Géolocalisation automatique et manuelle
   const [gpsLatitude, setGpsLatitude] = useState<number | null>(null);
@@ -274,6 +276,31 @@ export default function CreatePropertyScreen() {
     }
   };
 
+  // Chargement des immeubles existants pour validation des appartements
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetchWithAuth('/proprietaire/properties');
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          const list = Array.isArray(data.properties) ? data.properties : [];
+          const immeubles = list.filter((p: any) => 
+            p.propertyType === 'IMMEUBLE' || 
+            p.typeStructure === 'IMMEUBLE' || 
+            p.typeStructure === 'RESIDENCE' || 
+            p.typeStructure === 'COUR_COMMUNE'
+          );
+          setExistingImmeubles(immeubles);
+          if (immeubles.length > 0) {
+            setSelectedImmeubleId(immeubles[0].id);
+          }
+        }
+      } catch (_e) {}
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
   // Tentative de géolocalisation automatique à l'ouverture du formulaire
   useEffect(() => {
     let isMounted = true;
@@ -393,6 +420,20 @@ export default function CreatePropertyScreen() {
       }
     }
 
+    if (propertyType === 'APPARTEMENT') {
+      if (existingImmeubles.length === 0 || !selectedImmeubleId) {
+        Alert.alert(
+          'Immeuble requis',
+          'Pour enregistrer un appartement, veuillez créer un immeuble ou un bloc résidentiel d\'abord.',
+          [
+            { text: 'Créer un immeuble', onPress: () => setPropertyType('IMMEUBLE') },
+            { text: 'Compris', style: 'cancel' }
+          ]
+        );
+        return;
+      }
+    }
+
     const totalBuildingRent = immeubleUnits.reduce((sum, u) => sum + (Number(u.rent) || 0), 0);
     const totalBuildingRooms = immeubleUnits.reduce((sum, u) => sum + (Number(u.rooms) || 0), 0);
 
@@ -422,7 +463,8 @@ export default function CreatePropertyScreen() {
           quartier: detectedQuartier || undefined,
           city: selectedCity,
           propertyType,
-          typeStructure: propertyType === 'IMMEUBLE' ? 'IMMEUBLE' : 'INDEPENDANT',
+          typeStructure: propertyType === 'IMMEUBLE' ? 'IMMEUBLE' : (propertyType === 'APPARTEMENT' ? 'ENFANT' : 'INDEPENDANT'),
+          parentPropertyId: (propertyType === 'APPARTEMENT' && selectedImmeubleId) ? selectedImmeubleId : undefined,
           leaseType,
           declaredRentFcfa: propertyType === 'IMMEUBLE' ? totalBuildingRent : (!isForSale && cleanRentDigits ? parseInt(cleanRentDigits, 10) : 0),
           nbUnits: propertyType === 'IMMEUBLE' ? immeubleUnits.length : undefined,
@@ -558,6 +600,17 @@ export default function CreatePropertyScreen() {
                   <Pressable
                     key={t.id}
                     onPress={() => {
+                      if (t.id === 'APPARTEMENT' && existingImmeubles.length === 0) {
+                        Alert.alert(
+                          'Immeuble requis',
+                          'Pour enregistrer un appartement, veuillez créer un immeuble ou un bloc résidentiel d\'abord.',
+                          [
+                            { text: 'Créer un immeuble', onPress: () => setPropertyType('IMMEUBLE') },
+                            { text: 'Compris', style: 'cancel' }
+                          ]
+                        );
+                        return;
+                      }
                       setPropertyType(t.id);
                       if (t.id === 'STUDIO') setRooms('1');
                     }}
@@ -570,6 +623,62 @@ export default function CreatePropertyScreen() {
                 );
               })}
             </View>
+
+            {propertyType === 'APPARTEMENT' && (
+              <View style={{ backgroundColor: '#F0FDF4', borderWidth: 1, borderColor: '#BBF7D0', borderRadius: 16, padding: 14, marginTop: 12 }}>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#166534', marginBottom: 6 }}>
+                  🏢 Immeuble ou bloc de rattachement *
+                </Text>
+                {existingImmeubles.length === 0 ? (
+                  <View style={{ gap: 8 }}>
+                    <Text style={{ fontSize: 12, color: '#15803D' }}>
+                      Vous n'avez pas encore d'immeuble enregistré. Veuillez créer un immeuble ou un bloc résidentiel d'abord.
+                    </Text>
+                    <Pressable
+                      onPress={() => setPropertyType('IMMEUBLE')}
+                      style={{ backgroundColor: '#16A34A', paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8, alignSelf: 'flex-start' }}
+                    >
+                      <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700' }}>Créer un immeuble d'abord</Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  <View style={{ gap: 6 }}>
+                    {existingImmeubles.map((b: any) => {
+                      const isSelected = selectedImmeubleId === b.id;
+                      return (
+                        <Pressable
+                          key={b.id}
+                          onPress={() => {
+                            setSelectedImmeubleId(b.id);
+                            if (b.commune && COMMUNES_ABIDJAN.includes(b.commune)) {
+                              setCommune(b.commune);
+                            }
+                            if (b.address) {
+                              setAddress(b.address);
+                            }
+                          }}
+                          style={{
+                            padding: 10,
+                            borderRadius: 10,
+                            borderWidth: 1.5,
+                            borderColor: isSelected ? '#16A34A' : '#E5E7EB',
+                            backgroundColor: isSelected ? '#DCFCE7' : '#FFFFFF',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                          }}
+                        >
+                          <Text style={{ fontSize: 13, fontWeight: isSelected ? '700' : '500', color: '#1F2937' }}>
+                            {b.name || 'Immeuble sans nom'} ({b.commune || 'Abidjan'})
+                          </Text>
+                          {isSelected && <Check size={16} color="#16A34A" />}
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            )}
 
             {propertyType === 'IMMEUBLE' ? (
               <View style={{ backgroundColor: '#F0F9FF', borderWidth: 1, borderColor: '#BAE6FD', borderRadius: 16, padding: 16, marginTop: 14 }}>

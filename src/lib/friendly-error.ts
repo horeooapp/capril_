@@ -1,7 +1,29 @@
 /**
  * Helper de conversion d'erreurs techniques (Prisma, base de données, validation)
  * en messages clairs et compréhensibles par l'utilisateur final.
+ * Garantit qu'aucun code d'erreur système (P20xx, digest, stack trace, noms de colonnes SQL)
+ * ne fuite vers l'interface utilisateur.
  */
+
+export function sanitizeErrorMessage(raw: string): string {
+    if (!raw) return "";
+
+    // Supprimer les traces de code Prisma, invocations et digests
+    let cleaned = raw
+        .replace(/Invalid\s+`prisma\.[^`]+`\s+invocation:?/gi, '')
+        .replace(/Unique constraint failed on the constraint:?[^.\n]*/gi, '')
+        .replace(/Unique constraint failed on the fields?:?[^.\n]*/gi, '')
+        .replace(/Foreign key constraint failed on the field:?[^.\n]*/gi, '')
+        .replace(/An error occurred in the Server Components render[^.\n]*/gi, '')
+        .replace(/Digest Code:?\s*\d+/gi, '')
+        .replace(/\b[P][0-9]{4}\b/g, '')
+        .replace(/\{[^{}]*\}/g, '') // supprimer les dumps de json techniques { ... }
+        .replace(/-->\s+[0-9]+.*$/gm, '')
+        .replace(/^\s*at\s+.*$/gm, '')
+        .trim();
+
+    return cleaned;
+}
 
 export function formatUserFriendlyError(error: any, fallbackMessage: string = "Une erreur est survenue lors de l'enregistrement. Veuillez vérifier les informations saisies."): string {
     if (!error) return fallbackMessage;
@@ -10,23 +32,37 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         ? error 
         : String(error?.message || error?.error || '');
 
-    // Si le message est déjà un message clair et rédigé en français par nos contrôles métier
+    const lower = rawMessage.toLowerCase();
+
+    // 0. Cas prioritaire : Structure parente / Immeuble manquant pour un appartement ou sous-lot
     if (
-        rawMessage.startsWith('Veuillez ') || 
+        lower.includes('structure parente') ||
+        lower.includes('parent_property_id') ||
+        lower.includes('parentpropertyid') ||
+        (lower.includes('parent') && (lower.includes('obligatoire') || lower.includes('manquant') || lower.includes('requis') || lower.includes('introuvable'))) ||
+        (lower.includes('appartement') && (lower.includes('immeuble') || lower.includes('parent')))
+    ) {
+        return "Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord.";
+    }
+
+    // 1. Si le message est déjà un message clair et rédigé en français par nos contrôles métier
+    if (
+        (rawMessage.startsWith('Veuillez ') || 
         rawMessage.startsWith('Numéro ') || 
         rawMessage.startsWith('Adresse ') || 
         rawMessage.startsWith('Le bien ') ||
         rawMessage.startsWith('Montant ') ||
         rawMessage.startsWith('Accès ') ||
         rawMessage.startsWith('Champ ') ||
-        rawMessage.startsWith('RG-')
+        rawMessage.startsWith('RG-')) &&
+        !lower.includes('prisma') &&
+        !lower.includes('invocation') &&
+        !lower.includes('digest')
     ) {
-        return rawMessage;
+        return sanitizeErrorMessage(rawMessage);
     }
 
-    const lower = rawMessage.toLowerCase();
-
-    // 0. Contraintes d'unicité Prisma (P2002)
+    // 2. Contraintes d'unicité Prisma (P2002)
     if (error?.code === 'P2002' || lower.includes('p2002') || lower.includes('unique constraint')) {
         if (lower.includes('phone') || lower.includes('téléphone') || lower.includes('telephone') || lower.includes('contact')) {
             return "Ce numéro de téléphone est déjà associé à un compte ou un dossier.";
@@ -37,15 +73,29 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         if (lower.includes('propertycode') || lower.includes('property_code')) {
             return "Un bien avec ce code officiel d'immatriculation existe déjà dans le système.";
         }
+        if (lower.includes('unitlabel') || lower.includes('unit_label')) {
+            return "Un appartement ou lot avec ce même nom ou numéro existe déjà dans cet ensemble immobilier.";
+        }
         return "Un enregistrement avec ces mêmes identifiants existe déjà dans le système.";
     }
 
-    // 1. Contraintes de clé étrangère Prisma (P2003)
+    // 3. Contraintes de clé étrangère Prisma (P2003)
     if (error?.code === 'P2003' || lower.includes('p2003') || lower.includes('foreign key constraint')) {
-        return "Le bien ou l'utilisateur associé est introuvable ou n'est plus accessible.";
+        if (lower.includes('parentpropertyid') || lower.includes('parent_property_id') || lower.includes('parent')) {
+            return "Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord.";
+        }
+        if (lower.includes('owner') || lower.includes('user')) {
+            return "Le compte utilisateur ou le propriétaire associé est introuvable.";
+        }
+        return "Le bien ou l'élément associé est introuvable ou n'est plus accessible.";
     }
 
-    // 2. Erreurs d'Enum ou de statut dans le schéma
+    // 4. Enregistrement introuvable Prisma (P2025)
+    if (error?.code === 'P2025' || lower.includes('p2025') || lower.includes('record to update not found')) {
+        return "L'élément demandé est introuvable ou a déjà été modifié.";
+    }
+
+    // 5. Erreurs d'Enum ou de statut dans le schéma
     if (
         lower.includes('statutposition') || 
         lower.includes('statut_position') ||
@@ -54,7 +104,7 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Une valeur sélectionnée ou un statut transmis est non conforme au standard du référentiel.";
     }
 
-    // 3. Détection des erreurs spécifiques sur le numéro de téléphone
+    // 6. Détection des erreurs spécifiques sur le numéro de téléphone
     if (
         lower.includes('phone') || 
         lower.includes('téléphone') || 
@@ -63,16 +113,12 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Numéro de téléphone absent ou invalide. Veuillez renseigner un numéro de téléphone valide.";
     }
 
-    // 4. Détection des erreurs sur l'email
+    // 7. Détection des erreurs sur l'email
     if (lower.includes('email') || lower.includes('e-mail')) {
         return "Adresse email absente ou invalide. Veuillez renseigner une adresse email correcte.";
     }
 
-    // 5. Détection des erreurs STRICTEMENT sur le loyer ou les montants
-    // IMPORTANT : Dans les erreurs Prisma, tout le payload data: { declaredRentFcfa: ... } est dumpé dans le message.
-    // Il faut donc vérifier que l'erreur porte SPÉCIFIQUEMENT sur le champ financier,
-    // et qu'elle n'est pas causée par un autre champ (ex: statutPosition, phone, code, etc.)
-    // ou par un dump d'énumération comme LOYER_IMPAYE.
+    // 8. Détection des erreurs STRICTEMENT sur le loyer ou les montants
     const isStrictFinancial = 
         (/argument\s+[`'"]?(rent|declaredRent|rentAmount|caution|deposit|montant)/i.test(rawMessage)) ||
         (/(?:valeur|montant|chiffre)\s+invalide.*?(?:loyer|caution|deposit|montant)/i.test(rawMessage)) ||
@@ -92,7 +138,7 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Montant financier invalide ou manquant. Veuillez préciser le loyer mensuel ou la caution en FCFA.";
     }
 
-    // 6. Détection des erreurs sur le bien immobilier ou l'adresse
+    // 9. Détection des erreurs sur le bien immobilier ou l'adresse
     if (
         lower.includes('propertyid') || 
         lower.includes('property_id')
@@ -108,7 +154,7 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Localisation incomplète. Veuillez renseigner l'adresse précise et la commune du bien.";
     }
 
-    // 7. Détection des erreurs sur le nom ou identité
+    // 10. Détection des erreurs sur le nom ou identité
     if (
         lower.includes('tenantname') || 
         lower.includes('firstname') || 
@@ -117,7 +163,16 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Nom complet absent. Veuillez renseigner le prénom et le nom.";
     }
 
-    // 8. Prisma Invocation / Argument manquant général
+    // 11. Erreurs de rendu Server Components Next.js / digest
+    if (
+        lower.includes('server components render') ||
+        lower.includes('digest code') ||
+        lower.includes('digest property')
+    ) {
+        return "Une difficulté temporaire est survenue lors de l'affichage. Veuillez actualiser la page ou réessayer dans quelques instants.";
+    }
+
+    // 12. Prisma Invocation / Argument manquant général
     if (
         lower.includes('prisma') || 
         lower.includes('invocation') || 
@@ -127,11 +182,12 @@ export function formatUserFriendlyError(error: any, fallbackMessage: string = "U
         return "Certaines informations du formulaire sont manquantes ou incorrectes. Veuillez vérifier tous les champs requis.";
     }
 
-    // 9. Erreurs réseau / timeout
+    // 13. Erreurs réseau / timeout
     if (lower.includes('timeout') || lower.includes('timed out') || lower.includes('econnrefused')) {
         return "Le serveur n'a pas répondu à temps. Veuillez vérifier votre connexion internet et réessayer.";
     }
 
     return fallbackMessage;
 }
+
 

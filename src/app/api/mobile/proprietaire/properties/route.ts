@@ -132,6 +132,22 @@ export async function POST(request: Request) {
             precisionM
         } = body;
 
+        // Contrôle hiérarchique : création d'un appartement rattaché sans immeuble
+        if ((propertyType === 'APPARTEMENT' || propertyType === 'APARTMENT' || typeStructure === 'ENFANT') && typeStructure !== 'INDEPENDANT' && !parentPropertyId) {
+            return NextResponse.json({
+                error: "Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord."
+            }, { status: 400 });
+        }
+
+        if (parentPropertyId) {
+            const parent = await prisma.property.findUnique({ where: { id: parentPropertyId } });
+            if (!parent) {
+                return NextResponse.json({
+                    error: "Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord."
+                }, { status: 400 });
+            }
+        }
+
         // S-08 : Validation stricte contre le référentiel officiel config/lieux.json (refus de toute saisie libre -> 422)
         const quartierInput = body.quartier || body.quartierNom;
         const validationLieu = validerLieu(commune, quartierInput, city);
@@ -340,6 +356,6 @@ export async function POST(request: Request) {
         }, { status: 201 });
     } catch (error: any) {
         console.error('[MOBILE] proprietaire/properties POST error:', error);
-        return NextResponse.json({ error: formatUserFriendlyError(error, "Impossible de créer le bien. Veuillez vérifier les informations saisies.") }, { status: 500 });
+        return NextResponse.json({ error: formatUserFriendlyError(error, "Impossible de créer le bien. Veuillez vérifier les informations saisies.") }, { status: 400 });
     }
 }

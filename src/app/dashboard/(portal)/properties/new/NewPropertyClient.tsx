@@ -390,6 +390,13 @@ export default function NewPropertyClient() {
             formData.append("customUnits", JSON.stringify(customUnits))
             formData.append("nbUnits", customUnits.length.toString())
             formData.append("rent", totalBuildingRent.toString())
+        } else if (structureCategory === 'ENFANT') {
+            if (!selectedParentId) {
+                setError("Veuillez créer ou sélectionner un immeuble ou un bloc résidentiel d'abord.")
+                return
+            }
+            formData.append("typeStructure", "ENFANT")
+            formData.append("parentPropertyId", selectedParentId)
         } else {
             formData.append("typeStructure", "INDEPENDANT")
         }
@@ -619,8 +626,15 @@ export default function NewPropertyClient() {
                                             Recherche de vos immeubles enregistrés...
                                         </div>
                                     ) : parents.length === 0 ? (
-                                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 leading-relaxed">
-                                            Vous n'avez pas encore d'immeuble enregistré. Choisissez l'option <strong>« 🏢 Immeuble & Bloc Résidentiel »</strong> ci-dessus pour créer votre premier immeuble.
+                                        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 leading-relaxed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                            <span>Vous n'avez pas encore d'immeuble enregistré. Veuillez créer un immeuble ou un bloc résidentiel d'abord.</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setStructureCategory('PARENT')}
+                                                className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs shrink-0 transition-colors"
+                                            >
+                                                Créer un immeuble d'abord
+                                            </button>
                                         </div>
                                     ) : (
                                         <select 
