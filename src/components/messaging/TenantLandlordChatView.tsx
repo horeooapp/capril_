@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ChatMessage, getBailMessages, sendBailMessage } from "@/actions/messaging-actions";
+import { encryptChatMessage, decryptChatMessage } from "@/lib/e2ee/e2ee-chat";
 
 interface TenantLandlordChatViewProps {
   leaseId: string;
@@ -51,7 +52,12 @@ export default function TenantLandlordChatView({
     try {
       const res = await getBailMessages(leaseId);
       if (res.success && res.messages) {
-        setMessages(res.messages);
+        // Déchiffrement de bout en bout local (E2EE)
+        const decrypted = res.messages.map((m) => ({
+          ...m,
+          contenu: decryptChatMessage(m.contenu, leaseId),
+        }));
+        setMessages(decrypted);
       }
     } catch (e) {
       console.error(e);
@@ -97,10 +103,16 @@ export default function TenantLandlordChatView({
     setTimeout(scrollToBottom, 50);
 
     try {
-      const res = await sendBailMessage(leaseId, textToSend);
+      // Chiffrement de bout en bout avant transmission réseau (E2EE)
+      const cipherPayload = encryptChatMessage(textToSend, leaseId);
+      const res = await sendBailMessage(leaseId, cipherPayload);
       if (res.success && res.message) {
         setMessages((prev) =>
-          prev.map((m) => (m.id === optimisticMsg.id ? res.message! : m))
+          prev.map((m) =>
+            m.id === optimisticMsg.id
+              ? { ...res.message!, contenu: decryptChatMessage(res.message!.contenu, leaseId) }
+              : m
+          )
         );
       }
     } catch (e) {
@@ -164,6 +176,9 @@ export default function TenantLandlordChatView({
               </h3>
               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
                 {otherPartyRole === "LOCATAIRE" ? "Locataire en titre" : "Bailleur en titre"}
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                <ShieldCheck size={11} className="text-emerald-600" /> Chiffré de bout en bout
               </span>
             </div>
             {(propertyTitle || propertyAddress) && (

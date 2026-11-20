@@ -53,15 +53,25 @@ export async function getAllUsers() {
             }
         })
 
-        return users.map(user => {
-            const doc = user.identityDocuments?.[0]
+        const { decryptField } = await import('@/lib/encryption');
+
+        return Promise.all(users.map(async (user) => {
+            const doc = user.identityDocuments?.[0];
+            let docNumber = doc?.docNumber;
+            if (doc?.docNumberEnc) {
+                try {
+                    docNumber = await decryptField(doc.docNumberEnc);
+                } catch {
+                    docNumber = doc.docNumber;
+                }
+            }
             return {
                 ...user,
                 createdAt: user.createdAt.toISOString(),
                 primaryIdentityDoc: doc ? {
                     id: doc.id,
                     docType: doc.docType,
-                    docNumber: doc.docNumber,
+                    docNumber: docNumber,
                     scanS3Key: doc.scanS3Key,
                     versoUrl: ((doc.metadata as any)?.versoUrl as string | null) || null,
                     status: doc.status,
@@ -78,8 +88,8 @@ export async function getAllUsers() {
                         kycLevel: user.kycLevel
                     }
                 } : null
-            }
-        }) as any[]
+            };
+        })) as any;
     } catch (error) {
         console.error("[getAllUsers] Critical Error:", error)
         return [] // Return empty list to prevent page crash

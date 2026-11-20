@@ -262,12 +262,15 @@ export async function POST(request: Request) {
                     ? `${expediteur.firstName || ''} ${expediteur.lastName || ''}`.trim()
                     : (isTenant ? 'Locataire' : 'Bailleur');
 
+                const isE2EE = contenu.startsWith('QAPRIL_E2EE:v1:');
+                const notificationBody = isE2EE ? 'Nouveau message sécurisé' : contenu.trim();
+
                 if (destinataire?.pushToken) {
                     const { sendExpoPushNotification } = await import('@/lib/expo-push');
                     await sendExpoPushNotification({
                         to: destinataire.pushToken,
                         title: `💬 Message de ${senderName || 'votre correspondant'}`,
-                        body: contenu.trim(),
+                        body: notificationBody,
                         sound: 'default',
                         channelId: 'messages',
                         data: {
@@ -286,8 +289,8 @@ export async function POST(request: Request) {
                     {
                         payload: {
                             titre: `Nouveau message de ${senderName || 'votre correspondant'}`,
-                            message: contenu.trim(),
-                            smsText: `QAPRIL: Nouveau message de ${senderName || 'votre correspondant'}: ${contenu.trim().substring(0, 100)}`,
+                            message: notificationBody,
+                            smsText: `QAPRIL: Nouveau message de ${senderName || 'votre correspondant'}: ${isE2EE ? 'Nouveau message sécurisé' : contenu.trim().substring(0, 100)}`,
                             leaseId,
                             msgId: message.id
                         }

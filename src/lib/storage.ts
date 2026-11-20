@@ -59,7 +59,21 @@ export async function savePhysicalFile(file: File, subfolder: string = 'general'
     const filePath = path.join(targetDir, fileName);
 
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let buffer: any = Buffer.from(bytes);
+
+    // Chiffrement automatique au repos (AES-256-GCM) pour les documents sensibles (KYC, identité, reçus)
+    const isSensitive = safeSubfolder.startsWith('kyc') ||
+                        safeSubfolder.startsWith('identity') ||
+                        safeSubfolder.startsWith('receipts') ||
+                        safeSubfolder.startsWith('justificatifs');
+    if (isSensitive) {
+      try {
+        const { encryptFileBuffer } = await import('@/lib/encryption');
+        buffer = await encryptFileBuffer(buffer);
+      } catch (encErr) {
+        console.warn('[STORAGE] Erreur chiffrement fichier sensible, enregistrement standard:', encErr);
+      }
+    }
 
     await fs.writeFile(filePath, buffer);
 

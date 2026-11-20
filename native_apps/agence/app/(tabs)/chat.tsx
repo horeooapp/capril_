@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { fetchWithAuth } from '../../lib/api';
 import { Send, Check, CheckCheck, MessageCircle, Building2, User } from 'lucide-react-native';
+import { encryptChatMessage, decryptChatMessage } from '../../lib/e2ee/e2ee-chat';
 
 export default function AgenceChatScreen() {
     const insets = useSafeAreaInsets();
@@ -28,8 +29,13 @@ export default function AgenceChatScreen() {
             const json = await response.json();
 
             if (response.ok) {
+                const activeId = json.activeLeaseId || queryLeaseId || selectedLeaseId || '';
                 if (Array.isArray(json.conversations)) {
-                    setConversations(json.conversations);
+                    const decryptedConvs = json.conversations.map((c: any) => ({
+                        ...c,
+                        lastMessage: decryptChatMessage(c.lastMessage, c.leaseId)
+                    }));
+                    setConversations(decryptedConvs);
                 }
                 if (json.activeLeaseId && !selectedLeaseId) {
                     setSelectedLeaseId(json.activeLeaseId);
@@ -37,7 +43,11 @@ export default function AgenceChatScreen() {
 
                 if (Array.isArray(json.messages)) {
                     isFirstLoadRef.current = false;
-                    setMessages(json.messages);
+                    const decryptedMessages = json.messages.map((m: any) => ({
+                        ...m,
+                        contenu: decryptChatMessage(m.contenu, activeId)
+                    }));
+                    setMessages(decryptedMessages);
 
                     if (json.interlocutorName) setInterlocutorName(json.interlocutorName);
                     if (json.propertyName) setPropertyName(json.propertyName);
@@ -46,7 +56,7 @@ export default function AgenceChatScreen() {
                     if (json.messages.length > 0) {
                         await fetchWithAuth('/chat/read', {
                             method: 'POST',
-                            body: JSON.stringify({ leaseId: json.activeLeaseId || queryLeaseId, role: 'AGENCE' })
+                            body: JSON.stringify({ leaseId: activeId, role: 'AGENCE' })
                         }).catch(() => {});
                     }
                 }
@@ -88,11 +98,15 @@ export default function AgenceChatScreen() {
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
+            const cipherText = selectedLeaseId
+                ? encryptChatMessage(optimisticMessage.contenu, selectedLeaseId)
+                : optimisticMessage.contenu;
+
             await fetchWithAuth('/chat', {
                 method: 'POST',
                 body: JSON.stringify({
                     leaseId: selectedLeaseId,
-                    contenu: optimisticMessage.contenu,
+                    contenu: cipherText,
                     role: 'AGENCE'
                 })
             });

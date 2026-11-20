@@ -7,6 +7,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { fetchWithAuth } from '../../lib/api';
 import { playMessageNotificationSound } from '../../lib/notifications';
 import { Send, Check, CheckCheck, MessageCircle, Building2 } from 'lucide-react-native';
+import { encryptChatMessage, decryptChatMessage } from '../../lib/e2ee/e2ee-chat';
 
 export default function ChatScreen() {
     const insets = useSafeAreaInsets();
@@ -30,15 +31,23 @@ export default function ChatScreen() {
             const json = await response.json();
 
             if (response.ok) {
+                const activeId = json.activeLeaseId || queryLeaseId || selectedLeaseId || '';
                 if (Array.isArray(json.conversations)) {
-                    setConversations(json.conversations);
+                    const decryptedConvs = json.conversations.map((c: any) => ({
+                        ...c,
+                        lastMessage: decryptChatMessage(c.lastMessage, c.leaseId)
+                    }));
+                    setConversations(decryptedConvs);
                 }
                 if (json.activeLeaseId && !selectedLeaseId) {
                     setSelectedLeaseId(json.activeLeaseId);
                 }
 
                 if (Array.isArray(json.messages)) {
-                    const newMessages = json.messages;
+                    const newMessages = json.messages.map((m: any) => ({
+                        ...m,
+                        contenu: decryptChatMessage(m.contenu, activeId)
+                    }));
 
                     // Notification sonore et vibration si un nouveau message de l'interlocuteur est reçu
                     if (!isFirstLoadRef.current && newMessages.length > 0) {
@@ -61,7 +70,7 @@ export default function ChatScreen() {
                     if (newMessages.length > 0) {
                         await fetchWithAuth('/chat/read', {
                             method: 'POST',
-                            body: JSON.stringify({ leaseId: json.activeLeaseId || queryLeaseId, role: 'LOCATAIRE' })
+                            body: JSON.stringify({ leaseId: activeId, role: 'LOCATAIRE' })
                         }).catch(() => {});
                     }
                 }
@@ -103,11 +112,15 @@ export default function ChatScreen() {
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
+            const cipherText = selectedLeaseId
+                ? encryptChatMessage(optimisticMessage.contenu, selectedLeaseId)
+                : optimisticMessage.contenu;
+
             await fetchWithAuth('/chat', {
                 method: 'POST',
                 body: JSON.stringify({
                     leaseId: selectedLeaseId,
-                    contenu: optimisticMessage.contenu,
+                    contenu: cipherText,
                     role: 'LOCATAIRE'
                 })
             });

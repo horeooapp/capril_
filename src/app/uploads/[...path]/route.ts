@@ -55,10 +55,18 @@ export async function GET(
     }
 
     const fileBuffer = await fs.readFile(fullPath);
+    let outputBuffer: Buffer = fileBuffer;
+    try {
+      const { decryptFileBuffer } = await import('@/lib/encryption');
+      outputBuffer = await decryptFileBuffer(fileBuffer);
+    } catch (decErr) {
+      console.warn('[UPLOADS] Erreur déchiffrement buffer:', decErr);
+    }
+
     const ext = path.extname(fullPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(outputBuffer as any, {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': isPrivateKyc ? 'private, no-store' : 'public, max-age=31536000, immutable',

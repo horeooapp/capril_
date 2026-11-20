@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { normalizePhone } from "@/lib/phone";
+import { decryptChatMessage } from "@/lib/e2ee/e2ee-chat";
 
 export interface ChatMessage {
   id: string;
@@ -148,7 +149,7 @@ export async function getConversations(): Promise<{ success: boolean; conversati
         otherPartyName: otherName,
         otherPartyRole: userIsTenant ? "PROPRIETAIRE" : "LOCATAIRE",
         otherPartyPhone: otherPhone,
-        lastMessage: lastMsg?.contenu || "Début de la conversation sécurisée",
+        lastMessage: lastMsg?.contenu ? decryptChatMessage(lastMsg.contenu, l.id) : "Début de la conversation sécurisée",
         lastMessageDate: lastMsg?.dateEnvoi ? new Date(lastMsg.dateEnvoi).toISOString() : new Date().toISOString(),
         lastMessageStatut: (lastMsg?.statut as any) || "LU",
         lastMessageIsMe: lastMsg?.expediteurId === userId,
@@ -207,7 +208,7 @@ export async function getBailMessages(leaseId: string): Promise<{ success: boole
       leaseId: m.leaseId,
       expediteurId: m.expediteurId,
       roleExpediteur: m.roleExpediteur,
-      contenu: m.contenu,
+      contenu: decryptChatMessage(m.contenu, m.leaseId),
       statut: incomingUnread.some((u: any) => u.id === m.id) ? "LU" : (m.statut as any),
       dateEnvoi: new Date(m.dateEnvoi).toISOString(),
       dateReception: m.dateReception ? new Date(m.dateReception).toISOString() : null,

@@ -92,14 +92,30 @@ export async function POST(req: NextRequest) {
         docNumberHash = await generateIdentityHash(mrz.documentNumber, session.user.id, new Date().toISOString());
     }
 
-    // 4. Create or Update IdentityDocument entry
+    // 4. Chiffrement applicatif renforcé (AES-256-GCM) des champs ultra-sensibles
+    const { encryptField } = await import('@/lib/encryption');
+    const rawMrz = !mrzLine1 ? null : `${mrzLine1}\n${mrzLine2}${mrzLine3 ? '\n' + mrzLine3 : ''}`;
+    const docNumberEnc = mrz.documentNumber ? await encryptField(mrz.documentNumber) : null;
+    const mrzRawDataEnc = rawMrz ? await encryptField(rawMrz) : null;
+
+    // Numéro de pièce masqué pour l'affichage non sensible (ex: "CI••••1234")
+    const maskedDocNumber = mrz.documentNumber
+      ? (mrz.documentNumber.length > 4
+          ? mrz.documentNumber.slice(0, 2) + '••••' + mrz.documentNumber.slice(-4)
+          : '••••')
+      : null;
+
+    // 5. Create or Update IdentityDocument entry
     const doc = await prisma.identityDocument.upsert({
         where: { docNumberHash },
         update: {
             status: 'pending',
             scanS3Key,
             legalEntityId: entityId || undefined,
-            mrzRawData: !mrzLine1 ? null : `${mrzLine1}\n${mrzLine2}${mrzLine3 ? '\n' + mrzLine3 : ''}`,
+            docNumber: maskedDocNumber,
+            docNumberEnc,
+            mrzRawData: null, // Donnée brute purgée en clair
+            mrzRawDataEnc,
             fullName: mrz.fullName,
             birthDate: mrz.birthDate && mrz.birthDate !== '' ? new Date(mrz.birthDate.replace(/(\d{2})(\d{2})(\d{2})/, '$1-$2-$3')) : null,
             nationality: mrz.nationality,
@@ -109,11 +125,13 @@ export async function POST(req: NextRequest) {
             userId: session.user.id,
             legalEntityId: entityId || undefined,
             docType,
-            docNumber: mrz.documentNumber,
+            docNumber: maskedDocNumber,
+            docNumberEnc,
             docNumberHash,
             scanS3Key,
             status: 'pending',
-            mrzRawData: !mrzLine1 ? null : `${mrzLine1}\n${mrzLine2}${mrzLine3 ? '\n' + mrzLine3 : ''}`,
+            mrzRawData: null,
+            mrzRawDataEnc,
             fullName: mrz.fullName,
             birthDate: mrz.birthDate && mrz.birthDate !== '' ? new Date(mrz.birthDate.replace(/(\d{2})(\d{2})(\d{2})/, '$1-$2-$3')) : null,
             nationality: mrz.nationality,
