@@ -100,7 +100,7 @@ export default function RootLayout() {
           router.push('/(tabs)/chat' as any);
         } else if (data.type === 'payment' || data.type === 'LOYER_IMPAYE') {
           router.push('/(tabs)/payer' as any);
-        } else if (data.type === 'APP_UPDATE' || data.type === 'SYSTEM_UPDATE') {
+        } else if (data.type === 'APP_UPDATE' || data.type === 'MAJ_DISPONIBLE' || data.type === 'SYSTEM_UPDATE') {
           Updates.reloadAsync().catch(() => {});
         }
       } catch (navErr) {
