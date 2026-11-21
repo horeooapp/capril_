@@ -138,7 +138,9 @@ export const authConfig = {
             // 2. CHEMINS PROTÉGÉS - UTILISATEUR NON CONNECTÉ
             if (!isLoggedIn) {
                 if (pathname.startsWith("/admin")) return Response.redirect(new URL("/admin/login", nextUrl));
-                if (pathname.startsWith("/mon-espace-locataire")) return Response.redirect(new URL("/mon-espace-locataire/login", nextUrl));
+                if (pathname.startsWith("/mon-espace-locataire") || pathname.startsWith("/espace-locataire")) return Response.redirect(new URL("/mon-espace-locataire/login", nextUrl));
+                if (pathname.startsWith("/espace-agence")) return Response.redirect(new URL("/dashboard/login/agency", nextUrl));
+                if (pathname.startsWith("/espace-bailleur")) return Response.redirect(new URL("/dashboard/login", nextUrl));
                 return Response.redirect(new URL("/dashboard/login", nextUrl));
             }
 
@@ -158,18 +160,18 @@ export const authConfig = {
                 return true;
             }
 
-            // Route Espace Locataire (/mon-espace-locataire ou /onboarding/tenant)
+            // Route Espace Locataire (/mon-espace-locataire ou /onboarding/tenant ou /espace-locataire)
             // Un utilisateur connecté en bailleur/agence qui accède à l'espace locataire est automatiquement déconnecté
-            if (pathname.startsWith("/mon-espace-locataire") || pathname.startsWith("/onboarding/tenant")) {
+            if (pathname.startsWith("/mon-espace-locataire") || pathname.startsWith("/onboarding/tenant") || pathname.startsWith("/espace-locataire")) {
                 if (!isTenant && !isAdmin) {
                     return Response.redirect(new URL("/api/auth/logout?callbackUrl=/mon-espace-locataire/login", nextUrl));
                 }
                 return true;
             }
 
-            // Route Dashboard Gestionnaire/Propriétaire (/dashboard, /onboarding/landlord, /espace-agence)
+            // Route Dashboard Gestionnaire/Propriétaire (/dashboard, /onboarding/landlord, /espace-agence, /espace-bailleur)
             // Un utilisateur connecté en locataire qui accède à l'espace bailleur/agence est automatiquement déconnecté
-            if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding/landlord") || pathname.startsWith("/espace-agence")) {
+            if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding/landlord") || pathname.startsWith("/espace-agence") || pathname.startsWith("/espace-bailleur")) {
                 if (isTenant && !isAdmin) {
                     return Response.redirect(new URL("/api/auth/logout?callbackUrl=/dashboard/login", nextUrl));
                 }
