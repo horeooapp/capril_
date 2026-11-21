@@ -120,6 +120,24 @@ export async function verifyPartiesDistinctes(params: VerifyPartiesParams): Prom
                 code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
             };
         }
+
+        // 5b. RG-IDN-24 : Contrôle sur la table multi-téléphones user_telephones (ADD-33)
+        const telMatch = await prisma.userTelephone.findFirst({
+            where: {
+                numeroE164: normTargetPhone,
+                userId: initiatorUserId,
+                statut: { not: 'RETIRE' },
+            },
+            select: { id: true },
+        });
+
+        if (telMatch) {
+            return {
+                valid: false,
+                error: refusalMessage,
+                code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+            };
+        }
     }
 
     return { valid: true };

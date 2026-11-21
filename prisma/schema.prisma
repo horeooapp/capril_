@@ -10,7 +10,7 @@ datasource db {
 
 model User {
   id                              String                   @id @default(uuid()) @map("user_id")
-  phone                           String                   @unique
+  phone                           String?                  @unique
   firstName                       String?                  @map("first_name")
   lastName                        String?                  @map("last_name")
   birthDate                       DateTime?                @map("birth_date")
@@ -33,6 +33,16 @@ model User {
   isCertified                     Boolean                  @default(false) @map("is_certified")
   onboardingComplete              Boolean                  @default(false) @map("onboarding_complete")
   capaciteActive                  String?                  @default("PROPRIETAIRE") @map("capacite_active")
+  // ADD-33 : Identité & Espaces (RG-IDN-01 à RG-IDN-14)
+  statutCompte                    CompteStatut             @default(ACTIF) @map("statut_compte")
+  creeParTiersId                  String?                  @map("cree_par_tiers_id")
+  reclameAt                       DateTime?                @map("reclame_at")
+  geleAt                          DateTime?                @map("gele_at")
+  telephones                      UserTelephone[]
+  demandesFusionGarde             DemandeFusion[]          @relation("CompteGarde")
+  demandesFusionAbsorbe           DemandeFusion[]          @relation("CompteAbsorbe")
+  journalTelephones               JournalTelephone[]       @relation("JournalUser")
+  journalTelephonesAuteur         JournalTelephone[]       @relation("JournalAuteur")
   legalEntityId                   String?                  @map("legal_entity_id")
   preferredLang                   String?                  @default("fr") @map("preferred_lang")
   notificationPrefs               Json?                    @map("notification_prefs")
@@ -4951,4 +4961,87 @@ model RelanceAdossement {
 
   @@index([bailleurId, envoyeeAt])
   @@map("relances_adossement")
+}
+
+// ============================================================================
+// ADD-33 : IDENTITÉ, NUMÉROS DE TÉLÉPHONE ET ESPACES
+// Règles RG-IDN-01 à RG-IDN-37
+// ============================================================================
+
+enum CompteStatut {
+  A_RECLAMER
+  ACTIF
+  GELE
+}
+
+enum TelephoneStatut {
+  ACTIF
+  A_REVERIFIER
+  RETIRE
+}
+
+enum EspaceEnum {
+  LOCATAIRE
+  BAILLEUR
+  AGENCE
+}
+
+enum AgenceProfilEnum {
+  CHEF
+  COLLABORATEUR
+}
+
+enum FusionStatut {
+  DEMANDEE
+  CODES_VALIDES
+  ACCEPTEE
+  REFUSEE
+}
+
+model UserTelephone {
+  id                  String          @id @default(uuid()) @map("telephone_id")
+  userId              String          @map("user_id")
+  numeroE164          String          @map("numero_e164") // Format E.164 (+225...)
+  principal           Boolean         @default(false)
+  statut              TelephoneStatut @default(ACTIF)
+  verifieAt           DateTime?       @map("verifie_at")
+  derniereConnexionAt DateTime?       @map("derniere_connexion_at")
+  retireAt            DateTime?       @map("retire_at")
+  createdAt           DateTime        @default(now()) @map("created_at")
+
+  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([numeroE164, statut])
+  @@index([userId, statut])
+  @@map("user_telephones")
+}
+
+model DemandeFusion {
+  id               String       @id @default(uuid()) @map("fusion_id")
+  compteGardeId    String       @map("compte_garde_id")
+  compteAbsorbeId  String       @map("compte_absorbe_id")
+  statut           FusionStatut @default(DEMANDEE)
+  conseillerId     String?      @map("conseiller_id")
+  motifRefus       String?      @map("motif_refus")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  decideAt         DateTime?    @map("decide_at")
+
+  compteGarde      User         @relation("CompteGarde", fields: [compteGardeId], references: [id])
+  compteAbsorbe    User         @relation("CompteAbsorbe", fields: [compteAbsorbeId], references: [id])
+
+  @@map("demandes_fusion")
+}
+
+model JournalTelephone {
+  id           String    @id @default(uuid()) @map("evenement_id")
+  userId       String    @map("user_id")
+  numeroE164   String    @map("numero_e164")
+  type         String    @map("type") // AJOUT | VERIFICATION | PRINCIPAL | RETRAIT | RECLAMATION | DETACHEMENT | CORRECTION
+  auteurId     String?   @map("auteur_id")
+  horodatage   DateTime  @default(now()) @map("horodatage")
+
+  user         User      @relation("JournalUser", fields: [userId], references: [id], onDelete: Cascade)
+  auteur       User?     @relation("JournalAuteur", fields: [auteurId], references: [id])
+
+  @@map("journal_telephones")
 }
