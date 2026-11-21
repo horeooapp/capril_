@@ -5,12 +5,12 @@ import path from "path";
 // Mapping officiel des archives APK certifiées (QAPRIL v2.1.0 Universel & Rétrocompatibilité)
 const APK_REDIRECTS: Record<string, string> = {
   // 1. Application Unique QAPRIL (ADD-33 v2.1.0)
-  "qapril-latest.apk": "https://expo.dev/accounts/qapril/projects/proprietaire/builds/fcfea5d7-a22a-46d9-99bc-a5520f94c2e7",
-  "qapril-v2.1.0.apk": "https://expo.dev/accounts/qapril/projects/proprietaire/builds/fcfea5d7-a22a-46d9-99bc-a5520f94c2e7",
-  "qapril.apk": "https://expo.dev/accounts/qapril/projects/proprietaire/builds/fcfea5d7-a22a-46d9-99bc-a5520f94c2e7",
+  "qapril-latest.apk": "https://expo.dev/artifacts/eas/In9U7TNQla7s_33woSRbx5VjqB4YKxy-zpkv-2HP2XI.apk",
+  "qapril-v2.1.0.apk": "https://expo.dev/artifacts/eas/In9U7TNQla7s_33woSRbx5VjqB4YKxy-zpkv-2HP2XI.apk",
+  "qapril.apk": "https://expo.dev/artifacts/eas/In9U7TNQla7s_33woSRbx5VjqB4YKxy-zpkv-2HP2XI.apk",
 
   // 2. Liens historiques de compatibilité
-  "qapril-proprietaire-latest.apk": "https://expo.dev/accounts/qapril/projects/proprietaire/builds/fcfea5d7-a22a-46d9-99bc-a5520f94c2e7",
+  "qapril-proprietaire-latest.apk": "https://expo.dev/artifacts/eas/In9U7TNQla7s_33woSRbx5VjqB4YKxy-zpkv-2HP2XI.apk",
   "qapril-proprietaire-v2.0.7.apk": "https://expo.dev/artifacts/eas/IWiIc8XwZ8U5FjAqnPJQQo5S_qyuRMY1iPQTWZ7W_9E.apk",
   "qapril-proprietaire-v2.0.0.apk": "https://expo.dev/artifacts/eas/ZFZfTdzC3uc9T3OmwQWR1krIVqDrlTQwTBFcigS9R3w.apk",
   "qapril-locataire-latest.apk": "https://expo.dev/accounts/qapril/projects/proprietaire/builds/fcfea5d7-a22a-46d9-99bc-a5520f94c2e7",
