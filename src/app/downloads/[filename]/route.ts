@@ -4,11 +4,14 @@ import path from "path";
 
 // Mapping officiel des archives APK certifiees
 const APK_REDIRECTS: Record<string, string> = {
-  "qapril-proprietaire-latest.apk": "https://expo.dev/artifacts/eas/ZFZfTdzC3uc9T3OmwQWR1krIVqDrlTQwTBFcigS9R3w.apk",
+  "qapril-proprietaire-latest.apk": "https://expo.dev/artifacts/eas/IWiIc8XwZ8U5FjAqnPJQQo5S_qyuRMY1iPQTWZ7W_9E.apk",
+  "qapril-proprietaire-v2.0.7.apk": "https://expo.dev/artifacts/eas/IWiIc8XwZ8U5FjAqnPJQQo5S_qyuRMY1iPQTWZ7W_9E.apk",
   "qapril-proprietaire-v2.0.0.apk": "https://expo.dev/artifacts/eas/ZFZfTdzC3uc9T3OmwQWR1krIVqDrlTQwTBFcigS9R3w.apk",
-  "qapril-locataire-latest.apk": "https://expo.dev/artifacts/eas/fid1aYP5BbboeRhEaQvCo_vIeGFUKmuYKQYQuwmi6qE.apk",
+  "qapril-locataire-latest.apk": "https://expo.dev/artifacts/eas/eZz_QhSuR2Q1gHxNyi_i3g1sKFUMffWYRWZkvrGtc5Y.apk",
+  "qapril-locataire-v2.0.7.apk": "https://expo.dev/artifacts/eas/eZz_QhSuR2Q1gHxNyi_i3g1sKFUMffWYRWZkvrGtc5Y.apk",
   "qapril-locataire-v2.0.0.apk": "https://expo.dev/artifacts/eas/fid1aYP5BbboeRhEaQvCo_vIeGFUKmuYKQYQuwmi6qE.apk",
-  "qapril-agence-latest.apk": "https://expo.dev/artifacts/eas/ZFZfTdzC3uc9T3OmwQWR1krIVqDrlTQwTBFcigS9R3w.apk",
+  "qapril-agence-latest.apk": "https://expo.dev/artifacts/eas/suwZFEWCBKqH8WsgUWvZxO2I4GNTGMf5Ddm1SNHjD8E.apk",
+  "qapril-agence-v2.0.7.apk": "https://expo.dev/artifacts/eas/suwZFEWCBKqH8WsgUWvZxO2I4GNTGMf5Ddm1SNHjD8E.apk",
 };
 
 export async function GET(

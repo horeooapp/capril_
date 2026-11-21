@@ -62,6 +62,7 @@ audit_AUD-02/
 **/node_modules/
 native_apps/*/android/
 native_apps/*/ios/
+native_apps/*/dist/
 **/android/.gradle/
 **/android/app/build/
 **/android/build/

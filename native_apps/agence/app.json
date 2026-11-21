@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Qapril Agences Agr\u00e9\u00e9es",
-    "slug": "agence",
+    "name": "Qapril Agences Agréées",
+    "slug": "proprietaire",
     "version": "2.0.7",
     "orientation": "portrait",
     "icon": "../proprietaire/assets/icon.png",
@@ -15,9 +15,9 @@
     "scheme": "qaprilagence",
     "runtimeVersion": "1.0.0",
     "updates": {
-      "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959",
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 5000
+      "fallbackToCacheTimeout": 5000,
+      "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959"
     },
     "ios": {
       "supportsTablet": true
@@ -34,7 +34,13 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "USE_BIOMETRIC",
-        "USE_FINGERPRINT"
+        "USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ],
       "versionCode": 36
     },
@@ -42,7 +48,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Autoriser $(PRODUCT_NAME) \u00e0 utiliser Face ID ou Touch ID pour une connexion s\u00e9curis\u00e9e."
+          "faceIDPermission": "Autoriser $(PRODUCT_NAME) à utiliser Face ID ou Touch ID pour une connexion sécurisée."
         }
       ],
       "expo-font",
@@ -50,9 +56,11 @@
       "expo-secure-store"
     ],
     "extra": {
+      "router": {},
       "eas": {
         "projectId": "edbe7064-bfd4-4162-99a6-d2c731f1f959"
       }
-    }
+    },
+    "owner": "qapril"
   }
 }
