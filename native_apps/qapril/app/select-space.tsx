@@ -20,16 +20,21 @@ export default function SelectSpaceScreen() {
       
       <View style={styles.content}>
         
-        {/* EN-TÊTE ÉPURÉ STYLE APPLE */}
+        {/* EN-TÊTE ÉPURÉ STYLE APPLE AVEC LOGOTYPE ET TEXTES HAUT CONTRASTE */}
         <View style={styles.header}>
-          <View style={styles.logoWrap}>
-            <Image
-              source={{ uri: 'https://www.qapril.net/logo.png' }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+          <View style={styles.brandRow}>
+            <View style={styles.logoWrap}>
+              <Image
+                source={{ uri: 'https://www.qapril.net/logo.png' }}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={styles.brandTextWrap}>
+              <Text style={styles.brandTitle}>QAPRIL</Text>
+              <Text style={styles.brandTagline}>Gestion Locative Simple</Text>
+            </View>
           </View>
-          <Text style={styles.brandTitle}>QAPRIL</Text>
           <Text style={styles.subtitle}>
             Choisissez votre espace pour commencer
           </Text>
@@ -119,38 +124,54 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     marginBottom: 8,
   },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 10,
+  },
   logoWrap: {
-    width: 72,
-    height: 72,
-    borderRadius: 22,
+    width: 62,
+    height: 62,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: '#F1F5F9',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
   },
   logo: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 38,
+  },
+  brandTextWrap: {
+    justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '900',
     color: '#0F172A',
-    letterSpacing: -0.8,
+    letterSpacing: -0.6,
+  },
+  brandTagline: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#D97706',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: 2,
   },
   subtitle: {
     fontSize: 15,
-    color: '#64748B',
+    color: '#334155',
     textAlign: 'center',
-    marginTop: 6,
-    fontWeight: '500',
+    marginTop: 4,
+    fontWeight: '600',
   },
   cardsWrap: {
     gap: 16,
@@ -163,11 +184,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#E2E8F0',
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
   },
@@ -176,10 +197,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
   },
   locataireCard: {
-    borderColor: '#E2E8F0',
+    borderColor: '#CBD5E1',
   },
   bailleurCard: {
-    borderColor: '#E2E8F0',
+    borderColor: '#CBD5E1',
   },
   iconBox: {
     width: 58,
@@ -199,15 +220,16 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '900',
     color: '#0F172A',
     marginBottom: 4,
     letterSpacing: -0.3,
   },
   cardDesc: {
-    fontSize: 12.5,
-    color: '#64748B',
-    lineHeight: 17,
+    fontSize: 13,
+    color: '#334155',
+    lineHeight: 18,
+    fontWeight: '500',
   },
   chevronWrap: {
     paddingLeft: 4,
@@ -217,9 +239,9 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   footerText: {
-    fontSize: 11.5,
-    fontWeight: '500',
-    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#475569',
     textAlign: 'center',
   },
 });
