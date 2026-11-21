@@ -4,6 +4,7 @@ import { verifyMobileToken } from '@/lib/mobile-auth';
 import { formatUserFriendlyError } from '@/lib/friendly-error';
 import crypto from 'crypto';
 import { dispatchLeaseInitiationNotification } from '@/lib/lease-notification';
+import { verifyPartiesDistinctes } from '@/lib/anti-auto-bail';
 
 export async function POST(req: Request) {
     try {
@@ -20,6 +21,21 @@ export async function POST(req: Request) {
         }
 
         const userId = payload.userId;
+
+        // RG-IDN-24 : Contrôle d'interdiction du bail avec soi-même
+        if (tenantId) {
+            const checkParties = await verifyPartiesDistinctes({
+                initiatorUserId: userId,
+                targetUserId: tenantId,
+                direction: 'BAILLEUR_TO_LOCATAIRE',
+            });
+            if (!checkParties.valid) {
+                return NextResponse.json({
+                    error: checkParties.error,
+                    code: checkParties.code,
+                }, { status: 422 });
+            }
+        }
 
         // Vérification que le bien appartient au bailleur
         const property = await prisma.property.findUnique({ where: { id: propertyId } });

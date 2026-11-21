@@ -11,6 +11,7 @@ import { sendSMS } from '@/lib/sms';
 import { validateLeaseInput, calculerDroitsEnregistrement } from '@/lib/lease-validation';
 import crypto from 'crypto';
 import { dispatchLeaseInitiationNotification } from '@/lib/lease-notification';
+import { verifyPartiesDistinctes } from '@/lib/anti-auto-bail';
 
 // Fonction de nettoyage strict pour PDF (compatible Helvetica / WinAnsi)
 function cleanPdfText(str: string): string {
@@ -151,9 +152,23 @@ export async function POST(request: Request) {
             `${dbUser.firstName || ''} ${dbUser.lastName || ''}`.trim() || dbUser.email || dbUser.phone || 'Propriétaire QAPRIL'
         );
 
-        // 4. Recherche ou création du locataire
+        // 4. RG-IDN-24 à RG-IDN-27 : Contrôle d'interdiction du bail avec soi-même
         const tenantLookupEmail = cleanEmail || null;
         const tenantLookupPhone = cleanPhone || null;
+
+        const checkDistinctParties = await verifyPartiesDistinctes({
+            initiatorUserId: dbUser.id,
+            targetPhone: tenantLookupPhone,
+            targetEmail: tenantLookupEmail,
+            direction: 'BAILLEUR_TO_LOCATAIRE',
+        });
+
+        if (!checkDistinctParties.valid) {
+            return NextResponse.json({
+                error: checkDistinctParties.error,
+                code: checkDistinctParties.code,
+            }, { status: 422 });
+        }
 
         let tenant = await prisma.user.findFirst({
             where: {
@@ -163,6 +178,13 @@ export async function POST(request: Request) {
                 ],
             },
         });
+
+        if (tenant && tenant.id === dbUser.id) {
+            return NextResponse.json({
+                error: "Ce numéro est le vôtre. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre locataire.",
+                code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+            }, { status: 422 });
+        }
 
         if (!tenant) {
             const nameParts = (cleanName || "Locataire").split(' ');

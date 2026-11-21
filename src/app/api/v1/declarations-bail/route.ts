@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { verifyPartiesDistinctes } from "@/lib/anti-auto-bail";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,20 @@ export async function POST(request: NextRequest) {
 
     // Normalisation téléphone destinataire (format local/international CI)
     const cleanTel = destinataireTel.replace(/\s+/g, "");
+
+    // RG-IDN-24 & RG-DCL-09 : Interdiction formelle du bail avec soi-même
+    const isTenantDeclaring = String(userRole).toUpperCase().includes("TENANT") || String(userRole).toUpperCase().includes("LOCATAIRE");
+    const checkDistinct = await verifyPartiesDistinctes({
+      initiatorUserId: userId,
+      targetPhone: cleanTel,
+      direction: isTenantDeclaring ? 'LOCATAIRE_TO_BAILLEUR' : 'BAILLEUR_TO_LOCATAIRE',
+    });
+    if (!checkDistinct.valid) {
+      return NextResponse.json(
+        { error: checkDistinct.error, code: checkDistinct.code },
+        { status: 422 }
+      );
+    }
 
     // RG-DCL-10 : Limites anti-abus
     // Max 2 déclarations en attente simultanément

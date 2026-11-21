@@ -26,6 +26,7 @@ import { FiscalService } from "@/lib/fiscal-service";
 import { NotificationService } from "@/lib/notification-service";
 import { validateLeaseInput, calculerDroitsEnregistrement } from "@/lib/lease-validation";
 import { dispatchLeaseInitiationNotification, dispatchLeaseSignedBilateralNotification } from "@/lib/lease-notification";
+import { verifyPartiesDistinctes } from "@/lib/anti-auto-bail";
 
 // --- [CORE] Baux Standard ---
 
@@ -109,6 +110,19 @@ export async function createLease(data: {
             }
         }
 
+        // RG-IDN-24 à RG-IDN-27 : Contrôle d'interdiction du bail avec soi-même
+        if (data.tenantPhone || tenantId) {
+            const checkParties = await verifyPartiesDistinctes({
+                initiatorUserId: ownerId,
+                targetPhone: data.tenantPhone,
+                targetUserId: tenantId,
+                direction: 'BAILLEUR_TO_LOCATAIRE',
+            });
+            if (!checkParties.valid) {
+                throw new Error(checkParties.error || "Bail avec soi-même interdit.");
+            }
+        }
+
         if (data.tenantPhone) {
             const normalized = normalizePhone(data.tenantPhone);
             let tenant = await prisma.user.findFirst({
@@ -144,6 +158,9 @@ export async function createLease(data: {
                 }
             }
             tenantId = tenant.id;
+            if (tenantId === ownerId) {
+                throw new Error("Ce numéro est le vôtre. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre locataire.");
+            }
             if (!tenantEmail && tenant.email) tenantEmail = tenant.email;
         }
 
@@ -735,6 +752,16 @@ export async function createBDQ(data: any) {
                 normalizedPhone = "+2250" + digits;
             } else {
                 normalizedPhone = normalizedPhone.trim();
+            }
+
+            // RG-IDN-24 à RG-IDN-27 : Contrôle d'interdiction du bail avec soi-même
+            const checkParties = await verifyPartiesDistinctes({
+                initiatorUserId: bailleurId,
+                targetPhone: normalizedPhone,
+                direction: 'BAILLEUR_TO_LOCATAIRE',
+            });
+            if (!checkParties.valid) {
+                throw new Error(checkParties.error || "Bail avec soi-même interdit.");
             }
         } else {
             normalizedPhone = "NON_FOURNI";
