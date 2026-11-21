@@ -23,7 +23,7 @@ export default function SelectSpaceScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── EN-TÊTE PRINCIPAL CENTRÉ AVEC LOGOTYPE OFFICIEL ── */}
+        {/* ── EN-TÊTE CONVIVIAL AVEC LOGOTYPE OFFICIEL ── */}
         <View style={styles.header}>
           <View style={styles.logoWrap}>
             <Image
@@ -39,18 +39,15 @@ export default function SelectSpaceScreen() {
           </View>
 
           <Text style={styles.brandTitle}>QAPRIL</Text>
-          <Text style={styles.brandTagline}>
-            Infrastructure numérique de confiance pour l'immobilier
-          </Text>
           <Text style={styles.subtitle}>
-            Choisissez votre espace de connexion
+            Choisissez votre espace
           </Text>
         </View>
 
-        {/* ── LES DEUX GRANDS ESPACES CENTRÉS ET LISIBLES ── */}
+        {/* ── LES DEUX ESPACES CONVIVIAUX (ICÔNE EN FACE DU TITRE & BOUTON EN DESSOUS) ── */}
         <View style={styles.cardsWrap}>
           
-          {/* 1. ESPACE LOCATAIRE */}
+          {/* 1. ESPACE LOCATAIRE : Clé en face de "Je suis Locataire", Accéder à mon espace en dessous */}
           <Pressable
             style={({ pressed }) => [
               styles.card,
@@ -60,32 +57,23 @@ export default function SelectSpaceScreen() {
             onPress={() => router.push({ pathname: '/login', params: { space: 'LOCATAIRE' } })}
             android_ripple={{ color: '#E0E7FF' }}
           >
-            {/* Logotype Centré */}
-            <View style={[styles.emblemBox, styles.locataireEmblem]}>
-              <KeyRound size={32} color="#2C3E6B" strokeWidth={2.4} />
+            <View style={styles.cardHeaderRow}>
+              <View style={[styles.emblemBox, styles.locataireEmblem]}>
+                <KeyRound size={28} color="#2C3E6B" strokeWidth={2.4} />
+              </View>
+              <View style={styles.cardTitleWrap}>
+                <Text style={styles.cardRolePillLocataire}>ESPACE LOCATAIRE</Text>
+                <Text style={styles.cardTitle}>Je suis Locataire</Text>
+              </View>
             </View>
 
-            {/* Badge de rôle centré */}
-            <View style={styles.locatairePill}>
-              <Text style={styles.locatairePillText}>ESPACE LOCATAIRE</Text>
-            </View>
-
-            {/* Titre centré & haute lisibilité */}
-            <Text style={styles.cardTitle}>Je suis Locataire</Text>
-
-            {/* Description claire et rassurante */}
-            <Text style={styles.cardDesc}>
-              Paiement du loyer par Mobile Money, quittances certifiées instantanées et attestations de résidence
-            </Text>
-
-            {/* Bouton d'action centré */}
             <View style={[styles.actionBtn, styles.locataireActionBtn]}>
-              <Text style={styles.locataireActionText}>Accéder à mon espace</Text>
-              <ArrowRight size={16} color="#FFFFFF" strokeWidth={2.4} />
+              <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
+              <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
             </View>
           </Pressable>
 
-          {/* 2. ESPACE BAILLEUR */}
+          {/* 2. ESPACE BAILLEUR : Maison en face de "Je suis Bailleur", Accéder à mon espace en dessous */}
           <Pressable
             style={({ pressed }) => [
               styles.card,
@@ -95,37 +83,28 @@ export default function SelectSpaceScreen() {
             onPress={() => router.push({ pathname: '/login', params: { space: 'BAILLEUR' } })}
             android_ripple={{ color: '#DCFCE7' }}
           >
-            {/* Logotype Centré */}
-            <View style={[styles.emblemBox, styles.bailleurEmblem]}>
-              <Home size={32} color="#1B4D3E" strokeWidth={2.4} />
+            <View style={styles.cardHeaderRow}>
+              <View style={[styles.emblemBox, styles.bailleurEmblem]}>
+                <Home size={28} color="#1B4D3E" strokeWidth={2.4} />
+              </View>
+              <View style={styles.cardTitleWrap}>
+                <Text style={styles.cardRolePillBailleur}>ESPACE BAILLEUR</Text>
+                <Text style={styles.cardTitle}>Je suis Bailleur</Text>
+              </View>
             </View>
 
-            {/* Badge de rôle centré */}
-            <View style={styles.bailleurPill}>
-              <Text style={styles.bailleurPillText}>ESPACE BAILLEUR</Text>
-            </View>
-
-            {/* Titre centré & haute lisibilité */}
-            <Text style={styles.cardTitle}>Je suis Bailleur / Propriétaire</Text>
-
-            {/* Description claire et rassurante */}
-            <Text style={styles.cardDesc}>
-              Gestion des logements, baux certifiés conformes à la loi, quittance express et encaissements sécurisés
-            </Text>
-
-            {/* Bouton d'action centré */}
             <View style={[styles.actionBtn, styles.bailleurActionBtn]}>
-              <Text style={styles.bailleurActionText}>Accéder à mon espace</Text>
-              <ArrowRight size={16} color="#FFFFFF" strokeWidth={2.4} />
+              <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
+              <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
             </View>
           </Pressable>
 
         </View>
 
-        {/* ── PIED DE PAGE DISCRET ET RASSURANT ── */}
+        {/* ── PIED DE PAGE DISCRET ── */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Plateforme certifiée conforme aux lois immobilières ivoiriennes
+            Plateforme certifiée conforme aux lois ivoiriennes
           </Text>
           <Text style={styles.footerSubText}>
             Les agences immobilières agréées opèrent sur qapril.net
@@ -151,7 +130,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
     width: '100%',
     maxWidth: 440,
   },
@@ -172,20 +151,20 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   logo: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
   },
   sovereignBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     backgroundColor: '#FEF3C7',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: '#FDE68A',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   sovereignBadgeText: {
     fontSize: 10,
@@ -199,57 +178,53 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     letterSpacing: -0.8,
   },
-  brandTagline: {
-    fontSize: 13,
-    fontWeight: '500',
+  subtitle: {
+    fontSize: 15,
+    fontWeight: '600',
     color: '#475569',
     textAlign: 'center',
-    marginTop: 4,
-    maxWidth: 300,
-  },
-  subtitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0F172A',
-    textAlign: 'center',
-    marginTop: 10,
+    marginTop: 6,
   },
   cardsWrap: {
     gap: 18,
     width: '100%',
     maxWidth: 440,
-    marginBottom: 24,
+    marginBottom: 28,
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 22,
-    alignItems: 'center',
+    borderRadius: 22,
+    padding: 20,
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
-    shadowRadius: 14,
-    elevation: 3,
+    shadowRadius: 12,
+    elevation: 2,
   },
   cardPressed: {
     transform: [{ scale: 0.985 }],
-    opacity: 0.96,
+    opacity: 0.95,
   },
   locataireCard: {
-    borderColor: '#CBD5E1',
+    borderColor: '#E2E8F0',
   },
   bailleurCard: {
-    borderColor: '#CBD5E1',
+    borderColor: '#E2E8F0',
+  },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 16,
   },
   emblemBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: 54,
+    height: 54,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
   },
   locataireEmblem: {
     backgroundColor: '#EEF2FF',
@@ -261,48 +236,29 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#A7F3D0',
   },
-  locatairePill: {
-    backgroundColor: '#EEF2FF',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 8,
+  cardTitleWrap: {
+    flex: 1,
+    justifyContent: 'center',
   },
-  locatairePillText: {
-    fontSize: 11,
-    fontWeight: '900',
+  cardRolePillLocataire: {
+    fontSize: 10,
+    fontWeight: '800',
     color: '#2C3E6B',
     letterSpacing: 0.8,
+    marginBottom: 2,
   },
-  bailleurPill: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  bailleurPillText: {
-    fontSize: 11,
-    fontWeight: '900',
+  cardRolePillBailleur: {
+    fontSize: 10,
+    fontWeight: '800',
     color: '#1B4D3E',
     letterSpacing: 0.8,
+    marginBottom: 2,
   },
   cardTitle: {
     fontSize: 20,
     fontWeight: '900',
     color: '#0F172A',
-    textAlign: 'center',
-    marginBottom: 8,
-    letterSpacing: -0.4,
-  },
-  cardDesc: {
-    fontSize: 13,
-    color: '#334155',
-    textAlign: 'center',
-    lineHeight: 19,
-    fontWeight: '500',
-    marginBottom: 16,
-    paddingHorizontal: 6,
+    letterSpacing: -0.3,
   },
   actionBtn: {
     flexDirection: 'row',
@@ -310,28 +266,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     width: '100%',
-    paddingVertical: 13,
+    paddingVertical: 14,
     borderRadius: 14,
   },
   locataireActionBtn: {
     backgroundColor: '#2C3E6B',
   },
-  locataireActionText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
-  },
   bailleurActionBtn: {
     backgroundColor: '#1B4D3E',
   },
-  bailleurActionText: {
+  actionBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '800',
+    letterSpacing: 0.2,
   },
   footer: {
     alignItems: 'center',
-    paddingBottom: 16,
+    paddingBottom: 12,
     maxWidth: 360,
   },
   footerText: {
