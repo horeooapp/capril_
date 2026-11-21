@@ -1,13 +1,13 @@
 import * as Updates from 'expo-updates';
 import { Platform } from 'react-native';
 
-export const APP_NAME = 'QAPRIL Propriétaire';
-export const APP_KEY = 'proprietaire';
-export const APP_VERSION = '2.0.7';
-export const BUILD_NUMBER = 36;
-export const BUILD_DATE = '18/11/2026';
-export const BUILD_TIME = '01:25 UTC';
-export const BUILD_TIMESTAMP = '18/11/2026 à 01:25 UTC';
+export const APP_NAME = 'QAPRIL';
+export const APP_KEY = 'qapril';
+export const APP_VERSION = '2.1.1';
+export const BUILD_NUMBER = 38;
+export const BUILD_DATE = '21/11/2026';
+export const BUILD_TIME = '15:10 UTC';
+export const BUILD_TIMESTAMP = '21/11/2026 à 15:10 UTC';
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;
