@@ -22,7 +22,7 @@ interface VoiceAssistantFABProps {
 
 export function VoiceAssistantFAB({
   moduleName = 'BAILLEUR',
-  primaryColor = '#1B4D3E',
+  primaryColor = '#2C3E6B',
   visible = true,
 }: VoiceAssistantFABProps) {
   const router = useRouter();
@@ -164,7 +164,7 @@ export function VoiceAssistantFAB({
 
             {/* Avertissement souverain RG-AST-01 */}
             <View style={styles.legalBanner}>
-              <ShieldCheck color="#1B4D3E" size={16} />
+              <ShieldCheck color="#2C3E6B" size={16} />
               <Text style={styles.legalBannerText}>
                 Sécurité : Tout acte juridique exige votre confirmation tactile manuelle.
               </Text>

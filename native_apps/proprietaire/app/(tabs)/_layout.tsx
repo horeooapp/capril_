@@ -29,7 +29,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: 'rgba(255, 255, 255, 0.98)',
           borderTopWidth: 1,
-          borderTopColor: '#E4E0D7',
+          borderTopColor: '#E5E7EF',
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
@@ -43,8 +43,8 @@ export default function TabLayout() {
           justifyContent: 'center',
           alignItems: 'center',
         },
-        tabBarActiveTintColor: '#1B4D3E',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: '#2C3E6B',
+        tabBarInactiveTintColor: '#94A3B8',
       }}
     >
       {/* 1. Accueil */}

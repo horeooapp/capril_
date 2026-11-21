@@ -52,7 +52,7 @@ export default function FinanceScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color="#1B4D3E" />
+        <ActivityIndicator size="large" color="#2C3E6B" />
       </SafeAreaView>
     );
   }
@@ -87,7 +87,7 @@ export default function FinanceScreen() {
             });
           }}
         >
-          <FileText color="#1B4D3E" size={16} />
+          <FileText color="#2C3E6B" size={16} />
           <Text style={styles.reportBtnText}>Télécharger le rapport mensuel PDF</Text>
         </Pressable>
       </View>
@@ -127,7 +127,7 @@ export default function FinanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F2EC' },
+  container: { flex: 1, backgroundColor: '#F4F5F9' },
   center: { justifyContent: 'center', alignItems: 'center' },
   header: {
     paddingHorizontal: 18,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     padding: 18,
     borderRadius: 22,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     gap: 6,
   },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -175,14 +175,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  reportBtnText: { fontSize: 12, fontWeight: '600', color: '#1B4D3E' },
+  reportBtnText: { fontSize: 12, fontWeight: '600', color: '#2C3E6B' },
   list: { paddingHorizontal: 18, paddingBottom: 40, gap: 10 },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,

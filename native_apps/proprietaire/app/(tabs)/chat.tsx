@@ -139,7 +139,7 @@ export default function ProprietaireChatScreen() {
                     maxWidth: '82%',
                     padding: 12,
                     borderRadius: 16,
-                    backgroundColor: isMe ? '#1B4D3E' : '#FFFFFF',
+                    backgroundColor: isMe ? '#2C3E6B' : '#FFFFFF',
                     borderWidth: isMe ? 0 : 1,
                     borderColor: '#E2E8F0',
                     borderBottomRightRadius: isMe ? 2 : 16,
@@ -151,7 +151,7 @@ export default function ProprietaireChatScreen() {
                     elevation: 1,
                 }}>
                     {!isMe && (
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#1B4D3E', marginBottom: 2, textTransform: 'uppercase' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#2C3E6B', marginBottom: 2, textTransform: 'uppercase' }}>
                             {interlocutorName}
                         </Text>
                     )}
@@ -182,12 +182,12 @@ export default function ProprietaireChatScreen() {
             <TopNavHeader
                 title="Messagerie locataires"
                 subtitle={propertyName ? `${propertyName} · ${interlocutorName}` : "Échanges officiels horodatés"}
-                primaryColor="#1B4D3E"
+                primaryColor="#2C3E6B"
             />
 
             {/* SÉLECTEUR DE CONVERSATION SI MULTIPLES BAUX */}
             {conversations.length > 1 && (
-                <View style={{ backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E4E0D7', paddingVertical: 8 }}>
+                <View style={{ backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2E8F0', paddingVertical: 8 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
                         {conversations.map((c) => {
                             const isSelected = c.leaseId === selectedLeaseId;
@@ -202,9 +202,9 @@ export default function ProprietaireChatScreen() {
                                         paddingHorizontal: 12,
                                         paddingVertical: 7,
                                         borderRadius: 20,
-                                        backgroundColor: isSelected ? '#1B4D3E' : '#F3F4F6',
+                                        backgroundColor: isSelected ? '#2C3E6B' : '#F3F4F6',
                                         borderWidth: 1,
-                                        borderColor: isSelected ? '#1B4D3E' : '#E5E7EB',
+                                        borderColor: isSelected ? '#2C3E6B' : '#E5E7EB',
                                     }}
                                 >
                                     <User size={13} color={isSelected ? '#FFFFFF' : '#4B5563'} />
@@ -229,7 +229,7 @@ export default function ProprietaireChatScreen() {
             >
                 {loading && messages.length === 0 ? (
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <ActivityIndicator size="small" color="#1B4D3E" />
+                        <ActivityIndicator size="small" color="#2C3E6B" />
                         <Text style={{ fontSize: 13, color: '#6B7280', marginTop: 8 }}>Chargement des messages...</Text>
                     </View>
                 ) : (
@@ -243,9 +243,9 @@ export default function ProprietaireChatScreen() {
                         ListEmptyComponent={
                             <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 40 }}>
                                 <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: '#E8F5E9', justifyContent: 'center', alignItems: 'center', marginBottom: 16 }}>
-                                    <MessageCircle size={28} color="#1B4D3E" />
+                                    <MessageCircle size={28} color="#2C3E6B" />
                                 </View>
-                                <Text style={{ fontSize: 16, fontWeight: '800', color: '#1B4D3E', textAlign: 'center' }}>
+                                <Text style={{ fontSize: 16, fontWeight: '800', color: '#2C3E6B', textAlign: 'center' }}>
                                     Aucun message échangé
                                 </Text>
                                 <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 8, lineHeight: 18, maxWidth: 280 }}>
@@ -264,7 +264,7 @@ export default function ProprietaireChatScreen() {
                     paddingBottom: Math.max(insets.bottom, 10), 
                     backgroundColor: '#FFFFFF', 
                     borderTopWidth: 1, 
-                    borderTopColor: '#E4E0D7', 
+                    borderTopColor: '#E2E8F0', 
                     alignItems: 'center', 
                     gap: 8 
                 }}>
@@ -287,7 +287,7 @@ export default function ProprietaireChatScreen() {
                     />
                     <Pressable 
                         style={{
-                            backgroundColor: newMessage.trim() ? '#1B4D3E' : '#9CA3AF',
+                            backgroundColor: newMessage.trim() ? '#2C3E6B' : '#9CA3AF',
                             width: 42,
                             height: 42,
                             borderRadius: 21,

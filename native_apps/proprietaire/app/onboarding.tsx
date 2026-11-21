@@ -125,7 +125,7 @@ export default function OnboardingScreen() {
       {/* 2. EN-TÊTE FIXE */}
       <View style={styles.topBar}>
         <View style={styles.logoRow}>
-          <Building2 color="#1B4D3E" size={20} />
+          <Building2 color="#2C3E6B" size={20} />
           <Text style={styles.logoText}>QAPRIL</Text>
         </View>
         <Pressable onPress={finishOnboarding} hitSlop={10}>
@@ -150,7 +150,7 @@ export default function OnboardingScreen() {
             <View style={styles.slide}>
               <View style={styles.visualContainer}>
                 <View style={styles.iconCircle}>
-                  <Icon color="#1B4D3E" size={44} />
+                  <Icon color="#2C3E6B" size={44} />
                 </View>
               </View>
 
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     letterSpacing: 1.2,
   },
   skipText: {
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
   },
   dotInactive: {
     backgroundColor: '#E2E8F0',
   },
   actionBtn: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 999,
     paddingVertical: 15,
     alignItems: 'center',
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   },
   btnPrimaryConsent: {
     flex: 2,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',

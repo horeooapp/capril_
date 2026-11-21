@@ -75,7 +75,7 @@ export default function BauxScreen() {
       <TopNavHeader title="Baux" subtitle="Gestion locative" />
       <ScrollView
         contentContainerStyle={styles.scroll}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1B4D3E']} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2C3E6B']} />}
       >
         <View style={styles.headerRow}>
           <View>
@@ -93,7 +93,7 @@ export default function BauxScreen() {
         </View>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#1B4D3E" style={{ marginTop: 40 }} />
+          <ActivityIndicator size="large" color="#2C3E6B" style={{ marginTop: 40 }} />
         ) : leases.length === 0 ? (
           <View style={styles.cardEmpty}>
             <FileText color="#9CA3AF" size={40} />
@@ -171,7 +171,7 @@ export default function BauxScreen() {
                   value={l.bailleurMasque || false}
                   onValueChange={() => toggleIdentite(l.id, l.bailleurMasque || false)}
                   disabled={l.sousMandat || togglingId === l.id}
-                  trackColor={{ false: '#E2E8F0', true: '#1B4D3E' }}
+                  trackColor={{ false: '#E2E8F0', true: '#2C3E6B' }}
                   thumbColor="#FFFFFF"
                 />
               </View>
@@ -193,8 +193,8 @@ export default function BauxScreen() {
                 onPress={() => router.push({ pathname: '/(tabs)/chat', params: { leaseId: l.id } } as any)}
                 accessibilityLabel="Échanger avec le locataire"
               >
-                <MessageCircle size={15} color="#1B4D3E" />
-                <Text style={{ fontSize: 13, fontWeight: '800', color: '#1B4D3E' }}>
+                <MessageCircle size={15} color="#2C3E6B" />
+                <Text style={{ fontSize: 13, fontWeight: '800', color: '#2C3E6B' }}>
                   Échanger avec le locataire
                 </Text>
               </Pressable>
@@ -212,12 +212,12 @@ const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 100 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   sub: { fontSize: 11, fontWeight: '700', color: '#6B7280', textTransform: 'uppercase', letterSpacing: 0.5 },
-  title: { fontSize: 24, fontWeight: '900', color: '#1B4D3E', marginTop: 2 },
+  title: { fontSize: 24, fontWeight: '900', color: '#2C3E6B', marginTop: 2 },
   btnAdd: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 12,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     marginBottom: 12,
   },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     marginTop: 20,
   },
   emptyTitle: { fontSize: 17, fontWeight: '800', color: '#111827', marginTop: 12 },
   emptyText: { fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 8, lineHeight: 20 },
   btnPrimary: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,

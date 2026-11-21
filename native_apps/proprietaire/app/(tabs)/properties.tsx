@@ -223,7 +223,7 @@ export default function PropertiesScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color="#1B4D3E" />
+        <ActivityIndicator size="large" color="#2C3E6B" />
       </SafeAreaView>
     );
   }
@@ -250,7 +250,7 @@ export default function PropertiesScreen() {
               style={styles.headerBtnSecondary}
               onPress={() => router.push('/create-lease')}
             >
-              <FileSpreadsheet color="#1B4D3E" size={15} />
+              <FileSpreadsheet color="#2C3E6B" size={15} />
               <Text style={styles.headerBtnSecondaryText}>Bail</Text>
             </Pressable>
           </View>
@@ -327,7 +327,7 @@ export default function PropertiesScreen() {
         data={filteredList}
         keyExtractor={(item, index) => (item?.id ? String(item.id) : String(index))}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#1B4D3E']} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2C3E6B']} />}
         ListEmptyComponent={
           <View style={{ alignItems: 'center', justifyContent: 'center', padding: 32, marginTop: 20 }}>
             <Building2 size={44} color="#94A3B8" />
@@ -455,7 +455,7 @@ export default function PropertiesScreen() {
                     } as any);
                   }}
                 >
-                  <FileSpreadsheet color="#1B4D3E" size={14} />
+                  <FileSpreadsheet color="#2C3E6B" size={14} />
                   <Text style={styles.createLeaseBtnText}>Rédiger un bail pour ce bien</Text>
                 </Pressable>
               )}
@@ -480,10 +480,10 @@ export default function PropertiesScreen() {
                   disabled={capturingPropertyId === item.id}
                 >
                   {capturingPropertyId === item.id ? (
-                    <ActivityIndicator size="small" color="#1B4D3E" />
+                    <ActivityIndicator size="small" color="#2C3E6B" />
                   ) : (
                     <>
-                      <Navigation color="#1B4D3E" size={11} />
+                      <Navigation color="#2C3E6B" size={11} />
                       <Text style={styles.geoCaptureBtnText}>
                         {hasGps ? 'Actualiser' : 'Capturer GPS'}
                       </Text>
@@ -519,7 +519,7 @@ export default function PropertiesScreen() {
               {/* BOUTON DÉTAIL DU BIEN */}
               <View style={styles.cardDetailLink}>
                 <Text style={styles.cardDetailLinkText}>Voir les détails complets</Text>
-                <ChevronRight color="#1B4D3E" size={14} />
+                <ChevronRight color="#2C3E6B" size={14} />
               </View>
             </Pressable>
           );
@@ -597,7 +597,7 @@ export default function PropertiesScreen() {
 
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Loyer mensuel</Text>
-                    <Text style={[styles.detailValue, { color: '#1B4D3E', fontSize: 15 }]}>
+                    <Text style={[styles.detailValue, { color: '#2C3E6B', fontSize: 15 }]}>
                       {fmtFcfa(selectedProperty.currentRent || selectedProperty.declaredRentFcfa)} / mois
                     </Text>
                   </View>
@@ -701,7 +701,7 @@ export default function PropertiesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F2EC' },
+  container: { flex: 1, backgroundColor: '#F4F5F9' },
   center: { justifyContent: 'center', alignItems: 'center' },
   header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10, gap: 8 },
   headerTopRow: {
@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
@@ -738,13 +738,13 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#1B4D3E',
+    borderColor: '#2C3E6B',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
   },
   headerBtnSecondaryText: {
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     borderRadius: 12,
     marginTop: 2,
   },
@@ -773,9 +773,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
   },
-  chipOn: { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' },
+  chipOn: { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' },
   chipText: { fontSize: 12, fontWeight: '600', color: '#4B5563' },
   chipTextOn: { color: '#FFFFFF', fontWeight: '700' },
   sortRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
   },
   sortChipActive: { backgroundColor: '#E8A020', borderColor: '#E8A020' },
   sortChipText: { fontSize: 11, color: '#6E6E73', fontWeight: '500' },
@@ -797,7 +797,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 10,
   },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -855,7 +855,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F3F4F6',
     paddingTop: 10,
   },
-  rent: { fontSize: 14, fontWeight: '800', color: '#1B4D3E' },
+  rent: { fontSize: 14, fontWeight: '800', color: '#2C3E6B' },
   badgesRight: { flexDirection: 'row', gap: 6 },
   nivPill: {
     flexDirection: 'row',
@@ -881,7 +881,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 8,
   },
   resetBtnText: { color: '#FFFFFF', fontSize: 13, fontWeight: '600' },
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginTop: 16,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 10,
@@ -943,7 +943,7 @@ const styles = StyleSheet.create({
   geoCaptureBtnText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   // Styles cartes et images du bien
   cardImageContainer: {
@@ -1030,7 +1030,7 @@ const styles = StyleSheet.create({
   cardDetailLinkText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   // Modal de détail du bien
   modalOverlay: {
@@ -1128,7 +1128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 10,
     paddingVertical: 13,
     marginTop: 6,

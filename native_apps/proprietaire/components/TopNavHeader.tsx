@@ -54,7 +54,7 @@ export function TopNavHeader({
   showHome = false,
   showExit = false,
   onBack,
-  primaryColor = '#1B4D3E',
+  primaryColor = '#2C3E6B',
   bgColor,
   variant = 'light',
   rightElement,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E8A020',
+    backgroundColor: '#2C3E6B',
   },
   title: {
     fontSize: 13,

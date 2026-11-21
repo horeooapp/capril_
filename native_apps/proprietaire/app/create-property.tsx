@@ -550,7 +550,7 @@ export default function CreatePropertyScreen() {
       >
           {/* BANDEAU CONFORMITÉ SOUVERAINE */}
           <View style={styles.legalNotice}>
-            <ShieldCheck color="#1B4D3E" size={20} />
+            <ShieldCheck color="#2C3E6B" size={20} />
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Enregistrement Officiel QAPRIL</Text>
               <Text style={styles.legalNoticeDesc}>
@@ -991,7 +991,7 @@ export default function CreatePropertyScreen() {
                     onChangeText={setCustomCityInput}
                   />
                   <Pressable
-                    style={{ backgroundColor: '#1B4D3E', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center' }}
+                    style={{ backgroundColor: '#2C3E6B', borderRadius: 10, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center' }}
                     onPress={() => {
                       const trimmed = customCityInput.trim();
                       if (trimmed) {
@@ -1064,7 +1064,7 @@ export default function CreatePropertyScreen() {
             <View style={styles.geoBox}>
               <View style={styles.geoHeader}>
                 <View style={styles.geoIconCircle}>
-                  <Navigation color="#1B4D3E" size={16} />
+                  <Navigation color="#2C3E6B" size={16} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -1101,7 +1101,7 @@ export default function CreatePropertyScreen() {
                     </View>
                     <View style={styles.geoAdminRow}>
                       <Text style={styles.geoAdminLabel}>Commune</Text>
-                      <Text style={[styles.geoAdminValue, { color: '#1B4D3E', fontWeight: '800' }]}>{detectedCommune || finalCommune}</Text>
+                      <Text style={[styles.geoAdminValue, { color: '#2C3E6B', fontWeight: '800' }]}>{detectedCommune || finalCommune}</Text>
                     </View>
                     <View style={styles.geoAdminRow}>
                       <Text style={styles.geoAdminLabel}>Quartier</Text>
@@ -1234,7 +1234,7 @@ export default function CreatePropertyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F4F5F9',
   },
   header: {
     flexDirection: 'row',
@@ -1243,7 +1243,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E0D7',
+    borderBottomColor: '#E2E8F0',
     gap: 12,
   },
   backBtn: {
@@ -1279,7 +1279,7 @@ const styles = StyleSheet.create({
   legalNoticeTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   legalNoticeDesc: {
     fontSize: 11,
@@ -1292,13 +1292,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 10,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     letterSpacing: 0.8,
     marginBottom: 4,
   },
@@ -1361,7 +1361,7 @@ const styles = StyleSheet.create({
   valuePreviewText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   chipsWrap: {
     flexDirection: 'row',
@@ -1386,8 +1386,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   chipActive: {
-    backgroundColor: '#1B4D3E',
-    borderColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
   },
   chipText: {
     fontSize: 12,
@@ -1404,7 +1404,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   submitBtn: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 14,
     paddingVertical: 15,
     alignItems: 'center',
@@ -1463,7 +1463,7 @@ const styles = StyleSheet.create({
   geoBadgeText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   geoSubtitle: {
     fontSize: 11,
@@ -1487,7 +1487,7 @@ const styles = StyleSheet.create({
   geoAccuracyBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   geoAdminCard: {
     backgroundColor: '#FFFFFF',
@@ -1517,7 +1517,7 @@ const styles = StyleSheet.create({
   geoCoordsText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   geoAccuracyText: {
@@ -1535,7 +1535,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 14,

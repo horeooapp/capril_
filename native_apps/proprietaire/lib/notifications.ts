@@ -25,7 +25,7 @@ export async function setupNotificationChannels(): Promise<void> {
         name: 'Notifications Propriétaire',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#1B4D3E',
+        lightColor: '#2C3E6B',
         sound: 'default',
         enableVibrate: true,
       });

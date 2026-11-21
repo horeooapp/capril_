@@ -170,7 +170,7 @@ export default function ProfileScreen() {
         <Text style={styles.title}>Mon Compte</Text>
 
         {loading ? (
-          <ActivityIndicator size="large" color="#1B4D3E" />
+          <ActivityIndicator size="large" color="#2C3E6B" />
         ) : (
           <>
             <View style={styles.heroCard}>
@@ -188,7 +188,7 @@ export default function ProfileScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{displayName}</Text>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#1B4D3E', marginTop: 2 }}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#2C3E6B', marginTop: 2 }}>
                   {user?.phone || '+225 · Numéro vérifié'}
                 </Text>
                 
@@ -198,7 +198,7 @@ export default function ProfileScreen() {
                 >
                   <Mail color="#6E6E73" size={13} />
                   <Text style={styles.email} numberOfLines={1}>{user?.email || 'Ajouter un e-mail (optionnel)'}</Text>
-                  <Edit2 color="#1B4D3E" size={12} style={{ marginLeft: 2 }} />
+                  <Edit2 color="#2C3E6B" size={12} style={{ marginLeft: 2 }} />
                 </Pressable>
 
                 <View style={styles.pillOk}>
@@ -241,7 +241,7 @@ export default function ProfileScreen() {
             </View>
 
             <Pressable style={styles.cardRow} onPress={() => router.push('/(tabs)/diaspora' as any)}>
-              <Globe color="#1B4D3E" size={20} />
+              <Globe color="#2C3E6B" size={20} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Je gère depuis l’étranger — 7 € par mois</Text>
                 <Text style={styles.cardSub}>
@@ -260,7 +260,7 @@ export default function ProfileScreen() {
                   Boîte MaPoste : disponible prochainement (intégration La Poste CI).
                 </Text>
               </View>
-              <View style={{ backgroundColor: '#F5F2EC', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
+              <View style={{ backgroundColor: '#F4F5F9', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
                 <Text style={{ fontSize: 11, fontWeight: '700', color: '#6B7280' }}>Bientôt disponible</Text>
               </View>
             </View>
@@ -269,12 +269,12 @@ export default function ProfileScreen() {
               style={styles.btnSecondary}
               onPress={() => Linking.openURL('https://qapril.net/manuel')}
             >
-              <BookOpen color="#1B4D3E" size={16} />
+              <BookOpen color="#2C3E6B" size={16} />
               <Text style={styles.btnSecondaryText}>Aide & Manuel d’utilisation</Text>
             </Pressable>
 
             <Pressable style={styles.btnSecondary} onPress={() => setAboutModalVisible(true)}>
-              <RefreshCw color="#1B4D3E" size={16} />
+              <RefreshCw color="#2C3E6B" size={16} />
               <Text style={styles.btnSecondaryText}>À propos de QAPRIL · Version 2.0.0</Text>
             </Pressable>
 
@@ -304,7 +304,7 @@ export default function ProfileScreen() {
             </Pressable>
 
             <Pressable 
-              style={[styles.modalBtn, { backgroundColor: '#1B4D3E', flex: 1 }]} 
+              style={[styles.modalBtn, { backgroundColor: '#2C3E6B', flex: 1 }]} 
               onPress={handleSaveEmail}
               disabled={isSavingEmail}
             >
@@ -338,7 +338,7 @@ export default function ProfileScreen() {
           <View style={styles.modalBox}>
             <Text style={styles.modalTitle}>Je gère depuis l’étranger</Text>
             <Text style={styles.modalSubtitle}>Option à 7 € par mois · Résiliable à tout moment</Text>
-            <View style={{ backgroundColor: '#F5F2EC', borderRadius: 12, padding: 14, gap: 8, marginBottom: 14 }}>
+            <View style={{ backgroundColor: '#F4F5F9', borderRadius: 12, padding: 14, gap: 8, marginBottom: 14 }}>
               <Text style={{ fontSize: 12, fontWeight: '600', color: '#1C1C1E' }}>
                 ✓ Montants en FCFA et en € au taux officiel (1 € = 655,957 F)
               </Text>
@@ -360,7 +360,7 @@ export default function ProfileScreen() {
                 <Text style={{ color: '#4B5563', fontWeight: '700', fontSize: 13 }}>Fermer</Text>
               </Pressable>
               <Pressable
-                style={[styles.modalBtn, { backgroundColor: '#1B4D3E' }]}
+                style={[styles.modalBtn, { backgroundColor: '#2C3E6B' }]}
                 onPress={() => {
                   const next = !diaspora;
                   setDiaspora(next);
@@ -395,12 +395,12 @@ export default function ProfileScreen() {
               Gestion locative conforme à la réglementation en vigueur (Code de la Construction et de l’Habitat).
             </Text>
             <Pressable style={[styles.btnSecondary, { marginBottom: 10 }]} onPress={handleCheckUpdate} disabled={isCheckingUpdate}>
-              <RefreshCw color="#1B4D3E" size={16} />
+              <RefreshCw color="#2C3E6B" size={16} />
               <Text style={styles.btnSecondaryText}>
                 {isCheckingUpdate ? 'Recherche en cours...' : 'Rechercher une mise à jour'}
               </Text>
             </Pressable>
-            <Pressable style={[styles.modalBtn, { backgroundColor: '#1B4D3E', flex: 0 }]} onPress={() => setAboutModalVisible(false)}>
+            <Pressable style={[styles.modalBtn, { backgroundColor: '#2C3E6B', flex: 0 }]} onPress={() => setAboutModalVisible(false)}>
               <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 13 }}>Fermer</Text>
             </Pressable>
           </View>
@@ -427,7 +427,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F2EC' },
+  container: { flex: 1, backgroundColor: '#F4F5F9' },
   scroll: { padding: 18, gap: 12 },
   sub: { fontSize: 12, color: '#6E6E73', fontWeight: '600' },
   title: { fontSize: 24, fontWeight: '600', color: '#1C1C1E' },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 6,
   },
   label: { fontSize: 11, fontWeight: '600', color: '#6E6E73', marginBottom: 4 },
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   btnSecondary: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     borderRadius: 14,
     paddingVertical: 14,
     flexDirection: 'row',
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  btnSecondaryText: { color: '#1B4D3E', fontSize: 13, fontWeight: '600' },
+  btnSecondaryText: { color: '#2C3E6B', fontSize: 13, fontWeight: '600' },
   btnPrimaryKyc: {
     backgroundColor: '#1E7E4E',
     borderRadius: 14,

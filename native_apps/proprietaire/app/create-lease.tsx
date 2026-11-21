@@ -224,7 +224,7 @@ export default function CreateLeaseScreen() {
       >
           {/* BANDEAU RÈGLEMENTAIRE */}
           <View style={styles.legalNotice}>
-            <ShieldCheck color="#1B4D3E" size={20} />
+            <ShieldCheck color="#2C3E6B" size={20} />
             <View style={{ flex: 1 }}>
               <Text style={styles.legalNoticeTitle}>Sécurisation Intégrale & Signature SMS</Text>
               <Text style={styles.legalNoticeDesc}>
@@ -246,7 +246,7 @@ export default function CreateLeaseScreen() {
             </View>
 
             {loadingProps ? (
-              <ActivityIndicator color="#1B4D3E" style={{ marginVertical: 12 }} />
+              <ActivityIndicator color="#2C3E6B" style={{ marginVertical: 12 }} />
             ) : properties.length === 0 ? (
               <View style={styles.emptyPropsCard}>
                 <Building2 color="#9CA3AF" size={28} />
@@ -275,7 +275,7 @@ export default function CreateLeaseScreen() {
                       }}
                       style={[styles.propChip, active && styles.propChipActive]}
                     >
-                      <Building2 color={active ? '#FFFFFF' : '#1B4D3E'} size={15} />
+                      <Building2 color={active ? '#FFFFFF' : '#2C3E6B'} size={15} />
                       <View style={{ flex: 1 }}>
                         <Text
                           style={[styles.propChipTitle, active && styles.propChipTextActive]}
@@ -303,10 +303,10 @@ export default function CreateLeaseScreen() {
             <Text style={styles.sectionTitle}>TYPE DE CONTRAT</Text>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
               <Pressable
-                style={[styles.input, { flex: 1, alignItems: 'center', backgroundColor: !isRepriseBail ? '#E3F5EC' : '#FFFFFF', borderColor: !isRepriseBail ? '#1B4D3E' : '#E5E7EB' }]}
+                style={[styles.input, { flex: 1, alignItems: 'center', backgroundColor: !isRepriseBail ? '#E3F5EC' : '#FFFFFF', borderColor: !isRepriseBail ? '#2C3E6B' : '#E5E7EB' }]}
                 onPress={() => setIsRepriseBail(false)}
               >
-                <Text style={{ fontWeight: '700', color: !isRepriseBail ? '#1B4D3E' : '#6B7280', fontSize: 13 }}>Nouveau Bail</Text>
+                <Text style={{ fontWeight: '700', color: !isRepriseBail ? '#2C3E6B' : '#6B7280', fontSize: 13 }}>Nouveau Bail</Text>
               </Pressable>
               <Pressable
                 style={[styles.input, { flex: 1, alignItems: 'center', backgroundColor: isRepriseBail ? '#EEF2FF' : '#FFFFFF', borderColor: isRepriseBail ? '#4F46E5' : '#E5E7EB' }]}
@@ -624,7 +624,7 @@ export default function CreateLeaseScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F4F5F9',
   },
   header: {
     flexDirection: 'row',
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E0D7',
+    borderBottomColor: '#E2E8F0',
     gap: 12,
   },
   backBtn: {
@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
   legalNoticeTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   legalNoticeDesc: {
     fontSize: 11,
@@ -687,13 +687,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 10,
   },
   sectionTitle: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     letterSpacing: 0.8,
     marginBottom: 4,
   },
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
   valuePreviewText: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   inputError: {
     borderColor: '#EF4444',
@@ -806,8 +806,8 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   propChipActive: {
-    backgroundColor: '#1B4D3E',
-    borderColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
   },
   propChipTitle: {
     fontSize: 13,
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   btnSmallGreen: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -857,8 +857,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   durationChipActive: {
-    backgroundColor: '#1B4D3E',
-    borderColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
   },
   durationChipText: {
     fontSize: 12,
@@ -870,7 +870,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   submitBtn: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
     borderRadius: 14,
     paddingVertical: 15,
     alignItems: 'center',

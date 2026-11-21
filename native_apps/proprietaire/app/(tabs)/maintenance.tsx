@@ -110,7 +110,7 @@ export default function ProprietaireMaintenanceScreen() {
         {/* BANDEAU : SUIVI DES SIGNALEMENTS */}
         <View style={styles.roleBanner}>
           <View style={styles.roleTag}>
-            <Wrench color="#1B4D3E" size={14} />
+            <Wrench color="#2C3E6B" size={14} />
             <Text style={styles.roleTagText}>SUIVI DES TRAVAUX</Text>
           </View>
           <Text style={styles.roleTitle}>Signalements & pannes reçus</Text>
@@ -203,8 +203,8 @@ export default function ProprietaireMaintenanceScreen() {
                   </Text>
                 </View>
                 <View style={styles.tenantRow}>
-                  <User color="#1B4D3E" size={14} />
-                  <Text style={[styles.tenantText, { fontWeight: '700', color: '#1B4D3E' }]}>
+                  <User color="#2C3E6B" size={14} />
+                  <Text style={[styles.tenantText, { fontWeight: '700', color: '#2C3E6B' }]}>
                     Émis par : {inc.locataire}
                   </Text>
                 </View>
@@ -217,7 +217,7 @@ export default function ProprietaireMaintenanceScreen() {
                 </View>
                 <View style={styles.actionBtnHint}>
                   <Text style={styles.actionBtnHintText}>Traiter</Text>
-                  <ChevronRight color="#1B4D3E" size={14} />
+                  <ChevronRight color="#2C3E6B" size={14} />
                 </View>
               </View>
             </Pressable>
@@ -259,7 +259,7 @@ export default function ProprietaireMaintenanceScreen() {
                 <Text style={styles.modalSectionLabel}>DESCRIPTION TRANSMIS PAR LE LOCATAIRE :</Text>
                 <Text style={styles.modalDescText}>{selectedIncident?.description}</Text>
                 <View style={styles.photoAlert}>
-                  <Camera color="#1B4D3E" size={16} />
+                  <Camera color="#2C3E6B" size={16} />
                   <Text style={styles.photoAlertText}>
                     {selectedIncident?.photosCount} photos datées faisant foi
                   </Text>
@@ -269,7 +269,7 @@ export default function ProprietaireMaintenanceScreen() {
               <Text style={styles.modalSectionLabel}>ACTIONS DU PROPRIÉTAIRE :</Text>
               <View style={styles.modalActions}>
                 <Pressable
-                  style={[styles.modalActionBtn, { backgroundColor: '#1B4D3E' }]}
+                  style={[styles.modalActionBtn, { backgroundColor: '#2C3E6B' }]}
                   onPress={() =>
                     handleUpdateStatus(
                       selectedIncident.id,
@@ -324,14 +324,14 @@ export default function ProprietaireMaintenanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F2EC' },
+  container: { flex: 1, backgroundColor: '#F4F5F9' },
   scroll: { padding: 16, gap: 14, paddingBottom: 40 },
   roleBanner: {
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 8,
   },
   roleTag: {
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   roleTagText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
     letterSpacing: 0.8,
   },
   roleTitle: {
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     alignItems: 'center',
   },
   statValue: {
@@ -395,11 +395,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
   },
   filterChipActive: {
-    backgroundColor: '#1B4D3E',
-    borderColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
+    borderColor: '#2C3E6B',
   },
   filterChipText: {
     fontSize: 12,
@@ -418,11 +418,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 8,
   },
   catBadge: {
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F4F5F9',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#F5F2EC',
+    borderTopColor: '#F4F5F9',
     marginTop: 4,
   },
   footerDate: {
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
   actionBtnHintText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   pill: {
     paddingHorizontal: 8,
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F4F5F9',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
   photoAlertText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#1B4D3E',
+    color: '#2C3E6B',
   },
   modalActions: {
     gap: 8,

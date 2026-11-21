@@ -433,18 +433,17 @@ export default function BailleurAndAgencePrototypeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, styles.center]}>
-        <ActivityIndicator size="large" color="#1B4D3E" />
+        <ActivityIndicator size="large" color="#2C3E6B" />
       </SafeAreaView>
     );
   }
 
-  const primaryColor = isBailleur ? '#1B4D3E' : '#1F2A44';
-  const bgColor = isBailleur ? '#F5F2EC' : '#F3F4F8';
+  const primaryColor = isBailleur ? '#2C3E6B' : '#1F2A44';
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
-      {/* HEADER MOBILE NOUVELLE GÉNÉRATION */}
-      <View style={[styles.mobileHeader, { backgroundColor: primaryColor }]}>
+    <SafeAreaView style={styles.container}>
+      {/* HEADER MOBILE ÉPURÉ & LUMINEUX (IDENTIQUE APPLICATION LOCATAIRE) */}
+      <View style={styles.mobileHeader}>
         {((isBailleur && bTab !== 'home') || (!isBailleur && aTab !== 'home')) && (
           <Pressable
             style={styles.headerNavIconBtn}
@@ -454,7 +453,7 @@ export default function BailleurAndAgencePrototypeScreen() {
             }}
             accessibilityLabel="Retour à l'accueil"
           >
-            <ArrowLeft color="#FFFFFF" size={18} />
+            <ArrowLeft color="#1A1D26" size={18} />
           </Pressable>
         )}
         <Pressable
@@ -462,15 +461,15 @@ export default function BailleurAndAgencePrototypeScreen() {
           onPress={() => setMenuOpen(true)}
           accessibilityLabel="Ouvrir le menu mobile"
         >
-          <Menu color="#FFFFFF" size={22} />
+          <Menu color="#1A1D26" size={22} />
         </Pressable>
 
         <Pressable 
           style={styles.headerTitleContainer}
           onPress={() => setMenuOpen(true)}
         >
-          <Text style={[styles.headerAppBadge, { color: isBailleur ? '#E8A020' : '#F0774B' }]}>
-            {isBailleur ? 'QAPRIL · BAILLEUR' : 'QAPRIL · AGENCE AGRÉÉE'}
+          <Text style={styles.headerAppBadge}>
+            {isBailleur ? 'QAPRIL · ESPACE PROPRIÉTAIRE' : 'QAPRIL · AGENCE AGRÉÉE'}
           </Text>
           <View style={styles.headerCurrentScreenRow}>
             <Text style={styles.headerScreenName} numberOfLines={1}>
@@ -478,7 +477,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                 ? BAILLEUR_MENU_ITEMS.find((m) => m.id === bTab)?.label || 'Accueil'
                 : AGENCE_MENU_ITEMS.find((m) => m.id === aTab)?.label || 'Vue d’ensemble'}
             </Text>
-            <ChevronDown color={isBailleur ? '#E8A020' : '#F0774B'} size={15} />
+            <ChevronDown color="#2C3E6B" size={15} />
           </View>
         </Pressable>
 
@@ -497,14 +496,15 @@ export default function BailleurAndAgencePrototypeScreen() {
             onPress={() => router.push('/(tabs)/chat' as any)}
             accessibilityLabel="Messagerie locataires"
           >
-            <MessageCircle color="#FFFFFF" size={18} />
+            <MessageCircle color="#1A1D26" size={19} />
           </Pressable>
 
           <Pressable
             style={styles.headerIconBtn}
             onPress={() => router.push('/(tabs)/profile' as any)}
+            accessibilityLabel="Mon profil"
           >
-            <User color="#FFFFFF" size={18} />
+            <User color="#1A1D26" size={18} />
           </Pressable>
         </View>
       </View>
@@ -569,7 +569,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   styles.activeProfileBadgeBox,
                   {
                     backgroundColor: isBailleur ? 'rgba(27, 77, 62, 0.08)' : 'rgba(31, 42, 68, 0.08)',
-                    borderColor: isBailleur ? '#1B4D3E' : '#1F2A44',
+                    borderColor: isBailleur ? '#2C3E6B' : '#1F2A44',
                   },
                 ]}
               >
@@ -767,7 +767,7 @@ export default function BailleurAndAgencePrototypeScreen() {
       </Modal>
 
       {/* ===================================================================
-          MODE 1 : QAPRIL BAILLEUR — PROTOTYPE (#F5F2EC / #1B4D3E / #E8A020)
+          MODE 1 : QAPRIL BAILLEUR — PROTOTYPE (#F4F5F9 / #2C3E6B / #E8A020)
          =================================================================== */}
       {isBailleur ? (
         <>
@@ -834,7 +834,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </View>
                 </View>
 
-                <View style={[styles.heroCard, { backgroundColor: '#1B4D3E' }]}>
+                <View style={[styles.heroCard, { backgroundColor: '#2C3E6B' }]}>
                   <View style={styles.rowBetween}>
                     <Text style={styles.heroSub}>LOYERS ENCAISSÉS CE MOIS</Text>
                     <Text style={styles.heroSub}>{dashData?.occupancyRate ?? 0} % occupation</Text>
@@ -871,7 +871,7 @@ export default function BailleurAndAgencePrototypeScreen() {
 
                 <View style={styles.kpiRow}>
                   <Pressable
-                    style={[styles.kpiBox, { borderColor: '#1B4D3E', borderWidth: 1.2 }]}
+                    style={[styles.kpiBox, { borderColor: '#2C3E6B', borderWidth: 1.2 }]}
                     onPress={() => {
                       setBiensFilter('all');
                       setBTab('biens');
@@ -879,9 +879,9 @@ export default function BailleurAndAgencePrototypeScreen() {
                   >
                     <View style={styles.rowBetween}>
                       <Text style={styles.kpiNum}>{bBiens.length}</Text>
-                      <ChevronRight color="#1B4D3E" size={14} />
+                      <ChevronRight color="#2C3E6B" size={14} />
                     </View>
-                    <Text style={[styles.subMuted, { color: '#1B4D3E', fontWeight: '600' }]}>Biens (Tous)</Text>
+                    <Text style={[styles.subMuted, { color: '#2C3E6B', fontWeight: '600' }]}>Biens (Tous)</Text>
                   </Pressable>
                   <Pressable
                     style={[styles.kpiBox, { borderColor: '#1E7E4E', borderWidth: 1.2 }]}
@@ -935,7 +935,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={[styles.subMuted, { marginTop: 2 }]}>
                           Logement déclaré : {decl.housingDesc}
                         </Text>
-                        <Text style={[styles.boldText, { marginTop: 6, color: '#1B4D3E', fontSize: 15 }]}>
+                        <Text style={[styles.boldText, { marginTop: 6, color: '#2C3E6B', fontSize: 15 }]}>
                           Loyer mensuel : {fmt(decl.rentAmount)}
                         </Text>
 
@@ -1031,7 +1031,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Bail conforme à la loi, signé par code SMS</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('baux')}>
-                    <FileText color="#1B4D3E" size={20} />
+                    <FileText color="#2C3E6B" size={20} />
                     <Text style={styles.boldText}>Baux & DGI</Text>
                     <Text style={styles.subMuted}>Enregistrement fiscal</Text>
                   </Pressable>
@@ -1041,7 +1041,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Avec photo du reçu</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setMandatModal(true)}>
-                    <Users color="#1B4D3E" size={20} />
+                    <Users color="#2C3E6B" size={20} />
                     <Text style={styles.boldText}>Confier un bien</Text>
                     <Text style={styles.subMuted}>Agence ou gérant</Text>
                   </Pressable>
@@ -1051,7 +1051,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Text style={styles.subMuted}>Dossiers locataires</Text>
                   </Pressable>
                   <Pressable style={styles.cardGrid} onPress={() => setBTab('params')}>
-                    <Wrench color="#1B4D3E" size={20} />
+                    <Wrench color="#2C3E6B" size={20} />
                     <Text style={styles.boldText}>Paramètres</Text>
                     <Text style={styles.subMuted}>Relances & paiements partiels</Text>
                   </Pressable>
@@ -1096,8 +1096,8 @@ export default function BailleurAndAgencePrototypeScreen() {
                         style={[
                           styles.pillGold,
                           active
-                            ? { backgroundColor: '#1B4D3E' }
-                            : { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E4E0D7' },
+                            ? { backgroundColor: '#2C3E6B' }
+                            : { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E2E8F0' },
                         ]}
                       >
                         <Text
@@ -1227,16 +1227,16 @@ export default function BailleurAndAgencePrototypeScreen() {
                     </Text>
                     <View style={[styles.rowBetween, { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                        <Eye color="#1B4D3E" size={15} />
-                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#1B4D3E' }}>
+                        <Eye color="#2C3E6B" size={15} />
+                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#2C3E6B' }}>
                           Afficher le contrat de bail
                         </Text>
                       </View>
-                      <ChevronRight color="#1B4D3E" size={16} />
+                      <ChevronRight color="#2C3E6B" size={16} />
                     </View>
                     {!b.dgi && (
                       <Pressable
-                        style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 8 }]}
+                        style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 8 }]}
                         onPress={() => setDgiModalRef(b.ref)}
                       >
                         <Text style={styles.btnPrimaryText}>
@@ -1287,12 +1287,12 @@ export default function BailleurAndAgencePrototypeScreen() {
                         <Text style={styles.subMuted}>Réf : {r.receiptRef} · Quittance officielle</Text>
                         <View style={[styles.rowBetween, { marginTop: 6, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F1EFEA' }]}>
                           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <Eye color="#1B4D3E" size={15} />
-                            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1B4D3E' }}>
+                            <Eye color="#2C3E6B" size={15} />
+                            <Text style={{ fontSize: 12, fontWeight: '700', color: '#2C3E6B' }}>
                               Afficher la quittance
                             </Text>
                           </View>
-                          <ChevronRight color="#1B4D3E" size={16} />
+                          <ChevronRight color="#2C3E6B" size={16} />
                         </View>
                       </Pressable>
                     );
@@ -1410,7 +1410,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                     <Pressable
                       key={k}
                       onPress={() => setPartialPolicy(k as any)}
-                      style={[styles.chip, partialPolicy === k && { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' }]}
+                      style={[styles.chip, partialPolicy === k && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' }]}
                     >
                       <Text style={[styles.chipText, partialPolicy === k && { color: '#fff' }]}>{lbl}</Text>
                     </Pressable>
@@ -1866,7 +1866,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               Photo obligatoire du reçu manuscrit · émission immédiate de la quittance officielle
             </Text>
             <Pressable
-              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 10 }]}
+              style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 10 }]}
               onPress={() => {
                 setCashModal(false);
                 Alert.alert('Encaissement enregistré', 'Quittance officielle émise et envoyée par SMS.');
@@ -1890,7 +1890,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               Droits DGI (2,5 %) + Timbres (500 F/page) + Frais de service QAPRIL (2 000 F)
             </Text>
             <Pressable
-              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E', marginTop: 10 }]}
+              style={[styles.btnPrimary, { backgroundColor: '#2C3E6B', marginTop: 10 }]}
               onPress={() => {
                 setBBaux((prev) =>
                   prev.map((b) => (b.ref === dgiModalRef ? { ...b, dgi: true, st: 'actif' } : b))
@@ -1922,14 +1922,14 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <Pressable
                   key={t}
                   onPress={() => setMType(t as any)}
-                  style={[styles.chip, mType === t && { backgroundColor: '#1B4D3E', borderColor: '#1B4D3E' }]}
+                  style={[styles.chip, mType === t && { backgroundColor: '#2C3E6B', borderColor: '#2C3E6B' }]}
                 >
                   <Text style={[styles.chipText, mType === t && { color: '#fff' }]}>{lbl}</Text>
                 </Pressable>
               ))}
             </View>
             <Pressable
-              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+              style={[styles.btnPrimary, { backgroundColor: '#2C3E6B' }]}
               onPress={() => {
                 setMandatModal(false);
                 Alert.alert(
@@ -2028,7 +2028,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               </Text>
             </View>
             <Pressable
-              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+              style={[styles.btnPrimary, { backgroundColor: '#2C3E6B' }]}
               onPress={() => {
                 setBBiens((prev) =>
                   prev.map((x) => (x.id === positionModalBien?.id ? { ...x, gpsStatut: 'Confirmée', niv: Math.max(x.niv, 2) } : x))
@@ -2078,7 +2078,7 @@ export default function BailleurAndAgencePrototypeScreen() {
               <Text style={styles.subMuted}>• Avance de loyer exigible : max. 2 mois ({fmt((Number(offreLoyer) || 0) * 2)})</Text>
             </View>
             <Pressable
-              style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+              style={[styles.btnPrimary, { backgroundColor: '#2C3E6B' }]}
               onPress={() => {
                 setBBiens((prev) =>
                   prev.map((x) =>
@@ -2177,7 +2177,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                 <>
                   <View style={styles.rowBetween}>
                     <View style={{ flex: 1 }}>
-                      <Text style={[styles.label, { color: '#1B4D3E', fontWeight: '800' }]}>
+                      <Text style={[styles.label, { color: '#2C3E6B', fontWeight: '800' }]}>
                         RÉPUBLIQUE DE CÔTE D’IVOIRE · QAPRIL
                       </Text>
                       <Text style={styles.h2}>Quittance de Loyer Certifiée</Text>
@@ -2247,8 +2247,8 @@ export default function BailleurAndAgencePrototypeScreen() {
 
                     <View style={styles.recapBox}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                        <ShieldCheck color="#1B4D3E" size={16} />
-                        <Text style={[styles.boldText, { color: '#1B4D3E' }]}>Certification numérique officielle</Text>
+                        <ShieldCheck color="#2C3E6B" size={16} />
+                        <Text style={[styles.boldText, { color: '#2C3E6B' }]}>Certification numérique officielle</Text>
                       </View>
                       <Text style={styles.subMuted}>
                         Dont quittance, sous réserve de tous droits. Ce document électronique horodaté constitue une preuve légale de paiement conforme au CCH ivoirien.
@@ -2262,7 +2262,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                   </ScrollView>
 
                   <Pressable
-                    style={[styles.btnPrimary, { backgroundColor: '#1B4D3E' }]}
+                    style={[styles.btnPrimary, { backgroundColor: '#2C3E6B' }]}
                     onPress={() => setSelectedReceiptModal(null)}
                   >
                     <Text style={styles.btnPrimaryText}>Fermer la quittance</Text>
@@ -2367,7 +2367,7 @@ export default function BailleurAndAgencePrototypeScreen() {
                       </View>
                     </View>
 
-                    <View style={[styles.card, { marginBottom: 8, backgroundColor: '#F5F2EC' }]}>
+                    <View style={[styles.card, { marginBottom: 8, backgroundColor: '#F4F5F9' }]}>
                       <Text style={[styles.label, { color: primaryColor }]}>ARTICLE 4 — CONDITIONS FINANCIÈRES</Text>
                       <View style={styles.rowBetween}>
                         <Text style={styles.subMuted}>Loyer mensuel</Text>
@@ -2469,11 +2469,12 @@ const styles = StyleSheet.create({
     color: '#4B5563',
   },
 
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#F4F5F9' },
   center: { justifyContent: 'center', alignItems: 'center' },
   mobileHeader: {
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.12)',
+    borderBottomColor: '#E5E7EF',
     paddingHorizontal: 16,
     paddingVertical: 12,
     flexDirection: 'row',
@@ -2481,18 +2482,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.04,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   headerNavIconBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 4,
+    marginRight: 6,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   headerExitBtn: {
     width: 30,
@@ -2504,14 +2507,14 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   menuBurgerBtn: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.14)',
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderColor: '#E2E8F0',
   },
   headerTitleContainer: {
     flex: 1,
@@ -2523,6 +2526,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
+    color: '#2C3E6B',
   },
   headerCurrentScreenRow: {
     flexDirection: 'row',
@@ -2531,9 +2535,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   headerScreenName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1A1D26',
     letterSpacing: -0.3,
   },
   headerActionsRight: {
@@ -2542,28 +2546,28 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   headerCurrencyPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 8,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
+    borderColor: '#CBD5E1',
   },
   headerCurrencyText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '900',
+    color: '#2C3E6B',
+    fontSize: 11,
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
   headerIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.14)',
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: '#E2E8F0',
   },
   drawerBackdrop: {
     flex: 1,
@@ -2665,7 +2669,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -2721,10 +2725,10 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F1F5F9',
   },
   drawerModeBtnActiveBailleur: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
   },
   drawerModeBtnActiveAgence: {
     backgroundColor: '#1F2A44',
@@ -2760,9 +2764,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   drawerItemActiveBailleur: {
-    backgroundColor: '#F0F7F4',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#C7E4D7',
+    borderColor: '#BFDBFE',
   },
   drawerItemActiveAgence: {
     backgroundColor: '#EEF2FF',
@@ -2773,12 +2777,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
   },
   drawerItemIconActiveBailleur: {
-    backgroundColor: '#1B4D3E',
+    backgroundColor: '#2C3E6B',
   },
   drawerItemIconActiveAgence: {
     backgroundColor: '#1F2A44',
@@ -2801,14 +2805,14 @@ const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 40 },
   sectionGap: { gap: 12 },
   rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  h1: { fontSize: 21, fontWeight: '600', color: '#1C1C1E', letterSpacing: -0.4 },
-  h2: { fontSize: 17, fontWeight: '600', color: '#1C1C1E' },
+  h1: { fontSize: 21, fontWeight: '700', color: '#1C1C1E', letterSpacing: -0.4 },
+  h2: { fontSize: 17, fontWeight: '700', color: '#1C1C1E' },
   subMuted: { fontSize: 12, color: '#6E6E73', lineHeight: 17 },
   boldText: { fontSize: 13, fontWeight: '700', color: '#1C1C1E' },
   label: { fontSize: 11, fontWeight: '600', color: '#6E6E73', letterSpacing: 0.6 },
-  heroCard: { borderRadius: 22, padding: 18, gap: 6 },
+  heroCard: { borderRadius: 22, padding: 18, gap: 6, backgroundColor: '#1E293B' },
   heroSub: { fontSize: 11, color: 'rgba(255,255,255,0.82)', fontWeight: '600' },
-  heroBig: { fontSize: 27, fontWeight: '600', color: '#FFFFFF', letterSpacing: -0.5 },
+  heroBig: { fontSize: 27, fontWeight: '700', color: '#FFFFFF', letterSpacing: -0.5 },
   kpiRow: { flexDirection: 'row', gap: 8 },
   kpiBox: {
     flex: 1,
@@ -2816,9 +2820,9 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
   },
-  kpiNum: { fontSize: 20, fontWeight: '600', color: '#1C1C1E' },
+  kpiNum: { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
   grid2: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   cardGrid: {
     width: '48%',
@@ -2826,7 +2830,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 4,
   },
   card: {
@@ -2834,19 +2838,24 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 15,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     gap: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   pillGold: {
-    backgroundColor: '#FDF3DF',
+    backgroundColor: '#FEF3C7',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
   },
-  pillGoldText: { fontSize: 11, fontWeight: '600', color: '#9A6500' },
+  pillGoldText: { fontSize: 11, fontWeight: '700', color: '#92400E' },
   input: {
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#CBD5E1',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -2855,10 +2864,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   recapBox: {
-    backgroundColor: '#F5F2EC',
+    backgroundColor: '#F8FAFC',
     borderRadius: 12,
     padding: 12,
     marginVertical: 6,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
   btnPrimary: {
     borderRadius: 14,
@@ -2887,8 +2898,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     marginTop: 6,
+    backgroundColor: '#FFFFFF',
   },
   btnGhostText: { color: '#1C1C1E', fontSize: 12, fontWeight: '700' },
   modalBackdrop: {
@@ -2908,7 +2920,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E4E0D7',
+    borderColor: '#E2E8F0',
     backgroundColor: '#FFFFFF',
   },
   chipText: {

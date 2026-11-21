@@ -91,7 +91,7 @@ const s = StyleSheet.create({
   aide: { fontSize: 11, color: '#92400E', marginTop: 4, lineHeight: 16 },
   ligne: { flexDirection: 'row', gap: 8, marginTop: 10 },
   btn: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 },
-  btnPlein: { backgroundColor: '#1B4D3E' },
+  btnPlein: { backgroundColor: '#2C3E6B' },
   btnPleinTexte: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   btnContour: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D1D5DB' },
   btnContourTexte: { color: '#111827', fontSize: 13, fontWeight: '700' },

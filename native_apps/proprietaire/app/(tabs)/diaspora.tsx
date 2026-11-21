@@ -27,7 +27,7 @@ export default function DiasporaScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.container}>
-        <ActivityIndicator color="#1B4D3E" style={{ marginTop: 40 }} />
+        <ActivityIndicator color="#2C3E6B" style={{ marginTop: 40 }} />
       </SafeAreaView>
     );
   }
@@ -40,7 +40,7 @@ export default function DiasporaScreen() {
 
         {!diasporaActif ? (
           <View style={s.card}>
-            <Globe size={28} color="#1B4D3E" />
+            <Globe size={28} color="#2C3E6B" />
             <Text style={s.cardTitle}>Gérez vos biens depuis l'étranger</Text>
             <Text style={s.cardSub}>
               L'espace Diaspora vous permet d'afficher vos loyers en euros et de gérer vos biens
@@ -90,12 +90,12 @@ const s = StyleSheet.create({
   cardTitle: { fontSize: 16, fontWeight: '800', color: '#1F2A44', textAlign: 'center' },
   cardSub: { fontSize: 13, color: '#64748B', textAlign: 'center', lineHeight: 20 },
   activateBtn: {
-    backgroundColor: '#1B4D3E', borderRadius: 12,
+    backgroundColor: '#2C3E6B', borderRadius: 12,
     paddingHorizontal: 24, paddingVertical: 14, marginTop: 8,
   },
   activateBtnText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
   activeCard: {
-    backgroundColor: '#1B4D3E', borderRadius: 16, padding: 20,
+    backgroundColor: '#2C3E6B', borderRadius: 16, padding: 20,
     flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12,
   },
   activeTitle: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
