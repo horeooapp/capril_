@@ -153,11 +153,21 @@ export async function POST(request: Request) {
             });
         }
 
+        // Incrémenter tokenVersion pour déconnecter immédiatement toute session concurrente
+        const updatedUser = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                tokenVersion: { increment: 1 }
+            },
+            select: { tokenVersion: true }
+        });
+
         // 4. Signature du token JWT mobile
         const token = await signMobileToken({
             userId: user.id,
             email: user.email || user.phone || 'mobile@qapril.ci',
-            role: user.role
+            role: user.role,
+            tokenVersion: updatedUser.tokenVersion
         });
 
         return NextResponse.json({

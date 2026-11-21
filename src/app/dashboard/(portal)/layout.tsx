@@ -39,9 +39,9 @@ export default async function DashboardLayout({
     // RÔLE ACTIF STRICT : priorité à la capacité active choisie en base par l'utilisateur
     const activeRole = (dbUser as any).capaciteActive || (session.user as any).chosenRole || session.user.role || 'LANDLORD';
 
-    // Règle stricte : Pas de bascule en cours de session. Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire sans se déconnecter (sauf outil simulateur conversationnel universel).
+    // Règle stricte : Un compte connecté en profil locataire ne peut pas accéder au dashboard propriétaire : il est automatiquement déconnecté du système.
     if ((activeRole === "TENANT" || activeRole === "LOCATAIRE") && !isSimulateur) {
-        return redirect("/mon-espace-locataire");
+        return redirect("/api/auth/logout?callbackUrl=/dashboard/login");
     }
 
     // Si le rôle actif est Admin, redirection vers la console admin

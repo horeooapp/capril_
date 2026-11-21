@@ -13,10 +13,10 @@ export default async function TenantOnboardingPage() {
     }
 
     const userRole = (session.user as any)?.capaciteActive || (session.user as any)?.chosenRole || session.user.role
-    const isTenant = userRole === "TENANT" || session.user.role === "TENANT" || (session.user as any)?.eligibleRoles?.includes("TENANT")
+    const isTenant = userRole === "TENANT" || session.user.role === "TENANT"
 
     if (!isTenant) {
-        redirect("/dashboard")
+        redirect("/api/auth/logout?callbackUrl=/mon-espace-locataire/login")
     }
 
     // Always check DB for onboarding status as JWT might be stale

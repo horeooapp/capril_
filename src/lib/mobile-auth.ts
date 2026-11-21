@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { NextResponse } from 'next/server';
 import { isGlobalAuthRevoked } from '@/lib/session-revocation';
+import { prisma } from '@/lib/prisma';
 
 const getJwtSecretKey = () => {
     const secret = process.env.AUTH_SECRET;
@@ -10,7 +11,7 @@ const getJwtSecretKey = () => {
     return new TextEncoder().encode(secret);
 };
 
-export async function signMobileToken(payload: { userId: string; email: string; role: string }) {
+export async function signMobileToken(payload: { userId: string; email: string; role: string; tokenVersion?: number; space?: string }) {
     try {
         const token = await new SignJWT(payload)
             .setProtectedHeader({ alg: 'HS256' })
@@ -27,7 +28,7 @@ export async function signMobileToken(payload: { userId: string; email: string; 
 export async function verifyMobileToken(token: string) {
     try {
         const { payload } = await jwtVerify(token, getJwtSecretKey());
-        return payload as { userId: string; email: string; role: string };
+        return payload as { userId: string; email: string; role: string; tokenVersion?: number; space?: string };
     } catch (error) {
         return null;
     }
@@ -50,6 +51,19 @@ export async function authenticateMobileRequest(request: Request) {
     const isRevoked = await isGlobalAuthRevoked(decoded);
     if (isRevoked) {
         return null;
+    }
+
+    // Déconnexion automatique si une nouvelle session pour ce compte/numéro a incrémenté tokenVersion
+    if (typeof (decoded as any).tokenVersion === 'number') {
+        try {
+            const dbUser = await prisma.user.findUnique({
+                where: { id: decoded.userId },
+                select: { tokenVersion: true }
+            });
+            if (dbUser && dbUser.tokenVersion !== (decoded as any).tokenVersion) {
+                return null;
+            }
+        } catch {}
     }
     
     return decoded;

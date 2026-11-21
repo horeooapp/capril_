@@ -59,6 +59,7 @@ export const authConfig = {
                 token.eligibleRoles = (user as any).eligibleRoles
                 token.requiresRoleSelection = false
                 token.capacites = (user as any).capacites
+                token.tokenVersion = (user as any).tokenVersion || 0
             }
 
             // Calcul systématique du displayName selon le rôle actif :
@@ -157,18 +158,20 @@ export const authConfig = {
                 return true;
             }
 
-            // Route Espace Locataire (/mon-espace-locataire)
-            if (pathname.startsWith("/mon-espace-locataire")) {
+            // Route Espace Locataire (/mon-espace-locataire ou /onboarding/tenant)
+            // Un utilisateur connecté en bailleur/agence qui accède à l'espace locataire est automatiquement déconnecté
+            if (pathname.startsWith("/mon-espace-locataire") || pathname.startsWith("/onboarding/tenant")) {
                 if (!isTenant && !isAdmin) {
-                    return Response.redirect(new URL("/dashboard", nextUrl));
+                    return Response.redirect(new URL("/api/auth/logout?callbackUrl=/mon-espace-locataire/login", nextUrl));
                 }
                 return true;
             }
 
-            // Route Dashboard Gestionnaire/Propriétaire (/dashboard)
-            if (pathname.startsWith("/dashboard")) {
+            // Route Dashboard Gestionnaire/Propriétaire (/dashboard, /onboarding/landlord, /espace-agence)
+            // Un utilisateur connecté en locataire qui accède à l'espace bailleur/agence est automatiquement déconnecté
+            if (pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding/landlord") || pathname.startsWith("/espace-agence")) {
                 if (isTenant && !isAdmin) {
-                    return Response.redirect(new URL("/mon-espace-locataire", nextUrl));
+                    return Response.redirect(new URL("/api/auth/logout?callbackUrl=/dashboard/login", nextUrl));
                 }
                 return true;
             }

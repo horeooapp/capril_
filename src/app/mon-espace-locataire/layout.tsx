@@ -33,12 +33,12 @@ export default async function LocataireLayout({
 
     const computedRole = dbUser?.capaciteActive || (session?.user as any)?.chosenRole || session?.user?.role || 'TENANT';
 
-    // Si le rôle actif est Administrateur ou Bailleur/Agence exclusif, renvoyer vers son dashboard
+    // Si le rôle actif est Administrateur ou Bailleur/Agence, déconnecter automatiquement l'utilisateur du système
     if (['ADMIN', 'SUPER_ADMIN'].includes(computedRole)) {
         return redirect("/admin");
     }
     if (['LANDLORD', 'LANDLORD_PRO', 'AGENCY', 'NON_CERTIFIED_AGENT', 'BAILLEUR', 'AGENCE'].includes(computedRole)) {
-        return redirect("/dashboard");
+        return redirect("/api/auth/logout?callbackUrl=/mon-espace-locataire/login");
     }
 
     // Si l'utilisateur connecté visite la page de connexion locataire, rediriger directement vers l'espace

@@ -244,10 +244,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         }
 
                         // Mettre à jour en base de données pour aligner les requêtes Prisma ultérieures
-                        await prisma.user.update({
+                        // et incrémenter tokenVersion pour déconnecter automatiquement toute session active précédente
+                        const updatedUser = await prisma.user.update({
                             where: { id: user.id },
-                            data: { capaciteActive: activeRole }
-                        }).catch((err: any) => console.error("[AUTH] Could not update capaciteActive:", err));
+                            data: { 
+                                capaciteActive: activeRole,
+                                tokenVersion: { increment: 1 }
+                            },
+                            select: { tokenVersion: true }
+                        }).catch((err: any) => {
+                            console.error("[AUTH] Could not update capaciteActive:", err);
+                            return { tokenVersion: (user as any).tokenVersion || 0 };
+                        });
 
                         // Détermination du nom officiel affiché selon le rôle à la connexion :
                         // 1. Pour les agences : Le nom de l'agence (nomAgence ou companyName)
@@ -279,6 +287,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             onboardingComplete: (user as any).onboardingComplete,
                             diasporaAbonnement: (user as any).diasporaAbonnement,
                             capaciteActive: activeRole,
+                            tokenVersion: updatedUser.tokenVersion,
                             capacites: Array.from(eligibleRolesSet),
                             eligibleRoles: Array.from(eligibleRolesSet),
                             chosenRole: activeRole,
@@ -455,6 +464,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (isRevoked) {
                 return { ...params.session, user: undefined as any };
             }
+
+            // Déconnexion automatique si une nouvelle session a été ouverte (tokenVersion dépassé)
+            if (params.token?.id && typeof params.token?.tokenVersion === 'number') {
+                try {
+                    const dbCheck = await prisma.user.findUnique({
+                        where: { id: params.token.id },
+                        select: { tokenVersion: true }
+                    });
+                    if (dbCheck && dbCheck.tokenVersion !== params.token.tokenVersion) {
+                        return { ...params.session, user: undefined as any };
+                    }
+                } catch {}
+            }
+
             if (authConfig.callbacks?.session) {
                 return (authConfig.callbacks.session as any)(params);
             }
