@@ -114,6 +114,7 @@ export async function createLease(data: {
         if (data.tenantPhone || tenantId) {
             const checkParties = await verifyPartiesDistinctes({
                 initiatorUserId: ownerId,
+                propertyId: data.propertyId,
                 targetPhone: data.tenantPhone,
                 targetUserId: tenantId,
                 direction: 'BAILLEUR_TO_LOCATAIRE',

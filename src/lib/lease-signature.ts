@@ -90,6 +90,10 @@ export async function preparerCodeSignature(
   if (!locataire && !emetteur && !admin) throw new SignatureError("ACCES", "Vous n’êtes pas partie à ce bail.");
   if (bail.isSignedElectronically) throw new SignatureError("DEJA_SIGNE", "Ce bail est déjà signé.");
   if (STATUTS_FERMES.includes(bail.status)) throw new SignatureError("FERME", "Ce bail est clos : il ne peut plus être signé.");
+  const propertyOwner = bail.property?.ownerUserId || bail.property?.ownerId;
+  if (bail.tenantId && (bail.tenantId === bail.landlordId || (propertyOwner && bail.tenantId === propertyOwner))) {
+    throw new SignatureError("AUTO_BAIL", "Une personne ne peut être locataire de sa propre maison.");
+  }
   if (!bail.tenant || (!bail.tenant.phone && !bail.tenant.email)) {
     throw new SignatureError("SANS_LOCATAIRE", "Aucun locataire joignable sur ce bail : renseignez son téléphone avant l’envoi.");
   }
@@ -147,6 +151,10 @@ export async function signerBail(prisma: any, p: { leaseId: string; signataireId
   const user = await prisma.user.findUnique({ where: { id: p.signataireId }, select: { id: true, phone: true, email: true } });
   if (!user || !estLocataire(bail, user)) {
     throw new SignatureError("ACCES", "Seul le locataire désigné sur ce bail peut le signer. Connectez-vous avec son numéro.");
+  }
+  const propertyOwner = bail.property?.ownerUserId || bail.property?.ownerId;
+  if (user.id === bail.landlordId || (propertyOwner && user.id === propertyOwner)) {
+    throw new SignatureError("AUTO_BAIL", "Une personne ne peut être locataire de sa propre maison.");
   }
   if (bail.isSignedElectronically) throw new SignatureError("DEJA_SIGNE", "Ce bail est déjà signé.");
   if (STATUTS_FERMES.includes(bail.status)) throw new SignatureError("FERME", "Ce bail est clos : il ne peut plus être signé.");

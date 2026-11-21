@@ -30,6 +30,10 @@ export async function sendInvitation(data: {
             }
         }
 
+        if (data.locataireId && (data.locataireId === actualLandlordId || data.locataireId === data.invitantId)) {
+            return { success: false, error: "Une personne ne peut être locataire de sa propre maison." };
+        }
+
         // 1. Créer le contrat (Lease) en attente de signature immédiatement
         let newLease = null;
         if (data.propertyId) {
@@ -114,6 +118,10 @@ export async function respondToInvitation(invitationId: string, response: 'ACCEP
                 if (invitation.propertyId) {
                     const prop = await prisma.property.findUnique({ where: { id: invitation.propertyId }, select: { ownerUserId: true }});
                     if (prop?.ownerUserId) actualLandlordId = prop.ownerUserId;
+                }
+
+                if (invitation.locataireId === actualLandlordId || invitation.locataireId === invitation.invitantId) {
+                    throw new Error("Une personne ne peut être locataire de sa propre maison.");
                 }
 
                 const newLease = await prisma.lease.create({

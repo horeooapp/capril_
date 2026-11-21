@@ -59,7 +59,7 @@ export default function AgenceOnboardingScreen() {
     try {
       await setHasSeenOnboarding();
     } catch {}
-    router.replace('/(tabs)' as any);
+    router.replace('/login' as any);
   };
 
   const handleNext = () => {

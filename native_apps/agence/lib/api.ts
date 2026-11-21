@@ -147,6 +147,6 @@ export async function logoutAndRedirect(router: any): Promise<void> {
         }
     } catch {}
     try {
-        router.replace('/(tabs)' as any);
+        router.replace('/login' as any);
     } catch {}
 }

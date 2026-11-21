@@ -68,6 +68,21 @@ export async function creerBailDeclaratif(
     })
   }
 
+  if (tenant.id === ownerUserId) {
+    return { error: "Une personne ne peut être locataire de sa propre maison." }
+  }
+
+  if (data.propertyId) {
+    const prop = await prisma.property.findUnique({
+      where: { id: data.propertyId },
+      select: { ownerUserId: true, ownerId: true }
+    });
+    const propOwner = prop?.ownerUserId || prop?.ownerId;
+    if (propOwner && tenant.id === propOwner) {
+      return { error: "Une personne ne peut être locataire de sa propre maison." };
+    }
+  }
+
   // 2. Utiliser le bien fourni ou creer un bien declaratif
   let propertyId = data.propertyId
 

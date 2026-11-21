@@ -22,11 +22,12 @@ import { normalizePhone } from '@/lib/phone';
  * Refus affiché : « Ce numéro est le vôtre. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre locataire. »
  */
 
-export const MSG_AUTO_BAIL_LOCATAIRE = "Ce numéro est le vôtre. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre locataire.";
-export const MSG_AUTO_BAIL_BAILLEUR = "Ce numéro est le vôtre. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre bailleur.";
+export const MSG_AUTO_BAIL_LOCATAIRE = "Une personne ne peut être locataire de sa propre maison. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre locataire.";
+export const MSG_AUTO_BAIL_BAILLEUR = "Une personne ne peut être locataire de sa propre maison. Vous ne pouvez pas être à la fois le bailleur et le locataire d’un même bail. Saisissez le numéro de votre bailleur.";
 
 export interface VerifyPartiesParams {
     initiatorUserId: string;
+    propertyId?: string | null;
     targetPhone?: string | null;
     targetEmail?: string | null;
     targetUserId?: string | null;
@@ -42,6 +43,7 @@ export interface VerifyPartiesResult {
 export async function verifyPartiesDistinctes(params: VerifyPartiesParams): Promise<VerifyPartiesResult> {
     const {
         initiatorUserId,
+        propertyId,
         targetPhone,
         targetEmail,
         targetUserId,
@@ -51,6 +53,71 @@ export async function verifyPartiesDistinctes(params: VerifyPartiesParams): Prom
     const refusalMessage = direction === 'LOCATAIRE_TO_BAILLEUR' 
         ? MSG_AUTO_BAIL_BAILLEUR 
         : MSG_AUTO_BAIL_LOCATAIRE;
+
+    // 0. Contrôle de propriété du bien : Une personne ne peut être locataire de sa propre maison
+    if (propertyId) {
+        const property = await prisma.property.findUnique({
+            where: { id: propertyId },
+            select: { id: true, ownerUserId: true, ownerId: true }
+        });
+        const propertyOwnerId = property?.ownerUserId || property?.ownerId;
+        if (propertyOwnerId) {
+            // Le locataire ciblé par ID est le propriétaire du bien
+            if (targetUserId && targetUserId === propertyOwnerId) {
+                return {
+                    valid: false,
+                    error: "Une personne ne peut être locataire de sa propre maison.",
+                    code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+                };
+            }
+
+            // Le numéro de téléphone cible correspond au propriétaire du bien
+            const normTarget = targetPhone ? normalizePhone(targetPhone) : null;
+            if (normTarget) {
+                const owner = await prisma.user.findUnique({
+                    where: { id: propertyOwnerId },
+                    select: { id: true, phone: true }
+                });
+                if (owner?.phone && normalizePhone(owner.phone) === normTarget) {
+                    return {
+                        valid: false,
+                        error: "Une personne ne peut être locataire de sa propre maison.",
+                        code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+                    };
+                }
+                const ownerTel = await prisma.userTelephone.findFirst({
+                    where: {
+                        userId: propertyOwnerId,
+                        numeroE164: normTarget,
+                        statut: { not: 'RETIRE' }
+                    },
+                    select: { id: true }
+                });
+                if (ownerTel) {
+                    return {
+                        valid: false,
+                        error: "Une personne ne peut être locataire de sa propre maison.",
+                        code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+                    };
+                }
+            }
+
+            // L'email cible correspond au propriétaire du bien
+            if (targetEmail) {
+                const owner = await prisma.user.findUnique({
+                    where: { id: propertyOwnerId },
+                    select: { email: true }
+                });
+                if (owner?.email && owner.email.trim().toLowerCase() === targetEmail.trim().toLowerCase()) {
+                    return {
+                        valid: false,
+                        error: "Une personne ne peut être locataire de sa propre maison.",
+                        code: 'RG_IDN_24_AUTO_BAIL_INTERDIT',
+                    };
+                }
+            }
+        }
+    }
 
     // 1. Contrôle par identifiant unique de compte
     if (targetUserId && targetUserId === initiatorUserId) {

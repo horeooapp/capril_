@@ -161,6 +161,7 @@ export async function POST(request: Request) {
             targetPhone: tenantLookupPhone,
             targetEmail: tenantLookupEmail,
             direction: 'BAILLEUR_TO_LOCATAIRE',
+            propertyId: property.id,
         });
 
         if (!checkDistinctParties.valid) {

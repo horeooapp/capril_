@@ -28,6 +28,7 @@ export async function POST(req: Request) {
                 initiatorUserId: userId,
                 targetUserId: tenantId,
                 direction: 'BAILLEUR_TO_LOCATAIRE',
+                propertyId,
             });
             if (!checkParties.valid) {
                 return NextResponse.json({

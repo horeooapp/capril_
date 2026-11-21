@@ -1,11 +1,15 @@
 import { Stack, useRouter } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useState, useEffect } from 'react';
 import { BackHandler, Platform, View, Text, Pressable, AppState } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import * as Updates from 'expo-updates';
 import * as Notifications from 'expo-notifications';
+import { registerForPushNotificationsAsync } from '../lib/notifications';
 import { confirmExitApp } from '../components/TopNavHeader';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
   const [updating, setUpdating] = useState(false);
@@ -30,7 +34,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#1F2A44', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
       <Text style={{ color: '#EF4444', fontSize: 18, fontWeight: '700', marginBottom: 8, textAlign: 'center' }}>
         Une interruption est survenue
       </Text>
@@ -40,7 +44,7 @@ export function ErrorBoundary({ error, retry }: { error: Error; retry: () => voi
       <Pressable
         onPress={handleUpdateAndRestart}
         disabled={updating}
-        style={{ backgroundColor: '#1F2A44', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12, minWidth: 200, alignItems: 'center', marginBottom: 12 }}
+        style={{ backgroundColor: '#F0774B', paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12, minWidth: 200, alignItems: 'center', marginBottom: 12 }}
       >
         <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14 }}>
           {updating ? 'Mise à jour en cours...' : "Relancer l'application"}
@@ -71,12 +75,13 @@ export default function RootLayout() {
     }
     checkAppUpdates();
 
-    // Vérification automatique à chaque retour au premier plan de l'application
     const appStateSub = AppState.addEventListener('change', (nextState) => {
       if (nextState === 'active') {
         checkAppUpdates();
       }
     });
+
+    registerForPushNotificationsAsync().catch(() => {});
 
     const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
       try {
@@ -93,7 +98,12 @@ export default function RootLayout() {
       }
     });
 
+    const timeout = setTimeout(async () => {
+      await SplashScreen.hideAsync().catch(() => {});
+    }, 400);
+
     return () => {
+      clearTimeout(timeout);
       appStateSub.remove();
       responseListener.remove();
     };
@@ -116,7 +126,14 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <KeyboardProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ title: 'Accueil' }} />
+          <Stack.Screen name="onboarding" options={{ title: 'Présentation', gestureEnabled: false }} />
+          <Stack.Screen name="login" options={{ title: 'Connexion', gestureEnabled: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false, gestureEnabled: false }} />
+          <Stack.Screen name="create-property" options={{ title: 'Nouveau Bien', presentation: 'modal' }} />
+          <Stack.Screen name="create-lease" options={{ title: 'Nouveau Bail', presentation: 'modal' }} />
+        </Stack>
       </KeyboardProvider>
     </SafeAreaProvider>
   );
