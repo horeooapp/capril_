@@ -7,6 +7,7 @@ import {
   StatusBar,
   ScrollView,
   Image,
+  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -16,110 +17,164 @@ export default function SelectSpaceScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
-      
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── EN-TÊTE CONVIVIAL AVEC LOGOTYPE OFFICIEL ── */}
-        <View style={styles.header}>
-          <View style={styles.logoWrap}>
-            <Image
-              source={{ uri: 'https://www.qapril.net/logo.png' }}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+    <ImageBackground
+      source={require('../assets/bg-chalk.jpg')}
+      style={styles.bgContainer}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.container} edges={['top', 'bottom', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+
+        {/* ── FILIGRANE SOUVERAIN TRÈS DOUX EN FOND D'ÉCRAN (ARMOIRIES RCI) ── */}
+        <View style={styles.watermarkWrap} pointerEvents="none">
+          <Image
+            source={require('../assets/armoiries-rci.png')}
+            style={styles.watermarkArmoiries}
+            resizeMode="contain"
+          />
+        </View>
+
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* ── EN-TÊTE CONVIVIAL AVEC ARMOIRIES ET LOGOTYPE OFFICIEL ── */}
+          <View style={styles.header}>
+            <View style={styles.logoRow}>
+              {/* Armoiries Nationales Officielles de Côte d'Ivoire */}
+              <View style={styles.armoiriesWrap}>
+                <Image
+                  source={require('../assets/armoiries-rci.png')}
+                  style={styles.armoiriesLogo}
+                  resizeMode="contain"
+                />
+              </View>
+
+              {/* Logotype QAPRIL */}
+              <View style={styles.logoWrap}>
+                <Image
+                  source={{ uri: 'https://www.qapril.net/logo.png' }}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+
+            <View style={styles.sovereignBadge}>
+              <ShieldCheck size={14} color="#D97706" />
+              <Text style={styles.sovereignBadgeText}>RÉPUBLIQUE DE CÔTE D'IVOIRE</Text>
+            </View>
+
+            <Text style={styles.brandTitle}>QAPRIL</Text>
+            <Text style={styles.subtitle}>
+              Choisissez votre espace
+            </Text>
           </View>
-          
-          <View style={styles.sovereignBadge}>
-            <ShieldCheck size={14} color="#D97706" />
-            <Text style={styles.sovereignBadgeText}>RÉPUBLIQUE DE CÔTE D'IVOIRE</Text>
+
+          {/* ── LES DEUX ESPACES CONVIVIAUX (ICÔNE EN FACE DU TITRE & BOUTON EN DESSOUS) ── */}
+          <View style={styles.cardsWrap}>
+
+            {/* 1. ESPACE LOCATAIRE : Clé en face de "Je suis Locataire", Accéder à mon espace en dessous */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.card,
+                styles.locataireCard,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push({ pathname: '/login', params: { space: 'LOCATAIRE' } })}
+              android_ripple={{ color: '#E0E7FF' }}
+            >
+              {/* Filigrane doux de clé dans la carte */}
+              <View style={styles.cardWatermarkKey} pointerEvents="none">
+                <KeyRound size={86} color="#2C3E6B" strokeWidth={1} style={{ opacity: 0.06 }} />
+              </View>
+
+              <View style={styles.cardHeaderRow}>
+                <View style={[styles.emblemBox, styles.locataireEmblem]}>
+                  <KeyRound size={28} color="#2C3E6B" strokeWidth={2.4} />
+                </View>
+                <View style={styles.cardTitleWrap}>
+                  <Text style={styles.cardRolePillLocataire}>ESPACE LOCATAIRE</Text>
+                  <Text style={styles.cardTitle}>Je suis Locataire</Text>
+                </View>
+              </View>
+
+              <View style={[styles.actionBtn, styles.locataireActionBtn]}>
+                <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
+                <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
+              </View>
+            </Pressable>
+
+            {/* 2. ESPACE BAILLEUR : Maison en face de "Je suis Bailleur", Accéder à mon espace en dessous */}
+            <Pressable
+              style={({ pressed }) => [
+                styles.card,
+                styles.bailleurCard,
+                pressed && styles.cardPressed,
+              ]}
+              onPress={() => router.push({ pathname: '/login', params: { space: 'BAILLEUR' } })}
+              android_ripple={{ color: '#DCFCE7' }}
+            >
+              {/* Filigrane doux de maison dans la carte */}
+              <View style={styles.cardWatermarkHome} pointerEvents="none">
+                <Home size={86} color="#1B4D3E" strokeWidth={1} style={{ opacity: 0.06 }} />
+              </View>
+
+              <View style={styles.cardHeaderRow}>
+                <View style={[styles.emblemBox, styles.bailleurEmblem]}>
+                  <Home size={28} color="#1B4D3E" strokeWidth={2.4} />
+                </View>
+                <View style={styles.cardTitleWrap}>
+                  <Text style={styles.cardRolePillBailleur}>ESPACE BAILLEUR</Text>
+                  <Text style={styles.cardTitle}>Je suis Bailleur</Text>
+                </View>
+              </View>
+
+              <View style={[styles.actionBtn, styles.bailleurActionBtn]}>
+                <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
+                <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
+              </View>
+            </Pressable>
+
           </View>
 
-          <Text style={styles.brandTitle}>QAPRIL</Text>
-          <Text style={styles.subtitle}>
-            Choisissez votre espace
-          </Text>
-        </View>
+          {/* ── PIED DE PAGE DISCRET ── */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              Plateforme certifiée conforme aux lois ivoiriennes
+            </Text>
+            <Text style={styles.footerSubText}>
+              Les agences immobilières agréées opèrent sur qapril.net
+            </Text>
+          </View>
 
-        {/* ── LES DEUX ESPACES CONVIVIAUX (ICÔNE EN FACE DU TITRE & BOUTON EN DESSOUS) ── */}
-        <View style={styles.cardsWrap}>
-          
-          {/* 1. ESPACE LOCATAIRE : Clé en face de "Je suis Locataire", Accéder à mon espace en dessous */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.card,
-              styles.locataireCard,
-              pressed && styles.cardPressed,
-            ]}
-            onPress={() => router.push({ pathname: '/login', params: { space: 'LOCATAIRE' } })}
-            android_ripple={{ color: '#E0E7FF' }}
-          >
-            <View style={styles.cardHeaderRow}>
-              <View style={[styles.emblemBox, styles.locataireEmblem]}>
-                <KeyRound size={28} color="#2C3E6B" strokeWidth={2.4} />
-              </View>
-              <View style={styles.cardTitleWrap}>
-                <Text style={styles.cardRolePillLocataire}>ESPACE LOCATAIRE</Text>
-                <Text style={styles.cardTitle}>Je suis Locataire</Text>
-              </View>
-            </View>
-
-            <View style={[styles.actionBtn, styles.locataireActionBtn]}>
-              <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
-              <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
-            </View>
-          </Pressable>
-
-          {/* 2. ESPACE BAILLEUR : Maison en face de "Je suis Bailleur", Accéder à mon espace en dessous */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.card,
-              styles.bailleurCard,
-              pressed && styles.cardPressed,
-            ]}
-            onPress={() => router.push({ pathname: '/login', params: { space: 'BAILLEUR' } })}
-            android_ripple={{ color: '#DCFCE7' }}
-          >
-            <View style={styles.cardHeaderRow}>
-              <View style={[styles.emblemBox, styles.bailleurEmblem]}>
-                <Home size={28} color="#1B4D3E" strokeWidth={2.4} />
-              </View>
-              <View style={styles.cardTitleWrap}>
-                <Text style={styles.cardRolePillBailleur}>ESPACE BAILLEUR</Text>
-                <Text style={styles.cardTitle}>Je suis Bailleur</Text>
-              </View>
-            </View>
-
-            <View style={[styles.actionBtn, styles.bailleurActionBtn]}>
-              <Text style={styles.actionBtnText}>Accéder à mon espace</Text>
-              <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.4} />
-            </View>
-          </Pressable>
-
-        </View>
-
-        {/* ── PIED DE PAGE DISCRET ── */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Plateforme certifiée conforme aux lois ivoiriennes
-          </Text>
-          <Text style={styles.footerSubText}>
-            Les agences immobilières agréées opèrent sur qapril.net
-          </Text>
-        </View>
-
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  bgContainer: {
+    flex: 1,
+    backgroundColor: '#FAF9F6',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+  },
+  watermarkWrap: {
+    position: 'absolute',
+    top: '18%',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 0,
+  },
+  watermarkArmoiries: {
+    width: 320,
+    height: 320,
+    opacity: 0.055,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -127,32 +182,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexGrow: 1,
     justifyContent: 'center',
+    zIndex: 1,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 28,
+    marginBottom: 26,
     width: '100%',
     maxWidth: 440,
   },
-  logoWrap: {
-    width: 68,
-    height: 68,
-    borderRadius: 20,
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 12,
+  },
+  armoiriesWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 18,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
     borderWidth: 1.5,
     borderColor: '#E2E8F0',
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 3,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
-  logo: {
+  armoiriesLogo: {
     width: 44,
     height: 44,
+  },
+  logoWrap: {
+    width: 60,
+    height: 60,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  logo: {
+    width: 40,
+    height: 40,
   },
   sovereignBadge: {
     flexDirection: 'row',
@@ -189,10 +269,10 @@ const styles = StyleSheet.create({
     gap: 18,
     width: '100%',
     maxWidth: 440,
-    marginBottom: 28,
+    marginBottom: 26,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.94)',
     borderRadius: 22,
     padding: 20,
     borderWidth: 1.5,
@@ -202,6 +282,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 2,
+    overflow: 'hidden',
   },
   cardPressed: {
     transform: [{ scale: 0.985 }],
@@ -212,6 +293,16 @@ const styles = StyleSheet.create({
   },
   bailleurCard: {
     borderColor: '#E2E8F0',
+  },
+  cardWatermarkKey: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
+  },
+  cardWatermarkHome: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
   },
   cardHeaderRow: {
     flexDirection: 'row',

@@ -3,11 +3,11 @@ import { Platform } from 'react-native';
 
 export const APP_NAME = 'QAPRIL';
 export const APP_KEY = 'qapril';
-export const APP_VERSION = '2.1.2';
-export const BUILD_NUMBER = 39;
+export const APP_VERSION = '2.1.3';
+export const BUILD_NUMBER = 40;
 export const BUILD_DATE = '21/11/2026';
-export const BUILD_TIME = '16:42 UTC';
-export const BUILD_TIMESTAMP = '21/11/2026 à 16:42 UTC';
+export const BUILD_TIME = '17:25 UTC';
+export const BUILD_TIMESTAMP = '21/11/2026 à 17:25 UTC';
 
 export interface VersionCheckResult {
   isUpdateAvailable: boolean;
