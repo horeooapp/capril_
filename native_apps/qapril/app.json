@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "QAPRIL",
-    "slug": "qapril",
+    "slug": "proprietaire",
     "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,11 +14,16 @@
     },
     "scheme": "qapril",
     "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/edbe7064-bfd4-4162-99a6-d2c731f1f959",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 5000
+    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "ci.qapril.app",
+      "package": "ci.qapril.proprietaire",
       "allowBackup": false,
       "usesCleartextTraffic": false,
       "softwareKeyboardLayoutMode": "resize",
@@ -64,6 +69,13 @@
       "expo-font",
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "edbe7064-bfd4-4162-99a6-d2c731f1f959"
+      }
+    },
+    "owner": "qapril"
   }
 }
