@@ -97,8 +97,39 @@ export async function POST(request: Request) {
                 }
         });
 
+        const isOwnerAccount = (u: any) => u && (
+            u.role === 'LANDLORD' || u.role === 'AGENCY' ||
+            (u.capaciteActive && ['PROPRIETAIRE', 'AGENCE', 'AGENCE_AGREE', 'AGENCE_NON_AGREE'].includes(u.capaciteActive))
+        );
+
+        if (user && role === 'TENANT' && isOwnerAccount(user)) {
+            return NextResponse.json(
+                { error: "Numéro attribué à un compte propriétaire / agence, veuillez en utiliser un autre." },
+                { status: 403 }
+            );
+        }
+
         // 3. Inscription automatique si nouvel utilisateur
         if (!user) {
+            if (role === 'TENANT' && normalizedPhone) {
+                const existingOwner = await prisma.user.findFirst({
+                    where: {
+                        role: { in: ['LANDLORD', 'AGENCY'] },
+                        OR: [
+                            { phone: normalizedPhone },
+                            { telephones: { some: { numeroE164: normalizedPhone, statut: { not: 'RETIRE' } } } }
+                        ]
+                    },
+                    select: { id: true }
+                });
+                if (existingOwner) {
+                    return NextResponse.json(
+                        { error: "Numéro attribué à un compte propriétaire / agence, veuillez en utiliser un autre." },
+                        { status: 403 }
+                    );
+                }
+            }
+
             let assignedRole: "TENANT" | "LANDLORD" | "AGENCY" = "TENANT";
             let assignedCapacite = "LOCATAIRE";
 

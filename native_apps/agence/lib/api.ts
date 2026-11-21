@@ -147,10 +147,6 @@ export async function logoutAndRedirect(router: any): Promise<void> {
         }
     } catch {}
     try {
-        router.replace('/');
-    } catch {
-        try {
-            router.replace('/(tabs)');
-        } catch {}
-    }
+        router.replace('/(tabs)' as any);
+    } catch {}
 }

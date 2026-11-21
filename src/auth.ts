@@ -223,6 +223,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 eligibleRolesSet.add(reqRole);
                             }
                         } else if (reqRole === 'TENANT') {
+                            const isStrictOwnerOrAgency = isLandlord || isAgency || (user as any).propertiesOwned?.length > 0 || (user as any).mandates?.length > 0;
+                            if (isStrictOwnerOrAgency) {
+                                throw new CustomAuthError("role_conflict_owner");
+                            }
                             if (!eligibleRolesSet.has('TENANT')) {
                                 // Octroi dynamique de l'accès locataire
                                 eligibleRolesSet.add('TENANT');
@@ -290,6 +294,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 : requestedRoleNormalise === "AGENCY"
                                     ? "AGENCY"
                                     : "TENANT";
+
+                        if (roleBase === "TENANT" && normalizedPhone) {
+                            const existingOwner = await prisma.user.findFirst({
+                                where: {
+                                    role: { in: ['LANDLORD', 'AGENCY'] },
+                                    OR: [
+                                        { phone: normalizedPhone },
+                                        { telephones: { some: { numeroE164: normalizedPhone, statut: { not: 'RETIRE' } } } }
+                                    ]
+                                },
+                                select: { id: true }
+                            });
+                            if (existingOwner) {
+                                throw new CustomAuthError("role_conflict_owner");
+                            }
+                        }
 
                         const newUser = await prisma.user.create({
                             data: {

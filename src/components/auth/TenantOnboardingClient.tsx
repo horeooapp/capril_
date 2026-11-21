@@ -97,7 +97,10 @@ export default function TenantOnboardingClient({ session }: TenantOnboardingClie
                 }
             } catch (err: any) {
                 console.error("Client-side error during onboarding:", err);
-                toast.error("Une erreur inattendue est survenue: " + err.message);
+                const safeMsg = err?.message?.includes("prisma") || err?.message?.includes("invocation")
+                    ? "Une erreur technique est survenue. Veuillez vérifier vos informations ou réessayer."
+                    : (err?.message || "Une erreur inattendue est survenue.");
+                toast.error(safeMsg);
             }
         })
     }

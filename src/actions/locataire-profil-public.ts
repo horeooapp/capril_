@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { serializeObject } from "@/lib/serialize"
+import { normalizePhone } from "@/lib/phone"
 
 /**
  * M-PROFIL-LOC : Profil Locataire Autonome
@@ -233,30 +234,92 @@ export async function completeOnboarding(userId: string, data: any) {
     try {
         if (!userId) {
             console.error("[ONBOARDING] Missing userId");
-            return { success: false, error: "Utilisateur non identifié" }
+            return { success: false, error: "Utilisateur non identifié" };
         }
 
-        // Préparer ProfilData pour PostgreSQL
+        // 1. Contrôle d'étanchéité : Vérifier si le compte ou son numéro est déjà attribué à un compte propriétaire / agence
+        const existingUser = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                phone: true,
+                email: true,
+                role: true,
+                capacites: { select: { capacite: true, actif: true } },
+                propertiesOwned: { select: { id: true }, take: 1 },
+                mandates: { select: { id: true }, take: 1 }
+            }
+        });
+
+        if (existingUser) {
+            const userRole = (existingUser.role || '').toUpperCase();
+            const isOwnerOrAgency = 
+                ['LANDLORD', 'PROPRIETAIRE', 'AGENCY', 'AGENCE', 'AGENCE_AGREE', 'AGENCE_NON_AGREE'].includes(userRole) ||
+                existingUser.propertiesOwned.length > 0 ||
+                existingUser.mandates.length > 0 ||
+                existingUser.capacites?.some((c: any) => 
+                    c.actif && ['LANDLORD', 'PROPRIETAIRE', 'AGENCY', 'AGENCE', 'AGENCE_AGREE', 'AGENCE_NON_AGREE'].includes((c.capacite || '').toUpperCase())
+                );
+
+            if (isOwnerOrAgency) {
+                return {
+                    success: false,
+                    error: "Numéro attribué à un compte propriétaire / agence, veuillez en utiliser un autre."
+                };
+            }
+
+            // Vérifier également via user_telephones si le numéro est rattaché à un compte bailleur/agence
+            if (existingUser.phone) {
+                const normPhone = normalizePhone(existingUser.phone);
+                const conflictAccount = await prisma.user.findFirst({
+                    where: {
+                        id: { not: userId },
+                        role: { in: ['LANDLORD', 'AGENCY'] },
+                        OR: [
+                            { phone: existingUser.phone },
+                            { phone: normPhone },
+                            { telephones: { some: { numeroE164: normPhone, statut: { not: 'RETIRE' } } } }
+                        ]
+                    },
+                    select: { id: true }
+                });
+                if (conflictAccount) {
+                    return {
+                        success: false,
+                        error: "Numéro attribué à un compte propriétaire / agence, veuillez en utiliser un autre."
+                    };
+                }
+            }
+        }
+
+        // 2. Préparer strictement ProfilData selon le schéma Prisma LocataireProfilPublic
+        // (Exclut impérativement docType, fileName ou tout champ inconnu de Prisma)
         const profilDataToSave: any = {
-            ...data.profilData,
-            communesSouhaitees: Array.isArray(data.profilData?.communesSouhaitees) ? data.profilData.communesSouhaitees : [],
-            typeLogement: Array.isArray(data.profilData?.typeLogement) ? data.profilData.typeLogement : []
-        }
-        
-        // Supprimer explicitement city s'il est présent pour éviter les erreurs de client non-mis à jour
-        delete profilDataToSave.city;
+            statutRecherche: data.profilData?.statutRecherche || "EN_RECHERCHE",
+            statutPro: data.profilData?.statutPro || null,
+            revenuFourchette: data.profilData?.revenuFourchette || null,
+            employeurType: data.profilData?.employeurType || null,
+            city: data.profilData?.city || null,
+            budgetMaxFcfa: data.profilData?.budgetMaxFcfa ? Math.round(Number(data.profilData.budgetMaxFcfa)) : null,
+            disponibleAPartir: data.profilData?.disponibleAPartir ? new Date(data.profilData.disponibleAPartir) : null,
+            communesSouhaitees: Array.isArray(data.profilData?.communesSouhaitees) ? data.profilData.communesSouhaitees.filter(Boolean) : [],
+            typeLogement: Array.isArray(data.profilData?.typeLogement) ? data.profilData.typeLogement.filter(Boolean) : [],
+            visibilite: (data.profilData?.visibilite === 'TOUS' || data.profilData?.visibilite === 'AGENCES_UNIQUEMENT') 
+                ? data.profilData.visibilite 
+                : 'TOUS'
+        };
 
-        // 1. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
-        const updateData: any = { onboardingComplete: true }
+        // 3. Mettre à jour l'utilisateur (onboardingComplete + infos de base)
+        const updateData: any = { onboardingComplete: true };
         if (data.firstName) updateData.firstName = data.firstName;
         if (data.lastName) updateData.lastName = data.lastName;
-        if (data.email) updateData.email = data.email
+        if (data.email) updateData.email = data.email;
         
         console.log(`[ONBOARDING] Updating user...`);
         await prisma.user.update({
             where: { id: userId },
             data: updateData
-        })
+        });
 
         if ((prisma as any).locataireProfilPublic) {
             console.log(`[ONBOARDING] Upserting public profile...`);
@@ -269,21 +332,28 @@ export async function completeOnboarding(userId: string, data: any) {
                 update: {
                     ...profilDataToSave
                 }
-            })
+            });
         }
 
         console.log(`[ONBOARDING] Action complete, success:true`);
         
-        revalidatePath("/mon-espace-locataire")
-        revalidatePath("/onboarding/tenant")
+        revalidatePath("/mon-espace-locataire");
+        revalidatePath("/onboarding/tenant");
         
-        return { success: true }
+        return { success: true };
     } catch (error: any) {
-        console.error("Error completing onboarding:", error)
+        console.error("Error completing onboarding:", error);
+        let userMessage = "Erreur lors de la finalisation du profil. Veuillez réessayer.";
+        const rawMsg = error?.message || "";
+        if (rawMsg.includes("propriétaire") || rawMsg.includes("agence")) {
+            userMessage = rawMsg;
+        } else if (rawMsg.includes("Unique constraint") || rawMsg.includes("P2002")) {
+            userMessage = "Ce compte ou numéro est déjà enregistré. Veuillez vous connecter.";
+        }
         return { 
             success: false, 
-            error: error.message || "Erreur lors de la finalisation" 
-        }
+            error: userMessage 
+        };
     }
 }
 

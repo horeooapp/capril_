@@ -165,6 +165,7 @@ export async function loginWithOTP(identifier: string, otp: string, role?: strin
         const OTP_ERROR_MESSAGES: Record<string, string> = {
             invalid_otp: "Code OTP incorrect ou expiré.",
             no_valid_role: "Compte sans rôle valide. Veuillez contacter le support.",
+            role_conflict_owner: "Numéro attribué à un compte propriétaire / agence, veuillez en utiliser un autre.",
         };
 
         if (OTP_ERROR_MESSAGES[errorCode]) {
