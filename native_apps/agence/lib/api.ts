@@ -142,10 +142,15 @@ export async function logoutAndRedirect(router: any): Promise<void> {
         await removeStoredToken();
     } catch {}
     try {
-        router.replace('/login');
+        if (router.canDismiss && router.canDismiss()) {
+            router.dismissAll();
+        }
+    } catch {}
+    try {
+        router.replace('/');
     } catch {
         try {
-            router.replace('/');
+            router.replace('/(tabs)');
         } catch {}
     }
 }
